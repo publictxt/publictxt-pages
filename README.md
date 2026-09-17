@@ -27,6 +27,7 @@ Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to
 - `index.md` / `home.md` in a folder → `_index.md` (otherwise Hugo treats the folder as a leaf bundle and hides its sibling pages); folders with no index page at all get a minimal one, so every folder is browsable and appears in breadcrumbs
 - missing `title:` → taken from the first `# H1` (removed from the body), else the filename
 - missing `date:` on blog posts → from a `YYYYMMDD` filename prefix or a `blog/YYYY/MM/DD/` path
+- inline `#hashtags` → links to their tag page (text stays `#hashtag`; code, links and URL fragments are left alone)
 - repo housekeeping files (`README`, `LICENSE`, `CNAME`, `.obsidian/`, …) skipped
 
 Front matter, when present, is preserved.
@@ -59,6 +60,8 @@ scripts/build.sh --serve      # or: .\scripts\build.ps1 -Serve
 ```
 
 Note: Pagefind's index/UI only exists after a full build + `pagefind` run — `hugo server`'s live-reload preview won't have working search until you do a full build once.
+
+If you run `hugo server` by hand, pass `-M` (`--renderToMemory`). Hugo renders the preview to disk by default, overwriting pages in `public/` with dev-mode HTML that points at an unfingerprinted stylesheet — those pages then appear unstyled when the built site is served. The build scripts already pass it; a plain `hugo` build afterwards also repairs any damage.
 
 ## Publishing a content repo (GitHub Pages)
 

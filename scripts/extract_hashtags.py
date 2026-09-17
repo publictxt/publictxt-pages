@@ -6,8 +6,9 @@ Preprocessing step for PublicTxt-Hugo (see SPEC.md).
 
 Scans Markdown files under content/, extracts inline #hashtags from the
 body, and merges them into the front matter `tags` list. Body text is left
-untouched — hashtags remain visible for Obsidian-style reading. Hashtags
-inside fenced code blocks (```) and inline code spans (`...`) are ignored.
+untouched — hashtags remain visible for Obsidian-style reading. What counts
+as a hashtag (and what is skipped: code, links, URLs) is defined once in
+hashtags.py, shared with sync_content.py.
 
 No third-party dependencies (PyYAML etc. deliberately avoided). Only the
 `tags` entry is interpreted — as an inline `[a, b]` list, a block `- a`
@@ -26,27 +27,9 @@ import re
 import sys
 from pathlib import Path
 
-HASHTAG_RE = re.compile(r"(?<!\w)#([A-Za-z][A-Za-z0-9_-]*)")
+from hashtags import find_hashtags
+
 FRONT_MATTER_RE = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
-FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
-INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
-
-
-def strip_code(body: str) -> str:
-    """Remove fenced and inline code spans so hashtags inside code aren't extracted."""
-    body = FENCE_RE.sub("", body)
-    body = INLINE_CODE_RE.sub("", body)
-    return body
-
-
-def extract_hashtags(body: str) -> list[str]:
-    clean = strip_code(body)
-    seen = []
-    for match in HASHTAG_RE.finditer(clean):
-        tag = match.group(1).lower()
-        if tag not in seen:
-            seen.append(tag)
-    return seen
 
 
 KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$")
@@ -109,7 +92,7 @@ def process_file(path: Path) -> bool:
 
     existing_tags, span = parse_tags(fm_text)
 
-    inline_tags = extract_hashtags(body)
+    inline_tags = find_hashtags(body)
     merged = list(dict.fromkeys([*existing_tags, *inline_tags]))  # de-dupe, preserve order
 
     if merged == existing_tags:

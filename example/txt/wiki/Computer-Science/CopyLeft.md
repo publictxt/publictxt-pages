@@ -14,4 +14,6 @@ Coined by [[Richard-Stallman]] — a wikilink, which v1 renders as literal text.
 
 > "Copyleft: all rights reversed."
 
-External: [Wikipedia](https://en.wikipedia.org/wiki/Copyleft)
+External: [Wikipedia](https://en.wikipedia.org/wiki/Copyleft#cite_note-14) — a link whose
+URL fragment must not be mistaken for a tag, and a bare one:
+https://example.org/page/#section
