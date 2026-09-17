@@ -33,6 +33,10 @@ go.work.sum
 
 # Hugo
 public/
+build/
+# Source content repo (separate git repository, cloned/linked here) — root-level only,
+# so this doesn't also swallow example/txt/
+/txt/
 resources/_gen/
 .hugo_build.lock
 hugo_stats.json
