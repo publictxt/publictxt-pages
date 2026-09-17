@@ -101,6 +101,7 @@ Any other front matter keys (`web:`, `web-links:`, `bookmarks:`, …) are passed
 | **`index.md`/`home.md` → `_index.md`** | **sync step** |
 | **`title`/`date` derivation** | **sync step** |
 | **Skipping repo housekeeping files** | **sync step** |
+| **Inline `#hashtag` → link to its tag page** | **sync step** |
 | **Inline `#hashtag` → `tags`** | **hashtag step** |
 | Search, tag facets, tag combinations | Pagefind (post-build) |
 
@@ -119,6 +120,11 @@ Both scripts:
 - Self-contained Python 3, no third-party dependencies
 - Idempotent — safe to re-run
 - Never write to the source repo
+- Share one definition of what an inline hashtag is (`hashtags.py`), so a page's
+  linked hashtags and the tag cloud can never disagree. A hashtag is `#` + letter +
+  letters/digits/`_`/`-`, not preceded by a word character, `/` or `&`, and not inside
+  fenced/inline code, HTML, an existing link, or a URL — a fragment like
+  `…/page/#section` is not a tag. An already-linkified hashtag still counts as that tag.
 
 `sync_content.py`:
 
@@ -126,6 +132,7 @@ Both scripts:
 - Renames `index.md`/`home.md` → `_index.md`; rewrites link destinations pointing at them
 - Creates a minimal `_index.md` (title = folder name) in any folder holding Markdown but no index page, so every folder is a Hugo section: browsable, listed, and present in breadcrumbs
 - Derives `title` and blog `date` as per the front matter contract; preserves existing front matter verbatim
+- Linkifies inline `#hashtags` to `/tags/<tag>/`, leaving the visible text as `#hashtag`. Hugo's embedded link render hook resolves the destination to the term page, so subpath deployments get the right prefix
 - Skips `README*`, `LICENSE*`, `CONTRIBUTING*`, `CNAME`, `.gitignore`, `.obsidian/`, `.git/`, `.trash/`, `*.gitkeep`
 - Copies non-Markdown files verbatim
 
@@ -133,7 +140,6 @@ Both scripts:
 
 - Single responsibility: scan body, extract `#hashtag`, merge into front matter `tags`, dedupe, create front matter if absent
 - Must **not** strip hashtags from body text (they stay visible for Obsidian-style reading)
-- Must skip hashtags inside fenced/inline code blocks
 - Interprets only the `tags` key (inline, block, or scalar form); every other front matter line passes through
 
 ## Build pipeline

@@ -16,6 +16,8 @@ normalising the few things Hugo cannot handle natively:
     `_index.md` so Hugo's embedded link render hook can resolve them.
   * Folders containing Markdown but no index page get a minimal `_index.md`
     (title = folder name) so every folder is a browsable section.
+  * Inline `#hashtags` become links to their tag page (see hashtags.py for what
+    counts as one — code, links and URL fragments are left alone).
 
 Repo housekeeping files (README, LICENSE, CONTRIBUTING, CNAME, .obsidian,
 .git, .trash, *.gitkeep) are skipped. Non-Markdown files (media) are copied
@@ -32,6 +34,8 @@ import re
 import shutil
 import sys
 from pathlib import Path
+
+from hashtags import linkify
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
@@ -82,6 +86,8 @@ def yaml_str(s: str) -> str:
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+
+
 def normalise_md(text: str, rel: str) -> str:
     fm, body = split_front_matter(text)
     name = Path(rel).name
@@ -102,6 +108,7 @@ def normalise_md(text: str, rel: str) -> str:
             added.append(f"date: {d}")
 
     body = INDEX_LINK_RE.sub(r"\1_index.md\2)", body)
+    body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
     if not fm_lines:
