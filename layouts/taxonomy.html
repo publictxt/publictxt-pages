@@ -1,7 +1,7 @@
 {{ define "main" }}
 <header class="list-header">
   <h1>{{ .Title }}</h1>
-  <p class="muted">All tags across the repository. For tag <em>combinations</em>, use <a href="{{ "search/" | relURL }}">search</a> — filters there intersect.</p>
+  <p class="muted">All tags across the repository. For tag <em>combinations</em>, use <a href="{{ "search/" | relURL }}">search</a> — pick several tags there, with or without a search term.</p>
 </header>
 {{ partial "tag-cloud.html" (dict "limit" 0) }}
 {{ end }}

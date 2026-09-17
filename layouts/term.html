@@ -2,7 +2,7 @@
 <header class="list-header">
   <h1><span class="muted">#</span>{{ .Title }}</h1>
   <p class="muted">{{ len .Pages }} page{{ if ne (len .Pages) 1 }}s{{ end }} tagged
-    — combine with other tags in <a href="{{ "search/" | relURL }}">search</a>.</p>
+    — <a href="{{ "search/" | relURL }}?tag={{ .Data.Term | urlquery }}">combine with other tags in search</a>.</p>
 </header>
 {{ partial "page-list.html" (dict "pages" .Pages.ByTitle) }}
 {{ end }}

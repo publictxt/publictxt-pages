@@ -146,11 +146,12 @@ Wrapped by `scripts/build.sh` / `scripts/build.ps1`, which take the source repo 
 
 ## Search / filter (Pagefind)
 
-- Full-text search plus faceted filtering
+- Full-text search plus faceted filtering, **with or without a search term** — selecting tags alone browses by tag combination
 - Facets driven by `data-pagefind-filter` attributes emitted in templates (`tag`, `type`)
-- Tag **combinations** handled by Pagefind's multi-filter support — Hugo taxonomies cannot express intersections
+- Tag **combinations** are AND-ed via Pagefind's multi-filter support — Hugo taxonomies cannot express intersections. `type` is single-select.
+- Custom UI (`layouts/search.html`) on the Pagefind JS API rather than Pagefind's stock UI, which cannot run filter-only searches. Filter counts reflect the current result set; results show clickable tag chips.
+- URL state: `/search/?q=…&tag=a&tag=b&type=wiki` — tag pages deep-link into it (`/tags/foo/` → "combine with other tags"); the header search box submits `?q=`
 - Hugo taxonomy pages remain as a separate native browse path (`/tags/foo/`); these are two independent mechanisms over the same data, not one system
-- `?q=` on `/search/` pre-fills the query (header search box submits there)
 
 ## Theme
 
