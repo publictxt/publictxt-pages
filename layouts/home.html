@@ -1,0 +1,30 @@
+{{ define "main" }}
+<section class="hero">
+  <h1>{{ site.Title }}</h1>
+  <p class="lead">{{ with .Content }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}</p>
+</section>
+
+<section class="home-sections">
+  <h2>Browse</h2>
+  <div class="card-grid">
+    {{ range site.Sections }}
+    <a class="card" href="{{ .RelPermalink }}">
+      <h3>{{ .Title }}</h3>
+      <p class="muted">{{ len .RegularPagesRecursive }} page{{ if ne (len .RegularPagesRecursive) 1 }}s{{ end }}</p>
+    </a>
+    {{ end }}
+    <a class="card card-accent" href="{{ "search/" | relURL }}">
+      <h3>Search</h3>
+      <p class="muted">Full-text search with tag &amp; type filters</p>
+    </a>
+  </div>
+</section>
+
+{{ $recent := first 8 site.RegularPages.ByDate.Reverse }}
+{{ with $recent }}
+<section class="home-recent">
+  <h2>Recent</h2>
+  {{ partial "page-list.html" (dict "pages" .) }}
+</section>
+{{ end }}
+{{ end }}

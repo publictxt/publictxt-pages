@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-title" href="{{ site.Home.RelPermalink }}">
+        <span class="site-title-mark">▤</span> {{ site.Title }}
+      </a>
+      <form class="header-search" action="{{ "search/" | relURL }}" method="get" role="search">
+        <input type="search" name="q" placeholder="Search…" aria-label="Search the site">
+      </form>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      {{ partial "sidebar.html" . }}
+    </aside>
+    <main class="content">
+      {{ block "main" . }}{{ end }}
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>{{ site.Title }} — plain-text knowledge, published with Hugo + Pagefind.</p>
+  </footer>
+</body>
+</html>

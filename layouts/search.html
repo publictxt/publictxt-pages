@@ -1,0 +1,37 @@
+{{ define "main" }}
+<header class="list-header">
+  <h1>Search</h1>
+  <p class="muted">Full-text search with faceted filters. Select multiple tags to find pages matching <em>all</em> of them.</p>
+</header>
+
+<link rel="stylesheet" href="{{ "pagefind/pagefind-ui.css" | relURL }}">
+<div id="search" class="pagefind-wrap"></div>
+<noscript><p class="muted">Search requires JavaScript.</p></noscript>
+<p id="search-unavailable" class="muted" hidden>
+  The search index has not been built yet. Run a full build:
+  <code>hugo &amp;&amp; npx pagefind --site public</code> — search is unavailable under
+  <code>hugo server</code> live preview until then.
+</p>
+
+<script>
+  (function () {
+    var s = document.createElement("script");
+    s.src = {{ "pagefind/pagefind-ui.js" | relURL }};
+    s.onload = function () {
+      var ui = new PagefindUI({
+        element: "#search",
+        showSubResults: true,
+        showImages: false,
+        pageSize: 10,
+        translations: { placeholder: "Search pages…" }
+      });
+      var q = new URLSearchParams(window.location.search).get("q");
+      if (q) { ui.triggerSearch(q); }
+    };
+    s.onerror = function () {
+      document.getElementById("search-unavailable").hidden = false;
+    };
+    document.head.appendChild(s);
+  })();
+</script>
+{{ end }}

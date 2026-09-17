@@ -1,0 +1,8 @@
+{{ define "main" }}
+<header class="list-header">
+  <h1><span class="muted">#</span>{{ .Title }}</h1>
+  <p class="muted">{{ len .Pages }} page{{ if ne (len .Pages) 1 }}s{{ end }} tagged
+    — combine with other tags in <a href="{{ "search/" | relURL }}">search</a>.</p>
+</header>
+{{ partial "page-list.html" (dict "pages" .Pages.ByTitle) }}
+{{ end }}

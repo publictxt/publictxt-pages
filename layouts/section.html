@@ -1,0 +1,19 @@
+{{ define "main" }}
+<header class="list-header">
+  <h1>{{ .Title }}</h1>
+  {{ with .Content }}<div class="list-intro">{{ . }}</div>{{ end }}
+</header>
+
+{{ $pages := .RegularPagesRecursive }}
+{{ if eq .Section "blog" }}
+  {{ $pages = $pages.ByDate.Reverse }}
+{{ else }}
+  {{ $pages = $pages.ByTitle }}
+{{ end }}
+
+{{ if $pages }}
+  {{ partial "page-list.html" (dict "pages" $pages) }}
+{{ else }}
+  <p class="muted">No pages in this section yet.</p>
+{{ end }}
+{{ end }}

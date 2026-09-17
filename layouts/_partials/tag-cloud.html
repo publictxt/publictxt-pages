@@ -1,0 +1,12 @@
+{{ $limit := .limit | default 0 }}
+{{ $terms := site.Taxonomies.tags.ByCount }}
+{{ if gt $limit 0 }}{{ $terms = first $limit $terms }}{{ end }}
+{{ $max := 1 }}
+{{ with index $terms 0 }}{{ $max = .Count }}{{ end }}
+<div class="tag-cloud">
+  {{ range $terms }}
+  {{ $weight := math.Ceil (mul 4 (div (float .Count) $max)) }}
+  <a class="chip tag-w{{ $weight }}" href="{{ .Page.RelPermalink }}" title="{{ .Count }} page{{ if ne .Count 1 }}s{{ end }}">#{{ .Page.LinkTitle }}<span class="count">{{ .Count }}</span></a>
+  {{ end }}
+  {{ if not $terms }}<p class="muted">No tags yet.</p>{{ end }}
+</div>

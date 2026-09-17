@@ -1,0 +1,42 @@
+<nav class="side-block" aria-label="Sections">
+  <h2 class="side-heading">Sections</h2>
+  <ul class="section-list">
+    {{ $current := . }}
+    {{ range site.Sections }}
+    <li class="{{ if eq $current.FirstSection . }}active{{ end }}">
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      <span class="count">{{ len .RegularPagesRecursive }}</span>
+    </li>
+    {{ end }}
+    <li class="{{ if eq .Layout "search" }}active{{ end }}">
+      <a href="{{ "search/" | relURL }}">Search</a>
+    </li>
+  </ul>
+</nav>
+
+{{ if and .IsPage (ne .Layout "search") }}
+<div class="side-block page-meta" aria-label="Page metadata">
+  <h2 class="side-heading">This page</h2>
+  <dl class="meta-list">
+    <dt>Type</dt>
+    {{/* type defaults to section but can be overridden; only link when a section page exists */}}
+    {{ $typePage := site.GetPage .Type }}
+    <dd>{{ with $typePage }}<a class="chip chip-type" href="{{ .RelPermalink }}">{{ $.Type }}</a>{{ else }}<span class="chip chip-type">{{ .Type }}</span>{{ end }}</dd>
+    {{ if not .Date.IsZero }}
+    <dt>Date</dt>
+    <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006, 15:04" }}</time></dd>
+    {{ end }}
+    {{ with .GetTerms "tags" }}
+    <dt>Tags</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip" href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a>{{ end }}
+    </dd>
+    {{ end }}
+  </dl>
+</div>
+{{ end }}
+
+<div class="side-block" aria-label="Top tags">
+  <h2 class="side-heading"><a href="{{ "tags/" | relURL }}">Tags</a></h2>
+  {{ partial "tag-cloud.html" (dict "limit" (site.Params.tagCloudLimit | default 20)) }}
+</div>

@@ -1,0 +1,29 @@
+baseURL = "https://example.org/"
+title = "PublicTxt"
+enableRobotsTXT = true
+capitalizeListTitles = false
+
+# Section folders (wiki, blog, notes, metaweb) become sections natively.
+# `type:` in front matter overrides the folder-derived default (Hugo .Type).
+
+[taxonomies]
+  tag = "tags"
+
+[params]
+  description = "A PublicTxt repository — browsable, searchable, plain-text first."
+  # Number of tags shown in the sidebar tag cloud
+  tagCloudLimit = 20
+
+[markup]
+  [markup.goldmark.renderHooks.link]
+    # Embedded link render hook: resolves relative `.md` link destinations
+    # (Obsidian "relative path to file" links) to page URLs natively.
+    useEmbedded = "fallback"
+  [markup.highlight]
+    style = "github-dark"
+    lineNos = false
+    tabWidth = 4
+
+[outputs]
+  home = ["html"]
+  section = ["html"]
