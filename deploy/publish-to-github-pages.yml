@@ -1,0 +1,73 @@
+# Publish a PublicTxt content repo with PublicTxt-Hugo via GitHub Pages.
+#
+# Copy this file into the CONTENT repo (e.g. jaysen/txt) as
+#   .github/workflows/publish.yml
+# and in that repo's Settings -> Pages set "Source" to "GitHub Actions"
+# (the custom domain stays configured there; the CNAME file is no longer needed).
+#
+# The content repo stays pure Markdown — the site generator lives in its own
+# repo and is checked out at build time, so upgrading the site is a one-line
+# ref change below.
+
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out content
+        uses: actions/checkout@v4
+        with:
+          path: txt
+
+      - name: Check out PublicTxt-Hugo
+        uses: actions/checkout@v4
+        with:
+          repository: publictxt/txt-hugo   # <- adjust to wherever this repo lives
+          ref: main                        # pin to a tag for reproducible builds
+          path: site
+
+      - name: Set up Hugo (extended)
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.166.0"
+          extended: true
+
+      - name: Set up Node (for Pagefind)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build
+        env:
+          HUGO_BASEURL: https://jaysen.co.za/
+        run: sh site/scripts/build.sh ../txt
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
