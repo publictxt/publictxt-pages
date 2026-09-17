@@ -1,19 +1,24 @@
 # PublicTxt-Hugo — v1 Spec
 
 Static site interface for browsing/searching a single PublicTxt (or plain Obsidian) Markdown repository. Hugo + Pagefind.
-Dark theme.
-Good Search and Browse useability.
+Dark theme. Good search and browse usability.
 
+## Architecture principle (revised twice)
 
-## Architecture principle (revised)
+**Hugo-native first; one small sync/normalise step; no PublicTxt.Syntax dependency.**
 
-**Hugo-native first; minimal standalone preprocessing; no PublicTxt.Syntax dependency.**
+This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively.
 
-This repo must work against a Markdown wiki using relative links, with no .NET toolchain present. Everything Hugo can do natively is done natively. Exactly one preprocessing step exists (hashtag extraction), implemented as a small self-contained script in this repo.
+The original intent was "exactly one preprocessing step (hashtag extraction)". Testing against a real repo showed that is not enough — see *Why a sync step is unavoidable* below. v1 therefore has **one preprocessing stage in two scripts**:
 
-Rationale: keeps `publictxt-hugo` independently useful and testable, avoids coupling the static-site layer to the .NET solution's release cycle.
+1. `scripts/sync_content.py` — copy the source repo to a generated content dir and normalise what Hugo cannot handle
+2. `scripts/extract_hashtags.py` — merge inline `#hashtags` into front matter `tags`
 
-## Authoring constraint (important)
+The source repository is **never modified**; both scripts operate on the generated copy.
+
+Rationale: keeps `publictxt-hugo` independently useful and testable, avoids coupling the static-site layer to the .NET solution's release cycle, and keeps authors' repos free of generator-specific front matter.
+
+## Authoring constraint
 
 Obsidian must be configured to:
 
@@ -22,57 +27,85 @@ Obsidian must be configured to:
 
 This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded link render hook resolves `.md` destinations to page URLs natively, and the same links remain valid browsing the repo directly on GitHub/GitLab.
 
-`[[wikilink]]` syntax is **not supported in v1** — Hugo has no native support and upstream has declined to add it. Revisit only if authoring friction proves unacceptable.
+`[[wikilink]]` syntax is **not supported in v1** — they render as literal text. Hugo has no native support and upstream has declined to add it. Real repos do contain legacy wikilinks; converting them at sync time is a v2 candidate (the sync step already rewrites link destinations, so the hook exists).
 
 ## Scope (v1)
 
-- Single repo, full structure: `wiki/`, `blog/`, `notes/`, `metaweb/`
-- Extract inline `#hashtags` → merge into front matter `tags` (preprocessing step)
+- Single repo, full structure: `wiki/`, `blog/`, `notes/`, `metaweb/`, plus any other top-level folder (e.g. `posts/`) as a section
+- Root-level pages (`Projects.md`, …) published as plain pages outside any section
+- Extract inline `#hashtags` → merge into front matter `tags`
 - Facets for search + browsing: tags, tag combinations, document type
-- Sections listed in sidebar
+- Sections listed in sidebar (folder-derived names, not the index page's H1)
 - Tag cloud / top tags in sidebar
-- Content pages show meta info in sidebar
+- Content pages show meta info (type, date, tags) in sidebar
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
 
-## Content structure
+## Content structure — what real repos look like
 
-``` txt
-content/
+```txt
+<repo>/
+  index.md                       home page
+  Projects.md, online-things.md  root-level pages
   wiki/
+    index.md                     folder index (becomes section page)
+    Computer-Science/index.md    nested folders, each with its own index.md
+    Science/brain/Consciousness.md
+    Projects/PublicTxt/Other Software.md     spaces in names
   blog/
-    <year>/<month>/          e.g. 20260920-1-blog-title.md
-  notes/
-  metaweb/
-    <domain>/<subdomain-or-folder>/   e.g. resource-based-file.md
+    index.md
+    2023/12/17/20231217.md       date from path
+    2023/12/17/another-post.md   date from path
+    2024/home.md                 home.md as folder index
+    2024/20241013-title.md       date from YYYYMMDD- prefix
+    20260509-title.md            date from YYYYMMDD- prefix
+  notes/home.md, notes/Info politics/The WhatsApp Mess . 20240816.md
+  metaweb/sites/<domain>/<page>.md, metaweb/wiki/Obsidian.md.md
+  posts/index.md                 empty section
+  media/                         non-Markdown assets, copied verbatim
+  README.md LICENSE CNAME .obsidian/ .gitkeep   skipped
 ```
 
-- Section = folder = default `type`
+- Section = top-level folder = default `type`
+- Any folder may carry an `index.md` or `home.md` as its landing page
 - `metaweb/` entries are one-file-per-resource, rendered as normal pages (single-author-per-repo assumption; cross-repo aggregation is out of scope)
+- `example/txt/` in this repo is a synthetic repo exhibiting all of the above and is the default build source
 
 ## Front matter contract
 
+Everything is optional. Where absent, the sync step derives it:
+
 ```yaml
-title: string
-type: string          # optional — overrides folder-derived default
-tags: [string]         # merged: authored tags + extracted inline #hashtags
-author: string          # carried; not filterable in v1
-source_repo: string     # carried; not filterable in v1
-date: string             # blog only — full ISO 8601 datetime
+title: string        # else: first `# H1` in the body (removed from body), else filename
+type: string         # optional — overrides folder-derived default
+tags: [string]       # inline `[a, b]` or block `- a` list; merged with extracted #hashtags, rewritten inline
+date: string         # blog: else derived from YYYYMMDD filename prefix or blog/YYYY/MM/DD/ path
+author: string       # carried; not filterable in v1
+source_repo: string  # carried; not filterable in v1
 ```
 
-**Note on `date`/`time`**: use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate `date` and `time` fields. Hugo sorts and builds permalinks from `.Date` only; a separate `time` param would require custom sort logic and wouldn't participate in native ordering.
+Any other front matter keys (`web:`, `web-links:`, `bookmarks:`, …) are passed through untouched.
+
+**Note on `date`/`time`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate `date` and `time` fields. Hugo sorts and builds permalinks from `.Date` only. Derived dates are date-only; posts with no derivable date sort last.
 
 ## What is native vs. preprocessed
 
 | Concern | Mechanism |
 |---|---|
-| Relative `.md` link resolution | Hugo embedded link render hook — native |
-| URL-friendly URLs from filenames | Hugo urlize / `slug:` — native, no file renaming |
+| Relative `.md` link resolution | Hugo embedded link render hook (`useEmbedded = "fallback"`) — native |
+| URL-friendly URLs from filenames (spaces, dots, case) | Hugo urlize — native, no file renaming |
 | Type from folder + `type:` override | Hugo section + front matter — native |
 | Sections, tag cloud, meta sidebar | Hugo templates — native |
 | Blog ordering / permalinks | Hugo `.Date` — native |
-| **Inline `#hashtag` → `tags`** | **Preprocessing script — the only non-native step** |
+| Tag browse pages `/tags/foo/` | Hugo taxonomy — native |
+| **`index.md`/`home.md` → `_index.md`** | **sync step** |
+| **`title`/`date` derivation** | **sync step** |
+| **Skipping repo housekeeping files** | **sync step** |
+| **Inline `#hashtag` → `tags`** | **hashtag step** |
 | Search, tag facets, tag combinations | Pagefind (post-build) |
+
+### Why a sync step is unavoidable
+
+Hugo treats any folder containing `index.md` as a **leaf bundle**: sibling `.md` files become page *resources* and are not rendered as pages. Real repos use `index.md` (and `home.md`) as folder landing pages throughout the wiki. There is no Hugo configuration that changes this; the file must be renamed to `_index.md`. Once a copy step exists, deriving `title`/`date` there is cheaper and more robust than template-side hacks (which could never fix sort order anyway).
 
 ### Why hashtag extraction can't be native
 
@@ -80,37 +113,61 @@ Hugo builds taxonomies from front matter before content rendering. Templates can
 
 ### Preprocessing script requirements
 
-- Self-contained, no .NET dependency (language TBD — Go, Python, or shell)
-- Single responsibility: scan body, extract `#hashtag`, merge into front matter `tags`, dedupe
+Both scripts:
+
+- Self-contained Python 3, no third-party dependencies
+- Idempotent — safe to re-run
+- Never write to the source repo
+
+`sync_content.py`:
+
+- Wipes and recreates the destination (`build/content/`, gitignored)
+- Renames `index.md`/`home.md` → `_index.md`; rewrites link destinations pointing at them
+- Derives `title` and blog `date` as per the front matter contract; preserves existing front matter verbatim
+- Skips `README*`, `LICENSE*`, `CONTRIBUTING*`, `CNAME`, `.gitignore`, `.obsidian/`, `.git/`, `.trash/`, `*.gitkeep`
+- Copies non-Markdown files verbatim
+
+`extract_hashtags.py`:
+
+- Single responsibility: scan body, extract `#hashtag`, merge into front matter `tags`, dedupe, create front matter if absent
 - Must **not** strip hashtags from body text (they stay visible for Obsidian-style reading)
 - Must skip hashtags inside fenced/inline code blocks
-- Idempotent — safe to re-run
+- Interprets only the `tags` key (inline, block, or scalar form); every other front matter line passes through
 
 ## Build pipeline
 
-``` txt
-preprocess (hashtag merge)  →  hugo build  →  pagefind --site public
+```txt
+sync (repo → build/content)  →  hashtag merge  →  hugo build  →  pagefind --site public
 ```
 
-Order is mandatory. Pagefind indexes rendered HTML; Hugo must run first.
+Order is mandatory. Pagefind indexes rendered HTML; Hugo must run first. `public/` is removed before each build because Hugo does not delete stale pages.
+
+Wrapped by `scripts/build.sh` / `scripts/build.ps1`, which take the source repo path (default `example/txt`) and honour `HUGO_BASEURL`.
 
 ## Search / filter (Pagefind)
 
 - Full-text search plus faceted filtering
-- Facets driven by `data-pagefind-filter` attributes emitted in templates (tags, type)
+- Facets driven by `data-pagefind-filter` attributes emitted in templates (`tag`, `type`)
 - Tag **combinations** handled by Pagefind's multi-filter support — Hugo taxonomies cannot express intersections
 - Hugo taxonomy pages remain as a separate native browse path (`/tags/foo/`); these are two independent mechanisms over the same data, not one system
+- `?q=` on `/search/` pre-fills the query (header search box submits there)
 
 ## Theme
 
-- Layout: content area + sidepane (sections, tag cloud, filters, search, page meta)
-- Requires Hugo **extended** (SCSS pipeline)
-- Thin vertical slice first
+- Layout: sticky header with search box; sidebar (sections, page meta, tag cloud) + content area
+- Dark palette in CSS custom properties; responsive (sidebar drops below content on narrow screens)
+- Requires Hugo **extended** (SCSS pipeline; currently libsass — migrate to Dart Sass when available)
+
+## Deployment
+
+The content repo stays pure Markdown. A GitHub Actions workflow in the **content** repo checks out this repo alongside it, runs the pipeline, and deploys `public/` with `actions/deploy-pages`. See `deploy/publish-to-github-pages.yml`.
 
 ## Deferred to v2+
 
+- `[[wikilink]]` conversion at sync time
 - `author` / `source_repo` as active filters
 - Cross-repo aggregation of `metaweb/` resources (needs resource-identity/normalization decision)
 - Multi-repo subscription/fan-in
 - Backlinks / graph view
 - Tag co-occurrence / relatedness
+- Dart Sass migration
