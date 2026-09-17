@@ -4,15 +4,14 @@
   {{ with .Content }}<div class="list-intro">{{ . }}</div>{{ end }}
 </header>
 
-{{ $pages := .RegularPagesRecursive }}
-{{ if eq .Section "blog" }}
-  {{ $pages = $pages.ByDate.Reverse }}
-{{ else }}
-  {{ $pages = $pages.ByTitle }}
-{{ end }}
-
+{{/* Every page now carries a date (see scripts/dates.py), so recency is the
+     ordering for every section rather than a blog-only special case. */}}
+{{ $pages := .RegularPagesRecursive.ByDate.Reverse }}
 {{ if $pages }}
+<section class="list-recent">
+  <h2>Recent <span class="muted">({{ len $pages }} page{{ if ne (len $pages) 1 }}s{{ end }}, newest first)</span></h2>
   {{ partial "page-list.html" (dict "pages" $pages) }}
+</section>
 {{ else }}
   <p class="muted">No pages in this section yet.</p>
 {{ end }}

@@ -4,10 +4,7 @@
     <h1>{{ .Title }}</h1>
     <div class="single-meta">
       <span class="chip chip-type" data-pagefind-filter="type">{{ .Type }}</span>
-      {{ if not .Date.IsZero }}
-      <time class="muted" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}"
-            data-pagefind-meta="date">{{ .Date.Format "2 Jan 2006" }}</time>
-      {{ end }}
+      {{ partial "page-date.html" (dict "page" . "detail" true) }}
       {{ range .GetTerms "tags" }}
       <a class="chip" href="{{ .RelPermalink }}" data-pagefind-filter="tag">{{ .LinkTitle }}</a>
       {{ end }}

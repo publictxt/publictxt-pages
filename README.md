@@ -26,7 +26,10 @@ Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to
 
 - `index.md` / `home.md` in a folder → `_index.md` (otherwise Hugo treats the folder as a leaf bundle and hides its sibling pages); folders with no index page at all get a minimal one, so every folder is browsable and appears in breadcrumbs
 - missing `title:` → taken from the first `# H1` (removed from the body), else the filename
-- missing `date:` on blog posts → from a `YYYYMMDD` filename prefix or a `blog/YYYY/MM/DD/` path
+- missing `date:` → **every** page gets one: a date in the filename/path, else the file's
+  last Git commit time, else its mtime, else the build time. The rung used is recorded as
+  `date_source:`, so an inferred date is shown as *Updated 13 Oct 2024* rather than passed
+  off as a publication date. Section indexes inherit their newest descendant's date.
 - inline `#hashtags` → links to their tag page (text stays `#hashtag`; code, links and URL fragments are left alone)
 - repo housekeeping files (`README`, `LICENSE`, `CNAME`, `.obsidian/`, …) skipped
 

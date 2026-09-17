@@ -233,8 +233,11 @@ a:hover { text-decoration: underline; }
 
 .card-accent { border-color: var(--accent-soft); background: var(--accent-soft); }
 
-.home-sections, .home-recent { margin-top: 2rem; }
-.home-sections h2, .home-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
+.home-sections, .home-recent, .list-recent { margin-top: 2rem; }
+.home-sections h2, .home-recent h2, .list-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
+.list-recent h2 .muted { font-size: 0.85rem; font-weight: 400; }
+/* Section cards carry the newest date of their contents — keep it quiet. */
+.card time { display: block; font-size: 0.8rem; margin-top: 0.2rem; }
 
 /* ---------- Breadcrumbs ---------- */
 
