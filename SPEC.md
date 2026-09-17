@@ -36,6 +36,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Extract inline `#hashtags` → merge into front matter `tags`
 - Facets for search + browsing: tags, tag combinations, document type
 - Sections listed in sidebar (folder-derived names, not the index page's H1)
+- Breadcrumbs on every page except home (`Home › Wiki › Science › Brain › Page`), built from Hugo's native `.Ancestors`; section crumbs use folder names, numeric date folders stay literal
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
@@ -123,6 +124,7 @@ Both scripts:
 
 - Wipes and recreates the destination (`build/content/`, gitignored)
 - Renames `index.md`/`home.md` → `_index.md`; rewrites link destinations pointing at them
+- Creates a minimal `_index.md` (title = folder name) in any folder holding Markdown but no index page, so every folder is a Hugo section: browsable, listed, and present in breadcrumbs
 - Derives `title` and blog `date` as per the front matter contract; preserves existing front matter verbatim
 - Skips `README*`, `LICENSE*`, `CONTRIBUTING*`, `CNAME`, `.gitignore`, `.obsidian/`, `.git/`, `.trash/`, `*.gitkeep`
 - Copies non-Markdown files verbatim

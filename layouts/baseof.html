@@ -20,6 +20,7 @@
       {{ partial "sidebar.html" . }}
     </aside>
     <main class="content">
+      {{ partial "breadcrumbs.html" . }}
       {{ block "main" . }}{{ end }}
     </main>
   </div>

@@ -1,0 +1,11 @@
+{{- /* Short label for a page in a breadcrumb trail. Sections use their folder
+       name (authors title _index pages freely — "wiki home"), matching the sidebar. */ -}}
+{{- if .IsHome -}}Home
+{{- else if eq .Kind "section" -}}
+  {{- $b := path.Base .Path -}}
+  {{- /* humanize ordinalises numbers ("2023rd") — keep date folders literal */ -}}
+  {{- if findRE `^\d+$` $b }}{{ $b }}{{ else }}{{ $b | humanize }}{{ end -}}
+{{- else if eq .Kind "taxonomy" -}}{{ .Title | humanize }}
+{{- else if eq .Kind "term" -}}#{{ .Data.Term }}
+{{- else -}}{{ .Title }}
+{{- end -}}

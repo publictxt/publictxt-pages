@@ -236,6 +236,30 @@ a:hover { text-decoration: underline; }
 .home-sections, .home-recent { margin-top: 2rem; }
 .home-sections h2, .home-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
 
+/* ---------- Breadcrumbs ---------- */
+
+.breadcrumbs { margin-bottom: 0.9rem; font-size: 0.85rem; }
+.breadcrumbs ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+  color: var(--text-muted);
+}
+.breadcrumbs li + li::before { content: "›"; margin-right: 0.4rem; color: var(--border); }
+.breadcrumbs a { color: var(--text-muted); }
+.breadcrumbs a:hover { color: var(--accent); text-decoration: none; }
+.breadcrumbs [aria-current="page"] {
+  color: var(--text);
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ---------- Lists ---------- */
 
 .list-header { margin-bottom: 1.4rem; }

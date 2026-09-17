@@ -14,6 +14,8 @@ normalising the few things Hugo cannot handle natively:
     prefix or a `blog/YYYY/MM/DD/` path.
   * Link destinations pointing at `index.md` / `home.md` are rewritten to
     `_index.md` so Hugo's embedded link render hook can resolve them.
+  * Folders containing Markdown but no index page get a minimal `_index.md`
+    (title = folder name) so every folder is a browsable section.
 
 Repo housekeeping files (README, LICENSE, CONTRIBUTING, CNAME, .obsidian,
 .git, .trash, *.gitkeep) are skipped. Non-Markdown files (media) are copied
@@ -135,7 +137,25 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, target)
             other_count += 1
+
+    md_count += add_missing_indexes(dest)
     return md_count, other_count
+
+
+def add_missing_indexes(dest: Path) -> int:
+    """
+    Give every folder that contains Markdown (at any depth) an `_index.md` if it
+    has none. Hugo only treats a folder as a section — browsable, and present in
+    breadcrumbs — when it has one; nested wiki folders usually don't.
+    """
+    created = 0
+    for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
+        if (d / "_index.md").exists() or not any(d.rglob("*.md")):
+            continue
+        title = d.name.replace("-", " ").replace("_", " ").strip()
+        (d / "_index.md").write_text(f"---\ntitle: {yaml_str(title)}\n---\n", encoding="utf-8")
+        created += 1
+    return created
 
 
 def main():

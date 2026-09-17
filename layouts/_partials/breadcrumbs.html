@@ -1,0 +1,15 @@
+{{- if not .IsHome -}}
+{{- $trail := .Ancestors.Reverse | append . -}}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {{- range $i, $p := $trail -}}
+    {{- $label := partial "crumb-label.html" $p -}}
+    {{- if eq $i (sub (len $trail) 1) -}}
+    <li aria-current="page">{{ $label }}</li>
+    {{- else -}}
+    <li><a href="{{ $p.RelPermalink }}">{{ $label }}</a></li>
+    {{- end -}}
+    {{- end -}}
+  </ol>
+</nav>
+{{- end -}}

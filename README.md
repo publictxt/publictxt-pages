@@ -24,7 +24,7 @@ The build takes a PublicTxt repo directory as input — by default `example/txt/
 
 Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to `build/content/` (mounted as Hugo's content, together with the site-owned `site-content/` that holds the search page), normalising what Hugo can't handle natively:
 
-- `index.md` / `home.md` in a folder → `_index.md` (otherwise Hugo treats the folder as a leaf bundle and hides its sibling pages)
+- `index.md` / `home.md` in a folder → `_index.md` (otherwise Hugo treats the folder as a leaf bundle and hides its sibling pages); folders with no index page at all get a minimal one, so every folder is browsable and appears in breadcrumbs
 - missing `title:` → taken from the first `# H1` (removed from the body), else the filename
 - missing `date:` on blog posts → from a `YYYYMMDD` filename prefix or a `blog/YYYY/MM/DD/` path
 - repo housekeeping files (`README`, `LICENSE`, `CNAME`, `.obsidian/`, …) skipped
