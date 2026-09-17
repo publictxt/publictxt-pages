@@ -4,7 +4,8 @@
     {{ $current := . }}
     {{ range site.Sections }}
     <li class="{{ if eq $current.FirstSection . }}active{{ end }}">
-      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
+      <a href="{{ .RelPermalink }}">{{ .Section | humanize }}</a>
       <span class="count">{{ len .RegularPagesRecursive }}</span>
     </li>
     {{ end }}
@@ -24,7 +25,7 @@
     <dd>{{ with $typePage }}<a class="chip chip-type" href="{{ .RelPermalink }}">{{ $.Type }}</a>{{ else }}<span class="chip chip-type">{{ .Type }}</span>{{ end }}</dd>
     {{ if not .Date.IsZero }}
     <dt>Date</dt>
-    <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006, 15:04" }}</time></dd>
+    <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006" }}</time></dd>
     {{ end }}
     {{ with .GetTerms "tags" }}
     <dt>Tags</dt>
