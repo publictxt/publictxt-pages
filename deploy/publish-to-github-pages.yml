@@ -41,11 +41,10 @@ jobs:
           ref: main                        # pin to a tag for reproducible builds
           path: site
 
-      - name: Set up Hugo (extended)
+      - name: Set up Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: "0.166.0"
-          extended: true
 
       - name: Set up Node (for Pagefind)
         uses: actions/setup-node@v4

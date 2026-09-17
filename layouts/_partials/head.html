@@ -2,7 +2,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
 <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
-{{ $opts := dict "transpiler" "libsass" "targetPath" "css/main.css" "outputStyle" "compressed" }}
-{{ with resources.Get "scss/main.scss" | toCSS $opts }}
-<link rel="stylesheet" href="{{ .RelPermalink }}">
+{{ with resources.Get "css/main.css" }}
+{{ $css := . }}
+{{ if hugo.IsProduction }}{{ $css = $css | minify | fingerprint }}{{ end }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
 {{ end }}

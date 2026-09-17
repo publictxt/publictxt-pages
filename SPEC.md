@@ -156,7 +156,7 @@ Wrapped by `scripts/build.sh` / `scripts/build.ps1`, which take the source repo 
 
 - Layout: sticky header with search box; sidebar (sections, page meta, tag cloud) + content area
 - Dark palette in CSS custom properties; responsive (sidebar drops below content on narrow screens)
-- Requires Hugo **extended** (SCSS pipeline; currently libsass — migrate to Dart Sass when available)
+- Plain CSS (`assets/css/main.css`), pipelined through Hugo's asset pipeline (minify + fingerprint in production) — no Sass, so **plain (non-extended) Hugo works**
 
 ## Deployment
 
@@ -170,4 +170,3 @@ The content repo stays pure Markdown. A GitHub Actions workflow in the **content
 - Multi-repo subscription/fan-in
 - Backlinks / graph view
 - Tag co-occurrence / relatedness
-- Dart Sass migration

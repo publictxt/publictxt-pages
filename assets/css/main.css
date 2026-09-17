@@ -1,5 +1,5 @@
-// PublicTxt-Hugo — dark theme
-// Palette lives in CSS custom properties so it can be tweaked without SCSS knowledge.
+/* PublicTxt-Hugo — dark theme
+   Palette lives in CSS custom properties so it can be tweaked without a build step. */
 
 :root {
   --bg: #0e1116;
@@ -35,7 +35,7 @@ a:hover { text-decoration: underline; }
 
 .muted { color: var(--text-muted); }
 
-// ---------- Header ----------
+/* ---------- Header ---------- */
 
 .site-header {
   border-bottom: 1px solid var(--border);
@@ -60,8 +60,8 @@ a:hover { text-decoration: underline; }
   font-size: 1.1rem;
   color: var(--text);
   letter-spacing: 0.01em;
-  &:hover { text-decoration: none; color: var(--accent); }
 }
+.site-title:hover { text-decoration: none; color: var(--accent); }
 
 .site-title-mark { color: var(--accent); }
 
@@ -71,13 +71,13 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   color: var(--text);
   padding: 0.45rem 0.8rem;
-  width: unquote("min(280px, 40vw)"); // unquote: keep CSS min() away from libsass
+  width: min(280px, 40vw);
   font-size: 0.9rem;
-  &:focus { outline: none; border-color: var(--accent); }
-  &::placeholder { color: var(--text-muted); }
 }
+.header-search input[type="search"]:focus { outline: none; border-color: var(--accent); }
+.header-search input[type="search"]::placeholder { color: var(--text-muted); }
 
-// ---------- Layout ----------
+/* ---------- Layout ---------- */
 
 .layout {
   max-width: 1200px;
@@ -99,7 +99,7 @@ a:hover { text-decoration: underline; }
   padding: 1.25rem;
 }
 
-// ---------- Sidebar ----------
+/* ---------- Sidebar ---------- */
 
 .sidebar {
   position: sticky;
@@ -126,51 +126,46 @@ a:hover { text-decoration: underline; }
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--text-muted);
-  a { color: inherit; &:hover { color: var(--accent); text-decoration: none; } }
 }
+.side-heading a { color: inherit; }
+.side-heading a:hover { color: var(--accent); text-decoration: none; }
 
 .section-list {
   list-style: none;
   margin: 0;
   padding: 0;
-
-  li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 6px;
-
-    a {
-      flex: 1;
-      color: var(--text);
-      padding: 0.3rem 0.5rem;
-      &:hover { color: var(--accent); text-decoration: none; }
-    }
-    .count { color: var(--text-muted); font-size: 0.8rem; padding-right: 0.5rem; }
-
-    &.active {
-      background: var(--accent-soft);
-      a { color: var(--accent); font-weight: 600; }
-    }
-  }
 }
+.section-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 6px;
+}
+.section-list li a {
+  flex: 1;
+  color: var(--text);
+  padding: 0.3rem 0.5rem;
+}
+.section-list li a:hover { color: var(--accent); text-decoration: none; }
+.section-list li .count { color: var(--text-muted); font-size: 0.8rem; padding-right: 0.5rem; }
+.section-list li.active { background: var(--accent-soft); }
+.section-list li.active a { color: var(--accent); font-weight: 600; }
 
 .meta-list {
   margin: 0;
   font-size: 0.88rem;
-
-  dt {
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 0.6rem;
-    &:first-child { margin-top: 0; }
-  }
-  dd { margin: 0.2rem 0 0; }
 }
+.meta-list dt {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.6rem;
+}
+.meta-list dt:first-child { margin-top: 0; }
+.meta-list dd { margin: 0.2rem 0 0; }
 
-// ---------- Chips & tag cloud ----------
+/* ---------- Chips & tag cloud ---------- */
 
 .chip {
   display: inline-block;
@@ -182,14 +177,9 @@ a:hover { text-decoration: underline; }
   line-height: 1.4;
   padding: 0.1rem 0.6rem;
   white-space: nowrap;
-  &:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
-
-  .count {
-    color: var(--text-muted);
-    font-size: 0.7rem;
-    margin-left: 0.35rem;
-  }
 }
+.chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.chip .count { color: var(--text-muted); font-size: 0.7rem; margin-left: 0.35rem; }
 
 .chip-type {
   background: var(--chip-type-bg);
@@ -210,19 +200,17 @@ a:hover { text-decoration: underline; }
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-
-  .tag-w2 { font-size: 0.84rem; }
-  .tag-w3 { font-size: 0.9rem; }
-  .tag-w4 { font-size: 0.98rem; font-weight: 600; }
 }
+.tag-cloud .tag-w2 { font-size: 0.84rem; }
+.tag-cloud .tag-w3 { font-size: 0.9rem; }
+.tag-cloud .tag-w4 { font-size: 0.98rem; font-weight: 600; }
 
-// ---------- Home ----------
+/* ---------- Home ---------- */
 
-.hero {
-  padding: 1rem 0 1.5rem;
-  h1 { margin: 0 0 0.5rem; font-size: 2rem; }
-  .lead { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; p { margin: 0; } }
-}
+.hero { padding: 1rem 0 1.5rem; }
+.hero h1 { margin: 0 0 0.5rem; font-size: 2rem; }
+.hero .lead { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; }
+.hero .lead p { margin: 0; }
 
 .card-grid {
   display: grid;
@@ -238,25 +226,21 @@ a:hover { text-decoration: underline; }
   padding: 1rem 1.1rem;
   color: var(--text);
   transition: border-color 0.15s ease;
-
-  h3 { margin: 0 0 0.3rem; font-size: 1rem; }
-  p { margin: 0; font-size: 0.85rem; }
-
-  &:hover { border-color: var(--accent); text-decoration: none; }
 }
+.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
+.card p { margin: 0; font-size: 0.85rem; }
+.card:hover { border-color: var(--accent); text-decoration: none; }
 
 .card-accent { border-color: var(--accent-soft); background: var(--accent-soft); }
 
 .home-sections, .home-recent { margin-top: 2rem; }
 .home-sections h2, .home-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
 
-// ---------- Lists ----------
+/* ---------- Lists ---------- */
 
-.list-header {
-  margin-bottom: 1.4rem;
-  h1 { margin: 0 0 0.4rem; font-size: 1.7rem; }
-  p, .list-intro { color: var(--text-muted); margin: 0; }
-}
+.list-header { margin-bottom: 1.4rem; }
+.list-header h1 { margin: 0 0 0.4rem; font-size: 1.7rem; }
+.list-header p, .list-header .list-intro { color: var(--text-muted); margin: 0; }
 
 .page-list {
   list-style: none;
@@ -272,9 +256,8 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.9rem 1.1rem;
-
-  time { font-size: 0.8rem; }
 }
+.page-card time { font-size: 0.8rem; }
 
 .page-card-head {
   display: flex;
@@ -293,79 +276,74 @@ a:hover { text-decoration: underline; }
 
 .page-card .chip-row { margin-top: 0.5rem; }
 
-// ---------- Single page ----------
+/* ---------- Single page ---------- */
 
 .single-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
-  h1 { margin: 0 0 0.6rem; font-size: 1.8rem; line-height: 1.25; }
 }
+.single-header h1 { margin: 0 0 0.6rem; font-size: 1.8rem; line-height: 1.25; }
 
 .single-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
-  time { font-size: 0.85rem; margin-right: 0.3rem; }
+}
+.single-meta time { font-size: 0.85rem; margin-right: 0.3rem; }
+
+.prose { max-width: var(--content-max); }
+.prose h2 { font-size: 1.35rem; margin-top: 2rem; }
+.prose h3 { font-size: 1.1rem; }
+.prose h2, .prose h3, .prose h4 { line-height: 1.3; }
+
+.prose img { max-width: 100%; border-radius: var(--radius); }
+
+.prose blockquote {
+  margin: 1rem 0;
+  padding: 0.2rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-raised);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-muted);
 }
 
-.prose {
-  max-width: var(--content-max);
-
-  h2 { font-size: 1.35rem; margin-top: 2rem; }
-  h3 { font-size: 1.1rem; }
-  h2, h3, h4 { line-height: 1.3; }
-
-  img { max-width: 100%; border-radius: var(--radius); }
-
-  blockquote {
-    margin: 1rem 0;
-    padding: 0.2rem 1rem;
-    border-left: 3px solid var(--accent);
-    background: var(--bg-raised);
-    border-radius: 0 var(--radius) var(--radius) 0;
-    color: var(--text-muted);
-  }
-
-  code {
-    font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
-    font-size: 0.88em;
-    background: var(--bg-inset);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.1em 0.35em;
-  }
-
-  pre {
-    background: var(--bg-inset);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.9rem 1.1rem;
-    overflow-x: auto;
-    line-height: 1.5;
-
-    code { background: none; border: none; padding: 0; }
-  }
-
-  // Hugo/Chroma emits its own background on .highlight pre — keep ours consistent
-  .highlight pre { background: var(--bg-inset) !important; }
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1rem 0;
-    font-size: 0.92rem;
-
-    th, td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
-    th { background: var(--bg-raised); }
-    tr:nth-child(even) td { background: var(--bg-raised); }
-  }
-
-  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+.prose code {
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
 }
 
-// ---------- Pagefind UI (dark) ----------
+.prose pre {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+.prose pre code { background: none; border: none; padding: 0; }
+
+/* Hugo/Chroma emits its own background on .highlight pre — keep ours consistent */
+.prose .highlight pre { background: var(--bg-inset) !important; }
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+.prose table th, .prose table td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+.prose table th { background: var(--bg-raised); }
+.prose table tr:nth-child(even) td { background: var(--bg-raised); }
+
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+/* ---------- Pagefind UI (dark) ---------- */
 
 .pagefind-wrap {
   --pagefind-ui-scale: 0.9;
@@ -379,24 +357,23 @@ a:hover { text-decoration: underline; }
   --pagefind-ui-font: inherit;
 
   margin-top: 0.5rem;
-
-  .pagefind-ui__search-input {
-    background: var(--bg-inset);
-    color: var(--text);
-    &::placeholder { color: var(--text-muted); opacity: 1; }
-  }
-  .pagefind-ui__filter-name, .pagefind-ui__filter-value { color: var(--text); }
-  .pagefind-ui__result-title a { color: var(--accent); }
-  .pagefind-ui__result-excerpt { color: var(--text-muted); }
-  mark {
-    background: var(--accent-soft);
-    color: var(--accent);
-    border-radius: 3px;
-    padding: 0 0.15em;
-  }
+}
+.pagefind-wrap .pagefind-ui__search-input {
+  background: var(--bg-inset);
+  color: var(--text);
+}
+.pagefind-wrap .pagefind-ui__search-input::placeholder { color: var(--text-muted); opacity: 1; }
+.pagefind-wrap .pagefind-ui__filter-name, .pagefind-wrap .pagefind-ui__filter-value { color: var(--text); }
+.pagefind-wrap .pagefind-ui__result-title a { color: var(--accent); }
+.pagefind-wrap .pagefind-ui__result-excerpt { color: var(--text-muted); }
+.pagefind-wrap mark {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 3px;
+  padding: 0 0.15em;
 }
 
-// ---------- Responsive ----------
+/* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
   .layout {
@@ -407,7 +384,7 @@ a:hover { text-decoration: underline; }
   .sidebar {
     position: static;
     max-height: none;
-    order: 2; // content first on small screens
+    order: 2; /* content first on small screens */
   }
 
   .content { order: 1; }

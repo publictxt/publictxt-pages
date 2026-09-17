@@ -6,7 +6,7 @@ See `SPEC.md` for the full v1 spec.
 
 ## Requirements
 
-- **Hugo extended v0.158 or later (tested on v0.163.2)** — the OS-packaged Hugo on many distros (apt/dnf) may be older; verify with `hugo version` and check for "extended" in the output. Install a current release via Homebrew, winget, or the GitHub releases page if your package manager's version is stale.
+- **Hugo v0.158 or later** (plain or extended — this site uses only plain CSS, no Sass, so the smaller non-extended binary works). The OS-packaged Hugo on many distros (apt/dnf) may be older; verify with `hugo version`. Install a current release via Homebrew, winget, or the GitHub releases page if your package manager's version is stale.
 - Pagefind — either `npx pagefind` (Node.js) or the [standalone binary](https://github.com/Pagefind/pagefind/releases) (no Node needed)
 
 ## Authoring requirement
