@@ -9,11 +9,11 @@ body, and merges them into the front matter `tags` list. Body text is left
 untouched — hashtags remain visible for Obsidian-style reading. Hashtags
 inside fenced code blocks (```) and inline code spans (`...`) are ignored.
 
-No third-party dependencies (PyYAML etc. deliberately avoided — front
-matter here is a controlled, simple subset of YAML: scalar `key: value`
-pairs and one-line `key: [a, b, c]` lists). If front matter grows more
-complex than that, swap in a real YAML parser rather than extending the
-hand-rolled one below.
+No third-party dependencies (PyYAML etc. deliberately avoided). Only the
+`tags` entry is interpreted — as an inline `[a, b]` list, a block `- a`
+list, or a scalar — and it is rewritten in inline form. Every other front
+matter line is passed through untouched. If `tags` ever needs richer YAML
+than that, swap in a real parser rather than extending this one.
 
 Usage:
     python3 scripts/extract_hashtags.py [content_dir]
@@ -49,33 +49,47 @@ def extract_hashtags(body: str) -> list[str]:
     return seen
 
 
-def parse_front_matter(fm_text: str) -> tuple[dict, list[str]]:
+KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):\s*(.*)$")
+BLOCK_ITEM_RE = re.compile(r"^\s+-\s*(.*)$")
+
+
+def _unquote(s: str) -> str:
+    return s.strip().strip('"').strip("'")
+
+
+def parse_tags(fm_text: str) -> tuple[list[str], tuple[int, int] | None]:
     """
-    Minimal front matter parser. Returns (fields, original_lines).
-    fields: dict of key -> raw string value (list values kept as a Python list of str)
-    original_lines: the raw lines, for reconstruction preserving key order/formatting
+    Find the `tags` entry in front matter. Returns (tags, (start, end)) where
+    start/end are the line indices of the entry (end exclusive), or None if
+    there is no `tags` key. Supports inline `[a, b]` and block `- a` lists.
     """
-    fields = {}
     lines = fm_text.split("\n")
-    for line in lines:
-        if not line.strip() or line.strip().startswith("#"):
+    i = 0
+    while i < len(lines):
+        m = KEY_RE.match(lines[i])
+        if not m or m.group(1) != "tags":
+            i += 1
             continue
-        m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$", line)
-        if not m:
-            continue
-        key, value = m.group(1), m.group(2).strip()
+        value = m.group(2).strip()
+        start = i
+        i += 1
         if value.startswith("[") and value.endswith("]"):
             inner = value[1:-1].strip()
-            items = []
-            if inner:
-                for item in inner.split(","):
-                    item = item.strip().strip('"').strip("'")
-                    if item:
-                        items.append(item)
-            fields[key] = items
-        else:
-            fields[key] = value.strip('"').strip("'")
-    return fields, lines
+            tags = [_unquote(x) for x in inner.split(",") if _unquote(x)] if inner else []
+            return tags, (start, i)
+        if value:
+            return [_unquote(value)], (start, i)
+        tags = []
+        while i < len(lines):
+            bm = BLOCK_ITEM_RE.match(lines[i])
+            if not bm:
+                break
+            item = _unquote(bm.group(1))
+            if item:
+                tags.append(item)
+            i += 1
+        return tags, (start, i)
+    return [], None
 
 
 def render_tags_line(tags: list[str]) -> str:
@@ -86,16 +100,14 @@ def render_tags_line(tags: list[str]) -> str:
 def process_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     m = FRONT_MATTER_RE.match(text)
-    if not m:
-        return False  # no front matter — skip (e.g. malformed file)
+    if m:
+        fm_text = m.group(1)
+        body = text[m.end():]
+    else:
+        fm_text = ""  # no front matter yet — one is created if hashtags are found
+        body = text
 
-    fm_text = m.group(1)
-    body = text[m.end():]
-
-    fields, lines = parse_front_matter(fm_text)
-    existing_tags = fields.get("tags", [])
-    if isinstance(existing_tags, str):
-        existing_tags = [existing_tags]
+    existing_tags, span = parse_tags(fm_text)
 
     inline_tags = extract_hashtags(body)
     merged = list(dict.fromkeys([*existing_tags, *inline_tags]))  # de-dupe, preserve order
@@ -103,18 +115,16 @@ def process_file(path: Path) -> bool:
     if merged == existing_tags:
         return False  # nothing changed
 
-    new_lines = []
-    replaced = False
-    for line in lines:
-        if re.match(r"^tags:\s*", line):
-            new_lines.append(render_tags_line(merged))
-            replaced = True
-        else:
-            new_lines.append(line)
-    if not replaced:
-        new_lines.append(render_tags_line(merged))
+    lines = fm_text.split("\n") if fm_text else []
+    if span:
+        start, end = span
+        new_lines = lines[:start] + [render_tags_line(merged)] + lines[end:]
+    else:
+        new_lines = lines + [render_tags_line(merged)]
 
     new_fm = "\n".join(new_lines)
+    if not m:
+        body = "\n" + body.lstrip("\n")
     new_text = f"---\n{new_fm}\n---\n{body}"
     path.write_text(new_text, encoding="utf-8")
     return True
