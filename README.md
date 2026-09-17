@@ -22,7 +22,7 @@ This makes links portable — they work both in Obsidian, browsing the repo on G
 
 The build takes a PublicTxt repo directory as input — by default `example/txt/`, a synthetic repo that exhibits every quirk found in real ones (see its README). To build your own repo, clone it anywhere (`txt/` in this folder is gitignored for that purpose) and pass the path to the build script.
 
-Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to `build/content/` (Hugo's `contentDir`), normalising what Hugo can't handle natively:
+Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to `build/content/` (mounted as Hugo's content, together with the site-owned `site-content/` that holds the search page), normalising what Hugo can't handle natively:
 
 - `index.md` / `home.md` in a folder → `_index.md` (otherwise Hugo treats the folder as a leaf bundle and hides its sibling pages)
 - missing `title:` → taken from the first `# H1` (removed from the body), else the filename
