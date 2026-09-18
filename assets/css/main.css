@@ -312,13 +312,31 @@ a:hover { text-decoration: underline; }
 .link-list time { font-size: 0.8rem; }
 
 .list-controls {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.8rem;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  margin-bottom: 0.6rem;
+  flex-direction: column;
+  gap: 0.6rem;
 }
-.list-sort { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; }
+.list-controls-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.facet-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  flex: none;
+  min-width: 3rem;
+}
+.list-sort { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
 .list-sort select {
   background: var(--bg-inset);
   border: 1px solid var(--border);
@@ -329,8 +347,15 @@ a:hover { text-decoration: underline; }
   padding: 0.3rem 0.5rem;
 }
 .list-sort select:focus { outline: none; border-color: var(--accent); }
-.list-facet { flex-basis: 100%; }
-.list-reset { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.list-facet {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+.list-facet .chip-row { flex: 1 1 auto; min-width: 0; }
+.list-reset { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
 .list-status { margin: 0 0 0.8rem; font-size: 0.85rem; }
 .filter-chip.more { border-style: dashed; color: var(--text-muted); }
 
