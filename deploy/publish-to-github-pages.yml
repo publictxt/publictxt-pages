@@ -8,6 +8,12 @@
 # The content repo stays pure Markdown — the site generator lives in its own
 # repo and is checked out at build time, so upgrading the site is a one-line
 # ref change below.
+#
+# Edit the env: block in the Build step below for your own site — SITE_TITLE
+# and SITE_DESCRIPTION override hugo.toml's `title` and `params.description`
+# via Hugo's built-in HUGO_-prefixed environment variable config overrides
+# (https://gohugo.io/configuration/introduction/#configure-with-environment-variables),
+# so no fork of hugo.toml is needed per content repo.
 
 name: Publish site
 
@@ -53,7 +59,9 @@ jobs:
 
       - name: Build
         env:
-          HUGO_BASEURL: https://jaysen.co.za/
+          HUGO_BASEURL: https://publictxt.net/
+          HUGO_TITLE: "A PublicTxt instance"
+          HUGO_PARAMS_DESCRIPTION: "A PublicTxt repository — browsable, searchable, plain-text first."
         run: sh site/scripts/build.sh ../txt
 
       - name: Upload artifact
