@@ -9,6 +9,7 @@
       <a class="chip" href="{{ .RelPermalink }}" data-pagefind-filter="tag">{{ .LinkTitle }}</a>
       {{ end }}
     </div>
+    {{ partial "bookmark-links.html" . }}
   </header>
   <div class="prose">
     {{ .Content }}

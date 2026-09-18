@@ -33,7 +33,9 @@ Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to
 - inline `#hashtags` → links to their tag page (text stays `#hashtag`; code, links and URL fragments are left alone)
 - repo housekeeping files (`README`, `LICENSE`, `CNAME`, `.obsidian/`, …) skipped
 
-Front matter, when present, is preserved.
+Front matter, when present, is preserved. A page anywhere with `bookmark: <url>` in its front
+matter (or `bookmarks:`, a URL or a list) is also listed in the Bookmarks section, with the URL
+shown as an external link on its card, header and sidebar.
 
 ## Build
 

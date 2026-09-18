@@ -6,7 +6,7 @@
     <li class="{{ if eq $current.FirstSection . }}active{{ end }}">
       {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
       <a href="{{ .RelPermalink }}">{{ .Section | humanize }}</a>
-      <span class="count">{{ len .RegularPagesRecursive }}</span>
+      <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partial "bookmark-pages.html") }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span>
     </li>
     {{ end }}
     <li class="{{ if eq .Layout "search" }}active{{ end }}">
@@ -26,6 +26,12 @@
     {{ if not .Date.IsZero }}
     <dt>Date</dt>
     <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006" }}</time></dd>
+    {{ end }}
+    {{ with partial "bookmark-urls.html" . }}
+    <dt>Bookmark{{ if gt (len .) 1 }}s{{ end }}</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
+    </dd>
     {{ end }}
     {{ with .GetTerms "tags" }}
     <dt>Tags</dt>

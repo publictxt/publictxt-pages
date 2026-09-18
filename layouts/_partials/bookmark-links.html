@@ -1,0 +1,6 @@
+{{/* External link(s) to the resource(s) a page bookmarks; nothing if none. Expects a page. */}}
+{{ with partial "bookmark-urls.html" . }}
+<div class="chip-row bookmark-links">
+  {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
+</div>
+{{ end }}

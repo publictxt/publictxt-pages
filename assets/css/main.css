@@ -190,6 +190,9 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
 }
 
+.chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace; }
+.bookmark-links { margin-top: 0.4rem; }
+
 .chip-row {
   display: flex;
   flex-wrap: wrap;
