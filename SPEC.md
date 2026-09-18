@@ -40,6 +40,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
 - Section index bodies render as prose and are indexed for search, the same as single pages
+- Browse lists (home *Recent*, every section page, every tag page) are rendered client-side from a JSON index Hugo emits beside the page — sortable, filterable by tag and type, paged, with the view in the URL. Hugo renders a plain link list as the no-JS fallback. See *Browse lists* below
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
 
 ## Content structure — what real repos look like
@@ -105,7 +106,7 @@ folder there is no section page to list them on.
 
 ### The date ladders
 
-Every page gets both a `created` and an `updated` time, so recency ordering works across all types — not just `blog/` — and means one thing everywhere: lists sort on `updated`, cards show `created` plus *· updated …* when the page changed more than a day later. `scripts/dates.py` resolves them, most to least authoritative:
+Every page gets both a `created` and an `updated` time, so recency ordering works across all types — not just `blog/` — and means one thing everywhere: lists sort on `updated` by default, cards show `created` plus *· updated …* when the page changed more than a day later. `scripts/dates.py` resolves them, most to least authoritative:
 
 | `created_source` | Where `created` comes from |
 |---|---|
@@ -134,7 +135,8 @@ Section indexes take their newest descendant's `updated` whenever their own was 
 | URL-friendly URLs from filenames (spaces, dots, case) | Hugo urlize — native, no file renaming |
 | Type from folder + `type:` override | Hugo section + front matter — native |
 | Sections, tag cloud, meta sidebar | Hugo templates — native |
-| Ordering (all types) | Hugo `.Lastmod`, mapped from `updated` — native |
+| Ordering (all types) | `updated` / `created` / `title` from the JSON index — client-side (`assets/js/list.js`); default per site or section |
+| List data (`index.json` per list page) | Hugo output format — native (`layouts/*.json`) |
 | Tag browse pages `/tags/foo/` | Hugo taxonomy — native |
 | **`index.md`/`home.md` → `_index.md`** | **sync step** |
 | **`title` derivation** | **sync step** |
@@ -193,6 +195,21 @@ Order is mandatory. Pagefind indexes rendered HTML; Hugo must run first. `public
 
 Wrapped by `scripts/build.sh` / `scripts/build.ps1`, which take the source repo path (default `example/txt`) and honour `HUGO_BASEURL`.
 
+## Browse lists (JSON + JS)
+
+Every list page — home, each section, each tag — also renders an `index.json` (Hugo output formats; `layouts/_partials/list-json.html`): one object per listed page with `url`, `title`, `type`, `section`, `tags`, `created`, `updated` (RFC 3339), `summary` and bookmark URLs. The Bookmarks page's JSON carries its gathered collection (`layouts/bookmarks/section.json`); home's is capped at `params.recentLimit`.
+
+The HTML page holds a `[data-list]` container (`layouts/_partials/list-container.html`) with a plain `<ul>` of links inside — what crawlers and no-JS readers get. `assets/js/list.js` fetches the JSON and replaces it with cards, plus:
+
+- **Sort**: recently updated (default), newest, oldest, title A→Z / Z→A, least recently updated. The default comes from `params.listOrder`, overridable per section (and its sub-folders) with `order:` on the index page
+- **Filter**: chips for tag and type with counts within the current result set; several tags AND together. A facet only appears when the list varies on it, so a one-type section shows no type chips and a tag page hides its own tag. This gives tag combinations on tag pages themselves
+- **Paging**: `params.listPerPage` / `perPage:` cards per page; a pager with real links
+- **URL state**: `?tag=a&tag=b&type=wiki&sort=title&page=2`, so any view is linkable and back/forward work. `q` stays reserved for search
+
+Home's *Recent* list uses the same component in compact mode (cards only). Cards are drawn by `assets/js/cards.js`, shared with the search page, so a page looks the same wherever it is listed. Both scripts are bundled by `js.Build` (esbuild is in plain Hugo, so non-extended Hugo still works).
+
+Why this and not server-side pagination or Pagefind for lists: Hugo's `.Paginate` fixes order and membership at build time, so a sort toggle or filter could only act on the current page; Pagefind's result ranking would replace deterministic ordering and needs its index even under `hugo server`. The JSON index scales to a few thousand pages per section (roughly 300 bytes a page, gzipped well) and needs no extra tooling.
+
 ## Search / filter (Pagefind)
 
 - Full-text search plus faceted filtering, **with or without a search term** — selecting tags alone browses by tag combination
@@ -200,7 +217,7 @@ Wrapped by `scripts/build.sh` / `scripts/build.ps1`, which take the source repo 
 - Tag **combinations** are AND-ed via Pagefind's multi-filter support — Hugo taxonomies cannot express intersections. `type` is single-select.
 - Custom UI (`layouts/search.html`) on the Pagefind JS API rather than Pagefind's stock UI, which cannot run filter-only searches. Filter counts reflect the current result set; results show clickable tag chips.
 - URL state: `/search/?q=…&tag=a&tag=b&type=wiki` — tag pages deep-link into it (`/tags/foo/` → "combine with other tags"); the header search box submits `?q=`
-- Hugo taxonomy pages remain as a separate native browse path (`/tags/foo/`); these are two independent mechanisms over the same data, not one system
+- Tag pages (`/tags/foo/`) are the browse path over the same data: filterable by further tags and type from their own JSON index (see *Browse lists*), and deep-linking into search for full text. Two mechanisms over one data set: Pagefind for text, the JSON index for structured browsing
 
 ## Theme
 
