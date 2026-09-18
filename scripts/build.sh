@@ -18,7 +18,12 @@ python3 scripts/sync_content.py "$SOURCE" build/content
 python3 scripts/extract_hashtags.py build/content
 
 if [ -n "$SERVE" ]; then
-  exec hugo server -D
+  # -M keeps the live-reload render in memory so it never overwrites public/'s
+  # built HTML with dev-mode markup; --renderStaticToDisk is what still lets
+  # the server see Pagefind's index, which pagefind writes straight into
+  # public/ after a full build and which -M alone would hide (Hugo's own
+  # content/static/assets pipeline never touches it either way).
+  exec hugo server -D -M --renderStaticToDisk
 fi
 
 # Hugo does not remove stale pages from a previous build

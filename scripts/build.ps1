@@ -12,7 +12,12 @@ python scripts/sync_content.py $Source build/content
 python scripts/extract_hashtags.py build/content
 
 if ($Serve) {
-    hugo server -D
+    # -M keeps the live-reload render in memory so it never overwrites public/'s
+    # built HTML with dev-mode markup; --renderStaticToDisk is what still lets
+    # the server see Pagefind's index, which pagefind writes straight into
+    # public/ after a full build and which -M alone would hide (Hugo's own
+    # content/static/assets pipeline never touches it either way).
+    hugo server -D -M --renderStaticToDisk
     exit
 }
 
