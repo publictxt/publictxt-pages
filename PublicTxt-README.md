@@ -70,7 +70,7 @@ The directory structure for a Public Text repository (v1 focus in **bold**, late
 - **tags**: Tag indexes for the entire repository
 - **indexes**: Indexes for the entire repository
 - **settings**: Settings files
-- *metaweb*: Bookmarks, annotations and notes about web pages (later phase)
+- *bookmarks*: Bookmarks, annotations and notes about web pages (later phase)
   - *sites*: (eg `www.example.com.md`) folder containing all web pages with data for that site
     - *[modified url].md*: (eg `www.example.com-folder-page.md`)
   - *bookmarks*
@@ -91,10 +91,10 @@ These ideas are part of the PublicTxt vision but are explicitly deferred until t
 - **Fluid Community Controls**: Public / semi-public / private content settings, with selective access control for collaborative use.
 - **Collaborative Wikis with Friendly Merge UX**: Hiding Git's branching/merging complexity for non-technical contributors. v1 expects users comfortable with Git's existing collaboration primitives (PRs, branches, forks).
 
-### MetaWeb / Web Annotation
+### Bookmarks / Web Annotation
 
-- **MetaWeb Commons**: A browser extension that integrates Git-stored discussion and notes about web pages into the browsing experience.
-- **Social Bookmarking and Annotation**: A standard for storing MetaWeb (SideWiki-like) data about web resources, using W3C Annotation standards.
+- **Bookmarks Commons**: A browser extension that integrates Git-stored discussion and notes about web pages into the browsing experience.
+- **Social Bookmarking and Annotation**: A standard for storing Bookmarks (SideWiki-like) data about web resources, using W3C Annotation standards.
 
 ### Federation & Protocols
 

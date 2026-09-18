@@ -31,7 +31,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 
 ## Scope (v1)
 
-- Single repo, full structure: `wiki/`, `blog/`, `notes/`, `metaweb/`, plus any other top-level folder (e.g. `posts/`) as a section
+- Single repo, full structure: `wiki/`, `blog/`, `notes/`, `bookmarks/`, plus any other top-level folder (e.g. `posts/`) as a section
 - Root-level pages (`Projects.md`, …) published as plain pages outside any section
 - Extract inline `#hashtags` → merge into front matter `tags`
 - Facets for search + browsing: tags, tag combinations, document type
@@ -61,7 +61,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
     2024/20241013-title.md       date from YYYYMMDD- prefix
     20260509-title.md            date from YYYYMMDD- prefix
   notes/home.md, notes/Info politics/The WhatsApp Mess . 20240816.md
-  metaweb/sites/<domain>/<page>.md, metaweb/wiki/Obsidian.md.md
+  bookmarks/sites/<domain>/<page>.md, bookmarks/wiki/Obsidian.md.md
   posts/index.md                 empty section
   media/                         non-Markdown assets, copied verbatim
   README.md LICENSE CNAME .obsidian/ .gitkeep   skipped
@@ -69,7 +69,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 
 - Section = top-level folder = default `type`
 - Any folder may carry an `index.md` or `home.md` as its landing page
-- `metaweb/` entries are one-file-per-resource, rendered as normal pages (single-author-per-repo assumption; cross-repo aggregation is out of scope)
+- `bookmarks/` entries are one-file-per-resource, rendered as normal pages (single-author-per-repo assumption; cross-repo aggregation is out of scope)
 - `example/txt/` in this repo is a synthetic repo exhibiting all of the above and is the default build source
 
 ## Front matter contract
@@ -202,7 +202,7 @@ The content repo stays pure Markdown. A GitHub Actions workflow in the **content
 
 - `[[wikilink]]` conversion at sync time
 - `author` / `source_repo` as active filters
-- Cross-repo aggregation of `metaweb/` resources (needs resource-identity/normalization decision)
+- Cross-repo aggregation of `bookmarks/` resources (needs resource-identity/normalization decision)
 - Multi-repo subscription/fan-in
 - Backlinks / graph view
 - Tag co-occurrence / relatedness
