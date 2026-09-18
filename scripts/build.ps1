@@ -1,5 +1,6 @@
 # Full build pipeline: sync -> hashtags -> hugo -> pagefind
 # Usage: .\scripts\build.ps1 [-Source <repo dir>] [-BaseUrl https://host/] [-Serve]
+[CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$Source = "example/txt",
     [string]$BaseUrl = $env:HUGO_BASEURL,
@@ -7,6 +8,10 @@ param(
 )
 $ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
+
+if (-not (Test-Path -LiteralPath $Source -PathType Container)) {
+    throw "Source directory not found: '$Source'. Use -Source <path>, e.g. .\scripts\build.ps1 -Source C:\repo\txt"
+}
 
 python scripts/sync_content.py $Source build/content
 python scripts/extract_hashtags.py build/content
