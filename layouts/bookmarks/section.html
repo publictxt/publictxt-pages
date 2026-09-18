@@ -1,3 +1,4 @@
+{{/* Bookmarks section: the generic section template with a different page collection. */}}
 {{ define "main" }}
 <header class="list-header">
   <h1 data-pagefind-meta="title">{{ .Title }}</h1>
@@ -11,7 +12,11 @@
 </header>
 
 {{ $order := partial "list-order.html" . }}
-{{ $pages := partial "ordered.html" (dict "pages" .RegularPagesRecursive "order" $order) }}
+{{/* The top-level Bookmarks page also gathers pages elsewhere that carry a `bookmark:` URL;
+     its sub-folders list their own subtree like any section. */}}
+{{ $all := .RegularPagesRecursive }}
+{{ if eq .Parent site.Home }}{{ $all = partialCached "bookmark-pages.html" . }}{{ end }}
+{{ $pages := partial "ordered.html" (dict "pages" $all "order" $order) }}
 {{ $pg := "" }}
 {{ with partial "list-per-page.html" . }}{{ $pg = $.Paginate $pages . }}{{ else }}{{ $pg = .Paginate $pages }}{{ end }}
 
