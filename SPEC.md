@@ -39,7 +39,9 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Breadcrumbs on every page except home (`Home › Wiki › Science › Brain › Page`), built from Hugo's native `.Ancestors`; section crumbs use folder names, numeric date folders stay literal
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
-- Recency ordering everywhere, with one meaning: most recently *updated* first. Home carries a global *Recent* list; every section page and tag page lists all its pages in that order (`layouts/_partials/recent.html` is the single definition)
+- Recency ordering by default, with one meaning: most recently *updated* first. Home carries a global *Recent* list; every section page and tag page lists all its pages in that order (`layouts/_partials/recent.html` is the single definition)
+- List order is a build-time choice, not a per-visit toggle: `params.listOrder` sets the site default (`updated` | `created` | `title`, each with optional `asc`/`desc`); a section's index page overrides it for itself and its sub-folders with `order:` in its front matter (e.g. `order: title` for a wiki). `layouts/_partials/ordered.html` applies it, `list-order.html` resolves it. A client-side sort toggle was rejected because it cannot re-order what pagination has already split across pages
+- Section and tag lists paginate at `pagination.pagerSize` to `…/page/N/`, overridable per section (and its sub-folders) with `perPage:` on the index page; the section's index body renders and is indexed on page 1 only, so Pagefind returns it once
 - Section index bodies render as prose and are indexed for search, the same as single pages — for a section like `posts/` the index *is* the content
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
 

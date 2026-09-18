@@ -1,0 +1,33 @@
+{{/*
+  Pager for a paginated list. Expects a dict:
+    paginator — a Paginator
+    order     — the list's order string (ordered.html); date orders label the
+                steps Newer/Older, title orders Previous/Next.
+  Renders nothing for a single page. Shows first/last, a window around the
+  current page, and the two steps — at most ~9 links however long the list.
+*/}}
+{{ $pg := .paginator }}
+{{ if gt $pg.TotalPages 1 }}
+{{ $cur := $pg.PageNumber }}{{ $total := $pg.TotalPages }}
+{{ $field := index (split (trim (lower (.order | default "updated")) " ") " ") 0 }}
+{{ $back := "‹ Previous" }}{{ $fwd := "Next ›" }}
+{{ if ne $field "title" }}
+  {{ $asc := strings.HasSuffix (lower .order) " asc" }}
+  {{ $back = cond $asc "‹ Older" "‹ Newer" }}{{ $fwd = cond $asc "Newer ›" "Older ›" }}
+{{ end }}
+<nav class="pagination" aria-label="Pagination">
+  {{ if $pg.HasPrev }}<a class="pager pager-step" href="{{ $pg.Prev.URL }}" rel="prev">{{ $back }}</a>{{ else }}<span class="pager pager-step disabled">{{ $back }}</span>{{ end }}
+  <ol class="pager-numbers">
+    {{ $prev := 0 }}
+    {{ range $pg.Pagers }}
+      {{ $n := .PageNumber }}
+      {{ if or (le $n 2) (ge $n (sub $total 1)) (and (ge $n (sub $cur 2)) (le $n (add $cur 2))) }}
+        {{ if gt (sub $n $prev) 1 }}<li class="pager-gap" aria-hidden="true">…</li>{{ end }}
+        <li>{{ if eq $n $cur }}<span class="pager current" aria-current="page">{{ $n }}</span>{{ else }}<a class="pager" href="{{ .URL }}">{{ $n }}</a>{{ end }}</li>
+        {{ $prev = $n }}
+      {{ end }}
+    {{ end }}
+  </ol>
+  {{ if $pg.HasNext }}<a class="pager pager-step" href="{{ $pg.Next.URL }}" rel="next">{{ $fwd }}</a>{{ else }}<span class="pager pager-step disabled">{{ $fwd }}</span>{{ end }}
+</nav>
+{{ end }}
