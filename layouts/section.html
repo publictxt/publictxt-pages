@@ -10,25 +10,18 @@
   </div>
 </header>
 
-{{ $order := partial "list-order.html" . }}
-{{ $pages := partial "ordered.html" (dict "pages" .RegularPagesRecursive "order" $order) }}
-{{ $pg := "" }}
-{{ with partial "list-per-page.html" . }}{{ $pg = $.Paginate $pages . }}{{ else }}{{ $pg = .Paginate $pages }}{{ end }}
-
-{{/* A section's index body is real content (for `posts/` it is *the* content):
-     render it as prose and index it for search, exactly like a single page.
-     Only on the first page — later pages of the list are navigation, and
-     indexing the body again would return the same hit once per page.
-     The page list itself stays outside the Pagefind body. */}}
-{{ if eq $pg.PageNumber 1 }}{{ with .Content }}
+{{/* A section's index body is real content: render it as prose and index it
+     for search, exactly like a single page. The page list below stays
+     outside the Pagefind body. */}}
+{{ with .Content }}
 <div class="prose" data-pagefind-body>{{ . }}</div>
-{{ end }}{{ end }}
+{{ end }}
 
+{{ $pages := partial "recent.html" .RegularPagesRecursive }}
 {{ if $pages }}
-<section class="list-recent">
-  <h2>Pages <span class="muted">({{ len $pages }}, {{ partial "order-label.html" $order }}{{ if gt $pg.TotalPages 1 }} · page {{ $pg.PageNumber }} of {{ $pg.TotalPages }}{{ end }})</span></h2>
-  {{ partial "page-list.html" (dict "pages" $pg.Pages) }}
-  {{ partial "pagination.html" (dict "paginator" $pg "order" $order) }}
+<section class="list-section">
+  <h2>Pages <span class="muted">({{ len $pages }})</span></h2>
+  {{ partial "list-container.html" (dict "page" . "pages" $pages "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .)) }}
 </section>
 {{ else }}
   <p class="muted">No pages in this section yet.</p>

@@ -306,6 +306,34 @@ a:hover { text-decoration: underline; }
 
 .page-card .chip-row { margin-top: 0.5rem; }
 
+/* Browse lists (assets/js/list.js) */
+.link-list { margin: 0; padding-left: 1.2rem; }
+.link-list li { margin: 0.25rem 0; }
+.link-list time { font-size: 0.8rem; }
+
+.list-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.6rem;
+}
+.list-sort { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; }
+.list-sort select {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+}
+.list-sort select:focus { outline: none; border-color: var(--accent); }
+.list-facet { flex-basis: 100%; }
+.list-reset { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.list-status { margin: 0 0 0.8rem; font-size: 0.85rem; }
+.filter-chip.more { border-style: dashed; color: var(--text-muted); }
+
 .pagination {
   display: flex;
   align-items: center;

@@ -26,11 +26,12 @@
   </div>
 </section>
 
+{{/* The same pages home's index.json carries (see layouts/home.json). */}}
 {{ $recent := first (site.Params.recentLimit | default 8) (partial "recent.html" site.RegularPages) }}
 {{ with $recent }}
 <section class="home-recent">
   <h2>Recent <span class="muted">(recently updated first)</span></h2>
-  {{ partial "page-list.html" (dict "pages" .) }}
+  {{ partial "list-container.html" (dict "page" $ "pages" . "compact" true) }}
 </section>
 {{ end }}
 {{ end }}
