@@ -10,8 +10,11 @@ normalising the few things Hugo cannot handle natively:
     every sibling page inside it as a resource — fatal for a wiki.)
   * Missing `title:`  ->  taken from the first `# H1` (which is then removed
     from the body so it isn't rendered twice), else from the filename.
-  * Missing `date:` on blog posts  ->  derived from a `YYYYMMDD` filename
-    prefix or a `blog/YYYY/MM/DD/` path.
+  * Missing `date:`  ->  every page gets one, via the ladder in dates.py
+    (filename/path -> last Git commit -> mtime -> build time). The rung used
+    is recorded as `date_source:` so templates can distinguish an authored
+    date from an inferred one. Section indexes inherit the newest date among
+    their descendants.
   * Link destinations pointing at `index.md` / `home.md` are rewritten to
     `_index.md` so Hugo's embedded link render hook can resolve them.
   * Folders containing Markdown but no index page get a minimal `_index.md`
@@ -35,6 +38,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from dates import DateResolver, sort_key
 from hashtags import linkify
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
@@ -43,9 +47,15 @@ INDEX_NAMES = {"index.md", "home.md"}
 
 FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n?", re.DOTALL)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
-DATE_PREFIX_RE = re.compile(r"^(\d{4})(\d{2})(\d{2})")
-DATE_PATH_RE = re.compile(r"^blog/(\d{4})/(\d{2})/(\d{2})/")
 INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
+DATE_VALUE_RE = re.compile(r"^date\s*:\s*(.+?)\s*$", re.MULTILINE)
+# Matches only the date block sync itself wrote, and only on an inferred rung —
+# an authored date must never be silently overwritten by a folder's activity.
+INFERRED_DATE_RE = re.compile(
+    r"^date: .*\ndate_source: (?:git|mtime|build)$", re.MULTILINE
+)
+# Rungs where the date means "written", not "last touched".
+AUTHORED_SOURCES = {"front-matter", "path"}
 
 
 def split_front_matter(text: str) -> tuple[str | None, str]:
@@ -57,6 +67,12 @@ def split_front_matter(text: str) -> tuple[str | None, str]:
 
 def has_key(fm: str | None, key: str) -> bool:
     return bool(fm) and re.search(rf"^{key}\s*:", fm, re.MULTILINE) is not None
+
+
+def front_matter_date(fm: str | None) -> str:
+    """The raw `date:` value already in the front matter (quotes stripped)."""
+    m = DATE_VALUE_RE.search(fm or "")
+    return m.group(1).strip("\"'") if m else ""
 
 
 def derive_title(body: str, fallback: str) -> tuple[str, str]:
@@ -72,23 +88,14 @@ def derive_title(body: str, fallback: str) -> tuple[str, str]:
     return fallback, body
 
 
-def derive_date(rel: str, name: str) -> str | None:
-    m = DATE_PREFIX_RE.match(name)
-    if m:
-        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-    m = DATE_PATH_RE.match(rel)
-    if m:
-        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-    return None
-
-
 def yaml_str(s: str) -> str:
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
 
 
-def normalise_md(text: str, rel: str) -> str:
+def normalise_md(text: str, rel: str, date: str, date_source: str,
+                 git_time: str | None) -> str:
     fm, body = split_front_matter(text)
     name = Path(rel).name
     stem = Path(rel).stem
@@ -102,17 +109,23 @@ def normalise_md(text: str, rel: str) -> str:
         title, body = derive_title(body, fallback)
         added.append(f"title: {yaml_str(title)}")
 
-    if rel.startswith("blog/") and not has_key(fm, "date"):
-        d = derive_date(rel, name)
-        if d:
-            added.append(f"date: {d}")
+    if not has_key(fm, "date"):
+        added.append(f"date: {date}")
+    if not has_key(fm, "date_source"):
+        added.append(f"date_source: {date_source}")
+
+    # An authored date says when a page was written; for a page that has since
+    # been edited, `lastmod` is what makes "recent" mean recently *changed*.
+    # The inferred rungs are already modification times, so this only applies
+    # to the two authored ones.
+    if date_source in AUTHORED_SOURCES and git_time and not has_key(fm, "lastmod"):
+        if sort_key(git_time) > sort_key(date):
+            added.append(f"lastmod: {git_time}")
 
     body = INDEX_LINK_RE.sub(r"\1_index.md\2)", body)
     body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
-    if not fm_lines:
-        return body
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 
 
@@ -121,7 +134,15 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
         shutil.rmtree(dest)
     dest.mkdir(parents=True)
 
+    resolver = DateResolver(src)
+    if resolver.shallow_clone:
+        print("warning: source repo is a shallow clone — every tracked file reports the "
+              "same commit time. Check out with fetch-depth: 0 for real dates.",
+              file=sys.stderr)
+
     md_count = other_count = 0
+    page_dates: dict[Path, str] = {}  # regular page -> resolved date, for index inheritance
+
     for path in sorted(src.rglob("*")):
         if any(part in SKIP_DIRS for part in path.relative_to(src).parts):
             continue
@@ -134,33 +155,86 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
         target = dest / rel
 
         if path.suffix.lower() == ".md":
-            if path.name in INDEX_NAMES:
+            is_index = path.name in INDEX_NAMES
+            if is_index:
                 target = target.with_name("_index.md")
             text = path.read_text(encoding="utf-8")
+            fm, _ = split_front_matter(text)
+            if has_key(fm, "date"):
+                date, date_source = front_matter_date(fm), "front-matter"
+            else:
+                date, date_source = resolver.resolve(path, rel)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel), encoding="utf-8")
+            target.write_text(
+                normalise_md(text, rel, date, date_source, resolver.git_time(rel)),
+                encoding="utf-8",
+            )
+            if not is_index:
+                page_dates[target] = date
             md_count += 1
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, target)
             other_count += 1
 
-    md_count += add_missing_indexes(dest)
+    md_count += add_missing_indexes(dest, resolver.built_at)
+    apply_index_dates(dest, page_dates)
     return md_count, other_count
 
 
-def add_missing_indexes(dest: Path) -> int:
+def newest_by_folder(dest: Path, page_dates: dict[Path, str]) -> dict[Path, str]:
+    """Newest page date per folder, propagated up to every ancestor inside dest."""
+    newest: dict[Path, str] = {}
+    for page, date in page_dates.items():
+        for folder in (page.parent, *page.parent.parents):
+            current = newest.get(folder)
+            if current is None or sort_key(date) > sort_key(current):
+                newest[folder] = date
+            if folder == dest:
+                break
+    return newest
+
+
+def apply_index_dates(dest: Path, page_dates: dict[Path, str]) -> None:
+    """
+    Re-date every section index whose date was merely inferred to the newest
+    date among its descendants. A section is recent when its contents are —
+    the landing page's own mtime says nothing useful about that.
+
+    Authored dates (`front-matter`, `path`) are left alone, as is any index
+    with no descendant pages.
+    """
+    newest = newest_by_folder(dest, page_dates)
+    for index in dest.rglob("_index.md"):
+        date = newest.get(index.parent)
+        if date is None:
+            continue
+        text = index.read_text(encoding="utf-8")
+        patched, n = INFERRED_DATE_RE.subn(
+            f"date: {date}\ndate_source: children", text, count=1
+        )
+        if n:
+            index.write_text(patched, encoding="utf-8")
+
+
+def add_missing_indexes(dest: Path, built_at: str) -> int:
     """
     Give every folder that contains Markdown (at any depth) an `_index.md` if it
     has none. Hugo only treats a folder as a section — browsable, and present in
     breadcrumbs — when it has one; nested wiki folders usually don't.
+
+    The date written here is a placeholder: apply_index_dates replaces it with
+    the newest date among the folder's pages.
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
         if (d / "_index.md").exists() or not any(d.rglob("*.md")):
             continue
         title = d.name.replace("-", " ").replace("_", " ").strip()
-        (d / "_index.md").write_text(f"---\ntitle: {yaml_str(title)}\n---\n", encoding="utf-8")
+        (d / "_index.md").write_text(
+            f"---\ntitle: {yaml_str(title)}\ndate: {built_at}\ndate_source: build\n---\n",
+            encoding="utf-8",
+        )
         created += 1
     return created
 

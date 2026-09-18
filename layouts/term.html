@@ -4,5 +4,8 @@
   <p class="muted">{{ len .Pages }} page{{ if ne (len .Pages) 1 }}s{{ end }} tagged
     — <a href="{{ "search/" | relURL }}?tag={{ .Data.Term | urlquery }}">combine with other tags in search</a>.</p>
 </header>
-{{ partial "page-list.html" (dict "pages" .Pages.ByTitle) }}
+<section class="list-recent">
+  <h2>Recent <span class="muted">(newest first)</span></h2>
+  {{ partial "page-list.html" (dict "pages" .Pages.ByDate.Reverse) }}
+</section>
 {{ end }}

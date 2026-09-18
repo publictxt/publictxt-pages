@@ -39,6 +39,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Breadcrumbs on every page except home (`Home › Wiki › Science › Brain › Page`), built from Hugo's native `.Ancestors`; section crumbs use folder names, numeric date folders stay literal
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
+- Recency ordering everywhere: home carries a global *Recent* list; every section page and tag page lists newest first
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
 
 ## Content structure — what real repos look like
@@ -79,14 +80,37 @@ Everything is optional. Where absent, the sync step derives it:
 title: string        # else: first `# H1` in the body (removed from body), else filename
 type: string         # optional — overrides folder-derived default
 tags: [string]       # inline `[a, b]` or block `- a` list; merged with extracted #hashtags, rewritten inline
-date: string         # blog: else derived from YYYYMMDD filename prefix or blog/YYYY/MM/DD/ path
+date: string         # else derived — see the date ladder below. Every page ends up with one.
+lastmod: string      # optional; else the source file's last Git commit time, when the page
+                     #   carries an authored date and has been edited since
 author: string       # carried; not filterable in v1
 source_repo: string  # carried; not filterable in v1
 ```
 
 Any other front matter keys (`web:`, `web-links:`, `bookmarks:`, …) are passed through untouched.
 
-**Note on `date`/`time`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate `date` and `time` fields. Hugo sorts and builds permalinks from `.Date` only. Derived dates are date-only; posts with no derivable date sort last.
+**Note on `date`/`time`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate `date` and `time` fields. Hugo sorts and builds permalinks from `.Date` only.
+
+### The date ladder
+
+Every page gets a date, so recency ordering works across all types — not just `blog/`. `scripts/dates.py` resolves it, most to least authoritative:
+
+| `date_source` | Where the date comes from |
+|---|---|
+| `front-matter` | an explicit `date:` in the source file |
+| `path` | `YYYYMMDD` or `YYYY-MM-DD` anywhere in the filename, or a `.../YYYY/MM/DD/` path |
+| `git` | the last commit that touched the source file |
+| `mtime` | the source file's modification time (untracked or uncommitted files) |
+| `build` | the time of this build — last resort |
+| `children` | section indexes (`_index.md`) only: the newest date among their descendants |
+
+Defaulting straight to build time was rejected: it stamps every undated page with the same, ever-moving timestamp, so undated wiki pages leapfrog genuinely dated posts on every rebuild and "recent" becomes noise. Git commit time is the honest answer to *when did this page last change*; build time remains the floor beneath it.
+
+The rung used is written into the generated front matter as `date_source:`. It is not decoration: `front-matter` and `path` are dates an **author** chose, every other rung is a **modification** time, and templates render the second kind as *Updated 13 Oct 2024* so an inferred date never masquerades as a publication date. It also makes a bad inference visible in `build/content/` rather than silently wrong in a listing.
+
+Section indexes take their newest descendant's date (`children`) whenever their own date would merely have been inferred — a section is recent when its contents are, not when its landing page was last touched. An authored date on an index is never overwritten.
+
+**CI caveat**: `actions/checkout` defaults to `fetch-depth: 1`. A shallow clone has one commit, so every tracked file reports that commit's time and the `git` rung collapses to a single timestamp. `deploy/publish-to-github-pages.yml` sets `fetch-depth: 0`; the sync step warns when it sees a shallow repo.
 
 ## What is native vs. preprocessed
 
@@ -96,10 +120,11 @@ Any other front matter keys (`web:`, `web-links:`, `bookmarks:`, …) are passed
 | URL-friendly URLs from filenames (spaces, dots, case) | Hugo urlize — native, no file renaming |
 | Type from folder + `type:` override | Hugo section + front matter — native |
 | Sections, tag cloud, meta sidebar | Hugo templates — native |
-| Blog ordering / permalinks | Hugo `.Date` — native |
+| Ordering / permalinks (all types) | Hugo `.Date` — native |
 | Tag browse pages `/tags/foo/` | Hugo taxonomy — native |
 | **`index.md`/`home.md` → `_index.md`** | **sync step** |
-| **`title`/`date` derivation** | **sync step** |
+| **`title` derivation** | **sync step** |
+| **`date`/`date_source`/`lastmod` derivation** | **sync step** (`dates.py`) |
 | **Skipping repo housekeeping files** | **sync step** |
 | **Inline `#hashtag` → link to its tag page** | **sync step** |
 | **Inline `#hashtag` → `tags`** | **hashtag step** |
@@ -120,7 +145,8 @@ Both scripts:
 - Self-contained Python 3, no third-party dependencies
 - Idempotent — safe to re-run
 - Never write to the source repo
-- Share one definition of what an inline hashtag is (`hashtags.py`), so a page's
+- Share one definition of what an inline hashtag is (`hashtags.py`) and one of how a
+  date is resolved (`dates.py`), so a page's
   linked hashtags and the tag cloud can never disagree. A hashtag is `#` + letter +
   letters/digits/`_`/`-`, not preceded by a word character, `/` or `&`, and not inside
   fenced/inline code, HTML, an existing link, or a URL — a fragment like
@@ -131,7 +157,8 @@ Both scripts:
 - Wipes and recreates the destination (`build/content/`, gitignored)
 - Renames `index.md`/`home.md` → `_index.md`; rewrites link destinations pointing at them
 - Creates a minimal `_index.md` (title = folder name) in any folder holding Markdown but no index page, so every folder is a Hugo section: browsable, listed, and present in breadcrumbs
-- Derives `title` and blog `date` as per the front matter contract; preserves existing front matter verbatim
+- Derives `title` as per the front matter contract; preserves existing front matter verbatim
+- Derives `date` + `date_source` (and `lastmod` where useful) via the date ladder above, for every page
 - Linkifies inline `#hashtags` to `/tags/<tag>/`, leaving the visible text as `#hashtag`. Hugo's embedded link render hook resolves the destination to the term page, so subpath deployments get the right prefix
 - Skips `README*`, `LICENSE*`, `CONTRIBUTING*`, `CNAME`, `.gitignore`, `.obsidian/`, `.git/`, `.trash/`, `*.gitkeep`
 - Copies non-Markdown files verbatim

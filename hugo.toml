@@ -25,6 +25,8 @@ capitalizeListTitles = false
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
   # Number of tags shown in the sidebar tag cloud
   tagCloudLimit = 20
+  # Number of pages in the home page's Recent list
+  recentLimit = 8
 
 [markup]
   [markup.goldmark.renderHooks.link]
