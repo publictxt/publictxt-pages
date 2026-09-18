@@ -61,6 +61,9 @@ capitalizeListTitles = false
     lineNos = false
     tabWidth = 4
 
+# Every list page also emits index.json — the data behind its page list
+# (see layouts/_partials/list-json.html and assets/js/list.js).
 [outputs]
-  home = ["html"]
-  section = ["html"]
+  home = ["html", "json"]
+  section = ["html", "json"]
+  term = ["html", "json"]

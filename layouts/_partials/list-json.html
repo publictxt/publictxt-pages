@@ -1,0 +1,24 @@
+{{/*
+  A page collection as the JSON the list renderer (assets/js/list.js) reads:
+  one object per page with what a card shows and what filters and sorts need.
+  Expects a page collection; returns a JSON string. Dates are RFC 3339 so the
+  browser can compare them; `summary` is the same plain, truncated text the
+  server-rendered cards used to show.
+*/}}
+{{ $items := slice }}
+{{ range . }}
+  {{ $tags := slice }}{{ range .GetTerms "tags" }}{{ $tags = $tags | append .LinkTitle }}{{ end }}
+  {{ $item := dict
+      "url" .RelPermalink
+      "title" .Title
+      "type" .Type
+      "section" .Section
+      "tags" $tags
+      "created" (.Date.Format "2006-01-02T15:04:05Z07:00")
+      "updated" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+      "summary" (.Summary | plainify | truncate 180)
+  }}
+  {{ with partial "bookmark-urls.html" . }}{{ $item = merge $item (dict "bookmarks" .) }}{{ end }}
+  {{ $items = $items | append $item }}
+{{ end }}
+{{ return (jsonify $items) }}
