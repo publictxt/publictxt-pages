@@ -1,0 +1,11 @@
+{{/*
+  Pages per list page for a page: `perPage:` in its own front matter, else the
+  nearest ancestor's (the same cascade as list-order.html). Returns 0 when
+  nothing is set, and the caller then lets .Paginate use
+  `pagination.pagerSize` from the config (templates cannot read that value).
+*/}}
+{{ $n := .Params.perPage }}
+{{ if not $n }}
+  {{ range .Ancestors }}{{ if and (not $n) .Params.perPage }}{{ $n = .Params.perPage }}{{ end }}{{ end }}
+{{ end }}
+{{ return (int ($n | default 0)) }}

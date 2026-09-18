@@ -14,7 +14,8 @@
 {{ $pages := partial "ordered.html" (dict "pages" .RegularPagesRecursive "order" $order) }}
 {{/* The Bookmarks section also gathers pages elsewhere that carry a `bookmark:` URL. */}}
 {{ if and (eq .Section "bookmarks") (eq .Parent site.Home) }}{{ $pages = partial "ordered.html" (dict "pages" (partialCached "bookmark-pages.html" .) "order" $order) }}{{ end }}
-{{ $pg := .Paginate $pages }}
+{{ $pg := "" }}
+{{ with partial "list-per-page.html" . }}{{ $pg = $.Paginate $pages . }}{{ else }}{{ $pg = .Paginate $pages }}{{ end }}
 
 {{/* A section's index body is real content (for `posts/` it is *the* content):
      render it as prose and index it for search, exactly like a single page.

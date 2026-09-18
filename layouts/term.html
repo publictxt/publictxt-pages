@@ -1,6 +1,8 @@
 {{ define "main" }}
 {{ $order := partial "list-order.html" . }}
-{{ $pg := .Paginate (partial "ordered.html" (dict "pages" .Pages "order" $order)) }}
+{{ $pages := partial "ordered.html" (dict "pages" .Pages "order" $order) }}
+{{ $pg := "" }}
+{{ with partial "list-per-page.html" . }}{{ $pg = $.Paginate $pages . }}{{ else }}{{ $pg = .Paginate $pages }}{{ end }}
 <header class="list-header">
   <h1><span class="muted">#</span>{{ .Title }}</h1>
   <p class="muted">{{ len .Pages }} page{{ if ne (len .Pages) 1 }}s{{ end }} tagged

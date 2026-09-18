@@ -47,11 +47,13 @@ below the list. Both are set in `hugo.toml`:
 - `params.listOrder` — the default order: `updated`, `created` or `title`, optionally followed by
   `asc` or `desc` (`"created asc"` is oldest first; dates default to newest first, titles to A→Z)
 
-A section's index page can choose its own order, which also applies to its sub-folders:
+A section's index page can choose its own order and page size, which also apply to its
+sub-folders:
 
 ```yaml
 ---
 order: title
+perPage: 50
 ---
 # wiki home
 ```
