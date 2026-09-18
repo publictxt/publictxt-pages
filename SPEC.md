@@ -3,13 +3,13 @@
 Static site interface for browsing/searching a single PublicTxt (or plain Obsidian) Markdown repository. Hugo + Pagefind.
 Dark theme. Good search and browse usability.
 
-## Architecture principle (revised twice)
+## Architecture principle
 
-**Hugo-native first; one small sync/normalise step; no PublicTxt.Syntax dependency.**
+**no PublicTxt.Syntax dependency.**
 
-This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively.
+This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively. 
+Python preprocessing and client-side Javascript can be used for added functionality.
 
-The original intent was "exactly one preprocessing step (hashtag extraction)". Testing against a real repo showed that is not enough — see *Why a sync step is unavoidable* below. v1 therefore has **one preprocessing stage in two scripts**:
 
 1. `scripts/sync_content.py` — copy the source repo to a generated content dir and normalise what Hugo cannot handle
 2. `scripts/extract_hashtags.py` — merge inline `#hashtags` into front matter `tags`
@@ -39,10 +39,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Breadcrumbs on every page except home (`Home › Wiki › Science › Brain › Page`), built from Hugo's native `.Ancestors`; section crumbs use folder names, numeric date folders stay literal
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
-- Recency ordering by default, with one meaning: most recently *updated* first. Home carries a global *Recent* list; every section page and tag page lists all its pages in that order (`layouts/_partials/recent.html` is the single definition)
-- List order is a build-time choice, not a per-visit toggle: `params.listOrder` sets the site default (`updated` | `created` | `title`, each with optional `asc`/`desc`); a section's index page overrides it for itself and its sub-folders with `order:` in its front matter (e.g. `order: title` for a wiki). `layouts/_partials/ordered.html` applies it, `list-order.html` resolves it. A client-side sort toggle was rejected because it cannot re-order what pagination has already split across pages
-- Section and tag lists paginate at `pagination.pagerSize` to `…/page/N/`, overridable per section (and its sub-folders) with `perPage:` on the index page; the section's index body renders and is indexed on page 1 only, so Pagefind returns it once
-- Section index bodies render as prose and are indexed for search, the same as single pages — for a section like `posts/` the index *is* the content
+- Section index bodies render as prose and are indexed for search, the same as single pages
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
 
 ## Content structure — what real repos look like
@@ -64,8 +61,8 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
     2024/20241013-title.md       date from YYYYMMDD- prefix
     20260509-title.md            date from YYYYMMDD- prefix
   notes/home.md, notes/Info politics/The WhatsApp Mess . 20240816.md
-  bookmarks/sites/<domain>/<page>.md, bookmarks/wiki/Obsidian.md.md
-  posts/index.md                 empty section
+  bookmarks/sites/<domain>/<page>.md
+  posts/20260101-title.md        
   media/                         non-Markdown assets, copied verbatim
   README.md LICENSE CNAME .obsidian/ .gitkeep   skipped
 ```
@@ -219,7 +216,6 @@ The content repo stays pure Markdown. A GitHub Actions workflow in the **content
 
 - `[[wikilink]]` conversion at sync time
 - `author` / `source_repo` as active filters
-- Cross-repo aggregation of `bookmarks/` resources (needs resource-identity/normalization decision)
 - Multi-repo subscription/fan-in
 - Backlinks / graph view
 - Tag co-occurrence / relatedness
