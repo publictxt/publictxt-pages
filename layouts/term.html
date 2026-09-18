@@ -1,11 +1,14 @@
 {{ define "main" }}
+{{ $order := partial "list-order.html" . }}
+{{ $pg := .Paginate (partial "ordered.html" (dict "pages" .Pages "order" $order)) }}
 <header class="list-header">
   <h1><span class="muted">#</span>{{ .Title }}</h1>
   <p class="muted">{{ len .Pages }} page{{ if ne (len .Pages) 1 }}s{{ end }} tagged
     — <a href="{{ "search/" | relURL }}?tag={{ .Data.Term | urlquery }}">combine with other tags in search</a>.</p>
 </header>
 <section class="list-recent">
-  <h2>Pages <span class="muted">(recently updated first)</span></h2>
-  {{ partial "page-list.html" (dict "pages" (partial "recent.html" .Pages)) }}
+  <h2>Pages <span class="muted">({{ partial "order-label.html" $order }}{{ if gt $pg.TotalPages 1 }} · page {{ $pg.PageNumber }} of {{ $pg.TotalPages }}{{ end }})</span></h2>
+  {{ partial "page-list.html" (dict "pages" $pg.Pages) }}
+  {{ partial "pagination.html" (dict "paginator" $pg "order" $order) }}
 </section>
 {{ end }}

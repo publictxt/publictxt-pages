@@ -1,3 +1,6 @@
+---
+order: title
+---
 # wiki home
 
 [home](../index.md)

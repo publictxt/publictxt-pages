@@ -306,6 +306,36 @@ a:hover { text-decoration: underline; }
 
 .page-card .chip-row { margin-top: 0.5rem; }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+  font-size: 0.9rem;
+}
+.pager-numbers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.pager {
+  display: inline-block;
+  min-width: 2rem;
+  padding: 0.3rem 0.6rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+a.pager:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+.pager.current { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.pager.disabled { opacity: 0.4; }
+.pager-gap { align-self: center; color: var(--text-muted); padding: 0 0.2rem; }
+
 /* ---------- Single page ---------- */
 
 .single-header {

@@ -38,6 +38,26 @@ Front matter, when present, is preserved. A page anywhere with `bookmark: <url>`
 matter (or `bookmarks:`, a URL or a list) is also listed in the Bookmarks section, with the URL
 shown as an external link on its card, header and sidebar.
 
+## Lists: order and pagination
+
+Section and tag pages list their pages most recently *updated* first, 20 per page, with a pager
+below the list. Both are set in `hugo.toml`:
+
+- `pagination.pagerSize` — pages per list page
+- `params.listOrder` — the default order: `updated`, `created` or `title`, optionally followed by
+  `asc` or `desc` (`"created asc"` is oldest first; dates default to newest first, titles to A→Z)
+
+A section's index page can choose its own order, which also applies to its sub-folders:
+
+```yaml
+---
+order: title
+---
+# wiki home
+```
+
+The example repo's `wiki/index.md` does this, so the wiki reads A→Z while the blog stays newest first.
+
 ## Build
 
 ```bash

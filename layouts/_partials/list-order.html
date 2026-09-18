@@ -1,0 +1,11 @@
+{{/*
+  The list order that applies to a page: `order:` in its own front matter,
+  else the nearest ancestor's (so `order: title` on wiki/index.md covers every
+  sub-folder of the wiki), else `params.listOrder`, else "updated".
+  Returns the order string for ordered.html.
+*/}}
+{{ $order := .Params.order }}
+{{ if not $order }}
+  {{ range .Ancestors }}{{ if and (not $order) .Params.order }}{{ $order = .Params.order }}{{ end }}{{ end }}
+{{ end }}
+{{ return ($order | default site.Params.listOrder | default "updated") }}

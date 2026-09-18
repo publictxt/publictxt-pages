@@ -1,0 +1,13 @@
+{{/* Human label for an order string (see ordered.html), e.g. "recently updated first". */}}
+{{ $parts := split (trim (lower (. | default "updated")) " ") " " }}
+{{ $field := index $parts 0 }}
+{{ $dir := "" }}{{ if gt (len $parts) 1 }}{{ $dir = index $parts 1 }}{{ end }}
+{{ $label := "recently updated first" }}
+{{ if eq $field "created" }}
+  {{ $label = cond (eq $dir "asc") "oldest first" "newest first" }}
+{{ else if eq $field "title" }}
+  {{ $label = cond (eq $dir "desc") "Z→A" "A→Z" }}
+{{ else if eq $dir "asc" }}
+  {{ $label = "least recently updated first" }}
+{{ end }}
+{{ return $label }}
