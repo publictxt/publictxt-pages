@@ -15,7 +15,7 @@ capitalizeListTitles = false
     source = "site-content"
     target = "content"
 
-# Section folders (wiki, blog, notes, metaweb) become sections natively.
+# Section folders (wiki, blog, notes, bookmarks) become sections natively.
 # `type:` in front matter overrides the folder-derived default (Hugo .Type).
 
 [taxonomies]
