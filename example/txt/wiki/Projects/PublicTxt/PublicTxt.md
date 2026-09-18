@@ -9,4 +9,4 @@ Note the line *before* the H1 above — the sync step still has to find the titl
 ## Related
 - [Curated Commons](CuratedCommons.md)
 - [Other Software](Other%20Software.md) — a link with an encoded space
-- [Obsidian](../../../metaweb/wiki/Obsidian.md.md) — cross-section link into metaweb
+- [Obsidian](../../../bookmarks/wiki/Obsidian.md.md) — cross-section link into bookmarks
