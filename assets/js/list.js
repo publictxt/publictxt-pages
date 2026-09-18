@@ -125,44 +125,31 @@ async function mount(root) {
     return b;
   }
 
+  function facetRow(label, chips) {
+    const row = document.createElement("div");
+    row.className = "list-facet";
+    const lab = document.createElement("span");
+    lab.className = "facet-label";
+    lab.textContent = label;
+    const wrap = document.createElement("div");
+    wrap.className = "chip-row";
+    wrap.append(...chips);
+    row.append(lab, wrap);
+    return row;
+  }
+
   function renderControls(filtered) {
     controls.replaceChildren();
+    const head = document.createElement("div");
+    head.className = "list-controls-head";
     const sortWrap = document.createElement("label");
     sortWrap.className = "list-sort";
-    sortWrap.innerHTML = `<span class="muted">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
+    sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
       `<option value="${v}"${v === state.sort ? " selected" : ""}>${l}</option>`).join("")}</select>`;
     sortWrap.querySelector("select").addEventListener("change", (e) => {
       state.sort = e.target.value; state.page = 1; render(true);
     });
-    controls.append(sortWrap);
-
-    const within = (key) => new Map(counts(filtered, key));
-    if (hasTypes) {
-      const row = document.createElement("div");
-      row.className = "chip-row list-facet";
-      const c = within("type");
-      row.append(...typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n)));
-      controls.append(row);
-    }
-    if (tagFacet.length) {
-      const row = document.createElement("div");
-      row.className = "chip-row list-facet";
-      const c = within("tags");
-      const visible = state.moreTags ? tagFacet : tagFacet.slice(0, TAG_CHIPS);
-      row.append(...visible.map(([n]) => chip("tag", n, c.get(n) || 0, state.tags.has(n))));
-      for (const t of state.tags) {
-        if (!visible.some(([n]) => n === t)) row.append(chip("tag", t, c.get(t) || 0, true));
-      }
-      if (tagFacet.length > TAG_CHIPS) {
-        const more = document.createElement("button");
-        more.type = "button";
-        more.className = "chip filter-chip more";
-        more.textContent = state.moreTags ? "fewer tags" : `+${tagFacet.length - TAG_CHIPS} more`;
-        more.addEventListener("click", () => { state.moreTags = !state.moreTags; render(false); });
-        row.append(more);
-      }
-      controls.append(row);
-    }
+    head.append(sortWrap);
     if (state.type || state.tags.size || state.sort !== defaultSort) {
       const clear = document.createElement("button");
       clear.type = "button";
@@ -171,7 +158,31 @@ async function mount(root) {
       clear.addEventListener("click", () => {
         state.type = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
       });
-      controls.append(clear);
+      head.append(clear);
+    }
+    controls.append(head);
+
+    const within = (key) => new Map(counts(filtered, key));
+    if (hasTypes) {
+      const c = within("type");
+      controls.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
+    }
+    if (tagFacet.length) {
+      const c = within("tags");
+      const visible = state.moreTags ? tagFacet : tagFacet.slice(0, TAG_CHIPS);
+      const chips = visible.map(([n]) => chip("tag", n, c.get(n) || 0, state.tags.has(n)));
+      for (const t of state.tags) {
+        if (!visible.some(([n]) => n === t)) chips.push(chip("tag", t, c.get(t) || 0, true));
+      }
+      if (tagFacet.length > TAG_CHIPS) {
+        const more = document.createElement("button");
+        more.type = "button";
+        more.className = "chip filter-chip more";
+        more.textContent = state.moreTags ? "fewer tags" : `+${tagFacet.length - TAG_CHIPS} more`;
+        more.addEventListener("click", () => { state.moreTags = !state.moreTags; render(false); });
+        chips.push(more);
+      }
+      controls.append(facetRow("Tags", chips));
     }
   }
 
