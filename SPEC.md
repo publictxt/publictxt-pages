@@ -69,7 +69,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 
 - Section = top-level folder = default `type`
 - Any folder may carry an `index.md` or `home.md` as its landing page
-- `bookmarks/` entries are one-file-per-resource, rendered as normal pages (single-author-per-repo assumption; cross-repo aggregation is out of scope)
+- `bookmarks/` entries are one-file-per-resource, rendered as normal pages (single-author-per-repo assumption; cross-repo aggregation is out of scope); pages elsewhere with a `bookmark:` front matter URL are listed there too (see *Bookmarks from front matter*)
 - `example/txt/` in this repo is a synthetic repo exhibiting all of the above and is the default build source
 
 ## Front matter contract
@@ -85,9 +85,21 @@ lastmod: string      # optional; else the source file's last Git commit time, wh
                      #   carries an authored date and has been edited since
 author: string       # carried; not filterable in v1
 source_repo: string  # carried; not filterable in v1
+bookmark: url        # URL or list of URLs; makes the page a bookmark wherever it lives
+                     #   (`bookmarks:` is accepted as an alias)
 ```
 
-Any other front matter keys (`web:`, `web-links:`, `bookmarks:`, …) are passed through untouched.
+Any other front matter keys (`web:`, `web-links:`, …) are passed through untouched.
+
+### Bookmarks from front matter
+
+A page in any section may carry `bookmark: <url>` (or a list). Templates then treat it as a
+bookmark in addition to its own type: it is listed in the `bookmarks/` section (merged with the
+native one-file-per-resource pages, newest first, and counted in the sidebar/home counts), and
+the URL is shown as an external link on its list card, page header and sidebar meta. The page
+itself stays where it is — its `type`, URL and breadcrumbs are unchanged. This is done entirely
+in templates; the sync step does not move or copy anything. If the repo has no `bookmarks/`
+folder there is no section page to list them on.
 
 **Note on `date`/`time`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate `date` and `time` fields. Hugo sorts and builds permalinks from `.Date` only.
 
