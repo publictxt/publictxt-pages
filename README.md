@@ -26,10 +26,11 @@ Hugo does **not** read the repo directly: `scripts/sync_content.py` copies it to
 
 - `index.md` / `home.md` in a folder → `_index.md` (otherwise Hugo treats the folder as a leaf bundle and hides its sibling pages); folders with no index page at all get a minimal one, so every folder is browsable and appears in breadcrumbs
 - missing `title:` → taken from the first `# H1` (removed from the body), else the filename
-- missing `date:` → **every** page gets one: a date in the filename/path, else the file's
-  last Git commit time, else its mtime, else the build time. The rung used is recorded as
-  `date_source:`, so an inferred date is shown as *Updated 13 Oct 2024* rather than passed
-  off as a publication date. Section indexes inherit their newest descendant's date.
+- missing `created:` / `updated:` → **every** page gets both: `created` from a date in the
+  filename/path, else the file's first Git commit, else its file times, else the build time;
+  `updated` from its last Git commit, else its mtime. The rung `created` came from is recorded
+  as `created_source:`. Lists everywhere sort on `updated`. Section indexes inherit their
+  newest descendant's `updated`. Legacy `date:` / `lastmod:` are accepted and renamed.
 - inline `#hashtags` → links to their tag page (text stays `#hashtag`; code, links and URL fragments are left alone)
 - repo housekeeping files (`README`, `LICENSE`, `CNAME`, `.obsidian/`, …) skipped
 
@@ -64,9 +65,9 @@ Pagefind indexes rendered HTML, so Hugo must run first.
 scripts/build.sh --serve      # or: .\scripts\build.ps1 -Serve
 ```
 
-Note: Pagefind's index/UI only exists after a full build + `pagefind` run — `hugo server`'s live-reload preview won't have working search until you do a full build once.
+Note: Pagefind's index/UI only exists after a full build + `pagefind` run — do that once first, then start the server. It won't pick up content edited after that until you rebuild.
 
-If you run `hugo server` by hand, pass `-M` (`--renderToMemory`). Hugo renders the preview to disk by default, overwriting pages in `public/` with dev-mode HTML that points at an unfingerprinted stylesheet — those pages then appear unstyled when the built site is served. The build scripts already pass it; a plain `hugo` build afterwards also repairs any damage.
+If you run `hugo server` by hand, pass both `-M` (`--renderToMemory`) **and** `--renderStaticToDisk`. Hugo renders pages to disk by default, overwriting `public/`'s built HTML with dev-mode markup that points at an unfingerprinted stylesheet — those pages then appear unstyled when the built site is served next; `-M` keeps that render in memory instead. But `-M` alone also stops the server serving anything Hugo didn't render itself, and Pagefind's index is such a thing — it's written straight into `public/pagefind/` by the separate `pagefind` CLI step, outside Hugo's content/static/assets pipeline. `--renderStaticToDisk` is what still lets the server serve it from disk. The build scripts already pass both; a plain `hugo` build afterwards also repairs any damage from running the server without `-M`.
 
 ## Publishing a content repo (GitHub Pages)
 

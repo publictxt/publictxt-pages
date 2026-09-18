@@ -3,7 +3,7 @@
 This folder mimics a real PublicTxt / Obsidian repository, deliberately including every
 characteristic the Hugo pipeline has to cope with:
 
-- **No front matter** on most files — titles come from the first `# H1`, blog dates from filenames
+- **No front matter** on most files — titles come from the first `# H1`, `created` dates from filenames or Git history
 - `index.md` / `home.md` used as folder index pages (Hugo would treat `index.md` as a leaf bundle)
 - Blog posts in three layouts: `blog/YYYY/MM/DD/YYYYMMDD.md`, `blog/YYYY/YYYYMMDD-title.md`, `blog/YYYYMMDD-title.md`
 - Wiki pages nested several folders deep, with their own `index.md`

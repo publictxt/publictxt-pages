@@ -1,17 +1,28 @@
 {{ define "main" }}
 <header class="list-header">
-  <h1>{{ .Title }}</h1>
-  {{ with .Content }}<div class="list-intro">{{ . }}</div>{{ end }}
+  <h1 data-pagefind-meta="title">{{ .Title }}</h1>
+  <div class="single-meta">
+    <span class="chip chip-type" data-pagefind-filter="type">{{ .Type }}</span>
+    {{ partial "page-date.html" (dict "page" . "detail" true) }}
+    {{ range .GetTerms "tags" }}
+    <a class="chip" href="{{ .RelPermalink }}" data-pagefind-filter="tag">{{ .LinkTitle }}</a>
+    {{ end }}
+  </div>
 </header>
 
-{{/* Every page now carries a date (see scripts/dates.py), so recency is the
-     ordering for every section rather than a blog-only special case. */}}
-{{ $pages := .RegularPagesRecursive.ByDate.Reverse }}
+{{/* A section's index body is real content (for `posts/` it is *the* content):
+     render it as prose and index it for search, exactly like a single page.
+     The page list below stays outside the Pagefind body. */}}
+{{ with .Content }}
+<div class="prose" data-pagefind-body>{{ . }}</div>
+{{ end }}
+
+{{ $pages := partial "recent.html" .RegularPagesRecursive }}
 {{/* The Bookmarks section also gathers pages elsewhere that carry a `bookmark:` URL. */}}
-{{ if and (eq .Section "bookmarks") (eq .Parent site.Home) }}{{ $pages = partial "bookmark-pages.html" }}{{ end }}
+{{ if and (eq .Section "bookmarks") (eq .Parent site.Home) }}{{ $pages = partialCached "bookmark-pages.html" . }}{{ end }}
 {{ if $pages }}
 <section class="list-recent">
-  <h2>Recent <span class="muted">({{ len $pages }} page{{ if ne (len $pages) 1 }}s{{ end }}, newest first)</span></h2>
+  <h2>Pages <span class="muted">({{ len $pages }}, recently updated first)</span></h2>
   {{ partial "page-list.html" (dict "pages" $pages) }}
 </section>
 {{ else }}

@@ -1,21 +1,17 @@
 {{/*
-  A page's date, with its provenance. Expects a page in `.page`, and
-  `.detail` true on single pages (where the extra precision is worth the room).
+  A page's `created` date, followed by its `updated` date when the page has
+  changed since (more than a day later). Expects a page in `.page`, and
+  `.detail` true on single pages, where the created date is also exported as
+  Pagefind metadata.
 
-  `date_source` is written by scripts/dates.py and names the rung the date came
-  from. `front-matter` and `path` are dates an author chose; every other rung is
-  a modification time, so it is labelled "Updated" — an inferred date must never
-  read as a publication date.
+  The same two dates drive the whole site: lists sort on `updated` (see
+  recent.html), and the sidebar meta block shows the same pair, so a page never
+  reads as "18 Sep" in one place and "Updated 18 Sep" in another.
 */}}
 {{ $p := .page }}
-{{ $authored := in (slice "front-matter" "path") ($p.Params.date_source | default "") }}
 {{ if not $p.Date.IsZero }}
-  {{ if $authored }}
 <time class="muted" datetime="{{ $p.Date.Format "2006-01-02T15:04:05Z07:00" }}"{{ if .detail }} data-pagefind-meta="date"{{ end }}>{{ $p.Date.Format "2 Jan 2006" }}</time>
-    {{ if and .detail (gt (int (sub $p.Lastmod.Unix $p.Date.Unix)) 86400) }}
+  {{ if gt (int (sub $p.Lastmod.Unix $p.Date.Unix)) 86400 }}
 <span class="muted">· updated <time datetime="{{ $p.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ $p.Lastmod.Format "2 Jan 2006" }}</time></span>
-    {{ end }}
-  {{ else }}
-<time class="muted" datetime="{{ $p.Date.Format "2006-01-02T15:04:05Z07:00" }}"{{ if .detail }} data-pagefind-meta="date"{{ end }}>Updated {{ $p.Date.Format "2 Jan 2006" }}</time>
   {{ end }}
 {{ end }}

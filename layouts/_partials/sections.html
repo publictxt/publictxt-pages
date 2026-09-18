@@ -1,0 +1,17 @@
+{{/*
+  The site's top-level sections in navigation order: those named in
+  `params.sectionOrder`, in that order, then any others alphabetically by
+  folder name. Takes no argument. Hugo's own order is by date, which would
+  reshuffle the navigation on every edit.
+*/}}
+{{ $ordered := slice }}
+{{ $rest := slice }}
+{{ $wanted := site.Params.sectionOrder | default slice }}
+{{ range $wanted }}
+  {{ $name := . }}
+  {{ range site.Sections }}{{ if eq .Section $name }}{{ $ordered = $ordered | append . }}{{ end }}{{ end }}
+{{ end }}
+{{ range sort site.Sections "Section" }}
+  {{ if not (in $wanted .Section) }}{{ $rest = $rest | append . }}{{ end }}
+{{ end }}
+{{ return ($ordered | append $rest) }}

@@ -10,11 +10,11 @@ normalising the few things Hugo cannot handle natively:
     every sibling page inside it as a resource — fatal for a wiki.)
   * Missing `title:`  ->  taken from the first `# H1` (which is then removed
     from the body so it isn't rendered twice), else from the filename.
-  * Missing `date:`  ->  every page gets one, via the ladder in dates.py
-    (filename/path -> last Git commit -> mtime -> build time). The rung used
-    is recorded as `date_source:` so templates can distinguish an authored
-    date from an inferred one. Section indexes inherit the newest date among
-    their descendants.
+  * Missing `created:` / `updated:`  ->  every page gets both, via the ladders
+    in dates.py (filename/path -> Git history -> file times -> build time).
+    The rung `created` came from is recorded as `created_source:`. Section
+    indexes take the newest `updated` among their descendants. The legacy
+    keys `date:` and `lastmod:` are accepted and renamed in the copy.
   * Link destinations pointing at `index.md` / `home.md` are rewritten to
     `_index.md` so Hugo's embedded link render hook can resolve them.
   * Folders containing Markdown but no index page get a minimal `_index.md`
@@ -36,6 +36,7 @@ Usage:
 import re
 import shutil
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from dates import DateResolver, sort_key
@@ -48,14 +49,18 @@ INDEX_NAMES = {"index.md", "home.md"}
 FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n?", re.DOTALL)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
-DATE_VALUE_RE = re.compile(r"^date\s*:\s*(.+?)\s*$", re.MULTILINE)
-# Matches only the date block sync itself wrote, and only on an inferred rung —
-# an authored date must never be silently overwritten by a folder's activity.
-INFERRED_DATE_RE = re.compile(
-    r"^date: .*\ndate_source: (?:git|mtime|build)$", re.MULTILINE
-)
-# Rungs where the date means "written", not "last touched".
-AUTHORED_SOURCES = {"front-matter", "path"}
+UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
+# Legacy front matter keys, renamed in the generated copy so build/content
+# speaks one vocabulary. The source file is untouched.
+LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
+
+
+@dataclass
+class Stamp:
+    created: str
+    created_source: str
+    updated: str
+    updated_authored: bool   # explicit in front matter: never overridden by children
 
 
 def split_front_matter(text: str) -> tuple[str | None, str]:
@@ -69,10 +74,19 @@ def has_key(fm: str | None, key: str) -> bool:
     return bool(fm) and re.search(rf"^{key}\s*:", fm, re.MULTILINE) is not None
 
 
-def front_matter_date(fm: str | None) -> str:
-    """The raw `date:` value already in the front matter (quotes stripped)."""
-    m = DATE_VALUE_RE.search(fm or "")
+def front_matter_value(fm: str | None, key: str) -> str:
+    """The raw scalar value of `key` in the front matter (quotes stripped), or ""."""
+    m = re.search(rf"^{key}\s*:\s*(.+?)\s*$", fm or "", re.MULTILINE)
     return m.group(1).strip("\"'") if m else ""
+
+
+def rename_legacy_keys(fm: str | None) -> str | None:
+    if not fm:
+        return fm
+    for old, new in LEGACY_KEYS.items():
+        if not has_key(fm, new):
+            fm = re.sub(rf"^{old}(\s*:)", rf"{new}\1", fm, count=1, flags=re.MULTILINE)
+    return fm
 
 
 def derive_title(body: str, fallback: str) -> tuple[str, str]:
@@ -92,11 +106,27 @@ def yaml_str(s: str) -> str:
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> Stamp:
+    """Resolve a source file's `created` / `updated`, honouring what its front matter says."""
+    fm = rename_legacy_keys(fm)
+    if created := front_matter_value(fm, "created"):
+        created_source = "front-matter"
+    else:
+        created, created_source = resolver.created(path, rel)
+    if updated := front_matter_value(fm, "updated"):
+        authored = True
+    else:
+        updated, authored = resolver.updated(path, rel), False
+        # A file can't have changed before it was written; an authored
+        # `created` later than the last commit (a scheduled post) wins.
+        if sort_key(updated) < sort_key(created):
+            updated = created
+    return Stamp(created, created_source, updated, authored)
 
 
-def normalise_md(text: str, rel: str, date: str, date_source: str,
-                 git_time: str | None) -> str:
+def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
     fm, body = split_front_matter(text)
+    fm = rename_legacy_keys(fm)
     name = Path(rel).name
     stem = Path(rel).stem
     added = []
@@ -109,18 +139,12 @@ def normalise_md(text: str, rel: str, date: str, date_source: str,
         title, body = derive_title(body, fallback)
         added.append(f"title: {yaml_str(title)}")
 
-    if not has_key(fm, "date"):
-        added.append(f"date: {date}")
-    if not has_key(fm, "date_source"):
-        added.append(f"date_source: {date_source}")
-
-    # An authored date says when a page was written; for a page that has since
-    # been edited, `lastmod` is what makes "recent" mean recently *changed*.
-    # The inferred rungs are already modification times, so this only applies
-    # to the two authored ones.
-    if date_source in AUTHORED_SOURCES and git_time and not has_key(fm, "lastmod"):
-        if sort_key(git_time) > sort_key(date):
-            added.append(f"lastmod: {git_time}")
+    if not has_key(fm, "created"):
+        added.append(f"created: {stamp.created}")
+    if not has_key(fm, "created_source"):
+        added.append(f"created_source: {stamp.created_source}")
+    if not has_key(fm, "updated"):
+        added.append(f"updated: {stamp.updated}")
 
     body = INDEX_LINK_RE.sub(r"\1_index.md\2)", body)
     body = linkify(body)
@@ -141,7 +165,8 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
               file=sys.stderr)
 
     md_count = other_count = 0
-    page_dates: dict[Path, str] = {}  # regular page -> resolved date, for index inheritance
+    pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
+    indexes: dict[Path, Stamp] = {}   # existing section index -> stamp
 
     for path in sorted(src.rglob("*")):
         if any(part in SKIP_DIRS for part in path.relative_to(src).parts):
@@ -160,79 +185,74 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
                 target = target.with_name("_index.md")
             text = path.read_text(encoding="utf-8")
             fm, _ = split_front_matter(text)
-            if has_key(fm, "date"):
-                date, date_source = front_matter_date(fm), "front-matter"
-            else:
-                date, date_source = resolver.resolve(path, rel)
+            stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(
-                normalise_md(text, rel, date, date_source, resolver.git_time(rel)),
-                encoding="utf-8",
-            )
-            if not is_index:
-                page_dates[target] = date
+            target.write_text(normalise_md(text, rel, stamp), encoding="utf-8")
+            (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, target)
             other_count += 1
 
-    md_count += add_missing_indexes(dest, resolver.built_at)
-    apply_index_dates(dest, page_dates)
+    newest = newest_updated_by_folder(dest, pages)
+    md_count += add_missing_indexes(dest, resolver.built_at, newest)
+    inherit_index_dates(indexes, newest)
     return md_count, other_count
 
 
-def newest_by_folder(dest: Path, page_dates: dict[Path, str]) -> dict[Path, str]:
-    """Newest page date per folder, propagated up to every ancestor inside dest."""
+def newest_updated_by_folder(dest: Path, pages: dict[Path, Stamp]) -> dict[Path, str]:
+    """Newest `updated` per folder, propagated up to every ancestor inside dest."""
     newest: dict[Path, str] = {}
-    for page, date in page_dates.items():
+    for page, stamp in pages.items():
         for folder in (page.parent, *page.parent.parents):
             current = newest.get(folder)
-            if current is None or sort_key(date) > sort_key(current):
-                newest[folder] = date
+            if current is None or sort_key(stamp.updated) > sort_key(current):
+                newest[folder] = stamp.updated
             if folder == dest:
                 break
     return newest
 
 
-def apply_index_dates(dest: Path, page_dates: dict[Path, str]) -> None:
+def inherit_index_dates(indexes: dict[Path, Stamp], newest: dict[Path, str]) -> None:
     """
-    Re-date every section index whose date was merely inferred to the newest
-    date among its descendants. A section is recent when its contents are —
-    the landing page's own mtime says nothing useful about that.
+    Push every section index's inferred `updated` forward to the newest
+    `updated` among its descendants. A section is recent when its contents
+    are — the landing page's own history alone says nothing useful about that.
 
-    Authored dates (`front-matter`, `path`) are left alone, as is any index
-    with no descendant pages.
+    An authored `updated:` is left alone, as is any index with no descendant
+    pages or one that was itself touched more recently than its contents.
     """
-    newest = newest_by_folder(dest, page_dates)
-    for index in dest.rglob("_index.md"):
-        date = newest.get(index.parent)
-        if date is None:
+    for index, stamp in indexes.items():
+        latest = newest.get(index.parent)
+        if stamp.updated_authored or latest is None:
+            continue
+        if sort_key(latest) <= sort_key(stamp.updated):
             continue
         text = index.read_text(encoding="utf-8")
-        patched, n = INFERRED_DATE_RE.subn(
-            f"date: {date}\ndate_source: children", text, count=1
-        )
+        patched, n = UPDATED_LINE_RE.subn(f"updated: {latest}", text, count=1)
         if n:
             index.write_text(patched, encoding="utf-8")
 
 
-def add_missing_indexes(dest: Path, built_at: str) -> int:
+def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> int:
     """
     Give every folder that contains Markdown (at any depth) an `_index.md` if it
     has none. Hugo only treats a folder as a section — browsable, and present in
     breadcrumbs — when it has one; nested wiki folders usually don't.
 
-    The date written here is a placeholder: apply_index_dates replaces it with
-    the newest date among the folder's pages.
+    A generated index has no history of its own, so it is dated by its
+    contents: `updated` is the newest among the folder's pages.
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
         if (d / "_index.md").exists() or not any(d.rglob("*.md")):
             continue
         title = d.name.replace("-", " ").replace("_", " ").strip()
+        updated = newest.get(d, built_at)
         (d / "_index.md").write_text(
-            f"---\ntitle: {yaml_str(title)}\ndate: {built_at}\ndate_source: build\n---\n",
+            f"---\ntitle: {yaml_str(title)}\ncreated: {updated}\n"
+            f"created_source: children\nupdated: {updated}\n---\n",
             encoding="utf-8",
         )
         created += 1

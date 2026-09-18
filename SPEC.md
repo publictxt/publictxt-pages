@@ -35,11 +35,12 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Root-level pages (`Projects.md`, …) published as plain pages outside any section
 - Extract inline `#hashtags` → merge into front matter `tags`
 - Facets for search + browsing: tags, tag combinations, document type
-- Sections listed in sidebar (folder-derived names, not the index page's H1)
+- Sections listed in sidebar and on the home page (folder-derived names, not the index page's H1), in the fixed order given by `params.sectionOrder` (unlisted sections follow alphabetically) — Hugo's default page order is by date and would reshuffle the navigation on every edit
 - Breadcrumbs on every page except home (`Home › Wiki › Science › Brain › Page`), built from Hugo's native `.Ancestors`; section crumbs use folder names, numeric date folders stay literal
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
-- Recency ordering everywhere: home carries a global *Recent* list; every section page and tag page lists newest first
+- Recency ordering everywhere, with one meaning: most recently *updated* first. Home carries a global *Recent* list; every section page and tag page lists all its pages in that order (`layouts/_partials/recent.html` is the single definition)
+- Section index bodies render as prose and are indexed for search, the same as single pages — for a section like `posts/` the index *is* the content
 - `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
 
 ## Content structure — what real repos look like
@@ -80,9 +81,9 @@ Everything is optional. Where absent, the sync step derives it:
 title: string        # else: first `# H1` in the body (removed from body), else filename
 type: string         # optional — overrides folder-derived default
 tags: [string]       # inline `[a, b]` or block `- a` list; merged with extracted #hashtags, rewritten inline
-date: string         # else derived — see the date ladder below. Every page ends up with one.
-lastmod: string      # optional; else the source file's last Git commit time, when the page
-                     #   carries an authored date and has been edited since
+created: string      # when the page was written; else derived — see the date ladders below
+updated: string      # when it last changed; else derived. Every page ends up with both.
+                     #   Legacy `date:` / `lastmod:` are accepted as aliases and renamed in the copy
 author: string       # carried; not filterable in v1
 source_repo: string  # carried; not filterable in v1
 bookmark: url        # URL or list of URLs; makes the page a bookmark wherever it lives
@@ -101,28 +102,30 @@ itself stays where it is — its `type`, URL and breadcrumbs are unchanged. This
 in templates; the sync step does not move or copy anything. If the repo has no `bookmarks/`
 folder there is no section page to list them on.
 
-**Note on `date`/`time`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate `date` and `time` fields. Hugo sorts and builds permalinks from `.Date` only.
+**Note on `created`/`updated`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate date and time fields. `hugo.toml` maps `created` → `.Date` and `updated` → `.Lastmod`; Hugo sorts and renders from those only.
 
-### The date ladder
+### The date ladders
 
-Every page gets a date, so recency ordering works across all types — not just `blog/`. `scripts/dates.py` resolves it, most to least authoritative:
+Every page gets both a `created` and an `updated` time, so recency ordering works across all types — not just `blog/` — and means one thing everywhere: lists sort on `updated`, cards show `created` plus *· updated …* when the page changed more than a day later. `scripts/dates.py` resolves them, most to least authoritative:
 
-| `date_source` | Where the date comes from |
+| `created_source` | Where `created` comes from |
 |---|---|
-| `front-matter` | an explicit `date:` in the source file |
+| `front-matter` | an explicit `created:` (or legacy `date:`) in the source file |
 | `path` | `YYYYMMDD` or `YYYY-MM-DD` anywhere in the filename, or a `.../YYYY/MM/DD/` path |
-| `git` | the last commit that touched the source file |
-| `mtime` | the source file's modification time (untracked or uncommitted files) |
+| `git` | the **first** commit that touched the source file |
+| `mtime` | the file's birth time where the OS reports one, else its modification time |
 | `build` | the time of this build — last resort |
-| `children` | section indexes (`_index.md`) only: the newest date among their descendants |
+| `children` | generated section indexes only: the newest `updated` among the folder's pages |
 
-Defaulting straight to build time was rejected: it stamps every undated page with the same, ever-moving timestamp, so undated wiki pages leapfrog genuinely dated posts on every rebuild and "recent" becomes noise. Git commit time is the honest answer to *when did this page last change*; build time remains the floor beneath it.
+`updated` has a shorter ladder with no authored-vs-inferred ambiguity: an explicit `updated:` (or legacy `lastmod:`), else the **last** commit that touched the file, else its modification time, else the build time. It is never earlier than `created`.
 
-The rung used is written into the generated front matter as `date_source:`. It is not decoration: `front-matter` and `path` are dates an **author** chose, every other rung is a **modification** time, and templates render the second kind as *Updated 13 Oct 2024* so an inferred date never masquerades as a publication date. It also makes a bad inference visible in `build/content/` rather than silently wrong in a listing.
+Defaulting straight to build time was rejected: it stamps every undated page with the same, ever-moving timestamp, so undated wiki pages leapfrog genuinely dated posts on every rebuild and "recent" becomes noise. Git history is the honest answer to both *when was this written* and *when did it last change*; build time remains the floor beneath it.
 
-Section indexes take their newest descendant's date (`children`) whenever their own date would merely have been inferred — a section is recent when its contents are, not when its landing page was last touched. An authored date on an index is never overwritten.
+The rung `created` came from is written into the generated front matter as `created_source:`. Templates do not read it; it makes a bad inference visible in `build/content/` rather than silently wrong in a listing.
 
-**CI caveat**: `actions/checkout` defaults to `fetch-depth: 1`. A shallow clone has one commit, so every tracked file reports that commit's time and the `git` rung collapses to a single timestamp. `deploy/publish-to-github-pages.yml` sets `fetch-depth: 0`; the sync step warns when it sees a shallow repo.
+Section indexes take their newest descendant's `updated` whenever their own was merely inferred and is older — a section is recent when its contents are, not only when its landing page was last touched. An authored `updated:` on an index is never overwritten.
+
+**CI caveat**: `actions/checkout` defaults to `fetch-depth: 1`. A shallow clone has one commit, so every tracked file reports that commit's time at both ends and the `git` rung collapses to a single timestamp. `deploy/publish-to-github-pages.yml` sets `fetch-depth: 0`; the sync step warns when it sees a shallow repo.
 
 ## What is native vs. preprocessed
 
@@ -132,11 +135,11 @@ Section indexes take their newest descendant's date (`children`) whenever their 
 | URL-friendly URLs from filenames (spaces, dots, case) | Hugo urlize — native, no file renaming |
 | Type from folder + `type:` override | Hugo section + front matter — native |
 | Sections, tag cloud, meta sidebar | Hugo templates — native |
-| Ordering / permalinks (all types) | Hugo `.Date` — native |
+| Ordering (all types) | Hugo `.Lastmod`, mapped from `updated` — native |
 | Tag browse pages `/tags/foo/` | Hugo taxonomy — native |
 | **`index.md`/`home.md` → `_index.md`** | **sync step** |
 | **`title` derivation** | **sync step** |
-| **`date`/`date_source`/`lastmod` derivation** | **sync step** (`dates.py`) |
+| **`created`/`updated` derivation** | **sync step** (`dates.py`) |
 | **Skipping repo housekeeping files** | **sync step** |
 | **Inline `#hashtag` → link to its tag page** | **sync step** |
 | **Inline `#hashtag` → `tags`** | **hashtag step** |
@@ -170,7 +173,7 @@ Both scripts:
 - Renames `index.md`/`home.md` → `_index.md`; rewrites link destinations pointing at them
 - Creates a minimal `_index.md` (title = folder name) in any folder holding Markdown but no index page, so every folder is a Hugo section: browsable, listed, and present in breadcrumbs
 - Derives `title` as per the front matter contract; preserves existing front matter verbatim
-- Derives `date` + `date_source` (and `lastmod` where useful) via the date ladder above, for every page
+- Derives `created` + `created_source` and `updated` via the ladders above, for every page; renames legacy `date:` / `lastmod:` to the new keys in the copy
 - Linkifies inline `#hashtags` to `/tags/<tag>/`, leaving the visible text as `#hashtag`. Hugo's embedded link render hook resolves the destination to the term page, so subpath deployments get the right prefix
 - Skips `README*`, `LICENSE*`, `CONTRIBUTING*`, `CNAME`, `.gitignore`, `.obsidian/`, `.git/`, `.trash/`, `*.gitkeep`
 - Copies non-Markdown files verbatim

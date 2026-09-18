@@ -11,10 +11,10 @@
 <section class="home-sections">
   <h2>Browse</h2>
   <div class="card-grid">
-    {{ range site.Sections }}
+    {{ range partialCached "sections.html" . }}
     <a class="card" href="{{ .RelPermalink }}">
       <h3>{{ .Section | humanize }}</h3>
-      {{ $n := len .RegularPagesRecursive }}{{ if eq .Section "bookmarks" }}{{ $n = len (partial "bookmark-pages.html") }}{{ end }}
+      {{ $n := len .RegularPagesRecursive }}{{ if eq .Section "bookmarks" }}{{ $n = len (partialCached "bookmark-pages.html" .) }}{{ end }}
       <p class="muted">{{ $n }} page{{ if ne $n 1 }}s{{ end }}</p>
       {{ partial "page-date.html" (dict "page" .) }}
     </a>
@@ -26,11 +26,10 @@
   </div>
 </section>
 
-{{/* Sorted by .Date. Switch to .ByLastmod for "recently edited" instead. */}}
-{{ $recent := first (site.Params.recentLimit | default 8) site.RegularPages.ByDate.Reverse }}
+{{ $recent := first (site.Params.recentLimit | default 8) (partial "recent.html" site.RegularPages) }}
 {{ with $recent }}
 <section class="home-recent">
-  <h2>Recent</h2>
+  <h2>Recent <span class="muted">(recently updated first)</span></h2>
   {{ partial "page-list.html" (dict "pages" .) }}
 </section>
 {{ end }}

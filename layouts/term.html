@@ -5,7 +5,7 @@
     — <a href="{{ "search/" | relURL }}?tag={{ .Data.Term | urlquery }}">combine with other tags in search</a>.</p>
 </header>
 <section class="list-recent">
-  <h2>Recent <span class="muted">(newest first)</span></h2>
-  {{ partial "page-list.html" (dict "pages" .Pages.ByDate.Reverse) }}
+  <h2>Pages <span class="muted">(recently updated first)</span></h2>
+  {{ partial "page-list.html" (dict "pages" (partial "recent.html" .Pages)) }}
 </section>
 {{ end }}

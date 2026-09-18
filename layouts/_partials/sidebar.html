@@ -2,11 +2,11 @@
   <h2 class="side-heading">Sections</h2>
   <ul class="section-list">
     {{ $current := . }}
-    {{ range site.Sections }}
+    {{ range partialCached "sections.html" . }}
     <li class="{{ if eq $current.FirstSection . }}active{{ end }}">
       {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
       <a href="{{ .RelPermalink }}">{{ .Section | humanize }}</a>
-      <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partial "bookmark-pages.html") }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span>
+      <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partialCached "bookmark-pages.html" .) }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span>
     </li>
     {{ end }}
     <li class="{{ if eq .Layout "search" }}active{{ end }}">
@@ -24,8 +24,13 @@
     {{ $typePage := site.GetPage .Type }}
     <dd>{{ with $typePage }}<a class="chip chip-type" href="{{ .RelPermalink }}">{{ $.Type }}</a>{{ else }}<span class="chip chip-type">{{ .Type }}</span>{{ end }}</dd>
     {{ if not .Date.IsZero }}
-    <dt>Date</dt>
+    <dt>Created</dt>
     <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006" }}</time></dd>
+    {{/* Same threshold as page-date.html: an edit on the day of writing is not an update. */}}
+    {{ if gt (int (sub .Lastmod.Unix .Date.Unix)) 86400 }}
+    <dt>Updated</dt>
+    <dd><time datetime="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Lastmod.Format "2 Jan 2006" }}</time></dd>
+    {{ end }}
     {{ end }}
     {{ with partial "bookmark-urls.html" . }}
     <dt>Bookmark{{ if gt (len .) 1 }}s{{ end }}</dt>

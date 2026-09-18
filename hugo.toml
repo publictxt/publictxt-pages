@@ -18,11 +18,21 @@ capitalizeListTitles = false
 # Section folders (wiki, blog, notes, bookmarks) become sections natively.
 # `type:` in front matter overrides the folder-derived default (Hugo .Type).
 
+# The sync step writes `created:` and `updated:` on every page (see SPEC.md,
+# "The date ladders"). Hugo sorts and renders from .Date / .Lastmod, so map them.
+[frontmatter]
+  date = ["created"]
+  lastmod = ["updated", "created"]
+  publishDate = ["created"]
+
 [taxonomies]
   tag = "tags"
 
 [params]
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
+  # Order of sections in the sidebar and on the home page (folder names).
+  # Sections not listed here follow, alphabetically.
+  sectionOrder = ["blog", "wiki", "bookmarks", "posts", "notes"]
   # Number of tags shown in the sidebar tag cloud
   tagCloudLimit = 20
   # Number of pages in the home page's Recent list
