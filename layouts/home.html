@@ -14,7 +14,8 @@
     {{ range site.Sections }}
     <a class="card" href="{{ .RelPermalink }}">
       <h3>{{ .Section | humanize }}</h3>
-      <p class="muted">{{ len .RegularPagesRecursive }} page{{ if ne (len .RegularPagesRecursive) 1 }}s{{ end }}</p>
+      {{ $n := len .RegularPagesRecursive }}{{ if eq .Section "bookmarks" }}{{ $n = len (partial "bookmark-pages.html") }}{{ end }}
+      <p class="muted">{{ $n }} page{{ if ne $n 1 }}s{{ end }}</p>
       {{ partial "page-date.html" (dict "page" .) }}
     </a>
     {{ end }}

@@ -1,0 +1,11 @@
+{{/*
+  Every page that is a bookmark, newest first: the pages under `bookmarks/`
+  plus any page elsewhere whose front matter names a `bookmark:` URL
+  (see bookmark-urls.html). Takes no argument.
+*/}}
+{{ $pages := slice }}
+{{ with site.GetPage "bookmarks" }}{{ $pages = .RegularPagesRecursive }}{{ end }}
+{{ range site.RegularPages }}
+  {{ if partial "bookmark-urls.html" . }}{{ $pages = $pages | append . }}{{ end }}
+{{ end }}
+{{ return ($pages | uniq).ByDate.Reverse }}

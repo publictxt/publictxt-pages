@@ -7,6 +7,8 @@
 {{/* Every page now carries a date (see scripts/dates.py), so recency is the
      ordering for every section rather than a blog-only special case. */}}
 {{ $pages := .RegularPagesRecursive.ByDate.Reverse }}
+{{/* The Bookmarks section also gathers pages elsewhere that carry a `bookmark:` URL. */}}
+{{ if and (eq .Section "bookmarks") (eq .Parent site.Home) }}{{ $pages = partial "bookmark-pages.html" }}{{ end }}
 {{ if $pages }}
 <section class="list-recent">
   <h2>Recent <span class="muted">({{ len $pages }} page{{ if ne (len $pages) 1 }}s{{ end }}, newest first)</span></h2>

@@ -7,6 +7,7 @@
       <span class="chip chip-type">{{ .Type }}</span>
     </div>
     {{ partial "page-date.html" (dict "page" .) }}
+    {{ partial "bookmark-links.html" . }}
     {{ with .Summary }}<p class="page-card-summary">{{ . | plainify | truncate 180 }}</p>{{ end }}
     {{ with .GetTerms "tags" }}
     <div class="chip-row">
