@@ -1,8 +1,8 @@
 {{/*
   A page's `created` date, followed by its `updated` date when the page has
   changed since (more than a day later). Expects a page in `.page`, and
-  `.detail` true on single pages, where the created date is also exported as
-  Pagefind metadata.
+  `.detail` true on single pages, where both dates are also exported as
+  Pagefind metadata (`created`, `updated`, RFC 3339) for search result cards.
 
   The same two dates drive the whole site: lists sort on `updated` (see
   recent.html), and the sidebar meta block shows the same pair, so a page never
@@ -10,8 +10,8 @@
 */}}
 {{ $p := .page }}
 {{ if not $p.Date.IsZero }}
-<time class="muted" datetime="{{ $p.Date.Format "2006-01-02T15:04:05Z07:00" }}"{{ if .detail }} data-pagefind-meta="date"{{ end }}>{{ $p.Date.Format "2 Jan 2006" }}</time>
+<time class="muted" datetime="{{ $p.Date.Format "2006-01-02T15:04:05Z07:00" }}"{{ if .detail }} data-pagefind-meta="created[datetime]"{{ end }}>{{ $p.Date.Format "2 Jan 2006" }}</time>
   {{ if gt (int (sub $p.Lastmod.Unix $p.Date.Unix)) 86400 }}
-<span class="muted">· updated <time datetime="{{ $p.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ $p.Lastmod.Format "2 Jan 2006" }}</time></span>
+<span class="muted">· updated <time datetime="{{ $p.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}"{{ if .detail }} data-pagefind-meta="updated[datetime]"{{ end }}>{{ $p.Lastmod.Format "2 Jan 2006" }}</time></span>
   {{ end }}
 {{ end }}

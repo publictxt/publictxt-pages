@@ -28,12 +28,6 @@ capitalizeListTitles = false
 [taxonomies]
   tag = "tags"
 
-# Section and tag pages list this many pages per page (…/page/2/ and so on).
-# Page 1 is the list's own URL; the redirect alias …/page/1/ is not emitted.
-[pagination]
-  pagerSize = 5
-  disableAliases = true
-
 [params]
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
   # Order of sections in the sidebar and on the home page (folder names).
@@ -43,13 +37,17 @@ capitalizeListTitles = false
   tagCloudLimit = 30
   # Number of pages in the home page's Recent list
   recentLimit = 8
-  # Default order of section and tag page lists: "<field> [asc|desc]", field one of
+  # Browse lists (section and tag pages) are rendered client-side from each
+  # page's index.json, with sort, tag/type filters and paging in the URL.
+  # Default sort: "<field> [asc|desc]", field one of
   #   updated  (recently updated first — the site's one meaning of "recent")
   #   created  (newest first)
   #   title    (A→Z)
-  # A section's index page can override this for itself and its sub-folders
-  # with `order:` in its front matter (e.g. `order: title` on wiki/index.md).
+  # and default cards per page. A section's index page overrides either for
+  # itself and its sub-folders with `order:` / `perPage:` in its front matter
+  # (e.g. `order: title` on wiki/index.md).
   listOrder = "updated"
+  listPerPage = 20
 
 [markup]
   [markup.goldmark.renderHooks.link]
@@ -61,6 +59,9 @@ capitalizeListTitles = false
     lineNos = false
     tabWidth = 4
 
+# Every list page also emits index.json — the data behind its page list
+# (see layouts/_partials/list-json.html and assets/js/list.js).
 [outputs]
-  home = ["html"]
-  section = ["html"]
+  home = ["html", "json"]
+  section = ["html", "json"]
+  term = ["html", "json"]

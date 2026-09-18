@@ -1,0 +1,23 @@
+{{/*
+  A browse list. Hugo renders a plain list of links (what crawlers and no-JS
+  readers get); assets/js/list.js replaces it with sortable, filterable, paged
+  cards read from the page's index.json. Expects a dict:
+    page     — the list page (its json output is the data source)
+    pages    — the page collection, in the order the fallback should show
+    order    — default sort (see list.js), optional
+    perPage  — cards per page, optional (0 = list.js default)
+    compact  — true for cards only, no controls (home Recent)
+*/}}
+{{ $src := "" }}{{ with .page.OutputFormats.Get "json" }}{{ $src = .RelPermalink }}{{ end }}
+<div class="list" data-list data-src="{{ $src }}"{{ with .order }} data-order="{{ . }}"{{ end }}{{ with .perPage }} data-per-page="{{ . }}"{{ end }}{{ if .compact }} data-compact{{ end }}>
+  <ul class="link-list">
+    {{ range .pages }}
+    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> <span class="chip chip-type">{{ .Type }}</span> {{ partial "page-date.html" (dict "page" .) }}</li>
+    {{ end }}
+  </ul>
+</div>
+{{ with resources.Get "js/list.js" }}
+{{ $js := . | js.Build (dict "format" "esm" "minify" hugo.IsProduction) }}
+{{ if hugo.IsProduction }}{{ $js = $js | fingerprint }}{{ end }}
+<script type="module" src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
+{{ end }}

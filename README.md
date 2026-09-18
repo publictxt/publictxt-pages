@@ -38,17 +38,22 @@ Front matter, when present, is preserved. A page anywhere with `bookmark: <url>`
 matter (or `bookmarks:`, a URL or a list) is also listed in the Bookmarks section, with the URL
 shown as an external link on its card, header and sidebar.
 
-## Lists: order and pagination
+## Browse lists
 
-Section and tag pages list their pages most recently *updated* first, 20 per page, with a pager
-below the list. Both are set in `hugo.toml`:
+Section and tag pages, and the home page's Recent list, are rendered in the browser from a
+JSON index Hugo emits beside each list page (`/wiki/index.json`, `/tags/foo/index.json`, …).
+The list can be sorted (recently updated, newest, oldest, title), narrowed by tag and by type
+with live counts, and paged; the view is kept in the URL (`?tag=a&tag=b&type=wiki&sort=title&page=2`)
+so it can be linked. On a tag page this gives tag *combinations* without leaving the page.
+Without JavaScript the page still carries a plain list of links to every page.
 
-- `pagination.pagerSize` — pages per list page
-- `params.listOrder` — the default order: `updated`, `created` or `title`, optionally followed by
+Defaults are set in `hugo.toml`:
+
+- `params.listOrder` — the default sort: `updated`, `created` or `title`, optionally followed by
   `asc` or `desc` (`"created asc"` is oldest first; dates default to newest first, titles to A→Z)
+- `params.listPerPage` — cards per page
 
-A section's index page can choose its own order and page size, which also apply to its
-sub-folders:
+A section's index page can choose its own defaults, which also apply to its sub-folders:
 
 ```yaml
 ---
