@@ -42,8 +42,8 @@ shown as an external link on its card, header and sidebar.
 
 ```bash
 scripts/build.sh                      # Linux/macOS — builds example/txt
-scripts/build.sh ../my-txt-repo       # any PublicTxt repo directory
-HUGO_BASEURL=https://example.org/ scripts/build.sh txt
+scripts/build.sh --source ../my-txt-repo       # any PublicTxt repo directory
+HUGO_BASEURL=https://example.org/ scripts/build.sh --source txt
 .\scripts\build.ps1                   # Windows
 .\scripts\build.ps1 -Source txt -BaseUrl https://example.org/
 ```
