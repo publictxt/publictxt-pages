@@ -66,7 +66,7 @@ jobs:
           HUGO_BASEURL: https://publictxt.net/
           HUGO_TITLE: "A PublicTxt instance"
           HUGO_PARAMS_DESCRIPTION: "A PublicTxt repository — browsable, searchable, plain-text first."
-        run: sh site/scripts/build.sh ../txt
+        run: sh site/scripts/build.sh --source ../txt
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

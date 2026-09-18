@@ -7,13 +7,15 @@ cd "$(dirname "$0")/.."
 
 SOURCE="example/txt"
 SERVE=""
+SOURCE_SET=""
 
 usage() {
   cat <<'EOF'
-Usage: scripts/build.sh [--source <repo dir>] [--serve]
+Usage: scripts/build.sh [--source] <repo dir> [--serve]
 
 Options:
   --source <repo dir>   PublicTxt source repository directory (default: example/txt)
+                        May also be given as a bare positional argument.
   --serve               Run hugo server after preprocessing
   -h, --help            Show this help
 EOF
@@ -32,20 +34,34 @@ while [ "$#" -gt 0 ]; do
         exit 2
       fi
       SOURCE="$2"
+      SOURCE_SET=1
       shift 2
       ;;
     --source=*)
       SOURCE="${1#*=}"
+      SOURCE_SET=1
       shift
       ;;
     -h|--help)
       usage
       exit 0
       ;;
-    *)
-      echo "error: unknown argument '$1'" >&2
+    -*)
+      echo "error: unknown option '$1'" >&2
       usage >&2
       exit 2
+      ;;
+    *)
+      # A bare path is the source repo, so workflow copies that predate
+      # --source keep working.
+      if [ -n "$SOURCE_SET" ]; then
+        echo "error: unexpected argument '$1'" >&2
+        usage >&2
+        exit 2
+      fi
+      SOURCE="$1"
+      SOURCE_SET=1
+      shift
       ;;
   esac
 done
