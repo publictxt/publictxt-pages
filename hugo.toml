@@ -32,9 +32,9 @@ capitalizeListTitles = false
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
   # Order of sections in the sidebar and on the home page (folder names).
   # Sections not listed here follow, alphabetically.
-  sectionOrder = ["blog", "wiki", "bookmarks", "posts", "notes"]
+  sectionOrder = ["blog", "wiki", "posts", "notes", "bookmarks"]
   # Number of tags shown in the sidebar tag cloud
-  tagCloudLimit = 20
+  tagCloudLimit = 30
   # Number of pages in the home page's Recent list
   recentLimit = 8
 
