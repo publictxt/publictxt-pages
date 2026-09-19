@@ -1,2 +1,0 @@
-{{/* The top-level Bookmarks page gathers every bookmark page (see bookmark-pages.html). */}}
-{{ if eq .Parent site.Home }}{{ partial "list-json.html" (partialCached "bookmark-pages.html" .) }}{{ else }}{{ partial "list-json.html" .RegularPagesRecursive }}{{ end }}

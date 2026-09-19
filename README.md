@@ -2,7 +2,7 @@
 
 Static site interface for browsing/searching an Obsidian-style Markdown repository (PublicTxt or otherwise). Hugo + Pagefind.
 
-See `SPEC.md` for the full v1 spec.
+See `SPEC.md` for the full v1 spec, and `DECISIONS.md` for why it is shaped that way.
 
 ## Requirements
 
@@ -40,8 +40,10 @@ shown as an external link on its card, header and sidebar.
 
 ## Browse lists
 
-Section and tag pages, and the home page's Recent list, are rendered in the browser from a
-JSON index Hugo emits beside each list page (`/wiki/index.json`, `/tags/foo/index.json`, …).
+Section and tag pages, and the home page's Recent list, are rendered in the browser from one
+site-wide JSON page index, fetched once per visit and cached by URL. Each list page names the
+subset of it to show (its section's subtree, a tag, the bookmarks collection, or the most
+recently updated) rather than carrying its own copy of the data.
 The list can be sorted (recently updated, newest, oldest, title), narrowed by tag and by type
 with live counts, and paged; the view is kept in the URL (`?tag=a&tag=b&type=wiki&sort=title&page=2`)
 so it can be linked. On a tag page this gives tag *combinations* without leaving the page.

@@ -3,31 +3,26 @@
 Static site interface for browsing/searching a single PublicTxt (or plain Obsidian) Markdown repository. Hugo + Pagefind.
 Dark theme. Good search and browse usability.
 
+**This file describes what the build does today.**
+The reasoning lives in [`docs/decisions/D<n>.md`, referenced below as *(D1)*, *(D2)*.
+Look up Decisions only when needed.
+
 ## Architecture principle
 
 **no PublicTxt.Syntax dependency.**
 
-This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively. 
-Python preprocessing and client-side Javascript can be used for added functionality.
-
+This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively. Python preprocessing and client-side Javascript can be used for added functionality.
 
 1. `scripts/sync_content.py` — copy the source repo to a generated content dir and normalise what Hugo cannot handle
 2. `scripts/extract_hashtags.py` — merge inline `#hashtags` into front matter `tags`
 
-The source repository is **never modified**; both scripts operate on the generated copy.
-
-Rationale: keeps `publictxt-hugo` independently useful and testable, avoids coupling the static-site layer to the .NET solution's release cycle, and keeps authors' repos free of generator-specific front matter.
+The source repository is **never modified**; both scripts operate on the generated copy. *(D1)*
 
 ## Authoring constraint
 
-Obsidian must be configured to:
-
-- **Use Wikilinks: OFF** (emit standard Markdown links)
-- **New link format: Relative path to file**
-
 This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded link render hook resolves `.md` destinations to page URLs natively, and the same links remain valid browsing the repo directly on GitHub/GitLab.
 
-`[[wikilink]]` syntax is **not supported in v1** — they render as literal text. Hugo has no native support and upstream has declined to add it. Real repos do contain legacy wikilinks; converting them at sync time is a v2 candidate (the sync step already rewrites link destinations, so the hook exists).
+`[[wikilink]]` syntax is **not supported** — they render as literal text. *(D5)*
 
 ## Scope (v1)
 
@@ -35,13 +30,13 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Root-level pages (`Projects.md`, …) published as plain pages outside any section
 - Extract inline `#hashtags` → merge into front matter `tags`
 - Facets for search + browsing: tags, tag combinations, document type
-- Sections listed in sidebar and on the home page (folder-derived names, not the index page's H1), in the fixed order given by `params.sectionOrder` (unlisted sections follow alphabetically) — Hugo's default page order is by date and would reshuffle the navigation on every edit
+- Sections listed in sidebar and on the home page (folder-derived names, not the index page's H1), in the fixed order given by `params.sectionOrder` (unlisted sections follow alphabetically) *(D10)*
 - Breadcrumbs on every page except home (`Home › Wiki › Science › Brain › Page`), built from Hugo's native `.Ancestors`; section crumbs use folder names, numeric date folders stay literal
 - Tag cloud / top tags in sidebar
 - Content pages show meta info (type, date, tags) in sidebar
 - Section index bodies render as prose and are indexed for search, the same as single pages
-- Browse lists (home *Recent*, every section page, every tag page) are rendered client-side from a JSON index Hugo emits beside the page — sortable, filterable by tag and type, paged, with the view in the URL. Hugo renders a plain link list as the no-JS fallback. See *Browse lists* below
-- `author` / `source_repo` carried in front matter, not exposed in UI/filters (v2)
+- Browse lists (home *Recent*, every section page, every tag page) are rendered client-side from one site-wide JSON page index — sortable, filterable by tag and type, paged, with the view in the URL. Hugo renders a plain link list as the no-JS fallback. See *Browse lists* below *(D6, D7)*
+- `author` / `source_repo` carried in front matter, not exposed in UI/filters
 
 ## Content structure — what real repos look like
 
@@ -119,9 +114,7 @@ Every page gets both a `created` and an `updated` time, so recency ordering work
 
 `updated` has a shorter ladder with no authored-vs-inferred ambiguity: an explicit `updated:` (or legacy `lastmod:`), else the **last** commit that touched the file, else its modification time, else the build time. It is never earlier than `created`.
 
-Defaulting straight to build time was rejected: it stamps every undated page with the same, ever-moving timestamp, so undated wiki pages leapfrog genuinely dated posts on every rebuild and "recent" becomes noise. Git history is the honest answer to both *when was this written* and *when did it last change*; build time remains the floor beneath it.
-
-The rung `created` came from is written into the generated front matter as `created_source:`. Templates do not read it; it makes a bad inference visible in `build/content/` rather than silently wrong in a listing.
+The rung `created` came from is written into the generated front matter as `created_source:`. Templates do not read it; it makes a bad inference visible in `build/content/` rather than silently wrong in a listing. *(D4)*
 
 Section indexes take their newest descendant's `updated` whenever their own was merely inferred and is older — a section is recent when its contents are, not only when its landing page was last touched. An authored `updated:` on an index is never overwritten.
 
@@ -136,7 +129,7 @@ Section indexes take their newest descendant's `updated` whenever their own was 
 | Type from folder + `type:` override | Hugo section + front matter — native |
 | Sections, tag cloud, meta sidebar | Hugo templates — native |
 | Ordering (all types) | `updated` / `created` / `title` from the JSON index — client-side (`assets/js/list.js`); default per site or section |
-| List data (`index.json` per list page) | Hugo output format — native (`layouts/*.json`) |
+| List data (one site-wide `index.json`) | Hugo asset pipeline — native (`layouts/_partials/site-index.html`) |
 | Tag browse pages `/tags/foo/` | Hugo taxonomy — native |
 | **`index.md`/`home.md` → `_index.md`** | **sync step** |
 | **`title` derivation** | **sync step** |
@@ -146,13 +139,10 @@ Section indexes take their newest descendant's `updated` whenever their own was 
 | **Inline `#hashtag` → `tags`** | **hashtag step** |
 | Search, tag facets, tag combinations | Pagefind (post-build) |
 
-### Why a sync step is unavoidable
-
-Hugo treats any folder containing `index.md` as a **leaf bundle**: sibling `.md` files become page *resources* and are not rendered as pages. Real repos use `index.md` (and `home.md`) as folder landing pages throughout the wiki. There is no Hugo configuration that changes this; the file must be renamed to `_index.md`. Once a copy step exists, deriving `title`/`date` there is cheaper and more robust than template-side hacks (which could never fix sort order anyway).
-
-### Why hashtag extraction can't be native
-
-Hugo builds taxonomies from front matter before content rendering. Templates can regex `.RawContent` to extract hashtags for display or Pagefind filter attributes, but cannot inject them into Hugo's taxonomy system — so native `/tags/foo/` pages and the tag cloud would miss inline tags. Preprocessing is required for a single, consistent tag source.
+The two preprocessed concerns are forced, not chosen: Hugo's leaf-bundle rule makes the
+`index.md` → `_index.md` rename impossible to do in templates *(D2)*, and taxonomies are built
+from front matter before rendering, so inline hashtags cannot reach them from a template
+*(D3)*.
 
 ### Preprocessing script requirements
 
@@ -197,9 +187,18 @@ Wrapped by `scripts/build.sh` / `scripts/build.ps1`, which take the source repo 
 
 ## Browse lists (JSON + JS)
 
-Every list page — home, each section, each tag — also renders an `index.json` (Hugo output formats; `layouts/_partials/list-json.html`): one object per listed page with `url`, `title`, `type`, `section`, `tags`, `created`, `updated` (RFC 3339), `summary` and bookmark URLs. The Bookmarks page's JSON carries its gathered collection (`layouts/bookmarks/section.json`); home's is capped at `params.recentLimit`.
+The site publishes **one** page index (`layouts/_partials/site-index.html`, serialised by `list-json.html` from `site.RegularPages`): one object per page with `url`, `title`, `type`, `section`, `tags`, `created`, `updated` (RFC 3339), `summary` and bookmark URLs. It is fingerprinted in production and its URL is on `<html data-index>`.
 
-The HTML page holds a `[data-list]` container (`layouts/_partials/list-container.html`) with a plain `<ul>` of links inside — what crawlers and no-JS readers get. `assets/js/list.js` fetches the JSON and replaces it with cards, plus:
+Each list page declares *which subset of that index* it shows rather than carrying its own copy of the data — `data-scope-kind` / `data-scope-value` on the container, resolved by `assets/js/site-index.js`:
+
+| Scope | Shows | Server-side equivalent |
+|---|---|---|
+| `section` | pages below the section's path | `.RegularPagesRecursive` |
+| `tag` | pages carrying the tag | term `.Pages` |
+| `bookmarks` | the `bookmarks/` subtree plus any page with a `bookmark:` URL | `bookmark-pages.html` |
+| `recent` | the N most recently updated, site-wide | home, capped at `params.recentLimit` |
+
+The HTML page holds a `[data-list]` container (`layouts/_partials/list-container.html`) with a plain `<ul>` of links inside — what crawlers and no-JS readers get. `assets/js/list.js` scopes the index and replaces the fallback with cards, plus:
 
 - **Sort**: recently updated (default), newest, oldest, title A→Z / Z→A, least recently updated. The default comes from `params.listOrder`, overridable per section (and its sub-folders) with `order:` on the index page
 - **Filter**: chips for tag and type with counts within the current result set; several tags AND together. A facet only appears when the list varies on it, so a one-type section shows no type chips and a tag page hides its own tag. This gives tag combinations on tag pages themselves
@@ -208,31 +207,34 @@ The HTML page holds a `[data-list]` container (`layouts/_partials/list-container
 
 Home's *Recent* list uses the same component in compact mode (cards only). Cards are drawn by `assets/js/cards.js`, shared with the search page, so a page looks the same wherever it is listed. Both scripts are bundled by `js.Build` (esbuild is in plain Hugo, so non-extended Hugo still works).
 
-Why this and not server-side pagination or Pagefind for lists: Hugo's `.Paginate` fixes order and membership at build time, so a sort toggle or filter could only act on the current page; Pagefind's result ranking would replace deterministic ordering and needs its index even under `hugo server`. The JSON index scales to a few thousand pages per section (roughly 300 bytes a page, gzipped well) and needs no extra tooling.
+The index is roughly 300 bytes a page and gzips well. Why client-side lists rather than Hugo
+pagination or Pagefind *(D6)*; why one index rather than one per list page *(D7)*.
 
 ## Search / filter (Pagefind)
 
 - Full-text search plus faceted filtering, **with or without a search term** — selecting tags alone browses by tag combination
 - Facets driven by `data-pagefind-filter` attributes emitted in templates (`tag`, `type`)
-- Tag **combinations** are AND-ed via Pagefind's multi-filter support — Hugo taxonomies cannot express intersections. `type` is single-select.
-- Custom UI (`layouts/search.html`) on the Pagefind JS API rather than Pagefind's stock UI, which cannot run filter-only searches. Filter counts reflect the current result set; results show clickable tag chips.
+- Tag **combinations** are AND-ed via Pagefind's multi-filter support. `type` is single-select
+- Custom UI (`layouts/search.html`) on the Pagefind JS API. Filter counts reflect the current result set; results show clickable tag chips *(D8)*
 - URL state: `/search/?q=…&tag=a&tag=b&type=wiki` — tag pages deep-link into it (`/tags/foo/` → "combine with other tags"); the header search box submits `?q=`
-- Tag pages (`/tags/foo/`) are the browse path over the same data: filterable by further tags and type from their own JSON index (see *Browse lists*), and deep-linking into search for full text. Two mechanisms over one data set: Pagefind for text, the JSON index for structured browsing
+- Tag pages (`/tags/foo/`) are the browse path over the same data: filterable by further tags and type from the site-wide page index (see *Browse lists*), and deep-linking into search for full text. Two mechanisms over one data set: Pagefind for text, the JSON index for structured browsing
 
 ## Theme
 
 - Layout: sticky header with search box; sidebar (sections, page meta, tag cloud) + content area
 - Dark palette in CSS custom properties; responsive (sidebar drops below content on narrow screens)
-- Plain CSS (`assets/css/main.css`), pipelined through Hugo's asset pipeline (minify + fingerprint in production) — no Sass, so **plain (non-extended) Hugo works**
+- Plain CSS (`assets/css/main.css`), pipelined through Hugo's asset pipeline (minify + fingerprint in production) — no Sass, so **plain (non-extended) Hugo works** *(D9)*
 
 ## Deployment
 
 The content repo stays pure Markdown. A GitHub Actions workflow in the **content** repo checks out this repo alongside it, runs the pipeline, and deploys `public/` with `actions/deploy-pages`. See `deploy/publish-to-github-pages.yml`.
 
-## Deferred to v2+
+## Not yet built
 
-- `[[wikilink]]` conversion at sync time
-- `author` / `source_repo` as active filters
-- Multi-repo subscription/fan-in
-- Backlinks / graph view
-- Tag co-occurrence / relatedness
+Wikilink conversion, `author` / `source_repo` filters, multi-repo fan-in, backlinks, link
+weights, trust tiers, tag co-occurrence.
+
+These are listed in [`DECISIONS.md` → *Not yet decided*](DECISIONS.md#not-yet-decided) with,
+for each, why it hasn't happened and what would change that. That list is not a roadmap and
+not a reason to defer any of them — several are cheap, and one ("tag co-occurrence") only
+became possible with D7.

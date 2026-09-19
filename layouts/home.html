@@ -26,12 +26,13 @@
   </div>
 </section>
 
-{{/* The same pages home's index.json carries (see layouts/home.json). */}}
-{{ $recent := first (site.Params.recentLimit | default 8) (partial "recent.html" site.RegularPages) }}
+{{/* The fallback list; list.js takes the same pages from the site index. */}}
+{{ $limit := site.Params.recentLimit | default 8 }}
+{{ $recent := first $limit (partial "recent.html" site.RegularPages) }}
 {{ with $recent }}
 <section class="home-recent">
   <h2>Recent <span class="muted">(recently updated first)</span></h2>
-  {{ partial "list-container.html" (dict "page" $ "pages" . "compact" true) }}
+  {{ partial "list-container.html" (dict "pages" . "compact" true "scope" (dict "kind" "recent" "value" $limit)) }}
 </section>
 {{ end }}
 {{ end }}

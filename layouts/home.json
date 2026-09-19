@@ -1,2 +1,0 @@
-{{/* The home page's Recent list: the most recently updated pages, capped by params.recentLimit. */}}
-{{ partial "list-json.html" (first (site.Params.recentLimit | default 8) (partial "recent.html" site.RegularPages)) }}

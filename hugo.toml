@@ -59,9 +59,13 @@ capitalizeListTitles = false
     lineNos = false
     tabWidth = 4
 
-# Every list page also emits index.json — the data behind its page list
-# (see layouts/_partials/list-json.html and assets/js/list.js).
+# Browse lists read one site-wide page index, published as a fingerprinted
+# asset rather than a per-page output format — see
+# layouts/_partials/site-index.html and assets/js/site-index.js.
+#
+# List pages render HTML only. Naming the formats explicitly keeps Hugo's
+# default RSS off, which listing ["html", "json"] here used to do implicitly.
 [outputs]
-  home = ["html", "json"]
-  section = ["html", "json"]
-  term = ["html", "json"]
+  home = ["html"]
+  section = ["html"]
+  term = ["html"]

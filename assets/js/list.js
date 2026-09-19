@@ -1,15 +1,18 @@
-// Browse lists: every `[data-list]` container fetches its page's index.json
-// and renders sortable, filterable, paged cards in place of the plain link
-// list Hugo rendered as a fallback. Filter, sort and page live in the URL
+// Browse lists: every `[data-list]` container takes its pages from the
+// site-wide index (fetched once per document, see site-index.js) and renders
+// sortable, filterable, paged cards in place of the plain link list Hugo
+// rendered as a fallback. Filter, sort and page live in the URL
 // (?tag=a&tag=b&type=wiki&sort=title&page=2) so views are linkable; `q` stays
 // reserved for the search page.
 //
 // Container attributes:
-//   data-src        the JSON URL
-//   data-order      default sort, "<field>[ asc|desc]" (updated | created | title)
-//   data-per-page   cards per page
-//   data-compact    cards only: no controls, pager or URL state (home Recent)
+//   data-scope-kind   which subset of the index (section | tag | bookmarks | recent)
+//   data-scope-value  its argument — a path, a tag, or a limit
+//   data-order        default sort, "<field>[ asc|desc]" (updated | created | title)
+//   data-per-page     cards per page
+//   data-compact      cards only: no controls, pager or URL state (home Recent)
 import { card, escapeHTML } from "./cards.js";
+import { siteIndex, scope } from "./site-index.js";
 
 const SORTS = [
   ["updated", "Recently updated"],
@@ -55,9 +58,7 @@ async function mount(root) {
   const defaultSort = normaliseSort(root.dataset.order);
   let items;
   try {
-    const res = await fetch(root.dataset.src, { headers: { accept: "application/json" } });
-    if (!res.ok) throw new Error(String(res.status));
-    items = await res.json();
+    items = scope(await siteIndex(), root.dataset.scopeKind, root.dataset.scopeValue);
   } catch (e) {
     return;   // keep Hugo's plain link list
   }

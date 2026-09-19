@@ -1,15 +1,17 @@
 {{/*
   A browse list. Hugo renders a plain list of links (what crawlers and no-JS
   readers get); assets/js/list.js replaces it with sortable, filterable, paged
-  cards read from the page's index.json. Expects a dict:
-    page     — the list page (its json output is the data source)
+  cards, taking its pages from the site-wide index (see site-index.html).
+
+  The container names the *subset* it shows rather than its own data file, so
+  every list on the site reads one fetched-once index. Expects a dict:
     pages    — the page collection, in the order the fallback should show
+    scope    — dict: kind (section | tag | bookmarks | recent), value
     order    — default sort (see list.js), optional
     perPage  — cards per page, optional (0 = list.js default)
     compact  — true for cards only, no controls (home Recent)
 */}}
-{{ $src := "" }}{{ with .page.OutputFormats.Get "json" }}{{ $src = .RelPermalink }}{{ end }}
-<div class="list" data-list data-src="{{ $src }}"{{ with .order }} data-order="{{ . }}"{{ end }}{{ with .perPage }} data-per-page="{{ . }}"{{ end }}{{ if .compact }} data-compact{{ end }}>
+<div class="list" data-list data-scope-kind="{{ .scope.kind }}" data-scope-value="{{ .scope.value }}"{{ with .order }} data-order="{{ . }}"{{ end }}{{ with .perPage }} data-per-page="{{ . }}"{{ end }}{{ if .compact }} data-compact{{ end }}>
   <ul class="link-list">
     {{ range .pages }}
     <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> <span class="chip chip-type">{{ .Type }}</span> {{ partial "page-date.html" (dict "page" .) }}</li>
