@@ -6,6 +6,6 @@
 </header>
 <section class="list-section">
   <h2>Pages</h2>
-  {{ partial "list-container.html" (dict "page" . "pages" (partial "recent.html" .Pages) "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .)) }}
+  {{ partial "list-container.html" (dict "pages" (partial "recent.html" .Pages) "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .) "scope" (dict "kind" "tag" "value" .LinkTitle)) }}
 </section>
 {{ end }}

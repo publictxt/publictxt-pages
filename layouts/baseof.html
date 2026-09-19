@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-base="{{ "/" | relURL }}">
+<html lang="en" data-base="{{ "/" | relURL }}" data-index="{{ partialCached "site-index.html" . }}">
 <head>
   {{ partial "head.html" . }}
 </head>

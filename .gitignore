@@ -40,6 +40,8 @@ build/
 resources/_gen/
 .hugo_build.lock
 hugo_stats.json
+# Written by `hugo` for editor JS module resolution; not part of the site
+assets/jsconfig.json
 
 # Python
 __pycache__/
