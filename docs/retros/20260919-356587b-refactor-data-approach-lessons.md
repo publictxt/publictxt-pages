@@ -1,4 +1,4 @@
-# Lessons — "Serve browse lists from one site-wide page index"
+# Lessons — 20260919-356587b "Serve browse lists from one site-wide page index"
 
 Notes to myself (Claude) from the session that produced commit `356587b`, written down because
 the mistakes were process mistakes, not typos, and they'll recur otherwise.
@@ -93,9 +93,3 @@ all 110 item objects byte-for-byte against the global index, took one short scri
   to produce is usually worth what it cost.
 - Two of my three technical objections were wrong. Conceding them quickly and moving to the
   better design cost nothing; defending them would have cost the change.
-
-## Note on this file's name
-
-`lessons-learnt-this-commit.md` won't age well — the next commit's lessons have nowhere to go
-without overwriting these. If this becomes a habit, `docs/claude/lessons/<date>-<slug>.md`
-would keep them as a series.

@@ -3,19 +3,15 @@
 Static site interface for browsing/searching a single PublicTxt (or plain Obsidian) Markdown repository. Hugo + Pagefind.
 Dark theme. Good search and browse usability.
 
-**This file describes what the build does today.** The reasoning — why each piece is shaped
-the way it is, what it cost, and what would change it — lives in [`DECISIONS.md`](DECISIONS.md),
-referenced below as *(D1)*, *(D2)*, … Keeping them apart is deliberate: a description that
-carries its own justification tends to get quoted back as a constraint, when the only thing
-that should ever constrain a decision is whether its argument still holds.
+**This file describes what the build does today.**
+The reasoning lives in [`docs/decisions/D<n>.md`, referenced below as *(D1)*, *(D2)*.
+Look up Decisions only when needed.
 
 ## Architecture principle
 
 **no PublicTxt.Syntax dependency.**
 
-This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively. 
-Python preprocessing and client-side Javascript can be used for added functionality.
-
+This repo must work against a real Markdown wiki with relative links and **no front matter**, with no .NET toolchain present. Everything Hugo can do natively is done natively. Python preprocessing and client-side Javascript can be used for added functionality.
 
 1. `scripts/sync_content.py` — copy the source repo to a generated content dir and normalise what Hugo cannot handle
 2. `scripts/extract_hashtags.py` — merge inline `#hashtags` into front matter `tags`
@@ -23,11 +19,6 @@ Python preprocessing and client-side Javascript can be used for added functional
 The source repository is **never modified**; both scripts operate on the generated copy. *(D1)*
 
 ## Authoring constraint
-
-Obsidian must be configured to:
-
-- **Use Wikilinks: OFF** (emit standard Markdown links)
-- **New link format: Relative path to file**
 
 This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded link render hook resolves `.md` destinations to page URLs natively, and the same links remain valid browsing the repo directly on GitHub/GitLab.
 
