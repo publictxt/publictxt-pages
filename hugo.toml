@@ -1,5 +1,5 @@
 baseURL = "https://PublicTxt.net/"
-title = "PublicTxt"
+title = "A PublicTxt instance"
 enableRobotsTXT = true
 capitalizeListTitles = false
 
@@ -31,7 +31,7 @@ capitalizeListTitles = false
 [params]
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
   # Optional short site title shown in the mobile header.
-  shortTitle = "txt"
+  shortTitle = "PublicTxt"
   # Relative URL or file path to the favicon; a publishing site can override this,
   # or replace static/favicon.svg outright to change the default.
   favicon = "favicon.png"
