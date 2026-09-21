@@ -5,13 +5,13 @@
   --bg: #0e1116;
   --bg-raised: #161b23;
   --bg-inset: #0a0d11;
-  --border: #262d39;
-  --text: #d5dae2;
+  --border: #263239;
+  --text: #d5dce2;
   --text-muted: #8a93a5;
-  --accent: #7aa2f7;
-  --accent-soft: #24304d;
-  --chip-bg: #1d2430;
-  --chip-type-bg: #223146;
+  --accent: #53a4c7;
+  --accent-soft: rgba(57, 117, 145, 0.18);
+  --chip-bg: #1d2930;
+  --chip-type-bg: rgba(53, 117, 133, 0.12);
   --radius: 8px;
   --sidebar-width: 264px;
   --content-max: 76ch;
@@ -38,8 +38,8 @@ a:hover { text-decoration: underline; }
 /* ---------- Header ---------- */
 
 .site-header {
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-raised);
+  border-bottom: 1px solid rgba(44, 94, 117, 0.3);
+  background: linear-gradient(180deg, rgba(21, 39, 46, 0.80), rgba(8, 17, 20, 0.8));
   position: sticky;
   top: 0;
   z-index: 10;
@@ -60,8 +60,8 @@ a:hover { text-decoration: underline; }
   align-items: center;
   gap: 0.55rem;
   font-weight: 700;
-  font-size: 1.1rem;
   color: var(--text);
+  font-size: 1.05rem;
   letter-spacing: 0.01em;
 }
 .site-title:hover { text-decoration: none; color: var(--accent); }
