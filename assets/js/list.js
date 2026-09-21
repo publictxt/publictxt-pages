@@ -8,35 +8,18 @@
 // Container attributes:
 //   data-scope-kind   which subset of the index (section | tag | bookmarks | recent)
 //   data-scope-value  its argument — a path, a tag, or a limit
-//   data-order        default sort, "<field>[ asc|desc]" (updated | created | title)
+//   data-order        default sort, "<field>[ asc|desc]" (see sorts.js)
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL state (home Recent)
 import { card, escapeHTML } from "./cards.js";
 import { siteIndex, scope } from "./site-index.js";
+import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
-const SORTS = [
-  ["updated", "Recently updated"],
-  ["created", "Newest"],
-  ["created asc", "Oldest"],
-  ["title", "Title A→Z"],
-  ["title desc", "Title Z→A"],
-  ["updated asc", "Least recently updated"],
-];
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
-// Canonical form of a sort string: the default direction is left implicit.
-function normaliseSort(s) {
-  const [field = "updated", dir] = String(s || "").trim().toLowerCase().split(/\s+/);
-  const f = ["updated", "created", "title"].includes(field) ? field : "updated";
-  const d = dir === "asc" || dir === "desc" ? dir : (f === "title" ? "asc" : "desc");
-  const isDefault = f === "title" ? d === "asc" : d === "desc";
-  return isDefault ? f : `${f} ${d}`;
-}
-
 function sorted(items, sort) {
-  const [field, dir] = normaliseSort(sort).split(" ");
-  const asc = field === "title" ? dir !== "desc" : dir === "asc";
-  const sign = asc ? 1 : -1;
+  const { field, dir } = parseSort(sort);
+  const sign = dir === "asc" ? 1 : -1;
   const byTitle = (a, b) => (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
   return [...items].sort((a, b) => field === "title"
     ? sign * byTitle(a, b)
@@ -245,7 +228,7 @@ async function mount(root) {
     renderPager(total);
     const n = filtered.length;
     const what = [state.type, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
-    const label = (SORTS.find(([v]) => v === state.sort) || [, state.sort])[1];
+    const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")
       + (what ? ` — ${what}` : "")
