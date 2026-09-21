@@ -30,6 +30,9 @@ capitalizeListTitles = false
 
 [params]
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
+  # Relative URL or file path to the favicon; a publishing site can override this,
+  # or replace static/favicon.svg outright to change the default.
+  favicon = "favicon.png"
   # Order of sections in the sidebar and on the home page (folder names).
   # Sections not listed here follow, alphabetically.
   sectionOrder = ["blog", "wiki", "posts", "notes", "bookmarks"]

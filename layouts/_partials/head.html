@@ -2,6 +2,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ if not .IsHome }}{{ .Title }} · {{ end }}{{ site.Title }}</title>
 <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
+{{ $favicon := site.Params.favicon | default "favicon-256.png" }}
+{{ if strings.HasPrefix $favicon "/" }}
+  <link rel="icon" href="{{ $favicon }}" type="image/png">
+{{ else }}
+  <link rel="icon" href="{{ $favicon | relURL }}" type="image/png">
+{{ end }}
 {{ with resources.Get "css/main.css" }}
 {{ $css := . }}
 {{ if hugo.IsProduction }}{{ $css = $css | minify | fingerprint }}{{ end }}

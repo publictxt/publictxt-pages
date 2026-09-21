@@ -7,7 +7,8 @@
   <header class="site-header">
     <div class="site-header-inner">
       <a class="site-title" href="{{ site.Home.RelPermalink }}">
-        <span class="site-title-mark">▤</span> {{ site.Title }}
+        <img class="site-logo" src="{{ "logo.png" | relURL }}" alt="{{ site.Title }} logo">
+        <span>{{ site.Title }}</span>
       </a>
       <form class="header-search" action="{{ "search/" | relURL }}" method="get" role="search">
         <input type="search" name="q" placeholder="Search…" aria-label="Search the site">
