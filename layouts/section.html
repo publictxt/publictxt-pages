@@ -1,6 +1,7 @@
 {{ define "main" }}
 <header class="list-header">
   <h1 data-pagefind-meta="title">{{ .Title }}</h1>
+  {{ partial "pagefind-sort.html" . }}
   <div class="single-meta">
     <span class="chip chip-type" data-pagefind-filter="type">{{ .Type }}</span>
     {{ partial "page-date.html" (dict "page" . "detail" true) }}

@@ -2,6 +2,7 @@
 <article class="single" data-pagefind-body>
   <header class="single-header">
     <h1>{{ .Title }}</h1>
+    {{ partial "pagefind-sort.html" . }}
     <div class="single-meta">
       <span class="chip chip-type" data-pagefind-filter="type">{{ .Type }}</span>
       {{ partial "page-date.html" (dict "page" . "detail" true) }}
