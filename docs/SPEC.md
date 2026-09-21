@@ -203,7 +203,7 @@ The HTML page holds a `[data-list]` container (`layouts/_partials/list-container
 - **Sort**: recently updated (default), newest, oldest, title A→Z / Z→A, least recently updated. The default comes from `params.listOrder`, overridable per section (and its sub-folders) with `order:` on the index page
 - **Filter**: chips for tag and type with counts within the current result set; several tags AND together. A facet only appears when the list varies on it, so a one-type section shows no type chips and a tag page hides its own tag. This gives tag combinations on tag pages themselves
 - **Paging**: `params.listPerPage` / `perPage:` cards per page; a pager with real links
-- **URL state**: `?tag=a&tag=b&type=wiki&sort=title&page=2`, so any view is linkable and back/forward work. `q` stays reserved for search
+- **URL state**: `?tag=a&tag=b&type=wiki&sort=title&page=2`, so any view is linkable and back/forward work. `q` stays reserved for search. Sort names and their canonical `?sort=` forms are shared with the search page (`assets/js/sorts.js`)
 
 Home's *Recent* list uses the same component in compact mode (cards only). Cards are drawn by `assets/js/cards.js`, shared with the search page, so a page looks the same wherever it is listed. Both scripts are bundled by `js.Build` (esbuild is in plain Hugo, so non-extended Hugo still works).
 
@@ -216,7 +216,8 @@ pagination or Pagefind *(D6)*; why one index rather than one per list page *(D7)
 - Facets driven by `data-pagefind-filter` attributes emitted in templates (`tag`, `type`)
 - Tag **combinations** are AND-ed via Pagefind's multi-filter support. `type` is single-select
 - Custom UI (`layouts/search.html`) on the Pagefind JS API. Filter counts reflect the current result set; results show clickable tag chips *(D8)*
-- URL state: `/search/?q=…&tag=a&tag=b&type=wiki` — tag pages deep-link into it (`/tags/foo/` → "combine with other tags"); the header search box submits `?q=`
+- **Sort**: the same six orders as the browse lists (`assets/js/sorts.js`), plus *Relevance* — offered, and the default, only when there is a query; filter-only browsing defaults to recently updated. Pagefind sorts inside its index from keys every indexed template emits via `pagefind-sort.html` (dates as Unix seconds, title lower-cased), so ordering never loads a fragment per hit. A sort replaces relevance ranking outright — there is no relevance-then-date tiebreak. Pagefind drops pages lacking a sort key, so any new template carrying `data-pagefind-body` must include the partial
+- URL state: `/search/?q=…&tag=a&tag=b&type=wiki&sort=title` — tag pages deep-link into it (`/tags/foo/` → "combine with other tags"); the header search box submits `?q=`
 - Tag pages (`/tags/foo/`) are the browse path over the same data: filterable by further tags and type from the site-wide page index (see *Browse lists*), and deep-linking into search for full text. Two mechanisms over one data set: Pagefind for text, the JSON index for structured browsing
 
 ## Theme

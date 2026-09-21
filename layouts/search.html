@@ -30,7 +30,10 @@
     </aside>
 
     <section class="search-results" aria-live="polite">
-      <p id="search-status" class="muted"></p>
+      <div class="search-results-head">
+        <p id="search-status" class="muted"></p>
+        <label class="list-sort"><span class="facet-label">Sort</span> <select id="search-sort" aria-label="Sort order"></select></label>
+      </div>
       <ol id="search-list" class="result-list"></ol>
       <button type="button" id="search-more" class="btn-ghost" hidden>Show more</button>
     </section>
