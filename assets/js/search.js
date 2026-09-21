@@ -1,14 +1,21 @@
 // Search page: a custom UI on the Pagefind JS API (its stock UI cannot run
 // filter-only searches). Results are drawn with the same card as the browse
-// lists (cards.js); the query, type and tags live in the URL.
+// lists (cards.js); the query, type, tags and sort live in the URL.
+//
+// Sorting is Pagefind's own (sort keys emitted by pagefind-sort.html), so it
+// orders the whole result set inside the index without loading a fragment per
+// hit. A sort replaces relevance ranking outright, so "Relevance" is only
+// offered — and only the default — when there is a query; filter-only
+// browsing defaults to recently updated, like the browse lists.
 import { card } from "./cards.js";
+import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const PAGE = 20;
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
 const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"),
-  type: $("filter-type"), tag: $("filter-tag"), tagHint: $("filter-tag-hint"),
+  type: $("filter-type"), tag: $("filter-tag"), tagHint: $("filter-tag-hint"), sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
 
@@ -23,18 +30,30 @@ try {
 el.root.hidden = false;
 
 // ---- state <-> URL --------------------------------------------------
-const state = { q: "", type: "", tags: new Set() };
+// `sort` is null until chosen: the default then follows the query (see top).
+const RELEVANCE = "relevance";
+const state = { q: "", type: "", tags: new Set(), sort: null };
+const hasQuery = () => state.q.trim().length > 0;
+const defaultSort = () => hasQuery() ? RELEVANCE : "updated";
+function activeSort() {
+  const s = state.sort ?? defaultSort();
+  return s === RELEVANCE && !hasQuery() ? "updated" : s;
+}
 function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
   state.type = p.get("type") || "";
   state.tags = new Set(p.getAll("tag").filter(Boolean));
+  const s = p.get("sort");
+  state.sort = !s ? null : s === RELEVANCE ? RELEVANCE : normaliseSort(s);
 }
 function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
   if (state.type) p.set("type", state.type);
   for (const t of state.tags) p.append("tag", t);
+  const sort = activeSort();
+  if (state.sort && sort !== defaultSort()) p.set("sort", sort);
   const qs = p.toString();
   history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
 }
@@ -73,6 +92,12 @@ function renderFilters(counts) {
   el.tagHint.textContent = state.tags.size > 1 ? "— all selected must match" : "";
 }
 
+function renderSort() {
+  const options = hasQuery() ? [[RELEVANCE, "Relevance"], ...SORTS] : SORTS;
+  const cur = activeSort();
+  el.sort.replaceChildren(...options.map(([v, l]) => new Option(l, v, false, v === cur)));
+}
+
 // ---- search ---------------------------------------------------------------
 let shown = 0, current = [];
 async function run() {
@@ -80,14 +105,18 @@ async function run() {
   const filters = {};
   if (state.type) filters.type = state.type;
   if (state.tags.size) filters.tag = [...state.tags];     // array = AND
-  const hasQuery = state.q.trim().length > 0;
-  const res = await pagefind.search(hasQuery ? state.q : null, { filters });
+  const sort = activeSort();
+  const opts = { filters };
+  if (sort !== RELEVANCE) { const { field, dir } = parseSort(sort); opts.sort = { [field]: dir }; }
+  const res = await pagefind.search(hasQuery() ? state.q : null, opts);
   current = res.results; shown = 0;
   el.list.replaceChildren();
   renderFilters(res.filters || allFilters);
+  renderSort();
   const n = current.length;
-  const what = [hasQuery ? `“${state.q}”` : "", state.type, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
-  el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "");
+  const what = [hasQuery() ? `“${state.q}”` : "", state.type, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
+  el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
+    + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
   await showMore();
 }
 
@@ -115,7 +144,8 @@ function resultCard(d) {
 // ---- wiring -------------------------------------------------------------
 let timer;
 el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => { state.q = el.q.value; run(); }, 200); });
-el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; state.tags.clear(); el.q.value = ""; run(); el.q.focus(); });
+el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
+el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; state.tags.clear(); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 
