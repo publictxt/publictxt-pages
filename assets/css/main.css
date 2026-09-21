@@ -66,6 +66,8 @@ a:hover { text-decoration: underline; }
 }
 .site-title:hover { text-decoration: none; color: var(--accent); }
 
+.site-title-short { display: none; }
+
 .site-logo {
   width: 50px;
   height: 50px;
@@ -576,4 +578,9 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   .content { order: 1; }
 
   .header-search input[type="search"] { width: 42vw; }
+}
+
+@media (max-width: 700px) {
+  .site-title.has-short-title .site-title-full { display: none; }
+  .site-title.has-short-title .site-title-short { display: inline; }
 }

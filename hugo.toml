@@ -30,6 +30,8 @@ capitalizeListTitles = false
 
 [params]
   description = "A PublicTxt repository — browsable, searchable, plain-text first."
+  # Optional short site title shown in the mobile header.
+  shortTitle = "txt"
   # Relative URL or file path to the favicon; a publishing site can override this,
   # or replace static/favicon.svg outright to change the default.
   favicon = "favicon.png"

@@ -6,9 +6,12 @@
 <body>
   <header class="site-header">
     <div class="site-header-inner">
-      <a class="site-title" href="{{ site.Home.RelPermalink }}">
+      <a class="site-title{{ with site.Params.shortTitle }} has-short-title{{ end }}" href="{{ site.Home.RelPermalink }}">
         <img class="site-logo" src="{{ "logo.png" | relURL }}" alt="{{ site.Title }} logo">
-        <span>{{ site.Title }}</span>
+        <span class="site-title-full">{{ site.Title }}</span>
+        {{ with site.Params.shortTitle }}
+          <span class="site-title-short" aria-label="{{ site.Title }}">{{ . }}</span>
+        {{ end }}
       </a>
       <form class="header-search" action="{{ "search/" | relURL }}" method="get" role="search">
         <input type="search" name="q" placeholder="Search…" aria-label="Search the site">
