@@ -3,7 +3,7 @@
 
 :root {
   --bg: #0e1116;
-  --bg-raised: #161b23;
+  --bg-raised: #161f23;
   --bg-inset: #0a0d11;
   --border: #263239;
   --text: #d5dce2;
@@ -38,8 +38,8 @@ a:hover { text-decoration: underline; }
 /* ---------- Header ---------- */
 
 .site-header {
-  border-bottom: 1px solid rgba(44, 94, 117, 0.3);
-  background: linear-gradient(180deg, rgba(21, 39, 46, 0.80), rgba(8, 17, 20, 0.8));
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg-raised), rgba(13, 21, 26, 0.98));
   position: sticky;
   top: 0;
   z-index: 10;
