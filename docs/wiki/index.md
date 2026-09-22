@@ -82,7 +82,7 @@ layouts/_partials/
   list-container.html   [data-list] + no-JS <ul> + loads list.js
   list-order.html       order: cascade (page -> ancestors -> site param)
   list-per-page.html    perPage: cascade, same shape
-  pagefind-sort.html    hidden sort keys — see traps.md
+  pagefind-keys.html    hidden sort keys — see traps.md
   bookmark-urls.html    bookmark:/bookmarks: -> URLs; only reader of those keys
   bookmark-pages.html   bookmarks/ + every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row

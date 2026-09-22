@@ -12,7 +12,7 @@ would have to already know to open. **Read before editing templates or the pipel
 
 ## Pagefind drops pages silently
 
-Every template carrying `data-pagefind-body` **must** also call `pagefind-sort.html`.
+Every template carrying `data-pagefind-body` **must** also call `pagefind-keys.html`.
 Pagefind drops any page lacking the key it is sorting on, so a new template without it
 vanishes from sorted results with no error. Currently `page.html`, `section.html` and
 `bookmarks/section.html`.
