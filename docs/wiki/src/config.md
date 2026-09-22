@@ -3,10 +3,9 @@ covers:
   - hugo.toml
 ---
 
-# hugo.toml
+# [hugo.toml](../../../hugo.toml)
 
-The whole site configuration. Every setting here is either load-bearing for the
-build or a knob a publishing repo overrides.
+Every setting is either load-bearing or a knob a publishing repo overrides.
 
 ## Content mounts
 
@@ -18,8 +17,7 @@ Hugo's content is the **union of two directories**:
 ```
 
 `build/content` is generated and wiped every build — never edit it. `site-content`
-holds pages that belong to the site rather than anyone's notes (currently just the
-search page).
+holds pages belonging to the site rather than anyone's notes (the search page).
 
 ## Front matter mapping
 
@@ -30,9 +28,9 @@ lastmod     = ["updated", "created"]
 publishDate = ["created"]
 ```
 
-The sync step writes `created:`/`updated:` on every page; this is what turns them
-into `.Date` and `.Lastmod`, which every template and sort reads. Removing this
-mapping silently reverts the whole site to Hugo's own date guessing.
+Sync writes `created:`/`updated:` on every page; this turns them into `.Date` and
+`.Lastmod`, which every template and sort reads. Removing it silently reverts the
+site to Hugo's own date guessing. See [features/dates.md](../features/dates.md).
 
 ## Params
 
@@ -42,47 +40,34 @@ mapping silently reverts the whole site to Hugo's own date guessing.
 | `shortTitle` | header title on narrow screens |
 | `favicon` | relative URL or absolute path |
 | `sectionOrder` | section navigation order; unlisted follow alphabetically ([D10](../decisions/D10.md)) |
-| `tagCloudLimit` | terms in the sidebar cloud; currently 30 (template falls back to 20 if unset) |
-| `recentLimit` | pages in the home Recent list; currently 8 (template fallback 8) |
-| `listOrder` | default browse-list sort, `"<field> [asc\|desc]"` |
+| `tagCloudLimit` | terms in the sidebar cloud; currently 30 (template falls back to 20) |
+| `recentLimit` | pages in the home Recent list; currently 8 |
+| `listOrder` | default browse-list sort |
 | `listPerPage` | default cards per page |
 
-`listOrder` / `listPerPage` are overridable per section via `order:` / `perPage:`
-front matter, inherited by sub-folders — see
-[browse lists](../features/browse-lists.md).
+The last two are overridable per section via `order:` / `perPage:`, inherited by
+sub-folders — see [browse lists](../features/browse-lists.md).
 
-## Markup
+## Markup, outputs, taxonomies
 
-```toml
-[markup.goldmark.renderHooks.link] useEmbedded = "fallback"
-```
+`[markup.goldmark.renderHooks.link] useEmbedded = "fallback"` — the embedded link
+render hook resolves relative `.md` destinations (Obsidian "relative path to file"
+links) natively, which is why sync rewrites no links
+([D5](../decisions/D5.md)). It also resolves the site-relative `/tags/x/`
+destinations the hashtag linkifier emits, so sub-path deployments work.
+`[markup.highlight]` uses `github-dark`; [main.css](css.md) overrides the background
+it emits.
 
-The embedded link render hook resolves relative `.md` destinations (Obsidian
-"relative path to file" links) to page URLs natively — this is why no link
-rewriting is needed at sync time ([D5](../decisions/D5.md)). It also resolves the
-site-relative `/tags/x/` destinations the hashtag linkifier emits, so sub-path
-deployments get the right prefix.
+`[outputs] home / section / term = ["html"]` — naming the formats explicitly keeps
+Hugo's default RSS off. Listing `"json"` is what the **old** per-page-index design
+did; the site-wide index is now an asset built by `site-index.html`, not an output
+format ([D7](../decisions/D7.md)).
 
-`[markup.highlight]` uses `github-dark`; `main.css` overrides the background it
-emits.
-
-## Outputs
-
-```toml
-[outputs] home = ["html"]  section = ["html"]  term = ["html"]
-```
-
-Naming the formats explicitly keeps Hugo's default RSS off. Listing `"json"` here
-is what the **old** per-page-index design did; the site-wide index is now an asset
-built by `site-index.html`, not an output format ([D7](../decisions/D7.md)).
-
-## Taxonomies
-
-`tag = "tags"` — one taxonomy. `categories` is **not** configured; it does not
-exist on this site.
+`[taxonomies] tag = "tags"` — one taxonomy. `categories` is **not** configured; it
+does not exist on this site.
 
 ## Environment overrides
 
-Hugo's `HUGO_`-prefixed environment variables override any of this, which is how a
-publishing content repo customises the site without forking this file:
-`HUGO_BASEURL`, `HUGO_TITLE`, `HUGO_PARAMS_DESCRIPTION`. See [deploy](../deploy.md).
+`HUGO_`-prefixed environment variables override any of this, which is how a content
+repo customises the site without forking this file: `HUGO_BASEURL`, `HUGO_TITLE`,
+`HUGO_PARAMS_DESCRIPTION`. See [deploy](../deploy.md).
