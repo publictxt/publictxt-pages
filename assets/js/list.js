@@ -2,8 +2,8 @@
 // site-wide index (fetched once per document, see site-index.js) and renders
 // sortable, filterable, paged cards in place of the plain link list Hugo
 // rendered as a fallback. Filter, sort and page live in the URL
-// (?tag=a&tag=b&type=wiki&sort=title&page=2) so views are linkable; `q` stays
-// reserved for the search page.
+// (?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2) so views are linkable;
+// `q` stays reserved for the search page.
 //
 // Container attributes:
 //   data-scope-kind   which subset of the index (section | tag | bookmarks | recent)
@@ -17,6 +17,23 @@ import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
+// A page's year is the year of its `created` date, in the reader's own zone so
+// it agrees with the date the card prints (dateHTML() in cards.js).
+function yearOf(it) {
+  const d = new Date(it.created);
+  return isNaN(d) ? "" : String(d.getFullYear());
+}
+
+// The facets a list can offer: the values each page contributes, and the order
+// the chips sit in. Tags are multi-select and AND-ed; type and year are
+// exclusive, so their state is a string rather than a Set.
+const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
+const FACETS = {
+  type: { values: (it) => [it.type], order: byCount },
+  tags: { values: (it) => it.tags || [], order: byCount },
+  year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
+};
+
 function sorted(items, sort) {
   const { field, dir } = parseSort(sort);
   const sign = dir === "asc" ? 1 : -1;
@@ -26,13 +43,14 @@ function sorted(items, sort) {
     : sign * ((Date.parse(a[field]) || 0) - (Date.parse(b[field]) || 0)) || byTitle(a, b));
 }
 
-// [[value, count], ...] for a facet, most frequent first.
+// [[value, count], ...] for a facet, in that facet's chip order.
 function counts(items, key) {
+  const facet = FACETS[key];
   const m = new Map();
   for (const it of items) {
-    for (const v of (key === "tags" ? it.tags || [] : [it.type]).filter(Boolean)) m.set(v, (m.get(v) || 0) + 1);
+    for (const v of facet.values(it).filter(Boolean)) m.set(v, (m.get(v) || 0) + 1);
   }
-  return [...m].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  return [...m].sort(facet.order);
 }
 
 async function mount(root) {
@@ -47,12 +65,13 @@ async function mount(root) {
   }
 
   // ---- state <-> URL --------------------------------------------------
-  const state = { sort: defaultSort, type: "", tags: new Set(), page: 1, moreTags: false };
+  const state = { sort: defaultSort, type: "", year: "", tags: new Set(), page: 1, moreTags: false };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     state.type = p.get("type") || "";
+    state.year = p.get("year") || "";
     state.tags = new Set(p.getAll("tag").filter(Boolean));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
   }
@@ -61,6 +80,7 @@ async function mount(root) {
     const p = new URLSearchParams();
     if (s.sort !== defaultSort) p.set("sort", s.sort);
     if (s.type) p.set("type", s.type);
+    if (s.year) p.set("year", s.year);
     for (const t of s.tags) p.append("tag", t);
     if (s.page > 1) p.set("page", String(s.page));
     const qs = p.toString();
@@ -88,9 +108,12 @@ async function mount(root) {
   else root.append(controls, status, list, pager);
 
   // Chips for a facet are only useful when the list actually varies on it:
-  // a section of one type gets no type chips, a tag page hides its own tag.
+  // a section of one type gets no type chips, one year of posts gets no year
+  // chips, and a tag page hides its own tag.
   const typeFacet = counts(items, "type");
   const hasTypes = typeFacet.length > 1;
+  const yearFacet = counts(items, "year");
+  const hasYears = yearFacet.length > 1;
   const tagFacet = counts(items, "tags").filter(([, n]) => n < items.length);
 
   function chip(kind, name, n, active) {
@@ -100,9 +123,11 @@ async function mount(root) {
     b.setAttribute("aria-pressed", String(active));
     b.innerHTML = (kind === "tag" ? "#" : "") + escapeHTML(name) + `<span class="count">${n}</span>`;
     b.addEventListener("click", () => {
-      if (kind === "type") state.type = state.type === name ? "" : name;
-      else if (state.tags.has(name)) state.tags.delete(name);
-      else state.tags.add(name);
+      if (kind === "tag") {
+        if (state.tags.has(name)) state.tags.delete(name); else state.tags.add(name);
+      } else {
+        state[kind] = state[kind] === name ? "" : name;   // type, year: exclusive
+      }
       state.page = 1;
       render(true);
     });
@@ -134,13 +159,13 @@ async function mount(root) {
       state.sort = e.target.value; state.page = 1; render(true);
     });
     head.append(sortWrap);
-    if (state.type || state.tags.size || state.sort !== defaultSort) {
+    if (state.type || state.year || state.tags.size || state.sort !== defaultSort) {
       const clear = document.createElement("button");
       clear.type = "button";
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        state.type = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
+        state.type = ""; state.year = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
       });
       head.append(clear);
     }
@@ -150,6 +175,10 @@ async function mount(root) {
     if (hasTypes) {
       const c = within("type");
       controls.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
+    }
+    if (hasYears) {
+      const c = within("year");
+      controls.append(facetRow("Year", yearFacet.map(([n]) => chip("year", n, c.get(n) || 0, state.year === n))));
     }
     if (tagFacet.length) {
       const c = within("tags");
@@ -211,6 +240,7 @@ async function mount(root) {
   function render(pushHistory) {
     let filtered = items;
     if (state.type) filtered = filtered.filter((it) => it.type === state.type);
+    if (state.year) filtered = filtered.filter((it) => yearOf(it) === state.year);
     for (const t of state.tags) filtered = filtered.filter((it) => (it.tags || []).includes(t));
     filtered = sorted(filtered, state.sort);
 
@@ -227,7 +257,7 @@ async function mount(root) {
     renderControls(filtered);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
+    const what = [state.type, state.year, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")
