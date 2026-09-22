@@ -2,7 +2,7 @@
 """
 extract_hashtags.py
 
-Preprocessing step for PublicTxt-Hugo (see SPEC.md).
+Preprocessing step for PublicTxt-Hugo (see docs/wiki/features/tags.md).
 
 Scans Markdown files under content/, extracts inline #hashtags from the
 body, and merges them into the front matter `tags` list. Body text is left

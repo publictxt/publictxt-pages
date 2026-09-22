@@ -18,8 +18,9 @@ capitalizeListTitles = false
 # Section folders (wiki, blog, notes, bookmarks) become sections natively.
 # `type:` in front matter overrides the folder-derived default (Hugo .Type).
 
-# The sync step writes `created:` and `updated:` on every page (see SPEC.md,
-# "The date ladders"). Hugo sorts and renders from .Date / .Lastmod, so map them.
+# The sync step writes `created:` and `updated:` on every page (see
+# docs/wiki/features/dates.md). Hugo sorts and renders from .Date / .Lastmod,
+# so map them.
 [frontmatter]
   date = ["created"]
   lastmod = ["updated", "created"]

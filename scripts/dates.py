@@ -3,7 +3,7 @@
 dates.py
 
 Single source of truth for resolving a page's `created` and `updated` times
-(see SPEC.md, "Front matter contract"). Used by sync_content.py; kept separate
+(see docs/wiki/features/dates.md). Used by sync_content.py; kept separate
 for the same reason as hashtags.py — one definition, so nothing downstream can
 disagree about when a page is from.
 
