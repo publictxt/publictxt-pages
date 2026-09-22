@@ -46,7 +46,7 @@ SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
 INDEX_NAMES = {"index.md", "home.md"}
 
-FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n?", re.DOTALL)
+FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)^---\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
