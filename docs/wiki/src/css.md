@@ -3,11 +3,10 @@ covers:
   - assets/css/main.css
 ---
 
-# [main.css](../../../assets/css/main.css)
+# assets/css/main.css
 
-One plain-CSS file, 594 lines, no preprocessor — the non-extended Hugo binary is
-enough ([D9](../decisions/D9.md)). Loaded by
-[head.html](../../../layouts/_partials/head.html), minified and fingerprinted with an
+One plain-CSS file, 594 lines, no preprocessor — the non-extended Hugo binary is enough
+([D9](../decisions/D9.md)). Loaded by `head.html`, minified and fingerprinted with an
 SRI hash in production only.
 
 Banner comments mark the sections, in file order:

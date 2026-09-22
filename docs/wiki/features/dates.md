@@ -14,9 +14,9 @@ unless there is genuinely nothing better ([D4](../decisions/D4.md)). Resolver:
 
 ## The `created` ladder
 
-Most to least authoritative. The rung used is written as `created_source:` —
-diagnostic only, read by no template, but it makes a bad inference visible instead of
-silently wrong in a listing.
+Most to least authoritative. The rung used is written as `created_source:` — diagnostic
+only, read by no template, but it makes a bad inference visible instead of silently
+wrong in a listing.
 
 | Rung | Source |
 |---|---|
@@ -44,28 +44,24 @@ only when the new key is absent. [hugo.toml](../src/config.md) then maps `create
 
 ## Display
 
-One rule everywhere, so a page never reads "18 Sep" in one place and "Updated 18 Sep"
-in another:
+One rule everywhere, so a page never reads "18 Sep" in one place and "Updated 18 Sep" in
+another:
 
 > Show `created`. Add "· updated <date>" **only** when `updated` is more than a day later.
 
-Implemented three times, deliberately in step:
-[page-date.html](../../../layouts/_partials/page-date.html),
-[sidebar.html](../../../layouts/_partials/sidebar.html), and `dateHTML()` in
-[cards.js](../../../assets/js/cards.js). Format `2 Jan 2006` in all three. Changing
-the threshold means changing all three.
+Implemented three times, deliberately in step: `page-date.html`, `sidebar.html`, and
+`dateHTML()` in `cards.js`. Format `2 Jan 2006` in all three. Changing the threshold
+means changing all three.
 
 ## Sort order
 
-[recent.html](../../../layouts/_partials/recent.html) is the one definition of
-"newest first": `sort . "Lastmod" "desc"`, a **stable** sort over Hugo's default page
-order, so pages updated in the same commit keep a sensible order. `.ByLastmod.Reverse`
-was rejected — `.Reverse` also flips the tie-break, listing same-commit pages Z→A.
-`byUpdated()` in [site-index.js](../../../assets/js/site-index.js) mirrors it.
+`recent.html` is the one definition of "newest first": `sort . "Lastmod" "desc"`, a
+**stable** sort over Hugo's default page order, so pages updated in the same commit keep
+a sensible order. `.ByLastmod.Reverse` was rejected — `.Reverse` also flips the
+tie-break, listing same-commit pages Z→A. `byUpdated()` in `site-index.js` mirrors it.
 
 ## CI trap
 
-A shallow checkout (`fetch-depth: 1`, the `actions/checkout` default) has one commit,
-so **every tracked file reports the same time at both ends** and the `git` rung
-collapses. Sync warns when it sees one; [the workflow](../deploy.md) uses
-`fetch-depth: 0`.
+A shallow checkout (`fetch-depth: 1`, the `actions/checkout` default) has one commit, so
+**every tracked file reports the same time at both ends** and the `git` rung collapses.
+Sync warns when it sees one; [the workflow](../deploy.md) uses `fetch-depth: 0`.

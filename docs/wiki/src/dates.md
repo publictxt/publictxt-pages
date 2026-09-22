@@ -3,13 +3,12 @@ covers:
   - scripts/dates.py
 ---
 
-# [dates.py](../../../scripts/dates.py)
+# scripts/dates.py
 
 The single source of truth for when a page is from. Imported by
-[sync_content.py](sync.md); separate for the same reason as
-[hashtags.py](hashtags.md) — one definition, so nothing downstream can disagree.
-Ladders and rationale: [features/dates.md](../features/dates.md),
-[D4](../decisions/D4.md).
+[sync_content.py](sync.md); separate for the same reason as [hashtags.py](hashtags.md) —
+one definition, so nothing downstream can disagree. Ladders and rationale:
+[features/dates.md](../features/dates.md), [D4](../decisions/D4.md).
 
 ```python
 class DateResolver:
@@ -26,8 +25,8 @@ build_time() -> str
 sort_key(iso) -> datetime                           # comparable; unparseable sorts last
 ```
 
-`created()` / `updated()` are called only for files with no explicit front matter
-value — the `front-matter` rung is applied by `sync_content.stamp_for`.
+`created()` / `updated()` are called only for files with no explicit front matter value
+— the `front-matter` rung is applied by `sync_content.stamp_for`.
 
 ## `git_commit_times`
 
@@ -55,9 +54,9 @@ producing a bogus one.
 `_iso()` → local-offset ISO 8601, microseconds dropped. `st_birthtime` where the OS
 reports one, else mtime — so on Linux the `mtime` rung genuinely is mtime.
 
-`sort_key()` returns `datetime.min` (UTC) for anything unparseable rather than
-raising: an odd authored `created:` is Hugo's problem to report, not a reason to
-abort. Naive datetimes get the local offset so they compare against aware ones.
+`sort_key()` returns `datetime.min` (UTC) for anything unparseable rather than raising:
+an odd authored `created:` is Hugo's problem to report, not a reason to abort. Naive
+datetimes get the local offset so they compare against aware ones.
 
 **Gotcha:** a shallow clone makes every tracked file report one commit time at both
 ends. `shallow_clone` is exposed so sync can warn; CI must use `fetch-depth: 0`.

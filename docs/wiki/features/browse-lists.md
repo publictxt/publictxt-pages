@@ -14,23 +14,19 @@ covers:
 
 # Browse lists
 
-Every page list — home *Recent*, each section, each tag page, the Bookmarks
-collection — is one component: Hugo renders a plain `<ul>` of links, then
-[list.js](../../../assets/js/list.js) replaces it with sortable, filterable, paged
-cards ([D6](../decisions/D6.md)).
+Every page list — home *Recent*, each section, each tag page, the Bookmarks collection —
+is one component: Hugo renders a plain `<ul>` of links, then `list.js` replaces it with
+sortable, filterable, paged cards ([D6](../decisions/D6.md)).
 
 ## One index, many lists
 
-The site ships **one** `index.json`, built by
-[site-index.html](../../../layouts/_partials/site-index.html) from
-`site.RegularPages` and published as a fingerprinted asset. Its URL sits on
-`<html data-index>`; [site-index.js](../../../assets/js/site-index.js) fetches it once
-per document and shares the promise ([D7](../decisions/D7.md)).
+The site ships **one** `index.json`, built by `site-index.html` from `site.RegularPages`
+and published as a fingerprinted asset. Its URL sits on `<html data-index>`;
+`site-index.js` fetches it once per document and shares the promise
+([D7](../decisions/D7.md)).
 
-Per item (~300 B), from
-[list-json.html](../../../layouts/_partials/list-json.html): `url, title, type,
-section, tags[], created, updated` (RFC 3339), `summary` (plainified, 180 chars),
-`bookmarks[]` when present.
+Per item (~300 B), from `list-json.html`: `url, title, type, section, tags[], created,
+updated` (RFC 3339), `summary` (plainified, 180 chars), `bookmarks[]` when present.
 
 A page declares **which subset** it shows rather than carrying data:
 
@@ -46,7 +42,7 @@ change the other or the no-JS view diverges.
 
 ## What the reader gets
 
-- **Sort** — six options from [sorts.js](../../../assets/js/sorts.js): recently
+- **Sort** — six options from `sorts.js`: recently
   updated (default), newest, oldest, title A→Z, Z→A, least recently updated. Ties
   break on title.
 - **Filter chips** — tag and type, counts computed *within the current result set*.
@@ -63,12 +59,10 @@ Home *Recent* passes `data-compact`: cards only, no controls, pager or URL state
 
 ## Defaults and the cascade
 
-`params.listOrder` / `params.listPerPage` set site defaults. A section index
-overrides either with `order:` / `perPage:`, and the override **inherits to
-sub-folders** — `order: title` on `wiki/index.md` covers the whole wiki, resolved by
-[list-order.html](../../../layouts/_partials/list-order.html) and
-[list-per-page.html](../../../layouts/_partials/list-per-page.html) walking
-`.Ancestors`.
+`params.listOrder` / `params.listPerPage` set site defaults. A section index overrides
+either with `order:` / `perPage:`, and the override **inherits to sub-folders** —
+`order: title` on `wiki/index.md` covers the whole wiki, resolved by `list-order.html`
+and `list-per-page.html` walking `.Ancestors`.
 
 Order strings are `"<field>[ asc|desc]"` over `updated | created | title`; direction
 defaults to newest-first for dates and A→Z for titles, so `"created asc"` is

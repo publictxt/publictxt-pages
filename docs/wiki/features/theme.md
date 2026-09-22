@@ -16,23 +16,22 @@ Hugo's asset pipeline — no Sass, so the smaller non-extended Hugo binary works
 
 ## The shell
 
-[baseof.html](../../../layouts/baseof.html) carries two attributes the JS depends on:
+`baseof.html` carries two attributes the JS depends on:
 
 - `data-base` — `"/" | relURL`, so sub-path deployments resolve tag and Pagefind URLs.
 - `data-index` — the fingerprinted `index.json` URL (see [browse lists](browse-lists.md)).
 
 Then header (logo, site title with optional `params.shortTitle` for narrow screens, a
 search form posting `?q=` to `/search/`), sidebar, `main` preceded by breadcrumbs,
-footer. [page.html](../../../layouts/page.html) fills `main` for single pages: title,
-Pagefind sort keys, type/date/tag chips, bookmark links, body in `data-pagefind-body`.
+footer. `page.html` fills `main` for single pages: title, Pagefind sort keys,
+type/date/tag chips, bookmark links, body in `data-pagefind-body`.
 
-[head.html](../../../layouts/_partials/head.html) handles title, description, favicon
-and the stylesheet — minified and fingerprinted with an SRI hash **in production
-only**, so `hugo server` stays fast.
+`head.html` handles title, description, favicon and the stylesheet — minified and
+fingerprinted with an SRI hash **in production only**, so `hugo server` stays fast.
 
 ## Sidebar blocks
 
-[sidebar.html](../../../layouts/_partials/sidebar.html):
+`sidebar.html`:
 
 1. **Sections** — in `sections.html` order, each with a page count, current one
    `.active`, plus a Search link. The Bookmarks count uses `bookmark-pages.html`.
@@ -43,5 +42,5 @@ only**, so `hugo server` stays fast.
 Styling: [src/css.md](../src/css.md). Palette is CSS custom properties on `:root`, so
 retuning needs no rule changes.
 
-Not rendered anywhere: `author` and `source_repo` — carried in front matter, shown by
-no template. See [docs/SPEC.md](../../SPEC.md).
+Not rendered anywhere: `author` and `source_repo` — carried in front matter, shown by no
+template. See [docs/SPEC.md](../../SPEC.md).

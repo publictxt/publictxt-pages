@@ -1,8 +1,7 @@
 # Source Wiki
 
 How this repo works, written to be read **instead of** the source. The two or three
-relevant pages cost a fraction of reading [scripts/](../../scripts/),
-[layouts/](../../layouts/) and [assets/](../../assets/).
+relevant pages cost a fraction of reading `scripts/`, `layouts/` and `assets/`.
 
 > If a page contradicts the code, the code wins — and the page is a bug. Fix it in the same change.
 
@@ -25,7 +24,7 @@ Feature pages own behaviour, src pages own contracts; neither repeats the other.
 A stale code wiki is worse than none — it answers confidently and wrongly.
 
 1. Every page's `covers:` front matter names real paths.
-2. [scripts/wiki_lint.py](../../scripts/wiki_lint.py) checks the claim.
+2. `scripts/wiki_lint.py` checks the claim.
 
 **Change code and its wiki page in the same commit.** The lint is the safety net, not the process.
 

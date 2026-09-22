@@ -21,9 +21,8 @@ only its listing is shared.
 ## The front matter key
 
 `bookmark:` is the spec key; `bookmarks:` is accepted because it is already in use in
-the wild. Either takes a URL or a list.
-[bookmark-urls.html](../../../layouts/_partials/bookmark-urls.html) normalises all
-four shapes to a de-duplicated slice and is the **only** reader of these keys.
+the wild. Either takes a URL or a list. `bookmark-urls.html` normalises all four shapes
+to a de-duplicated slice and is the **only** reader of these keys.
 
 ```yaml
 bookmark: https://example.org/thing
@@ -34,23 +33,22 @@ bookmarks: [https://example.org/a, https://example.org/b]
 
 | Surface | Source |
 |---|---|
-| Page header, under the title | [bookmark-links.html](../../../layouts/_partials/bookmark-links.html) |
-| Sidebar meta block | [sidebar.html](../../../layouts/_partials/sidebar.html) |
+| Page header, under the title | `bookmark-links.html` |
+| Sidebar meta block | `sidebar.html` |
 | Card in any list or search result | [cards.js](../src/js.md), from the index's `bookmarks[]` |
 
-The label drops scheme, `www.` and trailing slash, prefixed `↗` —
-[bookmark-label.html](../../../layouts/_partials/bookmark-label.html) on the server,
-`bookmarkLabel()` in the browser. Links carry `rel="noopener external" target="_blank"`.
+The label drops scheme, `www.` and trailing slash, prefixed `↗` — `bookmark-label.html`
+on the server, `bookmarkLabel()` in the browser. Links carry `rel="noopener external"
+target="_blank"`.
 
 ## The Bookmarks section
 
-[bookmarks/section.html](../../../layouts/bookmarks/section.html) is the generic
-section template with one difference: the **top-level** page gathers
-[bookmark-pages.html](../../../layouts/_partials/bookmark-pages.html) — the
-`bookmarks/` subtree *plus* every page elsewhere carrying a bookmark URL — and scopes
-its list `bookmarks`. Sub-folders behave like any section.
+`bookmarks/section.html` is the generic section template with one difference: the
+**top-level** page gathers `bookmark-pages.html` — the `bookmarks/` subtree *plus* every
+page elsewhere carrying a bookmark URL — and scopes its list `bookmarks`. Sub-folders
+behave like any section.
 
-That partial scans every page, so it is always called through `partialCached`. The
-home card and sidebar count use it too, so counts include gathered pages. Without a
-`bookmarks/` folder there is no section to list into, and `bookmark:` only affects
-the page's own chips and cards.
+That partial scans every page, so it is always called through `partialCached`. The home
+card and sidebar count use it too, so counts include gathered pages. Without a
+`bookmarks/` folder there is no section to list into, and `bookmark:` only affects the
+page's own chips and cards.

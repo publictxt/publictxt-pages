@@ -24,7 +24,7 @@ wiki_lint.py             staleness check for this wiki    -> ../index.md
 ```
 
 No third-party dependencies — PyYAML deliberately avoided. Python 3.10+ (`X | None`,
-walrus). Files: [scripts/](../../../scripts/).
+walrus). Files: `scripts/`.
 
 ## Templates — [layouts](layouts.md)
 
@@ -55,7 +55,7 @@ _partials/
   bookmark-links.html   the chip row       bookmark-label.html  one URL's label
 ```
 
-Files: [layouts/](../../../layouts/).
+Files: `layouts/`.
 
 ## Browser — [js](js.md) · [css](css.md)
 
@@ -68,9 +68,8 @@ search.js      155  Pagefind UI: filters, sort, incremental results
 main.css       594  the whole theme
 ```
 
-ES modules, bundled per entry point by `js.Build` (esbuild, inside Hugo — no Node
-needed for the build). Entry points: `list.js`, `search.js`. Files:
-[assets/](../../../assets/).
+ES modules, bundled per entry point by `js.Build` (esbuild, inside Hugo — no Node needed
+for the build). Entry points: `list.js`, `search.js`. Files: `assets/`.
 
 ## Config and delivery
 

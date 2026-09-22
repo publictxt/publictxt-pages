@@ -16,8 +16,8 @@ Hugo's rendered HTML in `public/`.
 
 ## Commands
 
-[build.sh](../../scripts/build.sh) and [build.ps1](../../scripts/build.ps1) are
-equivalent; both `cd` to the repo root first, so they run from anywhere.
+`build.sh` and `build.ps1` are equivalent; both `cd` to the repo root first, so they run
+from anywhere.
 
 ```console
 scripts/build.sh                        # example/txt -> public/
@@ -44,8 +44,7 @@ predating `--source` keep working.
 
 ## Live preview
 
-`--serve` / `-Serve` runs the sync steps, then
-`hugo server -D -M --renderStaticToDisk`:
+`--serve` / `-Serve` runs the sync steps, then `hugo server -D -M --renderStaticToDisk`:
 
 - `-M` keeps the live-reload render in memory so it never overwrites `public/`'s
   built HTML with dev-mode markup.
@@ -53,8 +52,8 @@ predating `--source` keep working.
   writes straight into `public/` and which `-M` alone would hide.
 
 **Search does not work under `--serve` until a full build has produced an index** —
-the search page says so rather than failing silently. Content changes need a re-run
-of the sync steps: `hugo server` watches `build/content`, not the source repo.
+the search page says so rather than failing silently. Content changes need a re-run of
+the sync steps: `hugo server` watches `build/content`, not the source repo.
 
 ## Requirements
 

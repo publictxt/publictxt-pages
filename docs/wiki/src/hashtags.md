@@ -4,7 +4,7 @@ covers:
   - scripts/extract_hashtags.py
 ---
 
-# [hashtags.py](../../../scripts/hashtags.py), [extract_hashtags.py](../../../scripts/extract_hashtags.py)
+# scripts/hashtags.py, scripts/extract_hashtags.py
 
 Behaviour: [features/tags.md](../features/tags.md). Reasoning: [D3](../decisions/D3.md).
 
@@ -39,8 +39,8 @@ byte-identical. That is what makes both operations idempotent and order-independ
 python scripts/extract_hashtags.py [content_dir]     # default: content
 ```
 
-Walks `*.md`, merges body hashtags into front matter `tags`, prints each changed
-file. Idempotent — a second run reports 0 changes.
+Walks `*.md`, merges body hashtags into front matter `tags`, prints each changed file.
+Idempotent — a second run reports 0 changes.
 
 | Function | Contract |
 |---|---|

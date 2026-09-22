@@ -3,10 +3,10 @@ covers:
   - scripts/sync_content.py
 ---
 
-# [sync_content.py](../../../scripts/sync_content.py)
+# scripts/sync_content.py
 
-Copies a source repo into `build/content/`, normalising what Hugo can't handle
-natively ([D2](../decisions/D2.md)). 278 lines; imports only [dates.py](dates.md) and
+Copies a source repo into `build/content/`, normalising what Hugo can't handle natively
+([D2](../decisions/D2.md)). 278 lines; imports only [dates.py](dates.md) and
 [hashtags.py](hashtags.md). Behaviour: [sections](../features/sections.md),
 [dates](../features/dates.md), [tags](../features/tags.md).
 

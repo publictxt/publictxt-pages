@@ -7,7 +7,7 @@ covers:
   - assets/js/search.js
 ---
 
-# [assets/js/](../../../assets/js/)
+# assets/js/
 
 Five ES modules, two entry points, bundled per entry by `js.Build` (esbuild, shipped
 inside Hugo). No framework, no runtime dependencies.
@@ -21,7 +21,7 @@ list.js ──┬── site-index.js      search.js ──┬── cards.js
 Behaviour lives in [browse lists](../features/browse-lists.md) and
 [search](../features/search.md); this page is the contracts.
 
-## [sorts.js](../../../assets/js/sorts.js)
+## assets/js/sorts.js
 
 ```js
 SORTS             // [[value, label], …] the six options, in menu order
@@ -32,22 +32,22 @@ sortLabel(s)      // -> menu label
 ```
 
 Canonical form omits the field's natural direction, so `"updated"`, `"title"` and
-`"created asc"` are canonical and are what appears in `?sort=`. Imported by both UIs,
-so they cannot drift apart.
+`"created asc"` are canonical and are what appears in `?sort=`. Imported by both UIs, so
+they cannot drift apart.
 
-## [site-index.js](../../../assets/js/site-index.js)
+## assets/js/site-index.js
 
 ```js
 siteIndex()               // -> Promise<Item[]>, memoised per document
 scope(items, kind, value) // -> Item[]  (section | tag | bookmarks | recent)
 ```
 
-One module-level `pending` promise, so every `[data-list]` awaits the same fetch. URL
-is `document.documentElement.dataset.index`; rejects when absent, which `list.js`
-treats as "keep the fallback". `scope()` mirrors the template page collections
+One module-level `pending` promise, so every `[data-list]` awaits the same fetch. URL is
+`document.documentElement.dataset.index`; rejects when absent, which `list.js` treats as
+"keep the fallback". `scope()` mirrors the template page collections
 ([D7](../decisions/D7.md)).
 
-## [cards.js](../../../assets/js/cards.js)
+## assets/js/cards.js
 
 ```js
 card(item, {activeTags, onTag, summaryHTML}) // -> <li class="page-card">
@@ -55,16 +55,14 @@ escapeHTML, formatDate, dateHTML, bookmarkLabel, tagURL
 ```
 
 Item shape is `index.json`'s. Tag chips are `<button>` filter chips when `onTag` is
-given, plain links otherwise; max 6 per card. `tagURL` resolves against
-`<html data-base>` for sub-path deployments. Everything interpolated goes through
-`escapeHTML` except `summaryHTML`, which is Pagefind's `<mark>`ed excerpt.
+given, plain links otherwise; max 6 per card. `tagURL` resolves against `<html
+data-base>` for sub-path deployments. Everything interpolated goes through `escapeHTML`
+except `summaryHTML`, which is Pagefind's `<mark>`ed excerpt.
 
-`formatDate` / `dateHTML` / `bookmarkLabel` deliberately re-implement
-[page-date.html](../../../layouts/_partials/page-date.html) and
-[bookmark-label.html](../../../layouts/_partials/bookmark-label.html) — change both
-sides together.
+`formatDate` / `dateHTML` / `bookmarkLabel` deliberately re-implement `page-date.html`
+and `bookmark-label.html` — change both sides together.
 
-## [list.js](../../../assets/js/list.js)
+## assets/js/list.js
 
 Entry point; mounts every `[data-list]`. Reads `data-scope-kind`, `data-scope-value`,
 `data-order`, `data-per-page`, `data-compact`.
@@ -75,8 +73,8 @@ state = { sort, type, tags:Set, page, moreTags }
 
 `readURL()` / `url(overrides)` / `writeURL(push)` keep state and the query string in
 sync; only non-defaults are written, `popstate` re-reads, compact mode skips it all.
-`render()`: filter by type → filter by each tag (AND) → `sorted()` → clamp page →
-slice → `card()` each → controls, pager, status → `writeURL`.
+`render()`: filter by type → filter by each tag (AND) → `sorted()` → clamp page → slice
+→ `card()` each → controls, pager, status → `writeURL`.
 
 Non-obvious:
 
@@ -90,7 +88,7 @@ Non-obvious:
   modified clicks are let through.
 - `mount()` returns early on fetch failure, leaving Hugo's `<ul>`.
 
-## [search.js](../../../assets/js/search.js)
+## assets/js/search.js
 
 Entry point, top-level `await`. Dynamically imports `pagefind/pagefind.js` from
 `data-base`; on failure reveals `#search-unavailable` and rethrows.
@@ -103,11 +101,11 @@ state = { q, type, tags:Set, sort }   // sort null until chosen
 `activeSort()` downgrades a stale `relevance` when the query is cleared.
 
 `run()` builds `{ filters: {type, tag:[…]}, sort? }` — an **array** of tags is
-Pagefind's AND — and calls `pagefind.search(q || null, opts)`; `null` is a
-filter-only browse, and an active sort replaces relevance ranking.
+Pagefind's AND — and calls `pagefind.search(q || null, opts)`; `null` is a filter-only
+browse, and an active sort replaces relevance ranking.
 
 Results arrive as thunks; `showMore()` resolves 20 `.data()` promises at a time.
-`resultCard()` maps Pagefind's shape onto the index item shape to reuse `card()`.
-Chips render from `pagefind.filters()` (all values) with counts from the result set,
-so zero-count chips stay visible and marked `.empty`. URL uses `replaceState`; input
+`resultCard()` maps Pagefind's shape onto the index item shape to reuse `card()`. Chips
+render from `pagefind.filters()` (all values) with counts from the result set, so
+zero-count chips stay visible and marked `.empty`. URL uses `replaceState`; input
 debounced 200 ms.

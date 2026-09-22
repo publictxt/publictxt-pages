@@ -7,19 +7,17 @@ covers:
 
 # Breadcrumbs
 
-A trail on every page but home, rendered by
-[baseof.html](../../../layouts/baseof.html) above the main block, so it needs no
-per-template wiring.
+A trail on every page but home, rendered by `baseof.html` above the main block, so it
+needs no per-template wiring.
 
-[breadcrumbs.html](../../../layouts/_partials/breadcrumbs.html) builds
-`.Ancestors.Reverse | append .` — Hugo's own ancestry, which works only because the
-sync step gives **every** folder an `_index.md` (see [sections](sections.md)).
-Without that, nested wiki folders would be missing from the chain. The last item is
-`<li aria-current="page">` with no link.
+`breadcrumbs.html` builds `.Ancestors.Reverse | append .` — Hugo's own ancestry, which
+works only because the sync step gives **every** folder an `_index.md` (see
+[sections](sections.md)). Without that, nested wiki folders would be missing from the
+chain. The last item is `<li aria-current="page">` with no link.
 
 ## Labels
 
-[crumb-label.html](../../../layouts/_partials/crumb-label.html), by page kind:
+`crumb-label.html`, by page kind:
 
 | Kind | Label |
 |---|---|
