@@ -13,3 +13,6 @@ the non-extended Hugo binary works *([D9](../decisions/D9.md))*.
 
 Not rendered anywhere: `author` and `source_repo` — carried in front matter, shown by
 no template. See [../../SPEC.md](../../SPEC.md).
+
+Footer optionally renders `<a rel="me">` for `site.Params.mastodon` (hugo.toml),
+which Mastodon's profile verification checks for on the linked site.

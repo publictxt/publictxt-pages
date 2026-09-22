@@ -30,7 +30,9 @@
   </div>
 
   <footer class="site-footer">
-    <p>{{ site.Title }} - plain-text knowledge, published with <a href="https://github.com/publictxt/txt-hugo">publictxt-hugo</a>.</p>
+    <p>{{ site.Title }} - plain-text knowledge, published with <a href="https://github.com/publictxt/txt-hugo">publictxt-hugo</a>.
+       Contact me on {{ with site.Params.mastodon }}<a rel="me" href="{{ . }}">Mastodon</a>{{ end }}
+    </p>
   </footer>
 </body>
 </html>

@@ -36,6 +36,11 @@ capitalizeListTitles = false
   # Relative URL or file path to the favicon; a publishing site can override this,
   # or replace static/favicon.svg outright to change the default.
   favicon = "favicon.png"
+  # Optional Mastodon profile URL. Rendered in the footer as <a rel="me">,
+  # which Mastodon's profile verification looks for on this site.
+  # Example: "https://mastodon.social/@username"
+
+  mastodon = "https://hachyderm.io/@jaysen"
   # Order of sections in the sidebar and on the home page (folder names).
   # Sections not listed here follow, alphabetically.
   sectionOrder = ["blog", "wiki", "posts", "notes", "bookmarks"]
