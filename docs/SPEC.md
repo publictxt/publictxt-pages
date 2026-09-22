@@ -30,13 +30,14 @@ Items marked **(TBD)** are not built.
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
   - Sorting in all by Date, Recency, Alphabetical.
-  - Sort by Year/Month/Type/Category (TBD)
+  - Filter by Type, and by Year (the `created` year). 
+  - Filter by Category (TBD)
   - Sort by Source/Author (TBD)
-  - Sort by Rating (TBD)
+  - Sort and Filter by Rating (TBD)
 - Search
   - Full text search
-  - Type and Tag filters as 'facets' are available without a query
-  - Date filters (TBD)
+  - Type, Year and Tag filters as 'facets' are available without a query
+  - Finer date filters — month, ranges (TBD)
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
