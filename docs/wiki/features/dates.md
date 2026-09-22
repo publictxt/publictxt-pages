@@ -27,6 +27,11 @@ A section index whose `updated` was *inferred* takes its newest descendant's, so
 section reads as recent when its contents are. Legacy `date:`/`lastmod:` are renamed
 in the copy only; `hugo.toml` maps `created`→`.Date`, `updated`→`.Lastmod`.
 
+Renaming a source file on the way out — `index.md`/`home.md` → `_index.md`, or a
+post folder's lone Markdown file → `index.md` (see [sections.md](sections.md)) —
+never changes its dating: both ladders run on the original source path, before the
+rename.
+
 Display rule everywhere: show `created`, add "· updated *date*" only when `updated`
 is more than a day later. Sorting is `sort . "Lastmod" "desc"` — a **stable** sort,
 so pages from one commit keep a sensible order (`.ByLastmod.Reverse` was rejected: it

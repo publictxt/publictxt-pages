@@ -42,7 +42,7 @@ Items marked **(TBD)** are not built.
 - Bookmarks
   - frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page
 - Pages
-  - Images and attachments to post should be converted to Hugo content bundles (TBD)
+  - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
 
 ## Content Structure
 
@@ -56,7 +56,7 @@ blog/2023/12/17/x.md                    (dates derived from path)
 blog/2024/home.md                       (home.md also acts as folder index)
 blog/20260509-title.md                  (YYYYMMDD prefix date)
 blog/2024/09/20240922-title.md          (YYYYMMDD prefix date)
-blog/2026/09/22/Post-Name/title.md & blog/2026/09/22/Post-Name/image.png     (converts to Hugo content bundle) (TBD)
+blog/2026/09/22/Post-Name/title.md & blog/2026/09/22/Post-Name/image.png     (converts to Hugo content bundle)
 
 bookmarks/sites/domain/page.md     (one file per resource)
 

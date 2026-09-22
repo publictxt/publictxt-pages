@@ -19,6 +19,12 @@ normalising the few things Hugo cannot handle natively:
     `_index.md` so Hugo's embedded link render hook can resolve them.
   * Folders containing Markdown but no index page get a minimal `_index.md`
     (title = folder name) so every folder is a browsable section.
+  * A folder holding exactly one non-index Markdown file plus attachments, and
+    no subfolders, is a **post folder** (e.g. `Post-Name/title.md` +
+    `image.png`): the Markdown is renamed to `index.md` (lowercase, no
+    underscore) so Hugo reads the folder as a *leaf bundle* — one page, with
+    the attachments as its page resources — instead of getting an auto
+    section index.
   * Inline `#hashtags` become links to their tag page (see hashtags.py for what
     counts as one — code, links and URL fragments are left alone).
 
@@ -124,7 +130,7 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
     return Stamp(created, created_source, updated, authored)
 
 
-def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
+def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False) -> str:
     fm, body = split_front_matter(text)
     fm = rename_legacy_keys(fm)
     name = Path(rel).name
@@ -133,7 +139,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
 
     if not has_key(fm, "title"):
         fallback = stem.replace("-", " ").replace("_", " ").strip()
-        if name in INDEX_NAMES:
+        if name in INDEX_NAMES or is_leaf_bundle:
             parent = Path(rel).parent.name
             fallback = parent.replace("-", " ") if parent and parent != "." else fallback
         title, body = derive_title(body, fallback)
@@ -153,6 +159,29 @@ def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 
 
+def find_leaf_bundle_dirs(src: Path) -> set[Path]:
+    """
+    Source folders that are a Hugo leaf bundle in disguise: one non-index
+    Markdown post plus its attachments, no subfolders (spec: `title.md` +
+    `image.png` in one folder). Detected structurally, not by filename —
+    `index.md`/`home.md` keep meaning "section index".
+    """
+    bundles = set()
+    for d in src.rglob("*"):
+        if not d.is_dir() or any(part in SKIP_DIRS for part in d.relative_to(src).parts):
+            continue
+        children = [c for c in d.iterdir()
+                    if c.name not in SKIP_DIRS and c.name not in SKIP_FILES
+                    and not c.name.endswith(".gitkeep")]
+        if any(c.is_dir() for c in children):
+            continue
+        md = [c for c in children if c.suffix.lower() == ".md"]
+        other = [c for c in children if c.suffix.lower() != ".md"]
+        if len(md) == 1 and md[0].name not in INDEX_NAMES and other:
+            bundles.add(d)
+    return bundles
+
+
 def sync(src: Path, dest: Path) -> tuple[int, int]:
     if dest.exists():
         shutil.rmtree(dest)
@@ -163,6 +192,8 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
         print("warning: source repo is a shallow clone — every tracked file reports the "
               "same commit time. Check out with fetch-depth: 0 for real dates.",
               file=sys.stderr)
+
+    leaf_bundles = find_leaf_bundle_dirs(src)
 
     md_count = other_count = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -181,13 +212,16 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
 
         if path.suffix.lower() == ".md":
             is_index = path.name in INDEX_NAMES
+            is_leaf_bundle = path.parent in leaf_bundles
             if is_index:
                 target = target.with_name("_index.md")
+            elif is_leaf_bundle:
+                target = target.with_name("index.md")
             text = path.read_text(encoding="utf-8")
             fm, _ = split_front_matter(text)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, is_leaf_bundle), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
@@ -196,7 +230,8 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
             other_count += 1
 
     newest = newest_updated_by_folder(dest, pages)
-    md_count += add_missing_indexes(dest, resolver.built_at, newest)
+    leaf_bundle_dests = {dest / b.relative_to(src) for b in leaf_bundles}
+    md_count += add_missing_indexes(dest, resolver.built_at, newest, leaf_bundle_dests)
     inherit_index_dates(indexes, newest)
     return md_count, other_count
 
@@ -235,7 +270,9 @@ def inherit_index_dates(indexes: dict[Path, Stamp], newest: dict[Path, str]) -> 
             index.write_text(patched, encoding="utf-8")
 
 
-def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> int:
+def add_missing_indexes(
+    dest: Path, built_at: str, newest: dict[Path, str], leaf_bundle_dests: set[Path]
+) -> int:
     """
     Give every folder that contains Markdown (at any depth) an `_index.md` if it
     has none. Hugo only treats a folder as a section — browsable, and present in
@@ -243,10 +280,13 @@ def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> i
 
     A generated index has no history of its own, so it is dated by its
     contents: `updated` is the newest among the folder's pages.
+
+    Leaf bundles (post folders, see `find_leaf_bundle_dirs`) are skipped: they
+    are meant to be a single page, not a section wrapping one.
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
-        if (d / "_index.md").exists() or not any(d.rglob("*.md")):
+        if d in leaf_bundle_dests or (d / "_index.md").exists() or not any(d.rglob("*.md")):
             continue
         title = d.name.replace("-", " ").replace("_", " ").strip()
         updated = newest.get(d, built_at)

@@ -18,6 +18,14 @@ links pointing at them, and generates a minimal index for folders that have neit
 as a **leaf bundle** and hides every sibling page as a resource. Consequence:
 sections nest to any depth, and every folder appears in breadcrumbs.
 
+One exception is deliberate: a **post folder** — one non-index Markdown file plus
+attachments, no subfolders (e.g. `Post-Name/title.md` + `image.png`) — is a leaf
+bundle in disguise, not a section. `sync_content.py` detects it structurally
+(`find_leaf_bundle_dirs`) and renames its Markdown file to lowercase `index.md`
+instead of generating a section wrapper, so it comes out as Hugo's leaf bundle: one
+page, with the attachments as page resources sitting beside it. `index.md`/`home.md`
+folders are excluded from this detection — those already mean "section index".
+
 `params.sectionOrder` fixes navigation order, unlisted folders following
 alphabetically; `sections.html` is the single source for both sidebar and home
 *([D10](../decisions/D10.md))*.
