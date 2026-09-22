@@ -48,6 +48,7 @@ env:
   HUGO_BASEURL: https://publictxt.net/
   HUGO_TITLE: "A PublicTxt instance"
   HUGO_PARAMS_DESCRIPTION: "A PublicTxt repository — browsable, searchable, plain-text first."
+  HUGO_PARAMS_MASTODON: "https://hachyderm.io/@jaysen"
 ```
 
 `build.sh` passes `HUGO_BASEURL` through as `-b`; the rest Hugo reads directly.
