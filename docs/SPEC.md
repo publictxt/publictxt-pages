@@ -1,133 +1,90 @@
-# SPEC
+# Spec
 
-Static site (Hugo + Pagefind + Python Preprocessing + Javascript ) for browsing/searching one PublicTxt / plain Obsidian Markdown repo.
-Describes what the build does today; reasoning is in `docs/decisions/D<n>.md`, cited as *(Dn)* — read only when needed.
+What the site does and should do. Implementation lives in [`docs/wiki/`](wiki/index.md) —
+read that before the source. Reasoning is in [`docs/wiki/decisions/`](wiki/decisions/DECISIONS.md),
+cited as *(Dn)*.
+
+Items marked **(TBD)** are not built.
 
 ## Principles
 
-- **No PublicTxt.Syntax / .NET dependency.** Must work on a real wiki with relative links and no front matter. Hugo-native where possible; Python preprocessing + client JS otherwise.
-- Source repo is **never modified**; scripts operate on the generated copy `build/content/` *(D1)*.
-- Links are `[label](../wiki/page.md)`; Hugo's embedded link render hook resolves `.md`. `[[wikilinks]]` render as literal text *(D5)*.
+- **No PublicTxt.Syntax / .NET dependency.** Works with real wikis: relative links, no front matter required.
+- Source repo never modified; build operates on generated copy `build/content/`.
+- Links are `[label](../wiki/page.md)` - No `[[wikilinks]]`
+- Hugo renders `.md` extensions to `.html`
 
-## Scope
+## Feature list
 
-- Single repo; every top-level folder is a section (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-- Inline `#hashtags` merged into `tags`. Facets: tags (AND-able), type.
-- Sidebar + home list sections by folder name, ordered by `params.sectionOrder`, unlisted alphabetically after *(D10)*.
+- Sections
+  - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
+  - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*.
+  - Section index bodies render as prose and are search-indexed.
+- Sidebar
+  - Tag cloud
+  - page meta (type, dates, tags) in sidebar.
+  - Author **(TBD)** — carried in front matter, rendered nowhere
+- Categories (TBD)
+- Tags
+  - Inline `#hashtags` merged into `tags`. Facets: tags (AND-able), type.
+  - tag pages
+- Browse Lists
+  - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
+  - Sorting in all by Date, Recency, Alphabetical.
+  - Sort by Year/Month/Type/Category (TBD)
+  - Sort by Source/Author (TBD)
+  - Sort by Rating (TBD)
+- Search
+  - Full text search
+  - Type and Tag filters as 'facets' are available without a query
+  - Date filters (TBD)
+  - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
-- Tag cloud in sidebar; page meta (type, dates, tags) in sidebar.
-- Section index bodies render as prose and are search-indexed.
-- All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
+- Bookmarks
+  - frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page
+- Pages
+  - Images and attachments to post should be converted to Hugo content bundles (TBD)
 
-## Content structure
-
-```txt
-index.md; Projects.md            home; root pages
-wiki/index.md, wiki/A/index.md   folder index = section page (any depth); spaces in names OK
-blog/2023/12/17/x.md             date from path
-blog/2024/home.md                home.md also a folder index
-blog/20260509-title.md           date from YYYYMMDD prefix
-bookmarks/sites/<domain>/<p>.md  one file per resource, normal pages
-media/                           non-Markdown copied verbatim
-README* LICENSE* CONTRIBUTING* CNAME .gitignore .obsidian/ .git/ .trash/ *.gitkeep   skipped
-```
-
-Section = top-level folder = default `type`. `example/txt/` is the synthetic default source.
-
-## Front matter (all optional; sync derives the rest)
-
-```yaml
-title:        # else first H1 (removed from body), else filename
-type:         # overrides folder default
-tags:         # inline or block list; merged with #hashtags, rewritten inline
-created:      # ISO 8601 datetime; legacy `date:` alias renamed in copy
-updated:      # legacy `lastmod:` alias renamed. Every page ends with both.
-author:, source_repo:   # carried, not filterable
-bookmark:     # URL or list (`bookmarks:` alias); page is listed in bookmarks/ section
-              # but keeps its own location/type/URL/breadcrumbs. Templates only; needs bookmarks/ folder.
-```
-
-Other keys pass through. `hugo.toml` maps `created`→`.Date`, `updated`→`.Lastmod`.
-
-### Date ladders (`scripts/dates.py`) *(D4)*
-
-`created`, most→least authoritative; rung recorded as `created_source:` in generated front matter (diagnostic only):
-
-| rung | source |
-|---|---|
-| `front-matter` | explicit `created:` / `date:` |
-| `path` | `YYYYMMDD` / `YYYY-MM-DD` in filename, or `.../YYYY/MM/DD/` |
-| `git` | first commit touching the file |
-| `mtime` | birth time else mtime |
-| `build` | build time |
-| `children` | generated section indexes: newest `updated` of children |
-
-`updated`: explicit → last commit → mtime → build time; never earlier than `created`. Section indexes take newest descendant `updated` when their own was inferred and older; authored `updated:` never overwritten.
-
-Lists sort on `updated` by default; cards show `created` plus *· updated* when >1 day later.
-
-CI: shallow clones collapse the `git` rung; `deploy/publish-to-github-pages.yml` uses `fetch-depth: 0`, sync warns on shallow repo.
-
-## Native vs preprocessed
-
-| Concern | Mechanism |
-|---|---|
-| `.md` link resolution | link render hook (`useEmbedded = "fallback"`) |
-| URL-safe slugs | Hugo urlize, no renaming |
-| type, sections, tag cloud, meta, `/tags/x/` | Hugo native |
-| Site index JSON | `layouts/_partials/site-index.html` via asset pipeline |
-| Ordering | client-side `assets/js/list.js` |
-| `index.md`/`home.md` → `_index.md`; title; dates; skips; hashtag linkify | **sync step** *(D2)* |
-| `#hashtag` → `tags` | **hashtag step** *(D3)* |
-| Search + facets | Pagefind post-build |
-
-### Scripts (Python 3, idempotent, never write to source)
-
-Shared: `hashtags.py` (hashtag = `#` + letter + `[letters digits _ -]`, not after word char, `/`, `&`; not inside code, HTML, links, URLs; already-linkified hashtags still count) and `dates.py`.
-
-`sync_content.py`: wipes/recreates `build/content/`; renames index/home → `_index.md` and rewrites links to them; creates minimal `_index.md` (title = folder) in index-less folders so every folder is a section; derives title/dates; linkifies `#tag` → `/tags/<tag>/` keeping visible text; skips housekeeping files; copies non-Markdown verbatim.
-
-`extract_hashtags.py`: extract body `#hashtags` → merge into `tags`, dedupe, create front matter if absent; never strips hashtags from body; touches only `tags`.
-
-## Build
+## Content Structure
 
 ```txt
-sync → hashtag merge → hugo → pagefind --site public
+
+index.md, Projects.md                   (home + root pages)
+
+wiki/index.md, wiki/A/index.md          (folder index = section page (any depth))
+
+blog/2023/12/17/x.md                    (dates derived from path)
+blog/2024/home.md                       (home.md also acts as folder index)
+blog/20260509-title.md                  (YYYYMMDD prefix date)
+blog/2024/09/20240922-title.md          (YYYYMMDD prefix date)
+blog/2026/09/22/Post-Name/title.md & blog/2026/09/22/Post-Name/image.png     (converts to Hugo content bundle) (TBD)
+
+bookmarks/sites/domain/page.md     (one file per resource)
+
+posts/post-name.md
+notes/note-name.md
+
+media/                             (non-Markdown copied verbatim)
+
+README*, LICENSE*, CNAME, .git/    (skipped during sync)
+
 ```
-Order mandatory. `public/` wiped before build. `scripts/build.sh` / `build.ps1` take source path (default `example/txt`), honour `HUGO_BASEURL`.
 
-## Browse lists
+## Front Matter Reference
 
-One index (`site-index.html` → `list-json.html` from `site.RegularPages`): `url, title, type, section, tags, created, updated (RFC 3339), summary, bookmark URLs`. Fingerprinted; URL on `<html data-index>`. ~300 B/page.
+All front matter optional; sync derives the rest.
 
-List pages declare a scope via `data-scope-kind` / `data-scope-value` (`assets/js/site-index.js`):
+| Key                     | Purpose                    | Notes                                                                           |
+| ----------------------- | -------------------------- | ------------------------------------------------------------------------------- |
+| `title`                 | Page title                 | Falls back to first H1 (removed from body), then filename                       |
+| `type`                  | Override folder-based type | Defaults to top-level folder name                                               |
+| `tags`                  | Inline or block list       | Merged with `#hashtags`; deduplicated                                           |
+| `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
+| `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
+| `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
+| `bookmark`, `bookmarks` | URL or list                | Merges page into bookmarks section                                              |
 
-| scope | shows | server equiv |
-|---|---|---|
-| `section` | pages below path | `.RegularPagesRecursive` |
-| `tag` | pages with tag | term `.Pages` |
-| `bookmarks` | `bookmarks/` + any `bookmark:` page | `bookmark-pages.html` |
-| `recent` | N newest updated, `params.recentLimit` | home |
-
-`list-container.html` holds `[data-list]` with fallback `<ul>`; `list.js` replaces with cards (`cards.js`, shared with search):
-- Sort: updated (default), newest, oldest, title A→Z/Z→A, least recently updated. Default `params.listOrder`; per-section `order:` on index (inherits to sub-folders).
-- Filter chips: tag + type with counts within result set; tags AND. Facet hidden when list doesn't vary on it.
-- Paging: `params.listPerPage` / `perPage:`; real pager links.
-- URL state: `?tag=a&tag=b&type=wiki&sort=title&page=2`; `q` reserved. Sort names shared with search (`assets/js/sorts.js`).
-
-Home *Recent* = compact mode. JS bundled with `js.Build` (non-extended Hugo OK).
-
-## Search (Pagefind, `layouts/search.html`)
-
-- Full text + facets, with or without a query. Filters from `data-pagefind-filter` (`tag` multi/AND, `type` single). Counts reflect result set; results show tag chips *(D8)*.
-- Sort: same six + *Relevance* (default, only with a query; filter-only defaults to updated). Keys emitted per page by `pagefind-sort.html` (dates as Unix s, title lowercased); sort replaces relevance, no tiebreak. **Any template with `data-pagefind-body` must include the partial** or Pagefind drops the page.
-- URL: `/search/?q=…&tag=a&type=wiki&sort=title`; header box submits `?q=`; tag pages deep-link "combine with other tags".
-
-## Theme
-
-Sticky header w/ search; sidebar (sections, meta, tag cloud) + content; responsive. Plain CSS `assets/css/main.css` via asset pipeline (minify+fingerprint in prod), no Sass *(D9)*.
+Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.
 
 ## Deployment
 
-Content repo stays pure Markdown; its GitHub Actions workflow checks out this repo alongside, runs pipeline, deploys `public/` via `actions/deploy-pages`. See `deploy/publish-to-github-pages.yml`.
-
+Build outputs to `public/`. GitHub Actions workflow (`deploy/publish-to-github-pages.yml`) checks out the content repo, runs the build pipeline, and deploys via `actions/deploy-pages`.

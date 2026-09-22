@@ -2,7 +2,8 @@
 
 Static site interface for browsing/searching an Obsidian-style Markdown repository (PublicTxt or otherwise). Hugo + Pagefind.
 
-See `SPEC.md` for the full v1 spec, and `DECISIONS.md` for why it is shaped that way.
+See `docs/SPEC.md` for what the site does and should do, `docs/wiki/` for how it works
+(read that before the source), and `docs/wiki/decisions/` for why it is shaped that way.
 
 ## Requirements
 
