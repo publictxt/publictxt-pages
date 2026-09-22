@@ -25,8 +25,9 @@ Reports:
   STALE    a covered path changed after its page last did
   MISSING  a `covers:` path that no longer exists
   BARE     a wiki page with no `covers:` front matter — nothing can check it
-  ORPHAN   a source file no page names. Directory covers do not count here, or an
-           index page would silently absorb every new file.
+  UNMAPPED a source file the map in docs/wiki/index.md does not mention. The map's
+           whole job is to say where everything is, so a file missing from it is
+           a file nobody can be routed to.
 
 Uncommitted changes count as "now", so the lint is useful *before* committing:
 edit code, run it, see which page to update in the same commit.
@@ -45,7 +46,7 @@ from pathlib import Path
 
 from dates import git_commit_times, sort_key
 
-# Source files a wiki page is expected to account for (the ORPHAN check).
+# Source files the map is expected to account for (the UNMAPPED check).
 SOURCE_GLOBS = (
     "scripts/*.py", "scripts/*.sh", "scripts/*.ps1",
     "layouts/**/*.html",
@@ -53,8 +54,10 @@ SOURCE_GLOBS = (
     "deploy/*.yml",
     "hugo.toml",
 )
-# The linter describes itself in docs/wiki/index.md, which covers no files.
+# The linter is described in the map's prose rather than listed as a path.
 SOURCE_EXCLUDE = {"scripts/wiki_lint.py"}
+# The page whose map must mention every source file.
+MAP_PAGE = "index.md"
 
 # Separates entries in `git status -z` output.
 NUL = chr(0)
@@ -132,14 +135,13 @@ def day(iso: str) -> str:
     return (iso or "")[:10] or "?"
 
 
-def check_page(root: Path, times: Times, page: Path, claimed: set[str]) -> list[str]:
-    """Problems with one wiki page. Adds its file covers to `claimed`."""
+def check_page(root: Path, times: Times, page: Path) -> list[str]:
+    """Problems with one wiki page."""
     rel_page = page.relative_to(root).as_posix()
     declared = covers(page)
     if declared is None:
-        # Index and narrative pages may legitimately cover nothing, and decision
-        # records describe reasoning rather than files.
-        if "decisions/" in rel_page or page.name == "index.md":
+        # Decision records describe reasoning rather than files.
+        if "decisions/" in rel_page:
             return []
         return [f"BARE    {rel_page} - no covers: front matter"]
 
@@ -155,7 +157,6 @@ def check_page(root: Path, times: Times, page: Path, claimed: set[str]) -> list[
             what = f"{c}/ (files added or removed)"
             changed = NOW if c in times.dirty else structure_changed(root, c)
         else:
-            claimed.add(c)
             what, changed = c, times.of(c)
 
         if changed and page_t and sort_key(changed) > sort_key(page_t):
@@ -179,25 +180,29 @@ def main() -> int:
 
     times = Times(root)
     pages = sorted(wiki.rglob("*.md"))
-    claimed: set[str] = set()
     problems: list[str] = []
     for page in pages:
-        problems.extend(check_page(root, times, page, claimed))
+        problems.extend(check_page(root, times, page))
 
-    orphans = set()
+    # The map must mention every source file, by path or by name — partials are
+    # listed under a `layouts/_partials/` heading, so a bare name counts.
+    map_text = (wiki / MAP_PAGE).read_text(encoding="utf-8") if (wiki / MAP_PAGE).exists() else ""
+    unmapped = set()
     for pattern in SOURCE_GLOBS:
         for f in root.glob(pattern):
             rel = f.relative_to(root).as_posix()
-            if rel not in SOURCE_EXCLUDE and rel not in claimed:
-                orphans.add(rel)
-    problems += [f"ORPHAN  {rel} - no wiki page covers this file" for rel in sorted(orphans)]
+            if rel in SOURCE_EXCLUDE:
+                continue
+            if rel not in map_text and f.name not in map_text:
+                unmapped.add(rel)
+    problems += [f"UNMAPPED {rel} - not listed in {MAP_PAGE}" for rel in sorted(unmapped)]
 
     if not quiet:
         for p in problems:
             print(p)
-    counts = {k: sum(p.startswith(k) for p in problems) for k in ("STALE", "MISSING", "BARE", "ORPHAN")}
+    counts = {k: sum(p.startswith(k) for p in problems) for k in ("STALE", "MISSING", "BARE", "UNMAPPED")}
     print(f"{len(pages)} page(s) checked | {counts['STALE']} stale | {counts['MISSING']} missing "
-          f"| {counts['BARE']} bare | {counts['ORPHAN']} orphan")
+          f"| {counts['BARE']} bare | {counts['UNMAPPED']} unmapped")
     return 1 if problems else 0
 
 

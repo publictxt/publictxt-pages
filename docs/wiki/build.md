@@ -37,8 +37,8 @@ predating `--source` keep working.
 
 | Step | Command | Notes |
 |---|---|---|
-| 1. Sync | `sync_content.py $SOURCE build/content` | Wipes `build/content`. Warns on a shallow clone. [src](src/sync.md) |
-| 2. Hashtags | `extract_hashtags.py build/content` | Merges body tags into front matter. [src](src/hashtags.md) |
+| 1. Sync | `sync_content.py $SOURCE build/content` | Wipes `build/content`. Warns on a shallow clone. [traps](traps.md) |
+| 2. Hashtags | `extract_hashtags.py build/content` | Merges body tags into front matter. [features](features/tags.md) |
 | 3. Hugo | `hugo --minify [-b $HUGO_BASEURL]` | `public/` is **removed first** — Hugo does not delete stale pages from a previous build. |
 | 4. Pagefind | `pagefind --site public` | Prefers `pagefind` on `PATH`, else `npx pagefind`. |
 

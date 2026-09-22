@@ -5,22 +5,21 @@ This should fulfill the **Static Website Generation** portion of PublicTxt. See 
 
 ## Docs
 
-**Read `docs/wiki/` before reading source.** It is a maintained description of how
-this repo works, written to be read instead of `scripts/`, `layouts/` and `assets/`.
-Open the source only when the wiki is insufficient or you are editing that file.
+`docs/wiki/` is a map, not a substitute for the source — the source is well commented
+(module docstrings, `{{/* */}}` contract comments on every partial). Read the wiki to
+find the right file, then read that file.
 
-- `docs/wiki/index.md` — start here; how the wiki is organised
-- `docs/wiki/features/index.md` — feature → implementation map ("how does sorting work?")
-- `docs/wiki/src/index.md` — annotated source tree, per-subsystem contracts ("what does this file export?")
+- `docs/wiki/index.md` — entry point + the map: every source file, one line each
+- `docs/wiki/features/` — what a capability does and which files do it, one page each
+- `docs/wiki/traps.md` — cross-file invariants. **Read before editing templates or the pipeline.**
 - `docs/wiki/build.md`, `docs/wiki/deploy.md` — pipeline and publishing
-- `docs/SPEC.md` — what the site *should* do, including unbuilt **(TBD)** items; current best understanding, not contract
-- DO NOT WASTE TOKENS reading the following unless a wiki page points you at one:
+- `docs/SPEC.md` — what the site *should* do, including unbuilt **(TBD)** items; best understanding, not contract
+- DO NOT WASTE TOKENS reading these unless a wiki page points you at one:
   - `docs/wiki/decisions/` — why, one record per decision, cited as *(Dn)*
   - `docs/retros/*` — session retrospectives
 
 **When you change code, update its wiki page in the same change.** `python scripts/wiki_lint.py`
-reports pages whose covered files moved on without them, plus uncovered source files.
-A wrong wiki page is worse than none.
+reports pages whose covered files moved on without them, and files missing from the map.
 
 ## Working style
 

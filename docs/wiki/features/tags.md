@@ -9,32 +9,16 @@ covers:
 
 # Tags
 
-Tags come from two places and end up in one: front matter `tags:`, and inline
-`#hashtags`. The pipeline merges them, so a page's visible tags and the tag cloud can
-never disagree ([D3](../decisions/D3.md)).
+Front matter `tags:` and inline `#hashtags` merge into one list, so a page's visible
+tags and the tag cloud can never disagree *([D3](../decisions/D3.md))*. What counts
+as a hashtag is defined once in `hashtags.py`: `#` + a letter + letters/digits/`_`/
+`-`, not after a word character, `/` or `&`, never inside code, links or URLs.
 
-What counts as a hashtag is defined **once**, in [hashtags.py](../src/hashtags.md),
-shared by both preprocessing scripts: `#` + a letter + letters/digits/`_`/`-`, not after
-a word character, `/` or `&`, and never inside code, links or URLs.
+`sync_content.py` linkifies `#tag` to its tag page **leaving the visible text as
+`#tag`**, so the file still reads as plain text in Obsidian or on GitHub.
+`extract_hashtags.py` merges body tags into front matter, de-duplicated, and never
+strips them from the body. Both are idempotent and order-independent.
 
-## The two operations
-
-| Step | Where | Effect |
-|---|---|---|
-| Linkify | [sync_content.py](../src/sync.md) | `#tag` → a link to its tag page. **Visible text stays `#tag`**, so the file still reads as plain text in Obsidian or on GitHub. |
-| Merge | [extract_hashtags.py](../src/hashtags.md) | Body hashtags added to front matter `tags`, de-duplicated, order preserved. **Never strips hashtags from the body.** |
-
-The merge touches only `tags`; every other front matter line passes through. Slugs are
-the lower-cased tag, matching Hugo's `urlize`. Destinations are site-relative and the
-embedded link render hook resolves them, so sub-path deployments get the right prefix.
-
-## Tag pages
-
-| Page | Template | Shows |
-|---|---|---|
-| `/tags/` | `taxonomy.html` | the full cloud, no limit, plus a pointer to search for *combinations* |
-| `/tags/<term>/` | `term.html` | a [browse list](browse-lists.md) scoped `tag`, plus a deep link to `/search/?tag=<term>` |
-| sidebar | `tag-cloud.html` | top `params.tagCloudLimit` terms by count, sized into four buckets (`ceil(4 × count / max)` → `.tag-w1`–`.tag-w4`) |
-
-Within a browse list, tag chips are AND-able filter buttons, so combinations work on tag
-pages too, not only in search.
+`/tags/` is the full cloud; `/tags/<term>/` is a browse list plus a deep link to
+`/search/?tag=<term>`; the sidebar shows the top `params.tagCloudLimit` terms in four
+weight buckets.
