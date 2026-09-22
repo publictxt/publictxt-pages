@@ -125,11 +125,9 @@ async function mount(root) {
     b.setAttribute("aria-pressed", String(active));
     b.innerHTML = (kind === "tag" ? "#" : "") + escapeHTML(name) + `<span class="count">${n}</span>`;
     b.addEventListener("click", () => {
-      if (kind === "tag") {
-        if (state.tags.has(name)) state.tags.delete(name); else state.tags.add(name);
-      } else {
-        state[kind] = state[kind] === name ? "" : name;   // type, year: exclusive
-      }
+      if (kind === "type") state.type = state.type === name ? "" : name;
+      else if (state.tags.has(name)) state.tags.delete(name);
+      else state.tags.add(name);
       state.page = 1;
       render(true);
     });
@@ -149,10 +147,15 @@ async function mount(root) {
     return row;
   }
 
-  function renderControls(filtered) {
+  // `filtered` is the visible set; `forYear` is it without the year filter, so
+  // the year options count what picking each one would actually give — a
+  // single-select control cannot show "0" next to a year that has pages.
+  function renderControls(filtered, forYear) {
     controls.replaceChildren();
     const head = document.createElement("div");
     head.className = "list-controls-head";
+    const selects = document.createElement("div");
+    selects.className = "list-selects";
     const sortWrap = document.createElement("label");
     sortWrap.className = "list-sort";
     sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
@@ -160,7 +163,24 @@ async function mount(root) {
     sortWrap.querySelector("select").addEventListener("change", (e) => {
       state.sort = e.target.value; state.page = 1; render(true);
     });
-    head.append(sortWrap);
+    selects.append(sortWrap);
+
+    // Year is a select, not a chip row: it is the least-reached-for facet, and
+    // this keeps it off its own line and scales past a decade of chips.
+    if (hasYears) {
+      const c = new Map(counts(forYear, "year"));
+      const yearWrap = document.createElement("label");
+      yearWrap.className = "list-sort";
+      yearWrap.innerHTML = `<span class="facet-label">Year</span> <select aria-label="Filter by year">`
+        + `<option value=""${state.year ? "" : " selected"}>All years</option>`
+        + yearFacet.map(([y]) => `<option value="${y}"${y === state.year ? " selected" : ""}>${y} (${c.get(y) || 0})</option>`).join("")
+        + `</select>`;
+      yearWrap.querySelector("select").addEventListener("change", (e) => {
+        state.year = e.target.value; state.page = 1; render(true);
+      });
+      selects.append(yearWrap);
+    }
+    head.append(selects);
     if (state.type || state.year || state.tags.size || state.sort !== defaultSort) {
       const clear = document.createElement("button");
       clear.type = "button";
@@ -194,11 +214,6 @@ async function mount(root) {
         chips.push(more);
       }
       controls.append(facetRow("Tags", chips));
-    }
-    // Year sits last: the least-reached-for of the three.
-    if (hasYears) {
-      const c = within("year");
-      controls.append(facetRow("Year", yearFacet.map(([n]) => chip("year", n, c.get(n) || 0, state.year === n))));
     }
   }
 
@@ -241,10 +256,10 @@ async function mount(root) {
   }
 
   function render(pushHistory) {
-    let filtered = items;
-    if (state.type) filtered = filtered.filter((it) => it.type === state.type);
-    if (state.year) filtered = filtered.filter((it) => yearOf(it) === state.year);
-    for (const t of state.tags) filtered = filtered.filter((it) => (it.tags || []).includes(t));
+    let forYear = items;
+    if (state.type) forYear = forYear.filter((it) => it.type === state.type);
+    for (const t of state.tags) forYear = forYear.filter((it) => (it.tags || []).includes(t));
+    let filtered = state.year ? forYear.filter((it) => yearOf(it) === state.year) : forYear;
     filtered = sorted(filtered, state.sort);
 
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
@@ -257,7 +272,7 @@ async function mount(root) {
     list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tags, onTag })));
     if (compact) return;
 
-    renderControls(filtered);
+    renderControls(filtered, forYear);
     renderPager(total);
     const n = filtered.length;
     const what = [state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");

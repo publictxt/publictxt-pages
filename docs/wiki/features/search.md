@@ -21,9 +21,11 @@ missing that partial disappears from sorted results.
 The same three facets as the browse lists — type, year, tags — so a `?type=`,
 `?year=` or `?tag=` URL means the same thing on either. Type and year are exclusive;
 an array of tags is Pagefind's AND. The year is the `created` year, emitted per page
-by `pagefind-keys.html` as a `year[data-year]` filter; the Year group sits last in
-the sidebar, like the browse lists' year row, and hides itself when the whole site
-spans one year. Counts differ from a browse list's by design:
+by `pagefind-keys.html` as a `year[data-year]` filter. Like the browse lists it is a
+**select, not chips** — sitting above the tag list, hidden when the whole site spans
+one year. Its options carry no counts: Pagefind's are for the current result set, so
+a single-select control would print "0" beside years that do have pages, and unlike
+the browse lists there is no second collection here to count honestly. Counts differ from a browse list's by design:
 Pagefind also indexes section index bodies, which `index.json` (regular pages only)
 does not carry.
 

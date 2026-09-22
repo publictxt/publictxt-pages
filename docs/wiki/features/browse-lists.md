@@ -30,17 +30,24 @@ A list declares which subset it shows rather than carrying data:
 | `bookmarks` | `bookmarks/` + any page with a bookmark URL | `bookmark-pages.html` |
 | `recent` | N most recently updated, site-wide | home |
 
-Six sorts from `sorts.js`; three facets of filter chips with counts *within the
-current result set* — type and year single-select, tags AND-ed. A facet is hidden
-when the list doesn't vary on it, which is how a tag page hides its own tag and a
-single year of posts gets no year row. The rows run type, tags, year — year last as
-the least-reached-for. Chips sit most-frequent-first, except years, which run
-newest-first. A page's **year is the year of its `created` date**, in the
-page's own offset — `yearOf()` slices it out of the RFC 3339 string so it matches the
-year Hugo gives Pagefind (see [../traps.md](../traps.md)); `updated` has no facet.
-State lives in `?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2` (`q` reserved for
-search), and the three facets spell the same way on [search.md](search.md). Home
-*Recent* passes `data-compact`: cards only.
+Six sorts from `sorts.js`, and three facets: **type and tags as chip rows** with
+counts *within the current result set* (type single-select, tags AND-ed), and **year
+as a select beside Sort**. A facet is hidden when the list doesn't vary on it — how a
+tag page hides its own tag, and a single year of posts gets no year control at all.
+Chips sit most-frequent-first; years run newest-first.
+
+Year is a select rather than a third chip row because it is the least-reached-for of
+the three, and one line of chrome scales past a decade of values where chips do not.
+Its counts are taken *before* the year filter applies (`forYear` in `render`), so a
+single-select option never reads "0" next to a year that does have pages — the type
+chips, being chips, still show the post-filter 0s.
+
+A page's **year is the year of its `created` date**, in the page's own offset —
+`yearOf()` slices it out of the RFC 3339 string so it matches the year Hugo gives
+Pagefind (see [../traps.md](../traps.md)); `updated` has no facet. State lives in
+`?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2` (`q` reserved for search), and
+the three facets spell the same way on [search.md](search.md). Home *Recent* passes
+`data-compact`: cards only.
 
 Chips are JS-only either way: the no-JS `<ul>` fallback has no filtering.
 

@@ -346,7 +346,9 @@ a:hover { text-decoration: underline; }
   flex: none;
   min-width: 3rem;
 }
+.list-selects { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
 .list-sort { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
+.filter-group .list-sort, .filter-group .list-sort select { display: flex; width: 100%; }
 .list-sort select {
   background: var(--bg-inset);
   border: 1px solid var(--border);
