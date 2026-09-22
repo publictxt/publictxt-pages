@@ -1,9 +1,11 @@
 # Decisions
 
-Why the build is shaped the way it is. `docs/SPEC.md` says **what** the site should do and
-`docs/wiki/` says **how** it works today; this file and the records beside it hold the
-**reasoning**, so they can diverge honestly — a decision can
-be overturned without anyone having to reverse-engineer the argument from the description.
+[← Source wiki](../index.md)
+
+Why the build is shaped the way it is. [docs/SPEC.md](../../SPEC.md) says **what** the site
+should do and [docs/wiki/](../index.md) says **how** it works today; this file and the
+records beside it hold the **reasoning**, so they can diverge honestly — a decision can be
+overturned without anyone having to reverse-engineer the argument from the description.
 
 ## How to use this file
 
