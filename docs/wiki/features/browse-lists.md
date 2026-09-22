@@ -33,8 +33,9 @@ A list declares which subset it shows rather than carrying data:
 Six sorts from `sorts.js`; three facets of filter chips with counts *within the
 current result set* — type and year single-select, tags AND-ed. A facet is hidden
 when the list doesn't vary on it, which is how a tag page hides its own tag and a
-single year of posts gets no year row. Chips sit most-frequent-first, except years,
-which run newest-first. A page's **year is the year of its `created` date**, in the
+single year of posts gets no year row. The rows run type, tags, year — year last as
+the least-reached-for. Chips sit most-frequent-first, except years, which run
+newest-first. A page's **year is the year of its `created` date**, in the
 page's own offset — `yearOf()` slices it out of the RFC 3339 string so it matches the
 year Hugo gives Pagefind (see [../traps.md](../traps.md)); `updated` has no facet.
 State lives in `?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2` (`q` reserved for

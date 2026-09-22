@@ -94,13 +94,13 @@ function renderFilters(counts) {
   // counts: filter counts within the current result set (or totals when idle)
   el.type.replaceChildren(...sortedKeys(allFilters.type).map((n) =>
     chip("type", n, (counts.type || {})[n] ?? 0, state.type === n)));
+  el.tag.replaceChildren(...sortedKeys(allFilters.tag).map((n) =>
+    chip("tag", n, (counts.tag || {})[n] ?? 0, state.tags.has(n))));
+  el.tagHint.textContent = state.tags.size > 1 ? "— all selected must match" : "";
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
   el.year.replaceChildren(...years.map((n) =>
     chip("year", n, (counts.year || {})[n] ?? 0, state.year === n)));
-  el.tag.replaceChildren(...sortedKeys(allFilters.tag).map((n) =>
-    chip("tag", n, (counts.tag || {})[n] ?? 0, state.tags.has(n))));
-  el.tagHint.textContent = state.tags.size > 1 ? "— all selected must match" : "";
 }
 
 function renderSort() {
@@ -126,7 +126,7 @@ async function run() {
   renderFilters(res.filters || allFilters);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", state.type, state.year, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
+  const what = [hasQuery() ? `“${state.q}”` : "", state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
   await showMore();

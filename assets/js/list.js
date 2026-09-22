@@ -178,10 +178,6 @@ async function mount(root) {
       const c = within("type");
       controls.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
     }
-    if (hasYears) {
-      const c = within("year");
-      controls.append(facetRow("Year", yearFacet.map(([n]) => chip("year", n, c.get(n) || 0, state.year === n))));
-    }
     if (tagFacet.length) {
       const c = within("tags");
       const visible = state.moreTags ? tagFacet : tagFacet.slice(0, TAG_CHIPS);
@@ -198,6 +194,11 @@ async function mount(root) {
         chips.push(more);
       }
       controls.append(facetRow("Tags", chips));
+    }
+    // Year sits last: the least-reached-for of the three.
+    if (hasYears) {
+      const c = within("year");
+      controls.append(facetRow("Year", yearFacet.map(([n]) => chip("year", n, c.get(n) || 0, state.year === n))));
     }
   }
 
@@ -259,7 +260,7 @@ async function mount(root) {
     renderControls(filtered);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, state.year, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
+    const what = [state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")
