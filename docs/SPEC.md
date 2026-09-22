@@ -36,8 +36,8 @@ Items marked **(TBD)** are not built.
   - Sort and Filter by Rating (TBD)
 - Search
   - Full text search
-  - Type and Tag filters as 'facets' are available without a query
-  - Date filters (TBD)
+  - Type, Year and Tag filters as 'facets' are available without a query
+  - Finer date filters — month, ranges (TBD)
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks

@@ -17,11 +17,13 @@ import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
-// A page's year is the year of its `created` date, in the reader's own zone so
-// it agrees with the date the card prints (dateHTML() in cards.js).
+// A page's year: the year of its `created` date, read straight off the RFC 3339
+// string rather than via a Date, so it is the year in the page's own offset —
+// the same value Hugo hands Pagefind in pagefind-keys.html. Parsing it as a
+// local Date instead would let a reader far from the site's zone see a page
+// filed one year off what search files it under.
 function yearOf(it) {
-  const d = new Date(it.created);
-  return isNaN(d) ? "" : String(d.getFullYear());
+  return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
 // The facets a list can offer: the values each page contributes, and the order

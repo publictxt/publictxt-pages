@@ -14,8 +14,9 @@ would have to already know to open. **Read before editing templates or the pipel
 
 Every template carrying `data-pagefind-body` **must** also call `pagefind-keys.html`.
 Pagefind drops any page lacking the key it is sorting on, so a new template without it
-vanishes from sorted results with no error. Currently `page.html`, `section.html` and
-`bookmarks/section.html`.
+vanishes from sorted results with no error — and the same span carries the `year`
+filter, so a page missing it also vanishes whenever a year is selected. Currently
+`page.html`, `section.html` and `bookmarks/section.html`.
 
 ## Client/server pairs must change together
 
@@ -28,8 +29,14 @@ JS for the live one. Changing one alone makes the two views disagree:
 | `page-date.html` (>1-day updated rule) | `dateHTML()` in `cards.js` |
 | `bookmark-label.html` (URL display form) | `bookmarkLabel()` in `cards.js` |
 | the page collection each list template passes | the matching kind in `scope()` |
+| `pagefind-keys.html`'s `data-year` (`.Date`) | `yearOf()` in `list.js` |
 
 The >1-day date rule is implemented a **third** time, in `sidebar.html`.
+
+`yearOf()` deliberately slices the year out of the RFC 3339 string instead of building
+a `Date`: a local-zone `getFullYear()` would put a page in a different year from the
+one Hugo baked into the Pagefind filter, for readers far enough from the site's zone.
+The browse lists and search would then disagree about what `?year=` means.
 
 ## `partialCached` on site-scanning partials
 

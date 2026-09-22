@@ -34,13 +34,14 @@ Six sorts from `sorts.js`; three facets of filter chips with counts *within the
 current result set* — type and year single-select, tags AND-ed. A facet is hidden
 when the list doesn't vary on it, which is how a tag page hides its own tag and a
 single year of posts gets no year row. Chips sit most-frequent-first, except years,
-which run newest-first. A page's **year is the year of its `created` date**, taken in
-the reader's zone so it agrees with the date its card prints; `updated` has no facet.
+which run newest-first. A page's **year is the year of its `created` date**, in the
+page's own offset — `yearOf()` slices it out of the RFC 3339 string so it matches the
+year Hugo gives Pagefind (see [../traps.md](../traps.md)); `updated` has no facet.
 State lives in `?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2` (`q` reserved for
-search). Home *Recent* passes `data-compact`: cards only.
+search), and the three facets spell the same way on [search.md](search.md). Home
+*Recent* passes `data-compact`: cards only.
 
-Facets are client-side only: the no-JS `<ul>` has no chips, and search filters by type
-and tag but not year (Pagefind emits no year key — *SPEC* "Date filters (TBD)").
+Chips are JS-only either way: the no-JS `<ul>` fallback has no filtering.
 
 Defaults `params.listOrder` / `listPerPage`; a section index overrides with `order:` /
 `perPage:`, inherited by sub-folders via the `.Ancestors` walk in `list-order.html`.
