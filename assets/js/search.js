@@ -6,9 +6,8 @@
 // orders the whole result set inside the index without loading a fragment per
 // hit. A sort replaces relevance ranking outright, so "Relevance" is only
 // offered — and only the default — when there is a query; filter-only
-// browsing defaults to recently updated, like the browse lists. Type and year
-// are exclusive; tags AND together. The same three facets as the browse lists,
-// over Pagefind's index rather than index.json.
+// browsing defaults to recently updated, like the browse lists. Same three facets
+// as those lists, over Pagefind's index rather than index.json.
 import { card } from "./cards.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -94,10 +93,8 @@ function renderFilters(counts) {
   // counts: filter counts within the current result set (or totals when idle)
   el.type.replaceChildren(...sortedKeys(allFilters.type).map((n) =>
     chip("type", n, (counts.type || {})[n] ?? 0, state.type === n)));
-  // No counts on the year options, unlike the chips: Pagefind's counts are for
-  // the current result set, which for a single-select control would print "0"
-  // beside years that do have pages. The browse lists can compute the honest
-  // number from index.json (see renderControls in list.js); here we don't.
+  // No counts on the year options: Pagefind's are for the current result set, so a
+  // single-select control would print "0" beside years that do have pages.
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
   el.year.replaceChildren(new Option("All years", "", false, !state.year),

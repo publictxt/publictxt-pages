@@ -32,6 +32,5 @@ alphabetically; `sections.html` is the single source for both sidebar and home
 
 `section.html` renders the index body as prose in its **own** `data-pagefind-body` —
 a section index body is real content, searchable like any page — then a browse list
-of `.RegularPagesRecursive`. Being indexed, it owes Pagefind the sort keys and year
-filter from `pagefind-keys.html` like any single page (see [../traps.md](../traps.md)).
-See [browse-lists.md](browse-lists.md).
+of `.RegularPagesRecursive`. Being indexed, it owes Pagefind the `pagefind-keys.html`
+span like any page ([../traps.md](../traps.md)). See [browse-lists.md](browse-lists.md).

@@ -17,18 +17,14 @@ import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
-// A page's year: the year of its `created` date, read straight off the RFC 3339
-// string rather than via a Date, so it is the year in the page's own offset —
-// the same value Hugo hands Pagefind in pagefind-keys.html. Parsing it as a
-// local Date instead would let a reader far from the site's zone see a page
-// filed one year off what search files it under.
+// A page's `created` year, sliced off the RFC 3339 string rather than parsed as a
+// local Date, so it matches the year Hugo gives Pagefind (see docs/wiki/traps.md).
 function yearOf(it) {
   return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
-// The facets a list can offer: the values each page contributes, and the order
-// the chips sit in. Tags are multi-select and AND-ed; type and year are
-// exclusive, so their state is a string rather than a Set.
+// The facets a list offers: each page's values, and the order they display in.
+// Tags are AND-ed; type and year are exclusive, so their state is a string.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
   type: { values: (it) => [it.type], order: byCount },
@@ -147,9 +143,8 @@ async function mount(root) {
     return row;
   }
 
-  // `filtered` is the visible set; `forYear` is it without the year filter, so
-  // the year options count what picking each one would actually give — a
-  // single-select control cannot show "0" next to a year that has pages.
+  // `forYear` is `filtered` minus the year filter: a single-select option must
+  // count what picking it gives, not what the current year leaves.
   function renderControls(filtered, forYear) {
     controls.replaceChildren();
     const head = document.createElement("div");
@@ -165,8 +160,7 @@ async function mount(root) {
     });
     selects.append(sortWrap);
 
-    // Year is a select, not a chip row: it is the least-reached-for facet, and
-    // this keeps it off its own line and scales past a decade of chips.
+    // A select, not a chip row: the least-reached-for facet, and it scales.
     if (hasYears) {
       const c = new Map(counts(forYear, "year"));
       const yearWrap = document.createElement("label");
