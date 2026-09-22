@@ -7,7 +7,7 @@ This should fulfill the **Static Website Generation** portion of PublicTxt. See 
 
 `docs/wiki/` is a map, not a substitute for the source — the source is well commented
 (module docstrings, `{{/* */}}` contract comments on every partial). Read the wiki to
-find the right file, then read that file.
+find the right file/s, then read those files.
 
 - `docs/wiki/index.md` — entry point + the map: every source file, one line each
 - `docs/wiki/features/` — what a capability does and which files do it, one page each
