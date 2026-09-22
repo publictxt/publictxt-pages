@@ -24,7 +24,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 
 `[[wikilink]]` syntax is **not supported** — they render as literal text. *(D5)*
 
-## Scope (v1)
+## Scope
 
 - Single repo, full structure: `wiki/`, `blog/`, `notes/`, `bookmarks/`, plus any other top-level folder (e.g. `posts/`) as a section
 - Root-level pages (`Projects.md`, …) published as plain pages outside any section
@@ -36,7 +36,7 @@ This produces `[label](../wiki/page.md)` rather than `[[page]]`. Hugo's embedded
 - Content pages show meta info (type, date, tags) in sidebar
 - Section index bodies render as prose and are indexed for search, the same as single pages
 - Browse lists (home *Recent*, every section page, every tag page) are rendered client-side from one site-wide JSON page index — sortable, filterable by tag and type, paged, with the view in the URL. Hugo renders a plain link list as the no-JS fallback. See *Browse lists* below *(D6, D7)*
-- `author` / `source_repo` carried in front matter, not exposed in UI/filters
+
 
 ## Content structure — what real repos look like
 
@@ -89,13 +89,7 @@ Any other front matter keys (`web:`, `web-links:`, …) are passed through untou
 
 ### Bookmarks from front matter
 
-A page in any section may carry `bookmark: <url>` (or a list). Templates then treat it as a
-bookmark in addition to its own type: it is listed in the `bookmarks/` section (merged with the
-native one-file-per-resource pages, newest first, and counted in the sidebar/home counts), and
-the URL is shown as an external link on its list card, page header and sidebar meta. The page
-itself stays where it is — its `type`, URL and breadcrumbs are unchanged. This is done entirely
-in templates; the sync step does not move or copy anything. If the repo has no `bookmarks/`
-folder there is no section page to list them on.
+A page may carry `bookmark: <url>` (or list). Templates list it in `bookmarks/` section (merged with native pages, newest first), show URL on card/header/meta, but keep page at original location with original `type`, URL, breadcrumbs. Done entirely in templates; sync step does nothing. Requires `bookmarks/` folder for section page.
 
 **Note on `created`/`updated`**: when authored explicitly, use a single ISO 8601 datetime (`2026-09-20T14:30:00+02:00`), not separate date and time fields. `hugo.toml` maps `created` → `.Date` and `updated` → `.Lastmod`; Hugo sorts and renders from those only.
 
