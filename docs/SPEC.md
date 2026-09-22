@@ -7,40 +7,42 @@ cited as *(Dn)*.
 Items marked **(TBD)** are not built.
 
 ## Principles
+
 - **No PublicTxt.Syntax / .NET dependency.** Works with real wikis: relative links, no front matter required.
 - Source repo never modified; build operates on generated copy `build/content/`.
 - Links are `[label](../wiki/page.md)` - No `[[wikilinks]]`
 - Hugo renders `.md` extensions to `.html`
 
 ## Feature list
+
 - Sections
-	- Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-	- home list sections by folder name, ordered by `params.sectionOrder` *(D10)*.
-	- Section index bodies render as prose and are search-indexed.
+  - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
+  - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*.
+  - Section index bodies render as prose and are search-indexed.
 - Sidebar
-	- Tag cloud
-	- page meta (type, dates, tags) in sidebar.
-	- Author **(TBD)** — carried in front matter, rendered nowhere
+  - Tag cloud
+  - page meta (type, dates, tags) in sidebar.
+  - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories (TBD)
 - Tags
-	- Inline `#hashtags` merged into `tags`. Facets: tags (AND-able), type.
-	- tag pages
+  - Inline `#hashtags` merged into `tags`. Facets: tags (AND-able), type.
+  - tag pages
 - Browse Lists
-	- All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
-	- Sorting in all by Date, Recency, Alphabetical.
-	- Sort by Year/Month/Type/Category (TBD)
-	- Sort by Source/Author (TBD)
-	- Sort by Rating (TBD)
+  - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
+  - Sorting in all by Date, Recency, Alphabetical.
+  - Sort by Year/Month/Type/Category (TBD)
+  - Sort by Source/Author (TBD)
+  - Sort by Rating (TBD)
 - Search
-	- Full text search
-	- Type and Tag filters as 'facets' are available without a query
-	- Date filters (TBD)
-	- Also Sortable
+  - Full text search
+  - Type and Tag filters as 'facets' are available without a query
+  - Date filters (TBD)
+  - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
-	- frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page.
+  - frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page
 - Pages
-	- Images and attachments to post should be converted to Hugo content bundles (TBD)
+  - Images and attachments to post should be converted to Hugo content bundles (TBD)
 
 ## Content Structure
 
@@ -84,4 +86,5 @@ All front matter optional; sync derives the rest.
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.
 
 ## Deployment
+
 Build outputs to `public/`. GitHub Actions workflow (`deploy/publish-to-github-pages.yml`) checks out the content repo, runs the build pipeline, and deploys via `actions/deploy-pages`.
