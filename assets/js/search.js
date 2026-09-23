@@ -6,9 +6,8 @@
 // orders the whole result set inside the index without loading a fragment per
 // hit. A sort replaces relevance ranking outright, so "Relevance" is only
 // offered — and only the default — when there is a query; filter-only
-// browsing defaults to recently updated, like the browse lists. Type and year
-// are exclusive; tags AND together. The same three facets as the browse lists,
-// over Pagefind's index rather than index.json.
+// browsing defaults to recently updated, like the browse lists. Same three facets
+// as those lists, over Pagefind's index rather than index.json.
 import { card } from "./cards.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -84,8 +83,8 @@ function chip(kind, name, count, active) {
   n.textContent = count;
   b.append(n);
   b.addEventListener("click", () => {
-    if (kind === "tag") toggleTag(name);
-    else { state[kind] = state[kind] === name ? "" : name; run(); }   // type, year: exclusive
+    if (kind === "type") { state.type = state.type === name ? "" : name; run(); }
+    else toggleTag(name);
   });
   return b;
 }
@@ -94,10 +93,12 @@ function renderFilters(counts) {
   // counts: filter counts within the current result set (or totals when idle)
   el.type.replaceChildren(...sortedKeys(allFilters.type).map((n) =>
     chip("type", n, (counts.type || {})[n] ?? 0, state.type === n)));
+  // No counts on the year options: Pagefind's are for the current result set, so a
+  // single-select control would print "0" beside years that do have pages.
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
-  el.year.replaceChildren(...years.map((n) =>
-    chip("year", n, (counts.year || {})[n] ?? 0, state.year === n)));
+  el.year.replaceChildren(new Option("All years", "", false, !state.year),
+    ...years.map((y) => new Option(y, y, false, y === state.year)));
   el.tag.replaceChildren(...sortedKeys(allFilters.tag).map((n) =>
     chip("tag", n, (counts.tag || {})[n] ?? 0, state.tags.has(n))));
   el.tagHint.textContent = state.tags.size > 1 ? "— all selected must match" : "";
@@ -126,7 +127,7 @@ async function run() {
   renderFilters(res.filters || allFilters);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", state.type, state.year, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
+  const what = [hasQuery() ? `“${state.q}”` : "", state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
   await showMore();
@@ -157,6 +158,7 @@ function resultCard(d) {
 let timer;
 el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => { state.q = el.q.value; run(); }, 200); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
+el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
 el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; state.year = ""; state.tags.clear(); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });

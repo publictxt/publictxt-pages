@@ -23,9 +23,12 @@
         <h3 class="side-heading">Type</h3>
         <div id="filter-type" class="chip-row"></div>
       </div>
+      {{/* Year is a select, not chips: the least-reached-for facet, kept to one
+           line above the tag list. search.js hides the group when the whole
+           site sits in one year. */}}
       <div class="filter-group" id="filter-year-group" hidden>
         <h3 class="side-heading">Year</h3>
-        <div id="filter-year" class="chip-row"></div>
+        <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>
       </div>
       <div class="filter-group">
         <h3 class="side-heading">Tags <span class="muted" id="filter-tag-hint"></span></h3>

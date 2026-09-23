@@ -1,18 +1,11 @@
 {{/*
   The hidden Pagefind keys for one indexed page, on one empty element so nothing
-  reaches the indexed text:
+  reaches the indexed text: the two dates as Unix seconds and the title lower-cased
+  to sort on (Pagefind compares strings case-sensitively), plus the `created` year
+  as a filter — the same year the browse lists facet on, see yearOf() in list.js.
 
-    sort    the two dates as Unix seconds (numeric compare, offset-proof) and
-            the title lower-cased (Pagefind compares strings case-sensitively),
-            so search can order results without loading each one.
-    filter  the year — `created`'s, matching the browse lists' year facet
-            (yearOf() in assets/js/list.js reads the same `.Date` year out of
-            index.json, so both surfaces file a page under one year).
-
-  Every template that carries `data-pagefind-body` must include this. Pagefind
-  drops pages lacking the key it is sorting on, and a page lacking the year
-  filter vanishes whenever a year is selected. A section index with body content
-  is indexed just like a single page.
+  Every template carrying `data-pagefind-body` must include this; without it a page
+  drops out of sorted results and out of any year. See docs/wiki/traps.md.
 */}}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title]"
   data-pagefind-filter="year[data-year]"

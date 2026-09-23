@@ -17,6 +17,5 @@ URLs appear in the page header, the sidebar meta block and on cards, labelled wi
 scheme, `www.` and trailing slash dropped. The top-level `bookmarks/` page gathers
 `bookmark-pages.html`; its sub-folders behave like any section.
 
-`bookmarks/section.html` is `section.html` with that one collection swapped, so it
-carries the same `data-pagefind-body` and the same `pagefind-keys.html` span — a
-third copy of an obligation [../traps.md](../traps.md) records.
+`bookmarks/section.html` is `section.html` with that one collection swapped, down to
+the `pagefind-keys.html` span [../traps.md](../traps.md) requires.

@@ -17,18 +17,14 @@ import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
-// A page's year: the year of its `created` date, read straight off the RFC 3339
-// string rather than via a Date, so it is the year in the page's own offset —
-// the same value Hugo hands Pagefind in pagefind-keys.html. Parsing it as a
-// local Date instead would let a reader far from the site's zone see a page
-// filed one year off what search files it under.
+// A page's `created` year, sliced off the RFC 3339 string rather than parsed as a
+// local Date, so it matches the year Hugo gives Pagefind (see docs/wiki/traps.md).
 function yearOf(it) {
   return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
-// The facets a list can offer: the values each page contributes, and the order
-// the chips sit in. Tags are multi-select and AND-ed; type and year are
-// exclusive, so their state is a string rather than a Set.
+// The facets a list offers: each page's values, and the order they display in.
+// Tags are AND-ed; type and year are exclusive, so their state is a string.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
   type: { values: (it) => [it.type], order: byCount },
@@ -125,11 +121,9 @@ async function mount(root) {
     b.setAttribute("aria-pressed", String(active));
     b.innerHTML = (kind === "tag" ? "#" : "") + escapeHTML(name) + `<span class="count">${n}</span>`;
     b.addEventListener("click", () => {
-      if (kind === "tag") {
-        if (state.tags.has(name)) state.tags.delete(name); else state.tags.add(name);
-      } else {
-        state[kind] = state[kind] === name ? "" : name;   // type, year: exclusive
-      }
+      if (kind === "type") state.type = state.type === name ? "" : name;
+      else if (state.tags.has(name)) state.tags.delete(name);
+      else state.tags.add(name);
       state.page = 1;
       render(true);
     });
@@ -149,10 +143,14 @@ async function mount(root) {
     return row;
   }
 
-  function renderControls(filtered) {
+  // `forYear` is `filtered` minus the year filter: a single-select option must
+  // count what picking it gives, not what the current year leaves.
+  function renderControls(filtered, forYear) {
     controls.replaceChildren();
     const head = document.createElement("div");
     head.className = "list-controls-head";
+    const selects = document.createElement("div");
+    selects.className = "list-selects";
     const sortWrap = document.createElement("label");
     sortWrap.className = "list-sort";
     sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
@@ -160,7 +158,23 @@ async function mount(root) {
     sortWrap.querySelector("select").addEventListener("change", (e) => {
       state.sort = e.target.value; state.page = 1; render(true);
     });
-    head.append(sortWrap);
+    selects.append(sortWrap);
+
+    // A select, not a chip row: the least-reached-for facet, and it scales.
+    if (hasYears) {
+      const c = new Map(counts(forYear, "year"));
+      const yearWrap = document.createElement("label");
+      yearWrap.className = "list-sort";
+      yearWrap.innerHTML = `<span class="facet-label">Year</span> <select aria-label="Filter by year">`
+        + `<option value=""${state.year ? "" : " selected"}>All years</option>`
+        + yearFacet.map(([y]) => `<option value="${y}"${y === state.year ? " selected" : ""}>${y} (${c.get(y) || 0})</option>`).join("")
+        + `</select>`;
+      yearWrap.querySelector("select").addEventListener("change", (e) => {
+        state.year = e.target.value; state.page = 1; render(true);
+      });
+      selects.append(yearWrap);
+    }
+    head.append(selects);
     if (state.type || state.year || state.tags.size || state.sort !== defaultSort) {
       const clear = document.createElement("button");
       clear.type = "button";
@@ -177,10 +191,6 @@ async function mount(root) {
     if (hasTypes) {
       const c = within("type");
       controls.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
-    }
-    if (hasYears) {
-      const c = within("year");
-      controls.append(facetRow("Year", yearFacet.map(([n]) => chip("year", n, c.get(n) || 0, state.year === n))));
     }
     if (tagFacet.length) {
       const c = within("tags");
@@ -240,10 +250,10 @@ async function mount(root) {
   }
 
   function render(pushHistory) {
-    let filtered = items;
-    if (state.type) filtered = filtered.filter((it) => it.type === state.type);
-    if (state.year) filtered = filtered.filter((it) => yearOf(it) === state.year);
-    for (const t of state.tags) filtered = filtered.filter((it) => (it.tags || []).includes(t));
+    let forYear = items;
+    if (state.type) forYear = forYear.filter((it) => it.type === state.type);
+    for (const t of state.tags) forYear = forYear.filter((it) => (it.tags || []).includes(t));
+    let filtered = state.year ? forYear.filter((it) => yearOf(it) === state.year) : forYear;
     filtered = sorted(filtered, state.sort);
 
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
@@ -256,10 +266,10 @@ async function mount(root) {
     list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tags, onTag })));
     if (compact) return;
 
-    renderControls(filtered);
+    renderControls(filtered, forYear);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, state.year, ...[...state.tags].map((t) => "#" + t)].filter(Boolean).join(" · ");
+    const what = [state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")
