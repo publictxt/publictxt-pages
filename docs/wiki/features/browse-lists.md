@@ -44,5 +44,6 @@ off the RFC 3339 string to match what Hugo gives Pagefind ([../traps.md](../trap
 the same way on [search.md](search.md). Home *Recent* passes `data-compact`: cards
 only, and the no-JS `<ul>` fallback has no filtering at all.
 
-Defaults `params.listOrder` / `listPerPage`; a section index overrides with `order:` /
+Lists default to **Newest** (`params.listOrder = "created"`); the two `updated` sorts
+sit at the end of the menu. Defaults `params.listOrder` / `listPerPage`; a section index overrides with `order:` /
 `perPage:`, inherited by sub-folders via the `.Ancestors` walk in `list-order.html`.

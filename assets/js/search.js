@@ -6,7 +6,7 @@
 // orders the whole result set inside the index without loading a fragment per
 // hit. A sort replaces relevance ranking outright, so "Relevance" is only
 // offered — and only the default — when there is a query; filter-only
-// browsing defaults to recently updated, like the browse lists. Same three facets
+// browsing defaults to newest, like the browse lists. Same three facets
 // as those lists, over Pagefind's index rather than index.json.
 import { card } from "./cards.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
@@ -36,10 +36,10 @@ el.root.hidden = false;
 const RELEVANCE = "relevance";
 const state = { q: "", type: "", year: "", tags: new Set(), sort: null };
 const hasQuery = () => state.q.trim().length > 0;
-const defaultSort = () => hasQuery() ? RELEVANCE : "updated";
+const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
   const s = state.sort ?? defaultSort();
-  return s === RELEVANCE && !hasQuery() ? "updated" : s;
+  return s === RELEVANCE && !hasQuery() ? "created" : s;
 }
 function readURL() {
   const p = new URLSearchParams(location.search);

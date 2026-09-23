@@ -5,19 +5,19 @@
 // form leaves the field's natural direction implicit ("updated", "title",
 // "created asc"), which is also what goes in the URL.
 export const SORTS = [
-  ["updated", "Recently updated"],
   ["created", "Newest"],
   ["created asc", "Oldest"],
   ["title", "Title A→Z"],
   ["title desc", "Title Z→A"],
+  ["updated", "Recently updated"],
   ["updated asc", "Least recently updated"],
 ];
 
 export const FIELDS = ["updated", "created", "title"];
 
 export function normaliseSort(s) {
-  const [field = "updated", dir] = String(s || "").trim().toLowerCase().split(/\s+/);
-  const f = FIELDS.includes(field) ? field : "updated";
+  const [field = "created", dir] = String(s || "").trim().toLowerCase().split(/\s+/);
+  const f = FIELDS.includes(field) ? field : "created";
   const d = dir === "asc" || dir === "desc" ? dir : (f === "title" ? "asc" : "desc");
   const isDefault = f === "title" ? d === "asc" : d === "desc";
   return isDefault ? f : `${f} ${d}`;

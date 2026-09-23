@@ -26,7 +26,8 @@ instead of generating a section wrapper, so it comes out as Hugo's leaf bundle: 
 page, with the attachments as page resources sitting beside it. `index.md`/`home.md`
 folders are excluded from this detection — those already mean "section index".
 
-`params.sectionOrder` fixes navigation order, unlisted folders following
+`params.sectionOrder` fixes navigation order (`params.listOrder` the sort *within* a
+section's list — see [browse-lists.md](browse-lists.md)), unlisted folders following
 alphabetically; `sections.html` is the single source for both sidebar and home
 *([D10](../decisions/D10.md))*.
 

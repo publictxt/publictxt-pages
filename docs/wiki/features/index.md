@@ -32,4 +32,5 @@ Four things hold across everything:
   `index.json`, fetched once per visit *([D7](../decisions/D7.md))*.
 - **One sort vocabulary** (`sorts.js`) and **one card renderer** (`cards.js`), shared
   by the browse lists and search.
-- **"Recent" means recently *updated*** everywhere, by default — not newest.
+- **"Recent" means recently *updated***: the home *Recent* list and the `recent`
+  scope, only. Browse lists and search default to **Newest** (`created`).

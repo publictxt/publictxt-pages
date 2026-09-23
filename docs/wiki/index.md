@@ -106,7 +106,8 @@ ships inside Hugo, so the build needs no Node.
 ### Config and delivery
 
 ```txt
-hugo.toml                            mounts, frontmatter mapping, params, markup
+hugo.toml                            mounts, frontmatter mapping, params (listOrder,
+                                     sectionOrder, limits), markup
 deploy/publish-to-github-pages.yml   template for the CONTENT repo -> deploy.md
 site-content/                        site-owned pages (the search page)
 example/txt/                         synthetic default source repo

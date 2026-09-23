@@ -51,13 +51,13 @@ capitalizeListTitles = false
   # Browse lists (section and tag pages) are rendered client-side from each
   # page's index.json, with sort, tag/type filters and paging in the URL.
   # Default sort: "<field> [asc|desc]", field one of
-  #   updated  (recently updated first — the site's one meaning of "recent")
   #   created  (newest first)
   #   title    (A→Z)
+  #   updated  (recently updated first — what the home Recent list always uses)
   # and default cards per page. A section's index page overrides either for
   # itself and its sub-folders with `order:` / `perPage:` in its front matter
   # (e.g. `order: title` on wiki/index.md).
-  listOrder = "updated"
+  listOrder = "created"
   listPerPage = 20
 
 [markup]
