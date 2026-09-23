@@ -1,6 +1,7 @@
 ---
 covers:
   - layouts/baseof.html
+  - layouts/_partials/footer.html
   - assets/css/main.css
 ---
 
@@ -20,3 +21,8 @@ no template. See [../../SPEC.md](../../SPEC.md).
 
 Footer optionally renders `<a rel="me">` for `site.Params.mastodon` (hugo.toml),
 which Mastodon's profile verification checks for on the linked site.
+
+Footer lives in `_partials/footer.html`; its wording comes from `[params.footer]`
+(`text` as inline markdown, `contact` as the Mastodon lead-in), each defaulting to the
+original copy and hidden when set to `""`. The Mastodon link stays in the template, not
+the markdown, because markdown can't emit `rel="me"`.

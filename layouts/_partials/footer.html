@@ -1,0 +1,22 @@
+{{/*
+  Site footer. Every line is a site param (hugo.toml [params.footer]) so a
+  publishing site can reword it without overriding the template:
+    text     markdown, rendered inline; defaults to the publictxt-hugo credit.
+             Links render as plain <a> (no target/rel) — markdownify has no
+             external-link hook here.
+    contact  lead-in before the Mastodon link; shown only when
+             params.mastodon is set. Kept separate from `text` because the
+             link needs rel="me" (Mastodon verification), which markdown can't emit.
+  Set either to "" to hide it.
+*/}}
+{{ $f := site.Params.footer | default dict }}
+{{ $text := "PublicTxt, plain-text knowledge, published with [publictxt-hugo](https://github.com/publictxt/txt-hugo)." }}
+{{ if isset $f "text" }}{{ $text = $f.text }}{{ end }}
+{{ $contact := "Reach me on" }}
+{{ if isset $f "contact" }}{{ $contact = $f.contact }}{{ end }}
+<footer class="site-footer">
+  <p>
+    {{ with $text }}{{ . | markdownify }}{{ end }}
+    {{ with site.Params.mastodon }}{{ with $contact }}{{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Mastodon</a>{{ end }}
+  </p>
+</footer>

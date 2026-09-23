@@ -72,6 +72,7 @@ layouts/_partials/
   head.html             title, description, favicon, stylesheet
   sidebar.html          sections / page meta / tag cloud
   breadcrumbs.html      .Ancestors trail
+  footer.html           footer; wording from [params.footer]
   crumb-label.html      one crumb's label; date folders kept literal
   sections.html         top-level sections in sectionOrder   (partialCached)
   recent.html           the one "newest first": sort . "Lastmod" "desc"
