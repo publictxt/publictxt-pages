@@ -13,7 +13,8 @@ the non-extended Hugo binary works *([D9](../decisions/D9.md))*.
 
 `.list-selects` pairs the Sort and Year selects so the control head's `space-between`
 still pushes Reset right; `.filter-group .list-sort` reuses the same select in the
-search sidebar, full width.
+search sidebar, full width. A `.filter-group > summary` is the whole-row toggle, with a
+CSS chevron in place of the native marker.
 
 Not rendered anywhere: `author` and `source_repo` — carried in front matter, shown by
 no template. See [../../SPEC.md](../../SPEC.md).

@@ -18,22 +18,25 @@
   </form>
 
   <div class="search-layout">
+    {{/* Each group is a <details> so it folds away on a phone, where the
+         filters stack above the results. Open by default; search.js closes
+         the ones with nothing selected on narrow screens. */}}
     <aside class="search-filters">
-      <div class="filter-group">
-        <h3 class="side-heading">Type</h3>
+      <details class="filter-group" open>
+        <summary><h3 class="side-heading">Type</h3></summary>
         <div id="filter-type" class="chip-row"></div>
-      </div>
+      </details>
       {{/* Year is a select, not chips: the least-reached-for facet, kept to one
            line above the tag list. search.js hides the group when the whole
            site sits in one year. */}}
-      <div class="filter-group" id="filter-year-group" hidden>
-        <h3 class="side-heading">Year</h3>
+      <details class="filter-group" id="filter-year-group" open hidden>
+        <summary><h3 class="side-heading">Year</h3></summary>
         <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>
-      </div>
-      <div class="filter-group">
-        <h3 class="side-heading">Tags <span class="muted" id="filter-tag-hint"></span></h3>
+      </details>
+      <details class="filter-group" open>
+        <summary><h3 class="side-heading">Tags <span class="muted" id="filter-tag-hint"></span></h3></summary>
         <div id="filter-tag" class="chip-row"></div>
-      </div>
+      </details>
     </aside>
 
     <section class="search-results" aria-live="polite">

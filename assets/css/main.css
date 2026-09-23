@@ -527,7 +527,35 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   border-radius: var(--radius);
   padding: 0.8rem 0.9rem;
 }
-.filter-group .side-heading { margin-bottom: 0.5rem; }
+.filter-group .side-heading { margin: 0; }
+/* The group heading is its <details> toggle: whole row clickable, a chevron
+   standing in for the native marker. */
+.filter-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  list-style: none;
+  cursor: pointer;
+}
+.filter-group > summary::-webkit-details-marker { display: none; }
+.filter-group > summary::after {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+  flex: none;
+}
+.filter-group[open] > summary::after { transform: rotate(45deg); }
+@media (hover: hover) {
+  .filter-group > summary:hover .side-heading,
+  .filter-group > summary:hover::after { color: var(--accent); border-color: var(--accent); }
+}
+.filter-group > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.filter-group[open] > summary { margin-bottom: 0.5rem; }
 .filter-group .side-heading .muted { text-transform: none; letter-spacing: 0; font-weight: 400; }
 
 .filter-chip {
