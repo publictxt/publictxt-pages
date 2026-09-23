@@ -60,6 +60,16 @@ capitalizeListTitles = false
   listOrder = "created"
   listPerPage = 20
 
+  # Categories: a closed, curated vocabulary, unlike open-ended tags. A page
+  # opts in with a single `category: <name>` in its front matter; names match
+  # case-insensitively and display in the spelling listed here. A value not
+  # listed is ignored with a build warning. With `enabled = false` (or this
+  # block absent) categories vanish everywhere: no facet in browse lists or
+  # search, no category in the page index.
+  [params.categories]
+    enabled = true
+    list = ["essay", "howto", "reference", "project"]
+
 [markup]
   [markup.goldmark.renderHooks.link]
     # Embedded link render hook: resolves relative `.md` link destinations

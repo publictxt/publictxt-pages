@@ -2,7 +2,7 @@
 // site-wide index (fetched once per document, see site-index.js) and renders
 // sortable, filterable, paged cards in place of the plain link list Hugo
 // rendered as a fallback. Filter, sort and page live in the URL
-// (?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2) so views are linkable;
+// (?tag=a&tag=b&type=wiki&category=essay&year=2024&sort=title&page=2) so views are linkable;
 // `q` stays reserved for the search page.
 //
 // Container attributes:
@@ -24,10 +24,13 @@ function yearOf(it) {
 }
 
 // The facets a list offers: each page's values, and the order they display in.
-// Tags are AND-ed; type and year are exclusive, so their state is a string.
+// Tags are AND-ed; type, category and year are exclusive, so their state is a
+// string. Category is absent from the index when categories are disabled, which
+// leaves its facet empty and hidden — list.js needs no toggle of its own.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
   type: { values: (it) => [it.type], order: byCount },
+  category: { values: (it) => [it.category], order: byCount },
   tags: { values: (it) => it.tags || [], order: byCount },
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
 };
@@ -63,12 +66,13 @@ async function mount(root) {
   }
 
   // ---- state <-> URL --------------------------------------------------
-  const state = { sort: defaultSort, type: "", year: "", tags: new Set(), page: 1, moreTags: false };
+  const state = { sort: defaultSort, type: "", category: "", year: "", tags: new Set(), page: 1, moreTags: false };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     state.type = p.get("type") || "";
+    state.category = p.get("category") || "";
     state.year = p.get("year") || "";
     state.tags = new Set(p.getAll("tag").filter(Boolean));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
@@ -78,6 +82,7 @@ async function mount(root) {
     const p = new URLSearchParams();
     if (s.sort !== defaultSort) p.set("sort", s.sort);
     if (s.type) p.set("type", s.type);
+    if (s.category) p.set("category", s.category);
     if (s.year) p.set("year", s.year);
     for (const t of s.tags) p.append("tag", t);
     if (s.page > 1) p.set("page", String(s.page));
@@ -107,12 +112,15 @@ async function mount(root) {
 
   // Chips for a facet are only useful when the list actually varies on it:
   // a section of one type gets no type chips, one year of posts gets no year
-  // chips, and a tag page hides its own tag.
+  // chips, and a tag page hides its own tag. Category, like tags, shows when
+  // only some pages have one: "uncategorised" is not a value, so a lone
+  // category still narrows the list — unless every page carries it.
   const typeFacet = counts(items, "type");
   const hasTypes = typeFacet.length > 1;
   const yearFacet = counts(items, "year");
   const hasYears = yearFacet.length > 1;
   const tagFacet = counts(items, "tags").filter(([, n]) => n < items.length);
+  const categoryFacet = counts(items, "category").filter(([, n]) => n < items.length);
 
   function chip(kind, name, n, active) {
     const b = document.createElement("button");
@@ -121,7 +129,7 @@ async function mount(root) {
     b.setAttribute("aria-pressed", String(active));
     b.innerHTML = (kind === "tag" ? "#" : "") + escapeHTML(name) + `<span class="count">${n}</span>`;
     b.addEventListener("click", () => {
-      if (kind === "type") state.type = state.type === name ? "" : name;
+      if (kind === "type" || kind === "category") state[kind] = state[kind] === name ? "" : name;
       else if (state.tags.has(name)) state.tags.delete(name);
       else state.tags.add(name);
       state.page = 1;
@@ -175,13 +183,13 @@ async function mount(root) {
       selects.append(yearWrap);
     }
     head.append(selects);
-    if (state.type || state.year || state.tags.size || state.sort !== defaultSort) {
+    if (state.type || state.category || state.year || state.tags.size || state.sort !== defaultSort) {
       const clear = document.createElement("button");
       clear.type = "button";
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        state.type = ""; state.year = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
+        state.type = ""; state.category = ""; state.year = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
       });
       head.append(clear);
     }
@@ -191,6 +199,10 @@ async function mount(root) {
     if (hasTypes) {
       const c = within("type");
       controls.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
+    }
+    if (categoryFacet.length) {
+      const c = within("category");
+      controls.append(facetRow("Category", categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0, state.category === n))));
     }
     if (tagFacet.length) {
       const c = within("tags");
@@ -252,6 +264,7 @@ async function mount(root) {
   function render(pushHistory) {
     let forYear = items;
     if (state.type) forYear = forYear.filter((it) => it.type === state.type);
+    if (state.category) forYear = forYear.filter((it) => it.category === state.category);
     for (const t of state.tags) forYear = forYear.filter((it) => (it.tags || []).includes(t));
     let filtered = state.year ? forYear.filter((it) => yearOf(it) === state.year) : forYear;
     filtered = sorted(filtered, state.sort);
@@ -269,7 +282,7 @@ async function mount(root) {
     renderControls(filtered, forYear);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
+    const what = [state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")

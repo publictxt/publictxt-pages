@@ -3,11 +3,13 @@
   reaches the indexed text: the two dates as Unix seconds and the title lower-cased
   to sort on (Pagefind compares strings case-sensitively), plus the `created` year
   as a filter — the same year the browse lists facet on, see yearOf() in list.js.
+  Also the page's category as a filter, when it has one (see category.html).
 
   Every template carrying `data-pagefind-body` must include this; without it a page
   drops out of sorted results and out of any year. See docs/wiki/traps.md.
 */}}
+{{ $category := partial "category.html" . }}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title]"
-  data-pagefind-filter="year[data-year]"
+  data-pagefind-filter="year[data-year]{{ with $category }}, category[data-category]{{ end }}"
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
-  data-year="{{ .Date.Format "2006" }}"></span>
+  data-year="{{ .Date.Format "2006" }}"{{ with $category }} data-category="{{ . }}"{{ end }}></span>

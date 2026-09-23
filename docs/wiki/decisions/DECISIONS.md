@@ -34,6 +34,7 @@ Dates are when the record was *written*. Most decisions predate this log; those 
 | [D8](D8.md) | Custom Pagefind UI, not the stock one |
 | [D9](D9.md) | Plain CSS, no Sass |
 | [D10](D10.md) | Section order is configured, not derived |
+| [D11](D11.md) | Categories are a configured closed list, read from front matter |
 
 ---
 
