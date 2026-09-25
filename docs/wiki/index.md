@@ -42,7 +42,8 @@ If a page contradicts the code, the code wins and the page is a bug.
 
 ```txt
 scripts/sync_content.py     278  source repo -> build/content: index renames, titles,
-                                 dates, hashtag linkify, skips. Never touches source.
+                                 dates, hashtag linkify, source_path, skips. Never
+                                 touches source.
 scripts/dates.py            179  DateResolver: created/updated ladders, one git log
                                  pass, sort_key. Imported by sync_content.
 scripts/hashtags.py          67  HASHTAG_RE — the one definition of a hashtag;
@@ -72,7 +73,7 @@ layouts/_partials/
   head.html             title, description, favicon, stylesheet
   sidebar.html          sections / page meta / tag cloud
   breadcrumbs.html      .Ancestors trail
-  footer.html           footer; wording from [params.footer]
+  footer.html           footer; wording from [params.footer]; edit-in-repo link
   crumb-label.html      one crumb's label; date folders kept literal
   sections.html         top-level sections in sectionOrder   (partialCached)
   recent.html           the one "newest first": sort . "Lastmod" "desc"

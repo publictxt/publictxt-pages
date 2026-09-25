@@ -27,6 +27,10 @@ normalising the few things Hugo cannot handle natively:
     section index.
   * Inline `#hashtags` become links to their tag page (see hashtags.py for what
     counts as one — code, links and URL fragments are left alone).
+  * Every copied page records its path in the source repo as `source_path:`,
+    since the renames above make Hugo's own file path unreliable for that. The
+    "Edit this page" link (layouts/_partials/footer.html) is built from it;
+    generated indexes have no source file, so no key and no link.
 
 Repo housekeeping files (README, LICENSE, CONTRIBUTING, CNAME, .obsidian,
 .git, .trash, *.gitkeep) are skipped. Non-Markdown files (media) are copied
@@ -151,6 +155,8 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
         added.append(f"created_source: {stamp.created_source}")
     if not has_key(fm, "updated"):
         added.append(f"updated: {stamp.updated}")
+    if not has_key(fm, "source_path"):
+        added.append(f"source_path: {yaml_str(rel)}")
 
     body = INDEX_LINK_RE.sub(r"\1_index.md\2)", body)
     body = linkify(body)

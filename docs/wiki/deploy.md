@@ -53,4 +53,8 @@ env:
 
 `build.sh` passes `HUGO_BASEURL` through as `-b`; the rest Hugo reads directly.
 
+`HUGO_PARAMS_EDITURL` is prefilled from the GitHub context
+(`server_url/repository/edit/ref_name/`), so "Edit this page" links point at whichever
+content repo runs the workflow with no per-site edit. Set `""` to hide them.
+
 **Pinning:** `ref: main` tracks this repo's tip — pin to a tag for reproducible builds.
