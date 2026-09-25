@@ -1,8 +1,7 @@
 {{/*
-  A page's rating: its `rating:` front matter as a number 1–5 (decimals allowed,
-  3.5), or 0 when it has none (`rating: 0` included). Any other value (6, 0.5,
-  text, a list) is warned and read as 0: a typo should not silently drop a page
-  from its facet.
+  A page's rating: its `rating:` front matter as an int 1–5, or 0 when it has
+  none (`rating: 0` included). Any other value (6, 3.5, text, a list) is warned and read as 0: a
+  typo should not silently drop a page from its facet.
 
   The only reader of the `rating:` key — list-json.html, pagefind-keys.html
   and sidebar.html all go through here, so the browse lists, search and the
@@ -12,10 +11,10 @@
 {{ with .Params.rating }}
   {{ $s := "" }}
   {{ if not (or (reflect.IsSlice .) (reflect.IsMap .)) }}{{ $s = printf "%v" . }}{{ end }}
-  {{ if findRE `^([1-4](\.\d+)?|5(\.0+)?)$` $s }}
-    {{ $out = float $s }}
+  {{ if findRE `^[1-5]$` $s }}
+    {{ $out = int $s }}
   {{ else }}
-    {{ warnidf "rating-invalid" "%s: rating must be a number 1–5, got %v — ignored" $.Path . }}
+    {{ warnidf "rating-invalid" "%s: rating must be a whole number 1–5, got %v — ignored" $.Path . }}
   {{ end }}
 {{ end }}
 {{ return $out }}

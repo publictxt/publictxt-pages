@@ -135,8 +135,7 @@ async function mount(root) {
   const categoryFacet = counts(items, "category").filter(([, n]) => n < items.length);
   // Ratings present, best first. The select shows when some page differs from
   // the rest, unrated counting as a value: "★1+" then means "rated at all".
-  // Options are whole numbers — a minimum — whatever decimals the ratings carry.
-  const ratings = [...new Set(items.map((it) => Math.floor(it.rating || 0)).filter(Boolean))].sort((a, b) => b - a);
+  const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
 

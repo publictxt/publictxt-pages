@@ -38,7 +38,7 @@ Items marked **(TBD)** are not built.
   - Filter by Type, and by Year (the `created` year).
   - Filter by Category (also in Search)
   - Sort by Source/Author (TBD)
-  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter, decimals allowed (also in Search)
+  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search)
 - Search
   - Full text search
   - Type, Year and Tag filters as 'facets' are available without a query

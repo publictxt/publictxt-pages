@@ -86,7 +86,7 @@ capitalizeListTitles = false
     list = ["sci", "comp-sci", "political", "project", "personal"]
 
   # Ratings need no config: a page opts in with `rating: 1`–`5` in its front
-  # matter, decimals allowed (3.5); anything else is ignored with a build warning. Lists and search
+  # matter; anything else is ignored with a build warning. Lists and search
   # offer a minimum-rating filter and Top/Lowest rated sorts once any page has one.
 
 [markup]

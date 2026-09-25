@@ -25,7 +25,7 @@ and year are exclusive; the category group is hidden when the index has none
 `pagefind-keys.html`'s `year[data-year]` and is a select above the tag chips, hidden
 when the site spans one year; its options carry no counts, since Pagefind's are for
 the current result set and would print "0" beside years that do have pages. Rating is a
-minimum-rating select, sent as Pagefind's `any` over the whole-number filter values, plus
+minimum-rating select, sent as Pagefind's `any` over the qualifying values, plus
 *Unrated*, the filter value unrated pages carry ([ratings.md](ratings.md)). Chip
 counts run higher than a browse list's: Pagefind also indexes section index bodies,
 which `index.json` does not carry.

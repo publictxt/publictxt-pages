@@ -35,7 +35,7 @@
     {{/* Same stars as ratingHTML() in cards.js. */}}
     {{ with partial "rating.html" . }}
     <dt>Rating</dt>
-    <dd><span class="rating" role="img" aria-label="Rated {{ . }} of 5" style="--rating: {{ . }}">☆☆☆☆☆</span></dd>
+    <dd><span class="rating" role="img" aria-label="Rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
     {{ end }}
     {{ with partial "bookmark-urls.html" . }}
     <dt>Bookmark{{ if gt (len .) 1 }}s{{ end }}</dt>

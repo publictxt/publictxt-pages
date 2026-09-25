@@ -1,5 +1,5 @@
 ---
-rating: 3.5
+rating: 3
 ---
 # Curated Commons: Open Aggregation for the Open Web
 
