@@ -11,9 +11,7 @@
   </div>
 </header>
 
-{{/* A section's index body is real content: render it as prose and index it
-     for search, exactly like a single page. The page list below stays
-     outside the Pagefind body. */}}
+{{/* The index body is content, indexed like a page; the list below is not. */}}
 {{ with .Content }}
 <div class="prose" data-pagefind-body>{{ . }}</div>
 {{ end }}

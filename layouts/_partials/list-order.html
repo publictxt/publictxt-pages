@@ -1,8 +1,6 @@
 {{/*
-  The list order that applies to a page: `order:` in its own front matter,
-  else the nearest ancestor's (so `order: title` on wiki/index.md covers every
-  sub-folder of the wiki), else `params.listOrder`, else "created".
-  Returns the order string (see assets/js/list.js).
+  A page's list order: its `order:`, else the nearest ancestor's, else
+  params.listOrder, else "created".
 */}}
 {{ $order := .Params.order }}
 {{ if not $order }}

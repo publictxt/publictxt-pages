@@ -1,26 +1,13 @@
 #!/usr/bin/env python3
 """
-extract_hashtags.py
+extract_hashtags.py — merge each page's inline #hashtags (hashtags.py) into
+its front matter `tags`. Body untouched. Idempotent.
 
-Preprocessing step for publictxt-pages (see docs/wiki/features/tags.md).
+Not a YAML parser: only `tags` is read (inline `[a, b]`, block `- a`, or a
+scalar) and rewritten inline; other lines pass through. Needing more means a
+real parser, not a bigger regex.
 
-Scans Markdown files under content/, extracts inline #hashtags from the
-body, and merges them into the front matter `tags` list. Body text is left
-untouched — hashtags remain visible for Obsidian-style reading. What counts
-as a hashtag (and what is skipped: code, links, URLs) is defined once in
-hashtags.py, shared with sync_content.py.
-
-No third-party dependencies (PyYAML etc. deliberately avoided). Only the
-`tags` entry is interpreted — as an inline `[a, b]` list, a block `- a`
-list, or a scalar — and it is rewritten in inline form. Every other front
-matter line is passed through untouched. If `tags` ever needs richer YAML
-than that, swap in a real parser rather than extending this one.
-
-Usage:
-    python3 scripts/extract_hashtags.py [content_dir]
-
-Idempotent: safe to re-run: already-merged tags are de-duplicated, not
-re-appended.
+Usage: python3 scripts/extract_hashtags.py [content_dir]
 """
 
 import re
@@ -41,11 +28,7 @@ def _unquote(s: str) -> str:
 
 
 def parse_tags(fm_text: str) -> tuple[list[str], tuple[int, int] | None]:
-    """
-    Find the `tags` entry in front matter. Returns (tags, (start, end)) where
-    start/end are the line indices of the entry (end exclusive), or None if
-    there is no `tags` key. Supports inline `[a, b]` and block `- a` lists.
-    """
+    """(tags, (start, end) line span of the `tags` entry, end exclusive) or (…, None) when absent."""
     lines = fm_text.split("\n")
     i = 0
     while i < len(lines):

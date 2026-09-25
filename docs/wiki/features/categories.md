@@ -7,38 +7,15 @@ covers:
 
 # Categories
 
-A **closed, curated** vocabulary alongside open-ended tags *([D11](../decisions/D11.md))*.
-A page opts in with one `category: <name>` in its front matter. Configured in
-`hugo.toml`:
+A **closed, curated** vocabulary beside open-ended tags *([D11](../decisions/D11.md))*:
+one `category:` per page from `[params.categories] list` in `hugo.toml`.
 
-```toml
-[params.categories]
-  enabled = true
-  list = ["essay", "howto", "reference", "project"]
-```
+`category.html` is the only reader, feeding `list-json.html` (a browse-list chip row)
+and `pagefind-keys.html` (a search filter), both `?category=`. Bad values warn
+(`warnidf` ids `category-unknown` / `category-multi`, silenced via `ignoreLogs`).
 
-`category.html` is the **only reader** of the key. It matches case-insensitively
-against `list` and returns the configured spelling, or `""` when categories are
-disabled, the page has none, or the value isn't listed. Unlisted values and lists
-(`category: [a, b]`) are ignored with a build warning (`warnidf` ids
-`category-unknown` / `category-multi`, suppressible via `ignoreLogs`).
+**The toggle lives in one place**: disabled, no page has a category, so both UIs hide
+the facet on empty data — no JS knows about `enabled`. A deploy can flip it with
+`HUGO_PARAMS_CATEGORIES_ENABLED=false`.
 
-Two consumers, both through that partial, so they can't disagree:
-
-- `list-json.html` adds `category` to the page's `index.json` item → a **Category**
-  chip row in browse lists (`list.js`), single-select, `?category=`.
-- `pagefind-keys.html` adds a `category` Pagefind filter → a **Category** group on
-  the search page (`search.js`), same URL spelling.
-
-**The toggle lives in one place.** Disabled (or the block absent), no page has a
-category, so the index and Pagefind carry none and both UIs hide the facet on empty
-data — neither JS file knows about `enabled`. A content repo's deploy can flip it
-without forking `hugo.toml`: `HUGO_PARAMS_CATEGORIES_ENABLED=false`.
-
-A browse list shows the row when some pages have a category, even one — a page with
-none is "uncategorised", not a value — and hides a category every page shares, as
-with tags. Chip order is by count, not `list` order. No term pages, no sidebar chip:
-categories are not a Hugo taxonomy.
-
-Category is not a `sync_content.py` concern; the key passes through untouched.
-[ratings.md](ratings.md) follows the same one-reader pattern, without a config block.
+Not a Hugo taxonomy: no term pages or sidebar chip. Sync passes the key through.

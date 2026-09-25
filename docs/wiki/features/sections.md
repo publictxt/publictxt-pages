@@ -8,41 +8,24 @@ covers:
 
 # Sections
 
-Every top-level folder is a section (`wiki/`, `blog/`, `notes/`, …); root-level `.md`
-are plain pages. A folder's name is its default `type`.
+Every top-level folder is a section; its name is the default `type`. Root-level `.md`
+are plain pages.
 
-Hugo only treats a folder as a section when it holds `_index.md`; real wikis have
-`index.md`, `home.md` or nothing. `sync_content.py` renames the first two, rewrites
-links pointing at them, and generates a minimal index for folders that have neither
-*([D2](../decisions/D2.md))*. Without this Hugo reads a folder containing `index.md`
-as a **leaf bundle** and hides every sibling page as a resource. Consequence:
-sections nest to any depth, and every folder appears in breadcrumbs. The renames are
-why each page records its original `source_path` (for the edit link, see
-[theme.md](theme.md)).
+Hugo needs `_index.md` for a section, and reads a folder with `index.md` as a leaf
+bundle, hiding its siblings. So sync renames `index.md`/`home.md` → `_index.md`,
+rewrites links to them, and generates an index for folders with none
+*([D2](../decisions/D2.md))*: sections nest to any depth and every folder is in the
+breadcrumbs. The renames are why pages record `source_path` ([theme.md](theme.md)).
 
-One exception is deliberate: a **post folder** — one non-index Markdown file plus
-attachments, no subfolders (e.g. `Post-Name/title.md` + `image.png`) — is a leaf
-bundle in disguise, not a section. `sync_content.py` detects it structurally
-(`find_leaf_bundle_dirs`) and renames its Markdown file to lowercase `index.md`
-instead of generating a section wrapper, so it comes out as Hugo's leaf bundle: one
-page, with the attachments as page resources sitting beside it. `index.md`/`home.md`
-folders are excluded from this detection — those already mean "section index".
+Exception: a **post folder** (one non-index `.md` + attachments, no subfolders) is
+made a real leaf bundle — its `.md` becomes `index.md`, one page with its attachments.
 
-**`publish: off`** (or `false` / `no` / `0`, any case) keeps a page out of
-`build/content/` altogether, so it is in no list, search or `index.json`. An
-unpublished post folder goes whole, attachments included; loose attachments beside
-an unpublished page in an ordinary folder are still copied — sync can't tell whose
-they are. An unpublished `index.md` just gets the generated index instead. Links to
-an unpublished page are left dangling. The page is hidden, not private: the source
-repo still has it.
+**`publish: off`** (also `false` / `no` / `0`) keeps a page out of `build/content/`,
+so out of every list and search; an unpublished post folder goes whole. Hidden, not
+private: it stays in the source repo. Loose attachments in an ordinary folder are
+still copied, an unpublished `index.md` gets a generated one, and links to the page
+dangle.
 
-`params.sectionOrder` fixes navigation order (`params.listOrder` the sort *within* a
-section's list — see [browse-lists.md](browse-lists.md)), unlisted folders following
-alphabetically; `sections.html` is the single source for both sidebar and home
-*([D10](../decisions/D10.md))*. Sections group by folder; for a cross-cutting
-curated grouping, see [categories.md](categories.md).
-
-`section.html` renders the index body as prose in its **own** `data-pagefind-body` —
-a section index body is real content, searchable like any page — then a browse list
-of `.RegularPagesRecursive`. Being indexed, it owes Pagefind the `pagefind-keys.html`
-span like any page ([../traps.md](../traps.md)). See [browse-lists.md](browse-lists.md).
+Navigation order: `params.sectionOrder`, then A→Z, via `sections.html` for sidebar and
+home *([D10](../decisions/D10.md))*. `section.html` indexes the index body for search
+like a page, so it owes the `pagefind-keys.html` span ([../traps.md](../traps.md)).

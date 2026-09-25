@@ -1,17 +1,7 @@
 {{/*
-  The site's one page index, as a published JSON file; returns its URL.
-
-  Every browse list (home Recent, each section, each tag) is a subset of this
-  one file, selected client-side by assets/js/site-index.js. Previously each
-  list page emitted its own index.json, which meant a page's entry was
-  serialised once per list it appeared in — and a fresh fetch on every
-  navigation. One file is fetched once and reused across the whole visit.
-
-  Fingerprinted in production so the browser can cache it immutably: the URL
-  changes when the content does, which is the whole of the invalidation story.
-
-  Call it through partialCached with no variant — it walks every page in the
-  site and the result is the same for all of them.
+  Publishes the site's one page index and returns its URL; every browse list
+  is a subset (site-index.js). Fingerprinted in production, so cached until it
+  changes. Call via partialCached — it walks every page.
 */}}
 {{ $json := partial "list-json.html" site.RegularPages }}
 {{ $r := resources.FromString "index.json" $json }}

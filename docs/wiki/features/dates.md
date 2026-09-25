@@ -8,31 +8,16 @@ covers:
 
 # Dates
 
-Every page ends up with both `created` and `updated`; nothing is dated build time
-unless there is nothing better *([D4](../decisions/D4.md))*. The rung used is
-recorded as `created_source:` — read by no template, but it makes a bad inference
-visible rather than silently wrong in a listing.
+Every page gets both `created` and `updated`, from the ladders in `dates.py`;
+build time only as a last resort *([D4](../decisions/D4.md))*. `created_source:`
+records the rung, so a bad inference shows in the generated front matter. Generated
+section indexes use `children`: their newest page's `updated`.
 
-| `created`, best first | Source |
-|---|---|
-| `front-matter` | explicit `created:` (or legacy `date:`) |
-| `path` | `YYYYMMDD` / `YYYY-MM-DD` in the stem, or `.../YYYY/MM/DD/` |
-| `git` | first commit touching the file |
-| `mtime` | birth time where the OS reports one, else mtime |
-| `build` | last resort |
-| `children` | generated section indexes: newest `updated` below them |
+`updated` is never earlier than `created`. A section index whose `updated` was
+inferred takes its newest descendant's (`inherit_index_dates`). `hugo.toml` maps
+`created`→`.Date`, `updated`→`.Lastmod`.
 
-`updated`: explicit → last commit → mtime → build time, never earlier than `created`.
-A section index whose `updated` was *inferred* takes its newest descendant's, so a
-section reads as recent when its contents are. Legacy `date:`/`lastmod:` are renamed
-in the copy only; `hugo.toml` maps `created`→`.Date`, `updated`→`.Lastmod`.
+Ladders run on the **source** path, so sync's renames never change a page's dates.
 
-Renaming a source file on the way out — `index.md`/`home.md` → `_index.md`, or a
-post folder's lone Markdown file → `index.md` (see [sections.md](sections.md)) —
-never changes its dating: both ladders run on the original source path, before the
-rename.
-
-Display rule everywhere: show `created`, add "· updated *date*" only when `updated`
-is more than a day later. Sorting is `sort . "Lastmod" "desc"` — a **stable** sort,
-so pages from one commit keep a sensible order (`.ByLastmod.Reverse` was rejected: it
-flips the tie-break too).
+Display: `created`, plus "· updated" only when >1 day later — implemented three
+times ([../traps.md](../traps.md)). "Recently updated" order is `recent.html`.

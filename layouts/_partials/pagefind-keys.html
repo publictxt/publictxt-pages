@@ -1,18 +1,11 @@
 {{/*
-  The hidden Pagefind keys for one indexed page, on one empty element so nothing
-  reaches the indexed text: the two dates as Unix seconds and the title lower-cased
-  to sort on (Pagefind compares strings case-sensitively), plus the `created` year
-  as a filter — the same year the browse lists facet on, see yearOf() in list.js.
-  Also the page's category as a filter, when it has one (see category.html).
+  Hidden Pagefind keys for one page, on an empty element so none is indexed as
+  text. Sorts: dates as Unix seconds, title lower-cased (Pagefind compares
+  case-sensitively), rating (2.5 unrated, = UNRATED in sorts.js). Filters:
+  `created` year (= yearOf() in list.js), category, rating ("unrated" when none).
 
-  Rating (see rating.html) is a sort key on every page, mid-scale 2.5 when
-  unrated (UNRATED in sorts.js), so unrated pages sort between 2 and 3 rather
-  than drop out. The `rating` filter is on every page too, "unrated" when it
-  has none, so search can filter for those; the meta the result card reads is
-  only there when the page has one.
-
-  Every template carrying `data-pagefind-body` must include this; without it a page
-  drops out of sorted results and out of any year. See docs/wiki/traps.md.
+  Every `data-pagefind-body` template must include this, or the page drops out
+  of sorted and filtered results. See docs/wiki/traps.md.
 */}}
 {{ $category := partial "category.html" . }}
 {{ $rating := partial "rating.html" . }}

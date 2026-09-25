@@ -18,9 +18,7 @@
   </form>
 
   <div class="search-layout">
-    {{/* One <details> around every filter so they fold away together on a
-         phone, where the filters stack above the results. Open by default;
-         search.js closes it on narrow screens when nothing is selected. */}}
+    {{/* One fold for all filters; search.js closes it on phones when nothing is selected. */}}
     <details class="search-filters fold" id="search-filters" open>
       <summary><h3 class="side-heading">Filters</h3></summary>
       <div class="search-filters-body">
@@ -34,9 +32,7 @@
           <h3 class="side-heading">Category</h3>
           <div id="filter-category" class="chip-row"></div>
         </div>
-        {{/* Year is a select, not chips: the least-reached-for facet, kept to one
-             line above the tag list. search.js hides the group when the whole
-             site sits in one year. */}}
+        {{/* A select, hidden when the site spans one year. */}}
         <div class="filter-group" id="filter-year-group" hidden>
           <h3 class="side-heading">Year</h3>
           <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>

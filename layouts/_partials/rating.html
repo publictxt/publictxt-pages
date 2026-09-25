@@ -1,11 +1,6 @@
 {{/*
-  A page's rating: its `rating:` front matter as an int 1–5, or 0 when it has
-  none (`rating: 0` included). Any other value (6, 3.5, text, a list) is warned and read as 0: a
-  typo should not silently drop a page from its facet.
-
-  The only reader of the `rating:` key — list-json.html, pagefind-keys.html
-  and sidebar.html all go through here, so the browse lists, search and the
-  page cannot disagree. Expects a page.
+  A page's `rating:` as an int 1–5, else 0; other values warned. The only
+  reader of the key. Expects a page.
 */}}
 {{ $out := 0 }}
 {{ with .Params.rating }}

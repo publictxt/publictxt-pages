@@ -1,8 +1,6 @@
 {{/*
-  The site's top-level sections in navigation order: those named in
-  `params.sectionOrder`, in that order, then any others alphabetically by
-  folder name. Takes no argument. Hugo's own order is by date, which would
-  reshuffle the navigation on every edit.
+  Top-level sections: params.sectionOrder first, the rest by folder name —
+  Hugo's date order would reshuffle the nav on every edit. No argument.
 */}}
 {{ $ordered := slice }}
 {{ $rest := slice }}

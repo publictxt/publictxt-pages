@@ -1,12 +1,6 @@
 {{/*
-  A page's `created` date, followed by its `updated` date when the page has
-  changed since (more than a day later). Expects a page in `.page`, and
-  `.detail` true on single pages, where both dates are also exported as
-  Pagefind metadata (`created`, `updated`, RFC 3339) for search result cards.
-
-  The same two dates drive the whole site: lists sort on `updated` (see
-  recent.html), and the sidebar meta block shows the same pair, so a page never
-  reads as "18 Sep" in one place and "Updated 18 Sep" in another.
+  `created`, plus `updated` when >1 day later. Expects `.page`; `.detail` on
+  single pages also exports both as Pagefind meta for result cards.
 */}}
 {{ $p := .page }}
 {{ if not $p.Date.IsZero }}

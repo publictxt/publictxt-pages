@@ -1,17 +1,9 @@
-// Search page: a custom UI on the Pagefind JS API (its stock UI cannot run
-// filter-only searches). Results are drawn with the same card as the browse
-// lists (cards.js); the query, type, category, year, rating, tags and sort live in the URL.
+// Search page: custom UI on the Pagefind JS API (the stock UI can't search
+// filters alone). Same cards, facets and URL spelling as the browse lists.
 //
-// Sorting is Pagefind's own (sort keys emitted by pagefind-keys.html), so it
-// orders the whole result set inside the index without loading a fragment per
-// hit. A sort replaces relevance ranking outright, so "Relevance" is only
-// offered — and only the default — when there is a query; filter-only
-// browsing defaults to newest, like the browse lists. Same facets as those
-// lists, over Pagefind's index rather than index.json. Category only exists in
-// the index when categories are enabled and some page has one; otherwise its
-// group stays hidden. Rating is a minimum: `?rating=4` asks Pagefind for any
-// of "4" and "5"; `?rating=unrated` for the value pagefind-keys.html gives
-// unrated pages.
+// Sorting is Pagefind's, on pagefind-keys.html's keys, and replaces relevance
+// outright: "Relevance" is offered, and default, only with a query. Rating is
+// a minimum: `?rating=4` = any of "4", "5"; `unrated` is its own value.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -38,7 +30,7 @@ try {
 el.root.hidden = false;
 
 // ---- state <-> URL --------------------------------------------------
-// `sort` is null until chosen: the default then follows the query (see top).
+// `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
 const state = { q: "", type: "", category: "", year: "", rating: "", tags: new Set(), sort: null };
 const filtering = () => Boolean(state.type || state.category || state.year || state.rating || state.tags.size);
@@ -80,7 +72,7 @@ function toggleTag(t) {
 // ---- filter chips -------------------------------------------------------
 const allFilters = await pagefind.filters();   // { tag: {name: count}, type: {…}, category: {…}, year: {…}, rating: {…} }
 const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[a]) || a.localeCompare(b));
-// Years read newest-first, not most-frequent-first, like the browse lists.
+// Years newest-first, as in the browse lists.
 const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(a));
 
 function chip(kind, name, count, active) {
@@ -108,13 +100,12 @@ function renderFilters(counts) {
   el.categoryGroup.hidden = categories.length === 0;
   el.category.replaceChildren(...categories.map((n) =>
     chip("category", n, (counts.category || {})[n] ?? 0, state.category === n)));
-  // No counts on the year options: Pagefind's are for the current result set, so a
-  // single-select control would print "0" beside years that do have pages.
+  // No year counts: Pagefind's are per result set, so would read "0" beside real years.
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
   el.year.replaceChildren(new Option("All years", "", false, !state.year),
     ...years.map((y) => new Option(y, y, false, y === state.year)));
-  // Same reason for no counts; and Pagefind's would be per exact value, not "or better".
+  // Likewise, and they'd be per exact value, not "or better".
   const ratings = Object.keys(allFilters.rating || {}).filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);
   const hasUnrated = UNRATED_FILTER in (allFilters.rating || {});
   el.ratingGroup.hidden = ratings.length === 0;
@@ -193,9 +184,7 @@ window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run
 
 readURL();
 el.q.value = state.q;
-// Below the stacking breakpoint (main.css, 900px) the filters sit above the
-// results: start folded unless a filter is in use, so results show without
-// scrolling. Once, at load; after that the reader's toggling stands.
+// Narrow screens (900px, as main.css): fold at load unless a filter is set.
 if (matchMedia("(max-width: 900px)").matches) {
   el.filters.open = filtering();
 }

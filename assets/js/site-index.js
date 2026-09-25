@@ -1,11 +1,6 @@
-// The site's one page index (see layouts/_partials/site-index.html): every
-// regular page, fetched once per document and shared by every [data-list] on
-// it. Its URL is on <html data-index>, fingerprinted in production so the
-// browser reuses it across navigations until the next build.
-//
-// Each list page declares *which subset* it shows rather than shipping its own
-// copy of the data — the subsets below are the client-side equivalents of the
-// page collections the Hugo templates pass to the no-JS fallback list.
+// The site's one page index (site-index.html), fetched once per document from
+// <html data-index>; fingerprinted, so cached until the next build. scope()
+// subsets mirror the page collections the templates give the no-JS list.
 
 let pending;
 
@@ -22,9 +17,7 @@ export function siteIndex() {
   return pending;
 }
 
-// Most recently updated first — the same order as _partials/recent.html.
-// Array.prototype.sort is stable, and the index arrives in Hugo's default
-// page order, so pages sharing an `updated` keep that order as the tie-break.
+// Same order as recent.html: a stable sort over Hugo's default order breaks ties.
 function byUpdated(items) {
   return [...items].sort((a, b) => (Date.parse(b.updated) || 0) - (Date.parse(a.updated) || 0));
 }

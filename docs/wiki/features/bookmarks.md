@@ -7,15 +7,12 @@ covers:
 
 # Bookmarks
 
-A page is a bookmark by living under `bookmarks/` **or** by carrying `bookmark:` /
-`bookmarks:` in front matter anywhere in the repo — the point being that a wiki page
-about a tool gets listed among the bookmarks without being moved, keeping its own
-location, type, URL and breadcrumbs. Either key takes a URL or a list;
-`bookmark-urls.html` is the only reader of them.
+A page is a bookmark if it lives under `bookmarks/` **or** has `bookmark:` /
+`bookmarks:` anywhere — so a wiki page about a tool is listed among bookmarks without
+moving. `bookmark-urls.html` is the only reader of those keys; `bookmark-pages.html`
+gathers the set for the top-level Bookmarks page (sub-folders are ordinary sections).
 
-URLs appear in the page header, the sidebar meta block and on cards, labelled with
-scheme, `www.` and trailing slash dropped. The top-level `bookmarks/` page gathers
-`bookmark-pages.html`; its sub-folders behave like any section.
-
-`bookmarks/section.html` is `section.html` with that one collection swapped, down to
-the `pagefind-keys.html` span [../traps.md](../traps.md) requires.
+URLs show in the page header, sidebar and cards, labelled by `bookmark-label.html` /
+`bookmarkLabel()` — a client/server pair ([../traps.md](../traps.md)).
+`bookmarks/section.html` is `section.html` with that collection swapped in, including
+the `pagefind-keys.html` span.

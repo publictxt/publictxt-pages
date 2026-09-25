@@ -1,10 +1,7 @@
 {{/*
-  A browse list. Hugo renders a plain list of links (what crawlers and no-JS
-  readers get); assets/js/list.js replaces it with sortable, filterable, paged
-  cards, taking its pages from the site-wide index (see site-index.html).
-
-  The container names the *subset* it shows rather than its own data file, so
-  every list on the site reads one fetched-once index. Expects a dict:
+  A browse list: a plain link list for crawlers and no-JS, which list.js
+  replaces with cards from the site index. Names its subset, not its data.
+  Expects a dict:
     pages    — the page collection, in the order the fallback should show
     scope    — dict: kind (section | tag | bookmarks | recent), value
     order    — default sort (see list.js), optional

@@ -1,44 +1,20 @@
 #!/usr/bin/env python3
 """
-dates.py
+dates.py — the one definition of a page's `created` and `updated`, used by
+sync_content.py. Every page gets both.
 
-Single source of truth for resolving a page's `created` and `updated` times
-(see docs/wiki/features/dates.md). Used by sync_content.py; kept separate
-for the same reason as hashtags.py — one definition, so nothing downstream can
-disagree about when a page is from.
+`created`, best first (the rung is recorded as `created_source:`):
 
-Every page ends up with both. `created` says when the page was written,
-`updated` when it last changed; lists sort on `updated`.
+  1. `front-matter`  explicit `created:` (or legacy `date:`)
+  2. `path`          YYYYMMDD / YYYY-MM-DD in the stem, or .../YYYY/MM/DD/
+  3. `git`           first commit touching the file
+  4. `mtime`         birth time where the OS reports one, else mtime
+  5. `build`         this build
 
-`created`, most to least authoritative:
+`updated`: explicit `updated:` (or `lastmod:`) -> last commit -> mtime -> build.
 
-  1. `front-matter`  an explicit `created:` (or legacy `date:`) in the source
-  2. `path`          a date in the file name or path             — YYYYMMDD or
-                     YYYY-MM-DD anywhere in the stem, or .../YYYY/MM/DD/
-  3. `git`           the first commit that touched the source file
-  4. `mtime`         the file's birth time where the OS reports one, else its
-                     modification time (untracked or uncommitted files)
-  5. `build`         the time of this build                      — last resort
-
-`updated`:
-
-  1. an explicit `updated:` (or legacy `lastmod:`) in the source
-  2. the last commit that touched the source file
-  3. the file's modification time
-  4. the time of this build
-
-Section indexes (`_index.md`) whose `updated` was inferred take the newest
-`updated` among their descendants when that is later, so a section reads as
-recent when its contents are, not only when its landing page was touched.
-
-The rung `created` came from is written alongside it as `created_source:`.
-It is not used by templates; it makes a bad inference visible in the generated
-front matter rather than silently wrong in a listing.
-
-Note for CI: a shallow checkout (`fetch-depth: 1`, the actions/checkout
-default) has one commit, so every tracked file reports that commit's time for
-both ends and rung 3 collapses into a single timestamp. sync warns when it
-sees one; use `fetch-depth: 0`.
+A shallow clone collapses rung 3 to one timestamp; sync warns. Use
+`fetch-depth: 0` in CI.
 """
 
 import re
@@ -52,11 +28,10 @@ NAME_DATE_RES = (
     re.compile(r"(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)"),
     re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)"),
 )
-# A date in the path: `blog/2023/12/17/post.md`. No longer blog-only.
+# A date in the path: `blog/2023/12/17/post.md`.
 PATH_DATE_RE = re.compile(r"(?:^|/)(\d{4})/(\d{2})/(\d{2})/")
 
-# Separates a commit header from the file names that follow it in `git log`
-# output — a file could otherwise be named like a date.
+# Marks commit headers in `git log` output; a file could be named like a date.
 NUL = chr(0)
 
 
@@ -89,20 +64,12 @@ def _git(src: Path, *args: str) -> str:
 
 def git_commit_times(src: Path) -> tuple[dict[str, tuple[str, str]], bool]:
     """
-    Map every tracked file under `src` to the ISO 8601 times of the first and
-    last commit that touched it, as (created, updated), in one `git log` pass.
-    Returns ({}, False) when `src` is not a Git working tree or Git is
-    unavailable — an unversioned source repo is supported, it just falls
-    through to the next rung.
-
-    Renames are not followed: a renamed file is "created" by the rename.
-
-    The second element is True when the repo is a shallow clone, in which case
-    the times are all but meaningless (see the module docstring).
+    ({rel: (first, last commit ISO time)}, is_shallow) in one `git log` pass.
+    ({}, False) without Git or a work tree. Renames not followed: a renamed
+    file is "created" by the rename.
     """
     try:
-        # Paths in `git log` output are relative to the repo root, which may sit
-        # above `src`; this is the part to strip back off.
+        # `git log` paths are repo-root relative; the root may sit above `src`.
         prefix = _git(src, "rev-parse", "--show-prefix").strip()
         shallow = _git(src, "rev-parse", "--is-shallow-repository").strip() == "true"
         out = _git(src, "log", "--format=%x00%cI", "--name-only", "--no-renames", "--", ".")
@@ -165,8 +132,7 @@ class DateResolver:
             return self.built_at
 
 
-# Anything unparseable sorts last — an author's odd `created:` is Hugo's problem
-# to report, not a reason for the sync step to abort.
+# Unparseable sorts last: an odd `created:` is Hugo's to report, not sync's to abort on.
 UNDATED = datetime.min.replace(tzinfo=timezone.utc)
 
 

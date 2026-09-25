@@ -8,31 +8,19 @@ covers:
 
 # Theme
 
-A dark two-column shell: sticky header with search, sidebar (sections, page meta,
-tag cloud), content, footer. `baseof.html` carries `data-base` (sub-path
-deployments) and `data-index`. Plain CSS with `:root` custom properties, no Sass, so
-the non-extended Hugo binary works *([D9](../decisions/D9.md))*.
+Dark two-column shell: sticky header with search, sidebar (sections, page meta, tag
+cloud), content, footer. Plain CSS with `:root` properties, no Sass
+*([D9](../decisions/D9.md))*. `baseof.html` carries `data-base` (sub-path deploys) and
+`data-index`.
 
-`.list-selects` holds the Sort, Year and Rating selects so the control head's `space-between`
-still pushes Reset right; `.filter-group .list-sort` reuses the same select in the
-search sidebar, full width. `.fold` is a `<details>` whose summary is a whole-row toggle, with
-a CSS chevron in place of the native marker — the search filters and browse list
-controls; only their `-body` div lays out the contents. `.rating` colours the stars
-(sidebar and cards).
+In `main.css`: `.list-selects` holds the Sort / Year / Rating selects, and
+`.filter-group .list-sort` reuses them full width in search; `.fold` is the
+collapsible `<details>` for list controls and search filters; `.rating` colours the
+stars.
 
-Not rendered anywhere: `author` and `source_repo` — carried in front matter, shown by
-no template. See [../../SPEC.md](../../SPEC.md).
+**Edit this page** = `params.editURL` + the page's `source_path` (sync writes it,
+since renames make Hugo's path wrong). None on generated indexes or `site-content/`
+pages, or when `editURL` is empty; the deploy workflow sets it
+([../deploy.md](../deploy.md)). Footer wording is `[params.footer]`.
 
-`head.html` renders `site.Params.mastodon` as an invisible `<link rel="me">` —
-Mastodon's profile verification accepts it as well as a visible `<a rel="me">`.
-
-Footer lives in `_partials/footer.html`; its wording comes from `[params.footer]`
-(`text` as inline markdown, `edit` as the edit-link label, appended after a ` • ` to
-the end of the same line), each defaulting to the original copy and hidden when set
-to `""`.
-
-**Edit this page:** `params.editURL` + the page's `source_path`, which sync writes
-because its renames (`index.md`→`_index.md`, post folders→`index.md`) make Hugo's file
-path wrong for the source repo. No link on generated indexes or `site-content/` pages
-(no `source_path`), or when `editURL` is empty — the default; the deploy workflow sets
-it, see [../deploy.md](../deploy.md).
+`author` and `source_repo` are carried in front matter but rendered nowhere.

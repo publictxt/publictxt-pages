@@ -1,13 +1,8 @@
 {{/*
-  A page's category: its `category:` front matter matched case-insensitively
-  against params.categories.list, returned in the configured spelling. Returns
-  "" when categories are disabled, the page has none, or its value is not on
-  the list (warned: a typo should not silently drop a page from its facet).
-
-  The only reader of the `category:` key — list-json.html and
-  pagefind-keys.html both go through here, so the browse lists and search
-  cannot disagree about a page's category, and the enabled toggle is honoured
-  in one place. Expects a page.
+  A page's `category:`, matched case-insensitively against
+  params.categories.list and returned in its spelling; "" when disabled, absent
+  or unlisted (warned). The only reader of the key, so lists, search and the
+  toggle agree. Expects a page.
 */}}
 {{ $out := "" }}
 {{ $cfg := site.Params.categories }}
