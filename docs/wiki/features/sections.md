@@ -28,6 +28,14 @@ instead of generating a section wrapper, so it comes out as Hugo's leaf bundle: 
 page, with the attachments as page resources sitting beside it. `index.md`/`home.md`
 folders are excluded from this detection — those already mean "section index".
 
+**`publish: off`** (or `false` / `no` / `0`, any case) keeps a page out of
+`build/content/` altogether, so it is in no list, search or `index.json`. An
+unpublished post folder goes whole, attachments included; loose attachments beside
+an unpublished page in an ordinary folder are still copied — sync can't tell whose
+they are. An unpublished `index.md` just gets the generated index instead. Links to
+an unpublished page are left dangling. The page is hidden, not private: the source
+repo still has it.
+
 `params.sectionOrder` fixes navigation order (`params.listOrder` the sort *within* a
 section's list — see [browse-lists.md](browse-lists.md)), unlisted folders following
 alphabetically; `sections.html` is the single source for both sidebar and home

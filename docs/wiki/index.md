@@ -41,8 +41,9 @@ If a page contradicts the code, the code wins and the page is a bug.
 ### Python — pipeline
 
 ```txt
-scripts/sync_content.py     278  source repo -> build/content: index renames, titles,
-                                 dates, hashtag linkify, source_path, skips. Never
+scripts/sync_content.py     347  source repo -> build/content: index renames, titles,
+                                 dates, hashtag linkify, source_path, skips (incl.
+                                 `publish: off`). Never
                                  touches source.
 scripts/dates.py            179  DateResolver: created/updated ladders, one git log
                                  pass, sort_key. Imported by sync_content.

@@ -33,7 +33,11 @@ normalising the few things Hugo cannot handle natively:
     generated indexes have no source file, so no key and no link.
 
 Repo housekeeping files (README, LICENSE, CONTRIBUTING, CNAME, .obsidian,
-.git, .trash, *.gitkeep) are skipped. Non-Markdown files (media) are copied
+.git, .trash, *.gitkeep) are skipped, as is any page whose front matter says
+`publish: off` (or false / no / 0) — and with it, a post folder's attachments
+when its one page is unpublished. The site hides such a page; it is still in
+the source repo for anyone to read.
+ Non-Markdown files (media) are copied
 verbatim.
 
 The source directory is never modified. The destination is wiped first —
@@ -55,6 +59,9 @@ from hashtags import linkify
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
 INDEX_NAMES = {"index.md", "home.md"}
+# `publish:` values that keep a page off the site. YAML reads `off` / `no` as
+# false, so all spellings are one intent.
+UNPUBLISHED = {"off", "false", "no", "0"}
 
 FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)^---\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
@@ -88,6 +95,11 @@ def front_matter_value(fm: str | None, key: str) -> str:
     """The raw scalar value of `key` in the front matter (quotes stripped), or ""."""
     m = re.search(rf"^{key}\s*:\s*(.+?)\s*$", fm or "", re.MULTILINE)
     return m.group(1).strip("\"'") if m else ""
+
+
+def is_unpublished(text: str) -> bool:
+    fm, _ = split_front_matter(text)
+    return front_matter_value(fm, "publish").lower() in UNPUBLISHED
 
 
 def rename_legacy_keys(fm: str | None) -> str | None:
@@ -188,7 +200,7 @@ def find_leaf_bundle_dirs(src: Path) -> set[Path]:
     return bundles
 
 
-def sync(src: Path, dest: Path) -> tuple[int, int]:
+def sync(src: Path, dest: Path) -> tuple[int, int, int]:
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir(parents=True)
@@ -200,8 +212,12 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
               file=sys.stderr)
 
     leaf_bundles = find_leaf_bundle_dirs(src)
+    # A post folder is one page: unpublishing it takes its attachments too.
+    hidden_bundles = {d for d in leaf_bundles
+                      if any(is_unpublished(md.read_text(encoding="utf-8")) for md in d.glob("*.md"))}
+    leaf_bundles -= hidden_bundles
 
-    md_count = other_count = 0
+    md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
     indexes: dict[Path, Stamp] = {}   # existing section index -> stamp
 
@@ -211,6 +227,9 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
         if path.is_dir():
             continue
         if path.name in SKIP_FILES or path.name.endswith(".gitkeep"):
+            continue
+        if path.parent in hidden_bundles:
+            unpublished += path.suffix.lower() == ".md"
             continue
 
         rel = path.relative_to(src).as_posix()
@@ -224,6 +243,9 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
             elif is_leaf_bundle:
                 target = target.with_name("index.md")
             text = path.read_text(encoding="utf-8")
+            if is_unpublished(text):
+                unpublished += 1
+                continue
             fm, _ = split_front_matter(text)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -239,7 +261,7 @@ def sync(src: Path, dest: Path) -> tuple[int, int]:
     leaf_bundle_dests = {dest / b.relative_to(src) for b in leaf_bundles}
     md_count += add_missing_indexes(dest, resolver.built_at, newest, leaf_bundle_dests)
     inherit_index_dates(indexes, newest)
-    return md_count, other_count
+    return md_count, other_count, unpublished
 
 
 def newest_updated_by_folder(dest: Path, pages: dict[Path, Stamp]) -> dict[Path, str]:
@@ -316,8 +338,9 @@ def main():
     if src.resolve() == dest.resolve() or dest.resolve() in src.resolve().parents:
         print("error: destination must not be the source or a parent of it", file=sys.stderr)
         sys.exit(1)
-    md, other = sync(src, dest)
-    print(f"synced {md} markdown file(s) and {other} other file(s) -> {dest}")
+    md, other, unpublished = sync(src, dest)
+    print(f"synced {md} markdown file(s) and {other} other file(s) -> {dest}"
+          + (f"; {unpublished} unpublished page(s) left out" if unpublished else ""))
 
 
 if __name__ == "__main__":
