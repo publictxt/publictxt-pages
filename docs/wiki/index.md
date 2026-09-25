@@ -97,7 +97,7 @@ layouts/_partials/
 
 ```txt
 assets/js/site-index.js   58  fetch index.json once per document; scope() subsets
-assets/js/sorts.js        38  the seven sorts, ?sort= spellings, normalise/parse
+assets/js/sorts.js        40  the eight sorts, ?sort= spellings, normalise/parse
 assets/js/cards.js        81  the one card renderer, shared by lists and search
 assets/js/list.js        342  browse list: state<->URL, facets, paging, render
 assets/js/search.js      199  Pagefind UI: filters, sort, incremental results

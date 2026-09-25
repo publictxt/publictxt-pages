@@ -13,7 +13,7 @@
 //   data-compact      cards only: no controls, pager or URL state (home Recent)
 import { card, escapeHTML, minRatingLabel } from "./cards.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
+import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
@@ -35,14 +35,14 @@ const FACETS = {
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
 };
 
-// Rating ties fall back to newest; unrated pages count as 0, so sort last.
+// Rating ties fall back to newest in either direction; unrated pages sort as UNRATED.
 function sorted(items, sort) {
   const { field, dir } = parseSort(sort);
   const sign = dir === "asc" ? 1 : -1;
   const byTitle = (a, b) => (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
   const byDate = (f) => (a, b) => (Date.parse(a[f]) || 0) - (Date.parse(b[f]) || 0);
   return [...items].sort(field === "title" ? (a, b) => sign * byTitle(a, b)
-    : field === "rating" ? (a, b) => sign * ((a.rating || 0) - (b.rating || 0) || byDate("created")(a, b)) || byTitle(a, b)
+    : field === "rating" ? (a, b) => sign * ((a.rating || UNRATED) - (b.rating || UNRATED)) || -byDate("created")(a, b) || byTitle(a, b)
     : (a, b) => sign * byDate(field)(a, b) || byTitle(a, b));
 }
 

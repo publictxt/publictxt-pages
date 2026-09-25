@@ -15,7 +15,7 @@ build warning (`warnidf` id `rating-invalid`). Consumers, all through that parti
 
 - `list-json.html` → `rating` on the `index.json` item (absent when unrated).
 - `pagefind-keys.html` → a `rating` filter and meta when rated, and a
-  `rating[data-rating-sort]` sort key on **every** page, 0 when unrated — Pagefind
+  `rating[data-rating-sort]` sort key on **every** page, 2.5 when unrated — Pagefind
   drops pages lacking the sort key ([../traps.md](../traps.md)).
 - `sidebar.html` → ★★★★☆ under *This page*; `cards.js` draws the same on cards.
 
@@ -25,8 +25,9 @@ lists show it when the list varies on rating (unrated counts as a value, so ★1
 means "rated at all"), with counts over the set filtered by everything but rating;
 search shows it when any page is rated, without counts, as for year.
 
-**Sort is *Top rated* only** (`sorts.js`) — descending with unrated as 0, so an
-ascending sort would lead with every unrated page. `?sort=rating asc` normalises to
-`rating`. Browse lists break ties newest-first; Pagefind's tie order is its own.
+**Sort** is *Top rated* / *Lowest rated* (`sorts.js`), with unrated pages as a
+mid-scale 2.5 (`UNRATED`) so neither direction leads with them: 5, 4, 3, unrated, 2,
+1. Sort only — the filter still counts unrated as unrated. Browse lists break ties
+newest-first either way; Pagefind's tie order is its own.
 
 Not a `sync_content.py` concern; the key passes through untouched.

@@ -14,7 +14,7 @@ filter-only searches *([D8](../decisions/D8.md))*. The search page lives in
 `site-content/`, not the content repo.
 
 Sorting is Pagefind's own, over keys emitted by `pagefind-keys.html` (dates as Unix
-seconds, title lower-cased). A sort **replaces** relevance outright with no tiebreak,
+seconds, title lower-cased, rating with unrated as 2.5). A sort **replaces** relevance outright with no tiebreak,
 so *Relevance* is offered, and default, only when there is a query; filter-only
 browsing defaults to newest. See [../traps.md](../traps.md) — a template
 missing that partial disappears from sorted results.

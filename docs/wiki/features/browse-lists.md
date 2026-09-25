@@ -31,7 +31,7 @@ A list declares which subset it shows rather than carrying data:
 | `bookmarks` | `bookmarks/` + any page with a bookmark URL | `bookmark-pages.html` |
 | `recent` | N most recently updated, site-wide | home |
 
-Seven sorts from `sorts.js`; four facets: type, category and tag chips (type and
+Eight sorts from `sorts.js`; four facets: type, category and tag chips (type and
 category single-select, tags AND-ed) with counts *within the current result set*, and year as a select beside Sort, plus a minimum-rating select ([ratings.md](ratings.md)).
 A facet is hidden when the list doesn't vary on it, which is how a tag page hides its
 own tag. Chips sit most-frequent-first, years newest-first. Year options count over

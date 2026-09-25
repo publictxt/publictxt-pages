@@ -5,9 +5,10 @@
   as a filter — the same year the browse lists facet on, see yearOf() in list.js.
   Also the page's category as a filter, when it has one (see category.html).
 
-  Rating (see rating.html) is a sort key on every page, 0 when unrated, so
-  unrated pages sort last rather than drop out; the filter and the meta the
-  result card reads are only there when the page has one.
+  Rating (see rating.html) is a sort key on every page, mid-scale 2.5 when
+  unrated (UNRATED in sorts.js), so unrated pages sort between 2 and 3 rather
+  than drop out; the filter and the meta the result card reads are only there
+  when the page has one.
 
   Every template carrying `data-pagefind-body` must include this; without it a page
   drops out of sorted results and out of any year. See docs/wiki/traps.md.
@@ -19,4 +20,4 @@
   {{- with $rating }} data-pagefind-meta="rating[data-rating]"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
   data-year="{{ .Date.Format "2006" }}"{{ with $category }} data-category="{{ . }}"{{ end }}
-  data-rating-sort="{{ $rating }}"{{ with $rating }} data-rating="{{ . }}"{{ end }}></span>
+  data-rating-sort="{{ $rating | default 2.5 }}"{{ with $rating }} data-rating="{{ . }}"{{ end }}></span>
