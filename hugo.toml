@@ -82,7 +82,7 @@ capitalizeListTitles = false
   # search, no category in the page index.
   [params.categories]
     enabled = true
-    list = ["essay", "howto", "reference", "project"]
+    list = ["sci", "comp-sci", "political", "project", "personal"]
 
 [markup]
   [markup.goldmark.renderHooks.link]
