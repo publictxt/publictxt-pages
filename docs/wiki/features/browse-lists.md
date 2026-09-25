@@ -19,7 +19,8 @@ fails.
 `site-index.html` publishes one fingerprinted `index.json` from `site.RegularPages`;
 its URL is on `<html data-index>` and `site-index.js` fetches it once per document
 *([D7](../decisions/D7.md))*. Per item (~300 B): `url, title, type, section, tags[],
-created, updated` (RFC 3339), `summary`, `bookmarks[]`.
+created, updated` (RFC 3339), `summary`, `bookmarks[]`, `category` (see
+[categories.md](categories.md)).
 
 A list declares which subset it shows rather than carrying data:
 
@@ -30,8 +31,8 @@ A list declares which subset it shows rather than carrying data:
 | `bookmarks` | `bookmarks/` + any page with a bookmark URL | `bookmark-pages.html` |
 | `recent` | N most recently updated, site-wide | home |
 
-Six sorts from `sorts.js`; three facets: type and tag chips (type single-select, tags
-AND-ed) with counts *within the current result set*, and year as a select beside Sort.
+Six sorts from `sorts.js`; four facets: type, category and tag chips (type and
+category single-select, tags AND-ed) with counts *within the current result set*, and year as a select beside Sort.
 A facet is hidden when the list doesn't vary on it, which is how a tag page hides its
 own tag. Chips sit most-frequent-first, years newest-first. Year options count over
 `forYear` — the set filtered by everything *but* year — so a single-select option
@@ -40,7 +41,7 @@ never reads "0" when picking it would return pages; the type chips still show 0s
 A page's **year is its `created` year in the page's own offset**: `yearOf()` slices it
 off the RFC 3339 string to match what Hugo gives Pagefind ([../traps.md](../traps.md)).
 `updated` has no facet. State lives in
-`?tag=a&tag=b&type=wiki&year=2024&sort=title&page=2` (`q` reserved for search), spelled
+`?tag=a&tag=b&type=wiki&category=essay&year=2024&sort=title&page=2` (`q` reserved for search), spelled
 the same way on [search.md](search.md). Home *Recent* passes `data-compact`: cards
 only, and the no-JS `<ul>` fallback has no filtering at all.
 

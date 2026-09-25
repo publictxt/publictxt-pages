@@ -16,7 +16,9 @@ Hugo only treats a folder as a section when it holds `_index.md`; real wikis hav
 links pointing at them, and generates a minimal index for folders that have neither
 *([D2](../decisions/D2.md))*. Without this Hugo reads a folder containing `index.md`
 as a **leaf bundle** and hides every sibling page as a resource. Consequence:
-sections nest to any depth, and every folder appears in breadcrumbs.
+sections nest to any depth, and every folder appears in breadcrumbs. The renames are
+why each page records its original `source_path` (for the edit link, see
+[theme.md](theme.md)).
 
 One exception is deliberate: a **post folder** — one non-index Markdown file plus
 attachments, no subfolders (e.g. `Post-Name/title.md` + `image.png`) — is a leaf
@@ -29,7 +31,8 @@ folders are excluded from this detection — those already mean "section index".
 `params.sectionOrder` fixes navigation order (`params.listOrder` the sort *within* a
 section's list — see [browse-lists.md](browse-lists.md)), unlisted folders following
 alphabetically; `sections.html` is the single source for both sidebar and home
-*([D10](../decisions/D10.md))*.
+*([D10](../decisions/D10.md))*. Sections group by folder; for a cross-cutting
+curated grouping, see [categories.md](categories.md).
 
 `section.html` renders the index body as prose in its **own** `data-pagefind-body` —
 a section index body is real content, searchable like any page — then a browse list

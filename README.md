@@ -1,7 +1,17 @@
-# PublicTxt-Hugo
+# publictxt-pages
 
-Static site interface for browsing/searching an Obsidian-style Markdown repository
-(PublicTxt or otherwise). Hugo + Pagefind.
+Statically-hosted web interface for [PublicTxt](../publictxt) repos — deployable
+to GitHub/GitLab Pages for free, with no backend required.
+
+Python preprocessing + Hugo build produce the static site; a dynamic
+client-side layer (Pagefind + JS) adds full-text search and faceted
+tag/type browsing on top.
+
+Works directly against a standard Obsidian-style Markdown vault —
+relative links, inline `#hashtags`, and folder-derived types — with
+minimal reliance on PublicTxt-specific syntax transforms.
+
+## docs
 
 - [docs/SPEC.md](docs/SPEC.md) — what it does and should do
 - [docs/wiki/](docs/wiki/index.md) — how it works

@@ -18,8 +18,9 @@ so *Relevance* is offered, and default, only when there is a query; filter-only
 browsing defaults to newest. See [../traps.md](../traps.md) — a template
 missing that partial disappears from sorted results.
 
-The same three facets as the browse lists, spelled the same way in the URL. Type and
-year are exclusive; an array of tags is Pagefind's AND. Year comes from
+The same facets as the browse lists, spelled the same way in the URL. Type, category
+and year are exclusive; the category group is hidden when the index has none
+([categories.md](categories.md)); an array of tags is Pagefind's AND. Year comes from
 `pagefind-keys.html`'s `year[data-year]` and is a select above the tag chips, hidden
 when the site spans one year; its options carry no counts, since Pagefind's are for
 the current result set and would print "0" beside years that do have pages. Chip

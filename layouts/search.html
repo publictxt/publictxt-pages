@@ -26,6 +26,12 @@
         <summary><h3 class="side-heading">Type</h3></summary>
         <div id="filter-type" class="chip-row"></div>
       </details>
+      {{/* search.js hides the group when no indexed page has a category —
+           including when params.categories is disabled. */}}
+      <div class="filter-group" id="filter-category-group" hidden>
+        <h3 class="side-heading">Category</h3>
+        <div id="filter-category" class="chip-row"></div>
+      </div>
       {{/* Year is a select, not chips: the least-reached-for facet, kept to one
            line above the tag list. search.js hides the group when the whole
            site sits in one year. */}}

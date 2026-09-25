@@ -2,7 +2,7 @@
 
 ## about
 
-A fictional author's public text repository — used to exercise the PublicTxt-Hugo pipeline.
+A fictional author's public text repository — used to exercise the publictxt-pages pipeline.
 
 Spend time on and thinking about:
 

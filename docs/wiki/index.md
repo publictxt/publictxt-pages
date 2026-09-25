@@ -42,7 +42,8 @@ If a page contradicts the code, the code wins and the page is a bug.
 
 ```txt
 scripts/sync_content.py     278  source repo -> build/content: index renames, titles,
-                                 dates, hashtag linkify, skips. Never touches source.
+                                 dates, hashtag linkify, source_path, skips. Never
+                                 touches source.
 scripts/dates.py            179  DateResolver: created/updated ladders, one git log
                                  pass, sort_key. Imported by sync_content.
 scripts/hashtags.py          67  HASHTAG_RE — the one definition of a hashtag;
@@ -69,9 +70,10 @@ layouts/404.html
 layouts/bookmarks/section.html    section.html with the gathered bookmark collection
 
 layouts/_partials/
-  head.html             title, description, favicon, stylesheet
+  head.html             title, description, favicon, Mastodon rel="me", stylesheet
   sidebar.html          sections / page meta / tag cloud
   breadcrumbs.html      .Ancestors trail
+  footer.html           footer; wording from [params.footer]; edit-in-repo link
   crumb-label.html      one crumb's label; date folders kept literal
   sections.html         top-level sections in sectionOrder   (partialCached)
   recent.html           the one "newest first": sort . "Lastmod" "desc"
@@ -87,6 +89,7 @@ layouts/_partials/
   bookmark-pages.html   bookmarks/ + every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row
   bookmark-label.html   one URL's short display form
+  category.html         category: -> configured name or ""; only reader of the key
 ```
 
 ### Browser
@@ -107,7 +110,7 @@ ships inside Hugo, so the build needs no Node.
 
 ```txt
 hugo.toml                            mounts, frontmatter mapping, params (listOrder,
-                                     sectionOrder, limits), markup
+                                     sectionOrder, limits, categories), markup
 deploy/publish-to-github-pages.yml   template for the CONTENT repo -> deploy.md
 site-content/                        site-owned pages (the search page)
 example/txt/                         synthetic default source repo
