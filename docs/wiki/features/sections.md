@@ -16,7 +16,9 @@ Hugo only treats a folder as a section when it holds `_index.md`; real wikis hav
 links pointing at them, and generates a minimal index for folders that have neither
 *([D2](../decisions/D2.md))*. Without this Hugo reads a folder containing `index.md`
 as a **leaf bundle** and hides every sibling page as a resource. Consequence:
-sections nest to any depth, and every folder appears in breadcrumbs.
+sections nest to any depth, and every folder appears in breadcrumbs. The renames are
+why each page records its original `source_path` (for the edit link, see
+[theme.md](theme.md)).
 
 One exception is deliberate: a **post folder** — one non-index Markdown file plus
 attachments, no subfolders (e.g. `Post-Name/title.md` + `image.png`) — is a leaf

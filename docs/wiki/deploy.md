@@ -25,7 +25,7 @@ Push to `main` or `workflow_dispatch`. Permissions `contents: read`, `pages: wri
 | Step | Detail |
 |---|---|
 | Check out content | into `txt/`, **`fetch-depth: 0`** |
-| Check out PublicTxt-Hugo | `publictxt/txt-hugo`, `ref: main`, into `site/` |
+| Check out publictxt-pages | `publictxt/publictxt-pages`, `ref: main`, into `site/` |
 | Set up Hugo | `peaceiris/actions-hugo@v3`, pinned `0.166.0` |
 | Set up Node | for `npx pagefind` |
 | Build | `sh site/scripts/build.sh --source ../txt` |
@@ -52,5 +52,9 @@ env:
 ```
 
 `build.sh` passes `HUGO_BASEURL` through as `-b`; the rest Hugo reads directly.
+
+`HUGO_PARAMS_EDITURL` is prefilled from the GitHub context
+(`server_url/repository/edit/ref_name/`), so "Edit this page" links point at whichever
+content repo runs the workflow with no per-site edit. Set `""` to hide them.
 
 **Pinning:** `ref: main` tracks this repo's tip — pin to a tag for reproducible builds.

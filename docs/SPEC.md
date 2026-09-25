@@ -85,6 +85,7 @@ All front matter optional; sync derives the rest.
 | `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
 | `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
 | `bookmark`, `bookmarks` | URL or list                | Merges page into bookmarks section                                              |
+| `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.
 

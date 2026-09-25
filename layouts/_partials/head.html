@@ -8,6 +8,9 @@
 {{ else }}
   <link rel="icon" href="{{ $favicon | relURL }}" type="image/png">
 {{ end }}
+{{/* Mastodon profile verification: its checker accepts <link rel="me"> in the
+     head as well as <a rel="me">, so the link needn't be visible. */}}
+{{ with site.Params.mastodon }}<link rel="me" href="{{ . }}">{{ end }}
 {{ with resources.Get "css/main.css" }}
 {{ $css := . }}
 {{ if hugo.IsProduction }}{{ $css = $css | minify | fingerprint }}{{ end }}

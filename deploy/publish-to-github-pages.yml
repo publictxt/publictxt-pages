@@ -1,4 +1,4 @@
-# Publish a PublicTxt content repo with PublicTxt-Hugo via GitHub Pages.
+# Publish a PublicTxt content repo with publictxt-pages via GitHub Pages.
 #
 # Copy this file into the CONTENT repo (e.g. jaysen/txt) as
 #   .github/workflows/publish.yml
@@ -44,10 +44,10 @@ jobs:
           # every page would report the same date at both ends.
           fetch-depth: 0
 
-      - name: Check out PublicTxt-Hugo
+      - name: Check out publictxt-pages
         uses: actions/checkout@v4
         with:
-          repository: publictxt/txt-hugo   # <- adjust to wherever this repo lives
+          repository: publictxt/publictxt-pages   # <- adjust to wherever this repo lives
           ref: main                        # pin to a tag for reproducible builds
           path: site
 
@@ -66,9 +66,12 @@ jobs:
           HUGO_BASEURL: https://publictxt.net/
           HUGO_TITLE: "A PublicTxt instance"
           HUGO_PARAMS_DESCRIPTION: "A PublicTxt repository — browsable, searchable, plain-text first."
-          # Optional Mastodon profile URL. Rendered in the footer as <a rel="me">,
-          # which Mastodon's profile verification looks for on this site.
+          # Optional Mastodon profile URL. Rendered, invisibly, as <link rel="me">
+          # in the page <head>, which Mastodon's profile verification looks for.
           # Example: "https://mastodon.social/@username"
+          # "Edit this page" links: this content repo's edit URL on the branch
+          # being built. Works as-is for any repo; set "" to hide the links.
+          HUGO_PARAMS_EDITURL: ${{ github.server_url }}/${{ github.repository }}/edit/${{ github.ref_name }}/
         run: sh site/scripts/build.sh --source ../txt
 
       - name: Upload artifact
