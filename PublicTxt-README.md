@@ -24,6 +24,7 @@ If that works and feels good, the project is real. Community features, browser e
 
 ## Linked Repos
 
+- **PublicTxt-pages** - This repo.
 - [WikiTool](https://github.com/jaysen/WikiTool) - In-progress. Multiplatform .NET tool for handling multiple wikis.
   - Core wiki libraries.
   - Converts between wiki formats and wiki syntaxes (incl. Obsidian ↔ md-wiki).

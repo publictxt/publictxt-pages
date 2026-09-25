@@ -25,7 +25,7 @@ Push to `main` or `workflow_dispatch`. Permissions `contents: read`, `pages: wri
 | Step | Detail |
 |---|---|
 | Check out content | into `txt/`, **`fetch-depth: 0`** |
-| Check out PublicTxt-Hugo | `publictxt/txt-hugo`, `ref: main`, into `site/` |
+| Check out publictxt-pages | `publictxt/publictxt-pages`, `ref: main`, into `site/` |
 | Set up Hugo | `peaceiris/actions-hugo@v3`, pinned `0.166.0` |
 | Set up Node | for `npx pagefind` |
 | Build | `sh site/scripts/build.sh --source ../txt` |

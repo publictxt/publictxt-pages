@@ -1,4 +1,4 @@
-# Publish a PublicTxt content repo with PublicTxt-Hugo via GitHub Pages.
+# Publish a PublicTxt content repo with publictxt-pages via GitHub Pages.
 #
 # Copy this file into the CONTENT repo (e.g. jaysen/txt) as
 #   .github/workflows/publish.yml
@@ -44,10 +44,10 @@ jobs:
           # every page would report the same date at both ends.
           fetch-depth: 0
 
-      - name: Check out PublicTxt-Hugo
+      - name: Check out publictxt-pages
         uses: actions/checkout@v4
         with:
-          repository: publictxt/txt-hugo   # <- adjust to wherever this repo lives
+          repository: publictxt/publictxt-pages   # <- adjust to wherever this repo lives
           ref: main                        # pin to a tag for reproducible builds
           path: site
 
