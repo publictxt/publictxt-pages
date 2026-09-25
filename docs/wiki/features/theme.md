@@ -2,6 +2,7 @@
 covers:
   - layouts/baseof.html
   - layouts/_partials/footer.html
+  - layouts/_partials/head.html
   - assets/css/main.css
 ---
 
@@ -19,13 +20,13 @@ search sidebar, full width.
 Not rendered anywhere: `author` and `source_repo` — carried in front matter, shown by
 no template. See [../../SPEC.md](../../SPEC.md).
 
-Footer optionally renders `<a rel="me">` for `site.Params.mastodon` (hugo.toml),
-which Mastodon's profile verification checks for on the linked site.
+`head.html` renders `site.Params.mastodon` as an invisible `<link rel="me">` —
+Mastodon's profile verification accepts it as well as a visible `<a rel="me">`.
 
 Footer lives in `_partials/footer.html`; its wording comes from `[params.footer]`
-(`text` as inline markdown, `contact` as the Mastodon lead-in, `edit` as the edit-link
-label, appended after a ` • ` to the end of the same line), each defaulting to the original copy and hidden when set to `""`. The Mastodon
-link stays in the template, not the markdown, because markdown can't emit `rel="me"`.
+(`text` as inline markdown, `edit` as the edit-link label, appended after a ` • ` to
+the end of the same line), each defaulting to the original copy and hidden when set
+to `""`.
 
 **Edit this page:** `params.editURL` + the page's `source_path`, which sync writes
 because its renames (`index.md`→`_index.md`, post folders→`index.md`) make Hugo's file
