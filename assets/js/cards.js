@@ -31,13 +31,15 @@ export function bookmarkLabel(url) {
   return "↗ " + url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 }
 
-// Same stars as sidebar.html. `rating` is 1–5, absent when unrated.
+// Same stars as sidebar.html: five outlines, filled to `--rating` by main.css,
+// so 3.5 shows three and a half. `rating` is 1–5, absent when unrated.
 export function ratingHTML(item) {
-  const r = item.rating;
-  return r ? ` <span class="rating" role="img" aria-label="Rated ${r} of 5">${"★".repeat(r)}${"☆".repeat(5 - r)}</span>` : "";
+  const r = Number(item.rating);
+  return r ? ` <span class="rating" role="img" aria-label="Rated ${r} of 5" style="--rating: ${r}">☆☆☆☆☆</span>` : "";
 }
 
-// The rating filter, as `?rating=` spells it: "1"–"5" means that or better,
+// The rating filter, as `?rating=` spells it: "1"–"5" means that or better
+// (3 takes 3.5),
 // "unrated" means no rating; anything else is no filter. Shared by list.js and
 // search.js so both read the URL the same way.
 export const UNRATED_FILTER = "unrated";

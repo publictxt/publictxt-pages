@@ -200,8 +200,17 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
 }
 
-/* Stars from rating.html's value: sidebar and cards. */
-.rating { color: var(--accent); letter-spacing: 0.05em; white-space: nowrap; }
+/* Stars from rating.html's value: sidebar and cards. Five outlines, with five
+   filled stars over them clipped to --rating/5 of the width, so 3.5 shows half
+   a star. No letter-spacing: it would skew the clip. */
+.rating { position: relative; display: inline-block; color: var(--accent); white-space: nowrap; }
+.rating::before {
+  content: "★★★★★";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--rating, 0) / 5 * 100%);
+  overflow: hidden;
+}
 
 .chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace; }
 .bookmark-links { margin-top: 0.4rem; }

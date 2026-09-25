@@ -18,7 +18,7 @@ the files themselves — see the map in [../index.md](../index.md), and
 | [browse-lists.md](browse-lists.md) | the site-wide index, sortable/filterable/paged lists |
 | [search.md](search.md) | Pagefind full-text + facets, filter-only, sorting |
 | [categories.md](categories.md) | configured closed list, `category:` front matter, facets, toggle |
-| [ratings.md](ratings.md) | `rating:` 1–5 front matter, minimum or *Unrated* filter, *Top/Lowest rated* sorts, stars |
+| [ratings.md](ratings.md) | `rating:` 1–5 front matter (decimals), minimum or *Unrated* filter, *Top/Lowest rated* sorts, stars |
 | [tags.md](tags.md) | inline `#hashtags`, tag pages, tag cloud |
 | [dates.md](dates.md) | the `created`/`updated` ladders and how dates display |
 | [bookmarks.md](bookmarks.md) | `bookmark:` front matter, the section, link chips |

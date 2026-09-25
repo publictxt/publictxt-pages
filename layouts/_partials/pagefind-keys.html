@@ -7,9 +7,10 @@
 
   Rating (see rating.html) is a sort key on every page, mid-scale 2.5 when
   unrated (UNRATED in sorts.js), so unrated pages sort between 2 and 3 rather
-  than drop out. The `rating` filter is on every page too, "unrated" when it
-  has none, so search can filter for those; the meta the result card reads is
-  only there when the page has one.
+  than drop out; the sort uses the exact value. The `rating` filter is on every
+  page too: the whole-number part (3.5 -> "3"), so a minimum is an `any` over a
+  known set of values whatever the decimals, or "unrated" when it has none. The
+  exact value is meta, for the result card, only when the page has one.
 
   Every template carrying `data-pagefind-body` must include this; without it a page
   drops out of sorted results and out of any year. See docs/wiki/traps.md.
@@ -18,7 +19,8 @@
 {{ $rating := partial "rating.html" . }}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title], rating[data-rating-sort]"
   data-pagefind-filter="year[data-year], rating[data-rating]{{ with $category }}, category[data-category]{{ end }}"
-  {{- with $rating }} data-pagefind-meta="rating[data-rating]"{{ end }}
+  {{- with $rating }} data-pagefind-meta="rating[data-rating-value]"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
   data-year="{{ .Date.Format "2006" }}"{{ with $category }} data-category="{{ . }}"{{ end }}
-  data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}"></span>
+  data-rating-sort="{{ $rating | default 2.5 }}"
+  {{- with $rating }} data-rating="{{ int (math.Floor .) }}" data-rating-value="{{ . }}"{{ else }} data-rating="unrated"{{ end }}></span>
