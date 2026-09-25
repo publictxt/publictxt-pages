@@ -14,8 +14,9 @@ would have to already know to open. **Read before editing templates or the pipel
 
 Every template carrying `data-pagefind-body` **must** also call `pagefind-keys.html`.
 Pagefind drops any page lacking the key it is sorting on, so a new template without it
-vanishes from sorted results with no error; the same span carries the `year` and
-`category` filters, so it also vanishes whenever either is selected. Currently `page.html`, `section.html` and
+vanishes from sorted results with no error; the same span carries the `year`,
+`category` and `rating` filters, so it also vanishes whenever one is selected. The
+`rating` sort key is on every page (0 when unrated) for the same reason. Currently `page.html`, `section.html` and
 `bookmarks/section.html`.
 
 ## Client/server pairs must change together
@@ -30,6 +31,7 @@ JS for the live one. Changing one alone makes the two views disagree:
 | `bookmark-label.html` (URL display form) | `bookmarkLabel()` in `cards.js` |
 | the page collection each list template passes | the matching kind in `scope()` |
 | `pagefind-keys.html`'s `data-year` (`.Date`) | `yearOf()` in `list.js` |
+| stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
 
 The >1-day date rule is implemented a **third** time, in `sidebar.html`.
 

@@ -41,6 +41,12 @@
           <h3 class="side-heading">Year</h3>
           <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>
         </div>
+        {{/* A minimum, as in the browse lists. search.js hides the group when
+             no indexed page has a rating. */}}
+        <div class="filter-group" id="filter-rating-group" hidden>
+          <h3 class="side-heading">Rating</h3>
+          <label class="list-sort"><select id="filter-rating" aria-label="Filter by minimum rating"></select></label>
+        </div>
         <div class="filter-group">
           <h3 class="side-heading">Tags <span class="muted" id="filter-tag-hint"></span></h3>
           <div id="filter-tag" class="chip-row"></div>

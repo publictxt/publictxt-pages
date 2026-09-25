@@ -90,17 +90,18 @@ layouts/_partials/
   bookmark-links.html   the chip row
   bookmark-label.html   one URL's short display form
   category.html         category: -> configured name or ""; only reader of the key
+  rating.html           rating: -> int 1–5 or 0; only reader of the key
 ```
 
 ### Browser
 
 ```txt
 assets/js/site-index.js   58  fetch index.json once per document; scope() subsets
-assets/js/sorts.js        34  the six sorts, ?sort= spellings, normalise/parse
-assets/js/cards.js        70  the one card renderer, shared by lists and search
-assets/js/list.js        245  browse list: state<->URL, facets, paging, render
-assets/js/search.js      155  Pagefind UI: filters, sort, incremental results
-assets/css/main.css      594  the whole theme; palette is :root custom properties
+assets/js/sorts.js        38  the seven sorts, ?sort= spellings, normalise/parse
+assets/js/cards.js        81  the one card renderer, shared by lists and search
+assets/js/list.js        342  browse list: state<->URL, facets, paging, render
+assets/js/search.js      199  Pagefind UI: filters, sort, incremental results
+assets/css/main.css      632  the whole theme; palette is :root custom properties
 ```
 
 ES modules, bundled per entry point (`list.js`, `search.js`) by `js.Build` — esbuild

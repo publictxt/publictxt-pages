@@ -6,6 +6,7 @@ tags: ["announcement", "publictxt"]
 author: "example"
 source_repo: "example-txt"
 category: essay
+rating: 4
 ---
 
 # This H1 must NOT become the title

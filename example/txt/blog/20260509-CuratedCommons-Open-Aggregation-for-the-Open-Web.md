@@ -1,3 +1,6 @@
+---
+rating: 3
+---
 # Curated Commons: Open Aggregation for the Open Web
 
 _A PublicTxt Project Post_

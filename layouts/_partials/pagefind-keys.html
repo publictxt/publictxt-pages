@@ -5,11 +5,18 @@
   as a filter — the same year the browse lists facet on, see yearOf() in list.js.
   Also the page's category as a filter, when it has one (see category.html).
 
+  Rating (see rating.html) is a sort key on every page, 0 when unrated, so
+  unrated pages sort last rather than drop out; the filter and the meta the
+  result card reads are only there when the page has one.
+
   Every template carrying `data-pagefind-body` must include this; without it a page
   drops out of sorted results and out of any year. See docs/wiki/traps.md.
 */}}
 {{ $category := partial "category.html" . }}
-<span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title]"
-  data-pagefind-filter="year[data-year]{{ with $category }}, category[data-category]{{ end }}"
+{{ $rating := partial "rating.html" . }}
+<span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title], rating[data-rating-sort]"
+  data-pagefind-filter="year[data-year]{{ with $category }}, category[data-category]{{ end }}{{ with $rating }}, rating[data-rating]{{ end }}"
+  {{- with $rating }} data-pagefind-meta="rating[data-rating]"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
-  data-year="{{ .Date.Format "2006" }}"{{ with $category }} data-category="{{ . }}"{{ end }}></span>
+  data-year="{{ .Date.Format "2006" }}"{{ with $category }} data-category="{{ . }}"{{ end }}
+  data-rating-sort="{{ $rating }}"{{ with $rating }} data-rating="{{ . }}"{{ end }}></span>

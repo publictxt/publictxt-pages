@@ -2,7 +2,7 @@
 // site-wide index (fetched once per document, see site-index.js) and renders
 // sortable, filterable, paged cards in place of the plain link list Hugo
 // rendered as a fallback. Filter, sort and page live in the URL
-// (?tag=a&tag=b&type=wiki&category=essay&year=2024&sort=title&page=2) so views are linkable;
+// (?tag=a&tag=b&type=wiki&category=essay&year=2024&rating=4&sort=title&page=2) so views are linkable;
 // `q` stays reserved for the search page.
 //
 // Container attributes:
@@ -11,7 +11,7 @@
 //   data-order        default sort, "<field>[ asc|desc]" (see sorts.js)
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL state (home Recent)
-import { card, escapeHTML } from "./cards.js";
+import { card, escapeHTML, minRatingLabel } from "./cards.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -25,7 +25,7 @@ function yearOf(it) {
 
 // The facets a list offers: each page's values, and the order they display in.
 // Tags are AND-ed; type, category and year are exclusive, so their state is a
-// string. Category is absent from the index when categories are disabled, which
+// string. Rating is a minimum, not a facet value, and is handled in render(). Category is absent from the index when categories are disabled, which
 // leaves its facet empty and hidden — list.js needs no toggle of its own.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
@@ -35,14 +35,19 @@ const FACETS = {
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
 };
 
+// Rating ties fall back to newest; unrated pages count as 0, so sort last.
 function sorted(items, sort) {
   const { field, dir } = parseSort(sort);
   const sign = dir === "asc" ? 1 : -1;
   const byTitle = (a, b) => (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
-  return [...items].sort((a, b) => field === "title"
-    ? sign * byTitle(a, b)
-    : sign * ((Date.parse(a[field]) || 0) - (Date.parse(b[field]) || 0)) || byTitle(a, b));
+  const byDate = (f) => (a, b) => (Date.parse(a[f]) || 0) - (Date.parse(b[f]) || 0);
+  return [...items].sort(field === "title" ? (a, b) => sign * byTitle(a, b)
+    : field === "rating" ? (a, b) => sign * ((a.rating || 0) - (b.rating || 0) || byDate("created")(a, b)) || byTitle(a, b)
+    : (a, b) => sign * byDate(field)(a, b) || byTitle(a, b));
 }
+
+// `?rating=N` means N or better; anything but 1–5 reads as no filter.
+const minRating = (v) => (/^[1-5]$/.test(v || "") ? v : "");
 
 // [[value, count], ...] for a facet, in that facet's chip order.
 function counts(items, key) {
@@ -66,7 +71,7 @@ async function mount(root) {
   }
 
   // ---- state <-> URL --------------------------------------------------
-  const state = { sort: defaultSort, type: "", category: "", year: "", tags: new Set(), page: 1, moreTags: false };
+  const state = { sort: defaultSort, type: "", category: "", year: "", rating: "", tags: new Set(), page: 1, moreTags: false };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
@@ -74,6 +79,7 @@ async function mount(root) {
     state.type = p.get("type") || "";
     state.category = p.get("category") || "";
     state.year = p.get("year") || "";
+    state.rating = minRating(p.get("rating"));
     state.tags = new Set(p.getAll("tag").filter(Boolean));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
   }
@@ -84,6 +90,7 @@ async function mount(root) {
     if (s.type) p.set("type", s.type);
     if (s.category) p.set("category", s.category);
     if (s.year) p.set("year", s.year);
+    if (s.rating) p.set("rating", s.rating);
     for (const t of s.tags) p.append("tag", t);
     if (s.page > 1) p.set("page", String(s.page));
     const qs = p.toString();
@@ -128,6 +135,10 @@ async function mount(root) {
   const hasYears = yearFacet.length > 1;
   const tagFacet = counts(items, "tags").filter(([, n]) => n < items.length);
   const categoryFacet = counts(items, "category").filter(([, n]) => n < items.length);
+  // Ratings present, best first. The select shows when some page differs from
+  // the rest, unrated counting as a value: "★1+" then means "rated at all".
+  const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
+  const hasRatings = ratings.length > 1 || (ratings.length === 1 && items.some((it) => !it.rating));
 
   function chip(kind, name, n, active) {
     const b = document.createElement("button");
@@ -158,9 +169,9 @@ async function mount(root) {
     return row;
   }
 
-  // `forYear` is `filtered` minus the year filter: a single-select option must
-  // count what picking it gives, not what the current year leaves.
-  function renderControls(filtered, forYear) {
+  // `forYear` / `forRating` are `filtered` minus that one filter: a single-select
+  // option must count what picking it gives, not what the current choice leaves.
+  function renderControls(filtered, forYear, forRating) {
     body.replaceChildren();
     const head = document.createElement("div");
     head.className = "list-controls-head";
@@ -189,14 +200,27 @@ async function mount(root) {
       });
       selects.append(yearWrap);
     }
+    if (hasRatings) {
+      const atLeast = (r) => forRating.filter((it) => (it.rating || 0) >= r).length;
+      const ratingWrap = document.createElement("label");
+      ratingWrap.className = "list-sort";
+      ratingWrap.innerHTML = `<span class="facet-label">Rating</span> <select aria-label="Filter by minimum rating">`
+        + `<option value=""${state.rating ? "" : " selected"}>Any rating</option>`
+        + ratings.map((r) => `<option value="${r}"${String(r) === state.rating ? " selected" : ""}>${minRatingLabel(r)} (${atLeast(r)})</option>`).join("")
+        + `</select>`;
+      ratingWrap.querySelector("select").addEventListener("change", (e) => {
+        state.rating = e.target.value; state.page = 1; render(true);
+      });
+      selects.append(ratingWrap);
+    }
     head.append(selects);
-    if (state.type || state.category || state.year || state.tags.size || state.sort !== defaultSort) {
+    if (filtering() || state.sort !== defaultSort) {
       const clear = document.createElement("button");
       clear.type = "button";
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        state.type = ""; state.category = ""; state.year = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
+        state.type = ""; state.category = ""; state.year = ""; state.rating = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
       });
       head.append(clear);
     }
@@ -268,13 +292,18 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
+  const filtering = () => Boolean(state.type || state.category || state.year || state.rating || state.tags.size);
+
   function render(pushHistory) {
-    let forYear = items;
-    if (state.type) forYear = forYear.filter((it) => it.type === state.type);
-    if (state.category) forYear = forYear.filter((it) => it.category === state.category);
-    for (const t of state.tags) forYear = forYear.filter((it) => (it.tags || []).includes(t));
-    let filtered = state.year ? forYear.filter((it) => yearOf(it) === state.year) : forYear;
-    filtered = sorted(filtered, state.sort);
+    let base = items;
+    if (state.type) base = base.filter((it) => it.type === state.type);
+    if (state.category) base = base.filter((it) => it.category === state.category);
+    for (const t of state.tags) base = base.filter((it) => (it.tags || []).includes(t));
+    const byYear = (it) => !state.year || yearOf(it) === state.year;
+    const byRating = (it) => !state.rating || (it.rating || 0) >= Number(state.rating);
+    const forYear = base.filter(byRating);
+    const forRating = base.filter(byYear);
+    const filtered = sorted(forYear.filter(byYear), state.sort);
 
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
     if (state.page > total) state.page = total;
@@ -286,10 +315,11 @@ async function mount(root) {
     list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tags, onTag })));
     if (compact) return;
 
-    renderControls(filtered, forYear);
+    renderControls(filtered, forYear, forRating);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
+    const what = [state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year,
+      state.rating && minRatingLabel(Number(state.rating))].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")
@@ -304,7 +334,7 @@ async function mount(root) {
   // Below the stacking breakpoint (main.css, 900px), as on the search page:
   // start folded unless the URL brought a filter or sort, so cards show first.
   if (matchMedia("(max-width: 900px)").matches) {
-    controls.open = Boolean(state.type || state.category || state.year || state.tags.size || state.sort !== defaultSort);
+    controls.open = filtering() || state.sort !== defaultSort;
   }
   render(false);
 }

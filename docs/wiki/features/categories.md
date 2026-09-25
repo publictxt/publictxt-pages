@@ -41,3 +41,4 @@ with tags. Chip order is by count, not `list` order. No term pages, no sidebar c
 categories are not a Hugo taxonomy.
 
 Category is not a `sync_content.py` concern; the key passes through untouched.
+[ratings.md](ratings.md) follows the same one-reader pattern, without a config block.

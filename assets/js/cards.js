@@ -1,6 +1,6 @@
 // The one page-card renderer, shared by the browse lists (list.js) and the
 // search page (search.js). Takes the item shape of index.json:
-//   { url, title, type, section, tags[], created, updated, summary, bookmarks[] }
+//   { url, title, type, section, tags[], created, updated, summary, bookmarks[], rating }
 // Search maps Pagefind results onto the same shape.
 
 export function escapeHTML(s) {
@@ -31,6 +31,17 @@ export function bookmarkLabel(url) {
   return "↗ " + url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 }
 
+// Same stars as sidebar.html. `rating` is 1–5, absent when unrated.
+export function ratingHTML(item) {
+  const r = item.rating;
+  return r ? ` <span class="rating" role="img" aria-label="Rated ${r} of 5">${"★".repeat(r)}${"☆".repeat(5 - r)}</span>` : "";
+}
+
+// A minimum-rating filter value as the lists and search show it: "★4+", "★5".
+export function minRatingLabel(r) {
+  return `★${r}${r < 5 ? "+" : ""}`;
+}
+
 // Tag pages live at <base>/tags/<term>/; the base path comes from
 // <html data-base> so a site served from a sub-path still resolves.
 export function tagURL(name) {
@@ -57,7 +68,7 @@ export function card(item, opts = {}) {
       <a class="page-card-title" href="${escapeHTML(item.url)}">${escapeHTML(item.title || item.url)}</a>
       ${item.type ? `<span class="chip chip-type">${escapeHTML(item.type)}</span>` : ""}
     </div>
-    ${dateHTML(item)}
+    ${dateHTML(item)}${ratingHTML(item)}
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((u) =>
       `<a class="chip chip-link" href="${escapeHTML(u)}" rel="noopener external" target="_blank">${escapeHTML(bookmarkLabel(u))}</a>`).join("")}</div>` : ""}
     ${opts.summaryHTML ? `<p class="page-card-summary">${opts.summaryHTML}</p>`

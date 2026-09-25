@@ -24,18 +24,21 @@ Items marked **(TBD)** are not built.
   - page meta (type, dates, tags) in sidebar.
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
-  - One `category:` per page from a closed list in `hugo.toml`; feature toggleable *(D11)*.
+  - Currently: One `category:` per page from a closed list in `hugo.toml`; feature toggleable *(D11)*.
+  - Future: Allow multiple `categories:` per page (TBD)
   - Category pages / sidebar list (TBD)
 - Tags
-  - Inline `#hashtags` merged into `tags`. Facets: tags (AND-able), type.
+  - Inline `#hashtags` merged into `tags`.
+  - Facets: tags (AND-able), type.
   - tag pages
+  - Facets: tags OR-able (TBD)
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
   - Sorting in all by Date, Recency, Alphabetical.
-  - Filter by Type, and by Year (the `created` year). 
+  - Filter by Type, and by Year (the `created` year).
   - Filter by Category (also in Search)
   - Sort by Source/Author (TBD)
-  - Sort and Filter by Rating (TBD)
+  - Sort (Top rated) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search)
 - Search
   - Full text search
   - Type, Year and Tag filters as 'facets' are available without a query
@@ -46,6 +49,8 @@ Items marked **(TBD)** are not built.
   - frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
+- Date Properties
+  - Converts from YYYYMMDD to required format (TBD)
 
 ## Content Structure
 

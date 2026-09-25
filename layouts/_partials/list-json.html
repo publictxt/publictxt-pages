@@ -19,6 +19,7 @@
       "summary" (.Summary | plainify | truncate 180)
   }}
   {{ with partial "category.html" . }}{{ $item = merge $item (dict "category" .) }}{{ end }}
+  {{ with partial "rating.html" . }}{{ $item = merge $item (dict "rating" .) }}{{ end }}
   {{ with partial "bookmark-urls.html" . }}{{ $item = merge $item (dict "bookmarks" .) }}{{ end }}
   {{ $items = $items | append $item }}
 {{ end }}
