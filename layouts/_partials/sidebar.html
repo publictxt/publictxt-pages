@@ -32,6 +32,11 @@
     <dd><time datetime="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Lastmod.Format "2 Jan 2006" }}</time></dd>
     {{ end }}
     {{ end }}
+    {{/* Same stars as ratingHTML() in cards.js. */}}
+    {{ with partial "rating.html" . }}
+    <dt>Rating</dt>
+    <dd><span class="rating" role="img" aria-label="Rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
+    {{ end }}
     {{ with partial "bookmark-urls.html" . }}
     <dt>Bookmark{{ if gt (len .) 1 }}s{{ end }}</dt>
     <dd class="chip-row">

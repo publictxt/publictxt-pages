@@ -3,6 +3,7 @@ covers:
   - assets/js/search.js
   - layouts/search.html
   - layouts/_partials/pagefind-keys.html
+  - layouts/_partials/rating.html
 ---
 
 # Search
@@ -13,7 +14,7 @@ filter-only searches *([D8](../decisions/D8.md))*. The search page lives in
 `site-content/`, not the content repo.
 
 Sorting is Pagefind's own, over keys emitted by `pagefind-keys.html` (dates as Unix
-seconds, title lower-cased). A sort **replaces** relevance outright with no tiebreak,
+seconds, title lower-cased, rating with unrated as 2.5). A sort **replaces** relevance outright with no tiebreak,
 so *Relevance* is offered, and default, only when there is a query; filter-only
 browsing defaults to newest. See [../traps.md](../traps.md) — a template
 missing that partial disappears from sorted results.
@@ -23,7 +24,9 @@ and year are exclusive; the category group is hidden when the index has none
 ([categories.md](categories.md)); an array of tags is Pagefind's AND. Year comes from
 `pagefind-keys.html`'s `year[data-year]` and is a select above the tag chips, hidden
 when the site spans one year; its options carry no counts, since Pagefind's are for
-the current result set and would print "0" beside years that do have pages. Chip
+the current result set and would print "0" beside years that do have pages. Rating is a
+minimum-rating select, sent as Pagefind's `any` over the qualifying values, plus
+*Unrated*, the filter value unrated pages carry ([ratings.md](ratings.md)). Chip
 counts run higher than a browse list's: Pagefind also indexes section index bodies,
 which `index.json` does not carry.
 

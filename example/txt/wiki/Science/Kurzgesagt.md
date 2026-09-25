@@ -1,5 +1,6 @@
 ---
 bookmarks: https://kurzgesagt.org/
+rating: 5
 web-links:
   - https://kurzgesagt.org/
   - https://www.youtube.com/@kurzgesagt

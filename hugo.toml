@@ -68,6 +68,7 @@ capitalizeListTitles = false
   #   created  (newest first)
   #   title    (A→Z)
   #   updated  (recently updated first — what the home Recent list always uses)
+  #   rating   (top rated first; unrated sort as 2.5 — see `rating:` below)
   # and default cards per page. A section's index page overrides either for
   # itself and its sub-folders with `order:` / `perPage:` in its front matter
   # (e.g. `order: title` on wiki/index.md).
@@ -83,6 +84,10 @@ capitalizeListTitles = false
   [params.categories]
     enabled = true
     list = ["sci", "comp-sci", "political", "project", "personal"]
+
+  # Ratings need no config: a page opts in with `rating: 1`–`5` in its front
+  # matter; anything else is ignored with a build warning. Lists and search
+  # offer a minimum-rating filter and Top/Lowest rated sorts once any page has one.
 
 [markup]
   [markup.goldmark.renderHooks.link]

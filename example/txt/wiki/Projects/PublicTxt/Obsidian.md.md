@@ -1,5 +1,6 @@
 ---
 bookmark: https://obsidian.md
+rating: 4
 ---
 
 A wiki page that is *also* a bookmark: the `bookmark:` front matter key makes it

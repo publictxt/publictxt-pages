@@ -1,5 +1,6 @@
 ---
 category: Project
+rating: 5
 tags:
   - publictxt
   - commons
