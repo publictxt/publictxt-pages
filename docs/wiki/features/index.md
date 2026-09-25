@@ -14,7 +14,7 @@ the files themselves — see the map in [../index.md](../index.md), and
 
 | Page | Covers |
 |---|---|
-| [sections.md](sections.md) | top-level folders as sections, every folder browsable, ordering, post-folder leaf bundles |
+| [sections.md](sections.md) | top-level folders as sections, every folder browsable, ordering, post-folder leaf bundles, `publish: off` |
 | [browse-lists.md](browse-lists.md) | the site-wide index, sortable/filterable/paged lists |
 | [search.md](search.md) | Pagefind full-text + facets, filter-only, sorting |
 | [categories.md](categories.md) | configured closed list, `category:` front matter, facets, toggle |

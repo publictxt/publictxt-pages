@@ -49,6 +49,7 @@ Items marked **(TBD)** are not built.
   - frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
+  - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
 - Date Properties
   - Converts from YYYYMMDD to required format (TBD)
 
