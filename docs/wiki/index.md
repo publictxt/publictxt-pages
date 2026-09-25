@@ -89,6 +89,7 @@ layouts/_partials/
   bookmark-pages.html   bookmarks/ + every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row
   bookmark-label.html   one URL's short display form
+  category.html         category: -> configured name or ""; only reader of the key
 ```
 
 ### Browser
@@ -109,7 +110,7 @@ ships inside Hugo, so the build needs no Node.
 
 ```txt
 hugo.toml                            mounts, frontmatter mapping, params (listOrder,
-                                     sectionOrder, limits), markup
+                                     sectionOrder, limits, categories), markup
 deploy/publish-to-github-pages.yml   template for the CONTENT repo -> deploy.md
 site-content/                        site-owned pages (the search page)
 example/txt/                         synthetic default source repo

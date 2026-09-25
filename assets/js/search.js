@@ -1,13 +1,15 @@
 // Search page: a custom UI on the Pagefind JS API (its stock UI cannot run
 // filter-only searches). Results are drawn with the same card as the browse
-// lists (cards.js); the query, type, year, tags and sort live in the URL.
+// lists (cards.js); the query, type, category, year, tags and sort live in the URL.
 //
 // Sorting is Pagefind's own (sort keys emitted by pagefind-keys.html), so it
 // orders the whole result set inside the index without loading a fragment per
 // hit. A sort replaces relevance ranking outright, so "Relevance" is only
 // offered — and only the default — when there is a query; filter-only
-// browsing defaults to newest, like the browse lists. Same three facets
-// as those lists, over Pagefind's index rather than index.json.
+// browsing defaults to newest, like the browse lists. Same facets as those
+// lists, over Pagefind's index rather than index.json. Category only exists in
+// the index when categories are enabled and some page has one; otherwise its
+// group stays hidden.
 import { card } from "./cards.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -16,7 +18,8 @@ const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/")
 const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"),
-  type: $("filter-type"), year: $("filter-year"), yearGroup: $("filter-year-group"),
+  type: $("filter-type"), category: $("filter-category"), categoryGroup: $("filter-category-group"),
+  year: $("filter-year"), yearGroup: $("filter-year-group"),
   tag: $("filter-tag"), tagHint: $("filter-tag-hint"), sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
@@ -34,7 +37,7 @@ el.root.hidden = false;
 // ---- state <-> URL --------------------------------------------------
 // `sort` is null until chosen: the default then follows the query (see top).
 const RELEVANCE = "relevance";
-const state = { q: "", type: "", year: "", tags: new Set(), sort: null };
+const state = { q: "", type: "", category: "", year: "", tags: new Set(), sort: null };
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -45,6 +48,7 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
   state.type = p.get("type") || "";
+  state.category = p.get("category") || "";
   state.year = p.get("year") || "";
   state.tags = new Set(p.getAll("tag").filter(Boolean));
   const s = p.get("sort");
@@ -54,6 +58,7 @@ function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
   if (state.type) p.set("type", state.type);
+  if (state.category) p.set("category", state.category);
   if (state.year) p.set("year", state.year);
   for (const t of state.tags) p.append("tag", t);
   const sort = activeSort();
@@ -67,7 +72,7 @@ function toggleTag(t) {
 }
 
 // ---- filter chips -------------------------------------------------------
-const allFilters = await pagefind.filters();   // { tag: {name: count}, type: {…}, year: {…} }
+const allFilters = await pagefind.filters();   // { tag: {name: count}, type: {…}, category: {…}, year: {…} }
 const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[a]) || a.localeCompare(b));
 // Years read newest-first, not most-frequent-first, like the browse lists.
 const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(a));
@@ -83,7 +88,7 @@ function chip(kind, name, count, active) {
   n.textContent = count;
   b.append(n);
   b.addEventListener("click", () => {
-    if (kind === "type") { state.type = state.type === name ? "" : name; run(); }
+    if (kind === "type" || kind === "category") { state[kind] = state[kind] === name ? "" : name; run(); }
     else toggleTag(name);
   });
   return b;
@@ -93,6 +98,10 @@ function renderFilters(counts) {
   // counts: filter counts within the current result set (or totals when idle)
   el.type.replaceChildren(...sortedKeys(allFilters.type).map((n) =>
     chip("type", n, (counts.type || {})[n] ?? 0, state.type === n)));
+  const categories = sortedKeys(allFilters.category);
+  el.categoryGroup.hidden = categories.length === 0;
+  el.category.replaceChildren(...categories.map((n) =>
+    chip("category", n, (counts.category || {})[n] ?? 0, state.category === n)));
   // No counts on the year options: Pagefind's are for the current result set, so a
   // single-select control would print "0" beside years that do have pages.
   const years = yearKeys(allFilters.year);
@@ -116,6 +125,7 @@ async function run() {
   writeURL();
   const filters = {};
   if (state.type) filters.type = state.type;
+  if (state.category) filters.category = state.category;
   if (state.year) filters.year = state.year;
   if (state.tags.size) filters.tag = [...state.tags];     // array = AND
   const sort = activeSort();
@@ -127,7 +137,7 @@ async function run() {
   renderFilters(res.filters || allFilters);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", state.type, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
+  const what = [hasQuery() ? `“${state.q}”` : "", state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
   await showMore();
@@ -159,7 +169,7 @@ let timer;
 el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => { state.q = el.q.value; run(); }, 200); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; state.year = ""; state.tags.clear(); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; state.category = ""; state.year = ""; state.tags.clear(); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 

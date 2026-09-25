@@ -23,7 +23,9 @@ Items marked **(TBD)** are not built.
   - Tag cloud
   - page meta (type, dates, tags) in sidebar.
   - Author **(TBD)** — carried in front matter, rendered nowhere
-- Categories (TBD)
+- Categories
+  - One `category:` per page from a closed list in `hugo.toml`; feature toggleable *(D11)*.
+  - Category pages / sidebar list (TBD)
 - Tags
   - Inline `#hashtags` merged into `tags`. Facets: tags (AND-able), type.
   - tag pages
@@ -31,7 +33,7 @@ Items marked **(TBD)** are not built.
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
   - Sorting in all by Date, Recency, Alphabetical.
   - Filter by Type, and by Year (the `created` year). 
-  - Filter by Category (TBD)
+  - Filter by Category (also in Search)
   - Sort by Source/Author (TBD)
   - Sort and Filter by Rating (TBD)
 - Search

@@ -14,8 +14,8 @@ would have to already know to open. **Read before editing templates or the pipel
 
 Every template carrying `data-pagefind-body` **must** also call `pagefind-keys.html`.
 Pagefind drops any page lacking the key it is sorting on, so a new template without it
-vanishes from sorted results with no error; the same span carries the `year` filter, so
-it also vanishes whenever a year is selected. Currently `page.html`, `section.html` and
+vanishes from sorted results with no error; the same span carries the `year` and
+`category` filters, so it also vanishes whenever either is selected. Currently `page.html`, `section.html` and
 `bookmarks/section.html`.
 
 ## Client/server pairs must change together
