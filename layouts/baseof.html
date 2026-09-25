@@ -29,10 +29,6 @@
     </main>
   </div>
 
-  <footer class="site-footer">
-    <p>PublicTxt, plain-text knowledge, published with <a target="_blank" rel="noopener noreferrer" href="https://github.com/publictxt/publictxt-pages">publictxt-pages</a>.
-       Reach me on {{ with site.Params.mastodon }}<a target="_blank" rel="me noopener" href="{{ . }}">Mastodon</a>{{ end }}
-    </p>
-  </footer>
+  {{ partial "footer.html" . }}
 </body>
 </html>
