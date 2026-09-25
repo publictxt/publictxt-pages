@@ -24,7 +24,7 @@ which Mastodon's profile verification checks for on the linked site.
 
 Footer lives in `_partials/footer.html`; its wording comes from `[params.footer]`
 (`text` as inline markdown, `contact` as the Mastodon lead-in, `edit` as the edit-link
-label), each defaulting to the original copy and hidden when set to `""`. The Mastodon
+label, appended after a ` • ` to the end of the same line), each defaulting to the original copy and hidden when set to `""`. The Mastodon
 link stays in the template, not the markdown, because markdown can't emit `rel="me"`.
 
 **Edit this page:** `params.editURL` + the page's `source_path`, which sync writes

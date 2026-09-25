@@ -8,7 +8,8 @@
     contact  lead-in before the Mastodon link; shown only when
              params.mastodon is set. Kept separate from `text` because the
              link needs rel="me" (Mastodon verification), which markdown can't emit.
-    edit     label of the link to this page's file in its source repo; shown
+    edit     label of the link to this page's file in its source repo, appended
+             to the end of the footer line after a " · "; shown
              only when params.editURL and the page's `source_path` (written by
              sync_content.py — the repo path, not build/content's) are both set,
              so generated section indexes and site-content pages get none.
@@ -18,19 +19,22 @@
   read as URL syntax, so they are escaped here (% first, to not double-escape).
 */}}
 {{ $f := site.Params.footer | default dict }}
-{{ $text := "PublicTxt, plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)." }}
+{{ $text := "PublicTxt, plain-text knowledge published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)" }}
 {{ if isset $f "text" }}{{ $text = $f.text }}{{ end }}
 {{ $contact := "Contact me on" }}
 {{ if isset $f "contact" }}{{ $contact = $f.contact }}{{ end }}
 {{ $edit := "Edit this page" }}
 {{ if isset $f "edit" }}{{ $edit = $f.edit }}{{ end }}
 <footer class="site-footer">
-  {{ with $edit }}{{ with site.Params.editURL }}{{ with $.Params.source_path }}
-  {{ $path := . | replaceRE "%" "%25" | replaceRE "#" "%23" | replaceRE `\?` "%3F" }}
-  <p><a href="{{ strings.TrimSuffix "/" site.Params.editURL }}/{{ $path }}" rel="noopener external">{{ $edit }}</a></p>
-  {{ end }}{{ end }}{{ end }}
   <p>
     {{ with $text }}{{ . | markdownify }}{{ end }}
-    {{ with site.Params.mastodon }}{{ with $contact }}{{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Mastodon</a>{{ end }}
+
+    {{ with $edit }}{{ with site.Params.editURL }}{{ with $.Params.source_path }}
+    {{ $path := . | replaceRE "%" "%25" | replaceRE "#" "%23" | replaceRE `\?` "%3F" }}
+    <span aria-hidden="true">&nbsp;&nbsp;•&nbsp;&nbsp;</span><a href="{{ strings.TrimSuffix "/" site.Params.editURL }}/{{ $path }}" rel="noopener external">{{ $edit }}</a>
+    {{ end }}{{ end }}{{ end }}
+
+    {{ with site.Params.mastodon }}{{ with $contact }} <span aria-hidden="true">&nbsp;&nbsp;•&nbsp;&nbsp;</span> {{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Mastodon</a>{{ end }}
+
   </p>
 </footer>
