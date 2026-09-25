@@ -267,7 +267,7 @@ def add_missing_indexes(
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
-        if d in leaf_bundle_dests or (d / "_index.md").exists() or not any(d.rglob("*.md")):
+        if d in leaf_bundle_dests or (d / "_index.md").exists() or not any(p.is_file() for p in d.rglob("*.md")):
             continue
         title = d.name.replace("-", " ").replace("_", " ").strip()
         updated = newest.get(d, built_at)

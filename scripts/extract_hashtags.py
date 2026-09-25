@@ -104,7 +104,8 @@ def main():
 
     changed = 0
     for path in content_dir.rglob("*.md"):
-        if process_file(path):
+        # Folders match too: bookmark domain folders like `obsidian.md/`.
+        if path.is_file() and process_file(path):
             changed += 1
             print(f"updated: {path}")
 
