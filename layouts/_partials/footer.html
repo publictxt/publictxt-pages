@@ -17,6 +17,6 @@
 <footer class="site-footer">
   <p>
     {{ with $text }}{{ . | markdownify }}{{ end }}
-    {{ with site.Params.mastodon }}{{ with $contact }}{{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Reach me on Mastodon</a>{{ end }}
+    {{ with site.Params.mastodon }}{{ with $contact }}{{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Mastodon</a>{{ end }}
   </p>
 </footer>
