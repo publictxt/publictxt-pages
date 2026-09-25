@@ -37,9 +37,17 @@ export function ratingHTML(item) {
   return r ? ` <span class="rating" role="img" aria-label="Rated ${r} of 5">${"★".repeat(r)}${"☆".repeat(5 - r)}</span>` : "";
 }
 
-// A minimum-rating filter value as the lists and search show it: "★4+", "★5".
-export function minRatingLabel(r) {
-  return `★${r}${r < 5 ? "+" : ""}`;
+// The rating filter, as `?rating=` spells it: "1"–"5" means that or better,
+// "unrated" means no rating; anything else is no filter. Shared by list.js and
+// search.js so both read the URL the same way.
+export const UNRATED_FILTER = "unrated";
+export function ratingFilter(v) {
+  return /^[1-5]$/.test(v || "") || v === UNRATED_FILTER ? v : "";
+}
+
+// A rating filter value as the lists and search show it: "★4+", "★5", "Unrated".
+export function ratingFilterLabel(v) {
+  return v === UNRATED_FILTER ? "Unrated" : `★${v}${Number(v) < 5 ? "+" : ""}`;
 }
 
 // Tag pages live at <base>/tags/<term>/; the base path comes from

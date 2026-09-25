@@ -32,7 +32,7 @@ A list declares which subset it shows rather than carrying data:
 | `recent` | N most recently updated, site-wide | home |
 
 Eight sorts from `sorts.js`; four facets: type, category and tag chips (type and
-category single-select, tags AND-ed) with counts *within the current result set*, and year as a select beside Sort, plus a minimum-rating select ([ratings.md](ratings.md)).
+category single-select, tags AND-ed) with counts *within the current result set*, and year as a select beside Sort, plus a minimum-rating select with an *Unrated* option ([ratings.md](ratings.md)).
 A facet is hidden when the list doesn't vary on it, which is how a tag page hides its
 own tag. Chips sit most-frequent-first, years newest-first. Year options count over
 `forYear` — the set filtered by everything *but* year — so a single-select option

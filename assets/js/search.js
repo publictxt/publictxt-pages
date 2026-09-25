@@ -10,8 +10,9 @@
 // lists, over Pagefind's index rather than index.json. Category only exists in
 // the index when categories are enabled and some page has one; otherwise its
 // group stays hidden. Rating is a minimum: `?rating=4` asks Pagefind for any
-// of "4" and "5".
-import { card, minRatingLabel } from "./cards.js";
+// of "4" and "5"; `?rating=unrated` for the value pagefind-keys.html gives
+// unrated pages.
+import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const PAGE = 20;
@@ -53,7 +54,7 @@ function readURL() {
   state.type = p.get("type") || "";
   state.category = p.get("category") || "";
   state.year = p.get("year") || "";
-  state.rating = /^[1-5]$/.test(p.get("rating") || "") ? p.get("rating") : "";
+  state.rating = ratingFilter(p.get("rating"));
   state.tags = new Set(p.getAll("tag").filter(Boolean));
   const s = p.get("sort");
   state.sort = !s ? null : s === RELEVANCE ? RELEVANCE : normaliseSort(s);
@@ -114,10 +115,12 @@ function renderFilters(counts) {
   el.year.replaceChildren(new Option("All years", "", false, !state.year),
     ...years.map((y) => new Option(y, y, false, y === state.year)));
   // Same reason for no counts; and Pagefind's would be per exact value, not "or better".
-  const ratings = Object.keys(allFilters.rating || {}).map(Number).sort((a, b) => b - a);
+  const ratings = Object.keys(allFilters.rating || {}).filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);
+  const hasUnrated = UNRATED_FILTER in (allFilters.rating || {});
   el.ratingGroup.hidden = ratings.length === 0;
   el.rating.replaceChildren(new Option("Any rating", "", false, !state.rating),
-    ...ratings.map((r) => new Option(minRatingLabel(r), String(r), false, String(r) === state.rating)));
+    ...ratings.map((r) => new Option(ratingFilterLabel(r), r, false, r === state.rating)),
+    ...(hasUnrated ? [new Option("Unrated", UNRATED_FILTER, false, state.rating === UNRATED_FILTER)] : []));
   el.tag.replaceChildren(...sortedKeys(allFilters.tag).map((n) =>
     chip("tag", n, (counts.tag || {})[n] ?? 0, state.tags.has(n))));
   el.tagHint.textContent = state.tags.size > 1 ? "— all selected must match" : "";
@@ -137,7 +140,8 @@ async function run() {
   if (state.type) filters.type = state.type;
   if (state.category) filters.category = state.category;
   if (state.year) filters.year = state.year;
-  if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
+  if (state.rating === UNRATED_FILTER) filters.rating = UNRATED_FILTER;
+  else if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
   if (state.tags.size) filters.tag = [...state.tags];     // array = AND
   const sort = activeSort();
   const opts = { filters };
@@ -149,7 +153,7 @@ async function run() {
   renderSort();
   const n = current.length;
   const what = [hasQuery() ? `“${state.q}”` : "", state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year,
-    state.rating && minRatingLabel(Number(state.rating))].filter(Boolean).join(" · ");
+    state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
   await showMore();

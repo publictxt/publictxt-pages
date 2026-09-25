@@ -11,7 +11,7 @@
 //   data-order        default sort, "<field>[ asc|desc]" (see sorts.js)
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL state (home Recent)
-import { card, escapeHTML, minRatingLabel } from "./cards.js";
+import { card, escapeHTML, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -46,8 +46,6 @@ function sorted(items, sort) {
     : (a, b) => sign * byDate(field)(a, b) || byTitle(a, b));
 }
 
-// `?rating=N` means N or better; anything but 1–5 reads as no filter.
-const minRating = (v) => (/^[1-5]$/.test(v || "") ? v : "");
 
 // [[value, count], ...] for a facet, in that facet's chip order.
 function counts(items, key) {
@@ -79,7 +77,7 @@ async function mount(root) {
     state.type = p.get("type") || "";
     state.category = p.get("category") || "";
     state.year = p.get("year") || "";
-    state.rating = minRating(p.get("rating"));
+    state.rating = ratingFilter(p.get("rating"));
     state.tags = new Set(p.getAll("tag").filter(Boolean));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
   }
@@ -138,7 +136,8 @@ async function mount(root) {
   // Ratings present, best first. The select shows when some page differs from
   // the rest, unrated counting as a value: "★1+" then means "rated at all".
   const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
-  const hasRatings = ratings.length > 1 || (ratings.length === 1 && items.some((it) => !it.rating));
+  const hasUnrated = items.some((it) => !it.rating);
+  const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
 
   function chip(kind, name, n, active) {
     const b = document.createElement("button");
@@ -202,11 +201,13 @@ async function mount(root) {
     }
     if (hasRatings) {
       const atLeast = (r) => forRating.filter((it) => (it.rating || 0) >= r).length;
+      const unrated = forRating.filter((it) => !it.rating).length;
       const ratingWrap = document.createElement("label");
       ratingWrap.className = "list-sort";
       ratingWrap.innerHTML = `<span class="facet-label">Rating</span> <select aria-label="Filter by minimum rating">`
         + `<option value=""${state.rating ? "" : " selected"}>Any rating</option>`
-        + ratings.map((r) => `<option value="${r}"${String(r) === state.rating ? " selected" : ""}>${minRatingLabel(r)} (${atLeast(r)})</option>`).join("")
+        + ratings.map((r) => `<option value="${r}"${String(r) === state.rating ? " selected" : ""}>${ratingFilterLabel(r)} (${atLeast(r)})</option>`).join("")
+        + (hasUnrated ? `<option value="${UNRATED_FILTER}"${state.rating === UNRATED_FILTER ? " selected" : ""}>Unrated (${unrated})</option>` : "")
         + `</select>`;
       ratingWrap.querySelector("select").addEventListener("change", (e) => {
         state.rating = e.target.value; state.page = 1; render(true);
@@ -300,7 +301,8 @@ async function mount(root) {
     if (state.category) base = base.filter((it) => it.category === state.category);
     for (const t of state.tags) base = base.filter((it) => (it.tags || []).includes(t));
     const byYear = (it) => !state.year || yearOf(it) === state.year;
-    const byRating = (it) => !state.rating || (it.rating || 0) >= Number(state.rating);
+    const byRating = (it) => !state.rating
+      || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating));
     const forYear = base.filter(byRating);
     const forRating = base.filter(byYear);
     const filtered = sorted(forYear.filter(byYear), state.sort);
@@ -319,7 +321,7 @@ async function mount(root) {
     renderPager(total);
     const n = filtered.length;
     const what = [state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year,
-      state.rating && minRatingLabel(Number(state.rating))].filter(Boolean).join(" · ");
+      state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")

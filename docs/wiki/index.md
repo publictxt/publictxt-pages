@@ -98,9 +98,9 @@ layouts/_partials/
 ```txt
 assets/js/site-index.js   58  fetch index.json once per document; scope() subsets
 assets/js/sorts.js        40  the eight sorts, ?sort= spellings, normalise/parse
-assets/js/cards.js        81  the one card renderer, shared by lists and search
-assets/js/list.js        342  browse list: state<->URL, facets, paging, render
-assets/js/search.js      199  Pagefind UI: filters, sort, incremental results
+assets/js/cards.js        89  the one card renderer, shared by lists and search; rating filter value
+assets/js/list.js        344  browse list: state<->URL, facets, paging, render
+assets/js/search.js      203  Pagefind UI: filters, sort, incremental results
 assets/css/main.css      632  the whole theme; palette is :root custom properties
 ```
 
