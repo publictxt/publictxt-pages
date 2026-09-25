@@ -12,6 +12,7 @@ Items marked **(TBD)** are not built.
 - Source repo never modified; build operates on generated copy `build/content/`.
 - Links are `[label](../wiki/page.md)` - No `[[wikilinks]]`
 - Hugo renders `.md` extensions to `.html`
+- `![alt](youtube-url)` embeds the video; other images stay images.
 
 ## Feature list
 

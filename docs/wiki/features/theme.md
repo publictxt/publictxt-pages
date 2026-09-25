@@ -16,7 +16,7 @@ cloud), content, footer. Plain CSS with `:root` properties, no Sass
 In `main.css`: `.list-selects` holds the Sort / Year / Rating selects, and
 `.filter-group .list-sort` reuses them full width in search; `.fold` is the
 collapsible `<details>` for list controls and search filters; `.rating` colours the
-stars.
+stars; `.video` sizes YouTube embeds ([embeds.md](embeds.md)).
 
 **Edit this page** = `params.editURL` + the page's `source_path` (sync writes it,
 since renames make Hugo's path wrong). None on generated indexes or `site-content/`

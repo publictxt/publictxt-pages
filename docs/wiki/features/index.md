@@ -20,6 +20,7 @@ One page per capability and the files that do it. See the map in
 | [ratings.md](ratings.md) | `rating:` 1–5, minimum / *Unrated* filter, rating sorts, stars |
 | [tags.md](tags.md) | inline `#hashtags`, tag pages, tag cloud |
 | [dates.md](dates.md) | `created`/`updated` ladders and display |
+| [embeds.md](embeds.md) | YouTube links in image syntax become players |
 | [bookmarks.md](bookmarks.md) | `bookmark:` front matter, the section, link chips |
 | [breadcrumbs.md](breadcrumbs.md) | ancestor trail |
 | [theme.md](theme.md) | page shell, sidebar, CSS, footer |
