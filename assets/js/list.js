@@ -1,32 +1,26 @@
-// Browse lists: every `[data-list]` container takes its pages from the
-// site-wide index (fetched once per document, see site-index.js) and renders
-// sortable, filterable, paged cards in place of the plain link list Hugo
-// rendered as a fallback. Filter, sort and page live in the URL
-// (?tag=a&tag=b&type=wiki&category=essay&year=2024&rating=4&sort=title&page=2) so views are linkable;
-// `q` stays reserved for the search page.
+// Browse lists: each `[data-list]` swaps Hugo's fallback <ul> for sortable,
+// filterable, paged cards from the site index. State lives in the URL:
+// ?tag=a&tag=b&type=&category=&year=&rating=&sort=&page= (`q` is search's).
 //
-// Container attributes:
-//   data-scope-kind   which subset of the index (section | tag | bookmarks | recent)
-//   data-scope-value  its argument — a path, a tag, or a limit
-//   data-order        default sort, "<field>[ asc|desc]" (see sorts.js)
+//   data-scope-kind   section | tag | bookmarks | recent
+//   data-scope-value  a path, a tag, or a limit
+//   data-order        default sort (sorts.js)
 //   data-per-page     cards per page
-//   data-compact      cards only: no controls, pager or URL state (home Recent)
+//   data-compact      cards only: no controls, pager or URL (home Recent)
 import { card, escapeHTML, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const TAG_CHIPS = 20;   // tag chips shown before "more"
 
-// A page's `created` year, sliced off the RFC 3339 string rather than parsed as a
-// local Date, so it matches the year Hugo gives Pagefind (see docs/wiki/traps.md).
+// Sliced, not parsed as a local Date, to match Hugo's year (traps.md).
 function yearOf(it) {
   return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
-// The facets a list offers: each page's values, and the order they display in.
-// Tags are AND-ed; type, category and year are exclusive, so their state is a
-// string. Rating is a minimum, not a facet value, and is handled in render(). Category is absent from the index when categories are disabled, which
-// leaves its facet empty and hidden — list.js needs no toggle of its own.
+// Each facet's values per page and chip order. Tags AND; the rest single-select.
+// Rating is a minimum, handled in render(). Disabled categories leave no data,
+// so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
   type: { values: (it) => [it.type], order: byCount },
@@ -35,7 +29,7 @@ const FACETS = {
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
 };
 
-// Rating ties fall back to newest in either direction; unrated pages sort as UNRATED.
+// Rating ties: newest first either way.
 function sorted(items, sort) {
   const { field, dir } = parseSort(sort);
   const sign = dir === "asc" ? 1 : -1;
@@ -103,8 +97,7 @@ async function mount(root) {
 
   // ---- DOM ------------------------------------------------------------------
   root.replaceChildren();
-  // A <details> so the controls fold away; only `body` is re-rendered, so the
-  // reader's open/closed choice survives every filter click.
+  // Only `body` re-renders, so the fold's open state survives filtering.
   const controls = document.createElement("details");
   controls.className = "list-controls fold";
   controls.open = true;
@@ -122,19 +115,16 @@ async function mount(root) {
   if (compact) root.append(list);
   else root.append(controls, status, list, pager);
 
-  // Chips for a facet are only useful when the list actually varies on it:
-  // a section of one type gets no type chips, one year of posts gets no year
-  // chips, and a tag page hides its own tag. Category, like tags, shows when
-  // only some pages have one: "uncategorised" is not a value, so a lone
-  // category still narrows the list — unless every page carries it.
+  // A facet shows only when the list varies on it (a tag page hides its own
+  // tag). Tags and category count a missing value as no value, so a lone
+  // category shows unless every page has it.
   const typeFacet = counts(items, "type");
   const hasTypes = typeFacet.length > 1;
   const yearFacet = counts(items, "year");
   const hasYears = yearFacet.length > 1;
   const tagFacet = counts(items, "tags").filter(([, n]) => n < items.length);
   const categoryFacet = counts(items, "category").filter(([, n]) => n < items.length);
-  // Ratings present, best first. The select shows when some page differs from
-  // the rest, unrated counting as a value: "★1+" then means "rated at all".
+  // Shows when ratings vary, unrated counting as a value ("★1+" = rated at all).
   const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
@@ -168,8 +158,7 @@ async function mount(root) {
     return row;
   }
 
-  // `forYear` / `forRating` are `filtered` minus that one filter: a single-select
-  // option must count what picking it gives, not what the current choice leaves.
+  // forYear / forRating: `filtered` minus that filter, so options count what picking them gives.
   function renderControls(filtered, forYear, forRating) {
     body.replaceChildren();
     const head = document.createElement("div");
@@ -185,7 +174,7 @@ async function mount(root) {
     });
     selects.append(sortWrap);
 
-    // A select, not a chip row: the least-reached-for facet, and it scales.
+    // A select: least used, and scales.
     if (hasYears) {
       const c = new Map(counts(forYear, "year"));
       const yearWrap = document.createElement("label");
@@ -333,8 +322,7 @@ async function mount(root) {
 
   window.addEventListener("popstate", () => { readURL(); render(false); });
   readURL();
-  // Below the stacking breakpoint (main.css, 900px), as on the search page:
-  // start folded unless the URL brought a filter or sort, so cards show first.
+  // Narrow screens (900px, as main.css): fold unless the URL set a filter or sort.
   if (matchMedia("(max-width: 900px)").matches) {
     controls.open = filtering() || state.sort !== defaultSort;
   }

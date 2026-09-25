@@ -1,10 +1,5 @@
 {{/*
-  The one definition of "newest first": most recently *updated* first.
-  Expects a page collection; returns it re-ordered.
-
-  `sort` is a stable sort over Hugo's default page order (created desc, then
-  title A→Z), so pages updated at the same instant — every file in one commit —
-  keep that order. The `.ByLastmod.Reverse` idiom was rejected because
-  .Reverse also flips the tie-break, listing same-commit pages Z→A.
+  The one "most recently updated first". Stable, so same-commit pages keep
+  Hugo's default order; `.ByLastmod.Reverse` would flip that tie-break too.
 */}}
 {{ return sort . "Lastmod" "desc" }}

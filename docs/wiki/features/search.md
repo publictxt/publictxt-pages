@@ -8,32 +8,17 @@ covers:
 
 # Search
 
-Full-text plus tag/type browsing **with or without a query** — the reason for a
-custom UI on Pagefind's JS API rather than its stock one, which cannot run
-filter-only searches *([D8](../decisions/D8.md))*. The search page lives in
-`site-content/`, not the content repo.
+Full-text plus facets **with or without a query** — hence a custom UI on Pagefind's JS
+API, whose stock UI can't search filters alone *([D8](../decisions/D8.md))*. The page
+lives in `site-content/`.
 
-Sorting is Pagefind's own, over keys emitted by `pagefind-keys.html` (dates as Unix
-seconds, title lower-cased, rating with unrated as 2.5). A sort **replaces** relevance outright with no tiebreak,
-so *Relevance* is offered, and default, only when there is a query; filter-only
-browsing defaults to newest. See [../traps.md](../traps.md) — a template
-missing that partial disappears from sorted results.
+Sorts are Pagefind's, over `pagefind-keys.html`'s keys, and **replace** relevance
+with no tiebreak: *Relevance* is offered (and default) only with a query.
 
-The same facets as the browse lists, spelled the same way in the URL. Type, category
-and year are exclusive; the category group is hidden when the index has none
-([categories.md](categories.md)); an array of tags is Pagefind's AND. Year comes from
-`pagefind-keys.html`'s `year[data-year]` and is a select above the tag chips, hidden
-when the site spans one year; its options carry no counts, since Pagefind's are for
-the current result set and would print "0" beside years that do have pages. Rating is a
-minimum-rating select, sent as Pagefind's `any` over the qualifying values, plus
-*Unrated*, the filter value unrated pages carry ([ratings.md](ratings.md)). Chip
-counts run higher than a browse list's: Pagefind also indexes section index bodies,
-which `index.json` does not carry.
+Same facets and URL spelling as the browse lists. Tags AND; the rest single-select.
+Category hides when the index has none; year when the site spans one year; rating
+when nothing is rated. Selects show no counts — Pagefind's are per result set. Chip
+counts run higher than a browse list's: Pagefind also indexes section index bodies.
 
-The filter groups share one `<details>`, open by default. Below the 900px stacking
-breakpoint `search.js` closes it, once at load, when nothing is selected, so the
-results aren't pushed off a phone screen; that width is spelled in both `main.css` and
-`search.js`, so change them together.
-
-Results reuse the browse-list card with the `<mark>`ed excerpt as summary. No JS, or
-no index yet, each get an explicit notice.
+Filters fold on narrow screens when nothing is selected. No JS, or no index yet,
+each get a notice.

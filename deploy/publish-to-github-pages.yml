@@ -1,19 +1,8 @@
 # Publish a PublicTxt content repo with publictxt-pages via GitHub Pages.
 #
-# Copy this file into the CONTENT repo (e.g. jaysen/txt) as
-#   .github/workflows/publish.yml
-# and in that repo's Settings -> Pages set "Source" to "GitHub Actions"
-# (the custom domain stays configured there; the CNAME file is no longer needed).
-#
-# The content repo stays pure Markdown — the site generator lives in its own
-# repo and is checked out at build time, so upgrading the site is a one-line
-# ref change below.
-#
-# Edit the env: block in the Build step below for your own site — SITE_TITLE
-# and SITE_DESCRIPTION override hugo.toml's `title` and `params.description`
-# via Hugo's built-in HUGO_-prefixed environment variable config overrides
-# (https://gohugo.io/configuration/introduction/#configure-with-environment-variables),
-# so no fork of hugo.toml is needed per content repo.
+# Copy into the CONTENT repo as .github/workflows/publish.yml, and set its
+# Settings -> Pages -> Source to "GitHub Actions". Then edit the Build step's
+# env: — HUGO_-prefixed variables override hugo.toml, so no fork is needed.
 
 name: Publish site
 
@@ -39,9 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: txt
-          # Full history: a page's `created` / `updated` come from the first and
-          # last commit that touched it. A shallow checkout has one commit, so
-          # every page would report the same date at both ends.
+          # Page dates come from Git history; a shallow clone gives every page one date.
           fetch-depth: 0
 
       - name: Check out publictxt-pages
@@ -66,11 +53,8 @@ jobs:
           HUGO_BASEURL: https://publictxt.net/
           HUGO_TITLE: "A PublicTxt instance"
           HUGO_PARAMS_DESCRIPTION: "A PublicTxt repository — browsable, searchable, plain-text first."
-          # Optional Mastodon profile URL. Rendered, invisibly, as <link rel="me">
-          # in the page <head>, which Mastodon's profile verification looks for.
-          # Example: "https://mastodon.social/@username"
-          # "Edit this page" links: this content repo's edit URL on the branch
-          # being built. Works as-is for any repo; set "" to hide the links.
+          # HUGO_PARAMS_MASTODON: "https://mastodon.social/@username"   # optional, rel="me"
+          # "Edit this page" links for this repo and branch; "" hides them.
           HUGO_PARAMS_EDITURL: ${{ github.server_url }}/${{ github.repository }}/edit/${{ github.ref_name }}/
         run: sh site/scripts/build.sh --source ../txt
 

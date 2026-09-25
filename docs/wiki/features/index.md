@@ -8,31 +8,26 @@ covers:
 
 # Features
 
-One page per capability: what it does and which files do it. Per-file detail is in
-the files themselves — see the map in [../index.md](../index.md), and
-[../traps.md](../traps.md) before editing.
+One page per capability and the files that do it. See the map in
+[../index.md](../index.md) and [../traps.md](../traps.md) before editing.
 
 | Page | Covers |
 |---|---|
-| [sections.md](sections.md) | top-level folders as sections, every folder browsable, ordering, post-folder leaf bundles, `publish: off` |
-| [browse-lists.md](browse-lists.md) | the site-wide index, sortable/filterable/paged lists |
+| [sections.md](sections.md) | folders as sections, ordering, post-folder leaf bundles, `publish: off` |
+| [browse-lists.md](browse-lists.md) | the site index, sortable/filterable/paged lists |
 | [search.md](search.md) | Pagefind full-text + facets, filter-only, sorting |
-| [categories.md](categories.md) | configured closed list, `category:` front matter, facets, toggle |
-| [ratings.md](ratings.md) | `rating:` 1–5 front matter, minimum or *Unrated* filter, *Top/Lowest rated* sorts, stars |
+| [categories.md](categories.md) | closed `category:` list, facets, toggle |
+| [ratings.md](ratings.md) | `rating:` 1–5, minimum / *Unrated* filter, rating sorts, stars |
 | [tags.md](tags.md) | inline `#hashtags`, tag pages, tag cloud |
-| [dates.md](dates.md) | the `created`/`updated` ladders and how dates display |
+| [dates.md](dates.md) | `created`/`updated` ladders and display |
 | [bookmarks.md](bookmarks.md) | `bookmark:` front matter, the section, link chips |
 | [breadcrumbs.md](breadcrumbs.md) | ancestor trail |
-| [theme.md](theme.md) | page shell, sidebar, CSS |
+| [theme.md](theme.md) | page shell, sidebar, CSS, footer |
 
-Four things hold across everything:
+Across everything:
 
-- **Nothing reads the source repo directly.** Hugo's content is `build/content/`,
-  written by the sync step. Any "how does Hugo know X" resolves to front matter sync
-  wrote, or to `hugo.toml`.
-- **One index, many lists** — every browse list is a subset of one site-wide
-  `index.json`, fetched once per visit *([D7](../decisions/D7.md))*.
-- **One sort vocabulary** (`sorts.js`) and **one card renderer** (`cards.js`), shared
-  by the browse lists and search.
-- **"Recent" means recently *updated***: the home *Recent* list and the `recent`
-  scope, only. Browse lists and search default to **Newest** (`created`).
+- **Hugo never reads the source repo** — only `build/content/`, which sync writes.
+- **One index, many lists** *([D7](../decisions/D7.md))*; **one sort vocabulary**
+  (`sorts.js`) and **one card** (`cards.js`) for lists and search.
+- **"Recent" = recently updated**, only on home and the `recent` scope; lists and
+  search default to Newest (`created`).

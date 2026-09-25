@@ -1,7 +1,6 @@
 {{/*
-  Cards per list page for a page: `perPage:` in its own front matter, else the
-  nearest ancestor's (the same cascade as list-order.html), else
-  `params.listPerPage`. Returns an integer (0 = let list.js decide).
+  Cards per list page: same cascade as list-order.html over `perPage:` /
+  params.listPerPage. Returns an int (0 = list.js default).
 */}}
 {{ $n := .Params.perPage }}
 {{ if not $n }}

@@ -1,10 +1,5 @@
-// The one sort vocabulary, shared by the browse lists (list.js) and the search
-// page (search.js) so both offer the same options and the same `?sort=` values.
-//
-// A sort is "<field>[ asc|desc]" over updated | created | title | rating. Its
-// canonical form leaves the field's natural direction implicit ("updated",
-// "title", "created asc"), which is also what goes in the URL. Unrated pages
-// sort as UNRATED, mid-scale, so neither direction leads with them.
+// The one sort vocabulary for list.js and search.js. "<field>[ asc|desc]";
+// the canonical (URL) form omits the field's natural direction.
 export const SORTS = [
   ["created", "Newest"],
   ["created asc", "Oldest"],
@@ -18,7 +13,7 @@ export const SORTS = [
 
 export const FIELDS = ["updated", "created", "title", "rating"];
 
-// An unrated page's sort value. Same as pagefind-keys.html's data-rating-sort.
+// Unrated pages' sort value, mid-scale. Same as pagefind-keys.html.
 export const UNRATED = 2.5;
 
 export function normaliseSort(s) {

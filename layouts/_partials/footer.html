@@ -1,19 +1,11 @@
 {{/*
-  Site footer. Context: the page. Every line is a site param (hugo.toml
-  [params.footer]) so a publishing site can reword it without overriding the
-  template:
-    text     markdown, rendered inline; defaults to the publictxt-pages credit.
-             Links render as plain <a> (no target/rel) — markdownify has no
-             external-link hook here.
-    edit     label of the link to this page's file in its source repo, appended
-             to the end of the footer line after a " • "; shown
-             only when params.editURL and the page's `source_path` (written by
-             sync_content.py — the repo path, not build/content's) are both set,
-             so generated section indexes and site-content pages get none.
-  Set any to "" to hide it.
+  Site footer; wording from [params.footer], "" hides a line. `text` is inline
+  markdown (links get no target/rel). `edit` labels the source-repo link,
+  shown only with params.editURL and the page's `source_path` — so not on
+  generated indexes or site-content pages.
 
-  The edit href: html/template percent-encodes spaces itself; # and ? it would
-  read as URL syntax, so they are escaped here (% first, to not double-escape).
+  The edit href: html/template encodes spaces itself; # and ? are escaped here
+  (% first, to not double-escape).
 */}}
 {{ $f := site.Params.footer | default dict }}
 {{ $text := "PublicTxt, plain-text knowledge published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)" }}

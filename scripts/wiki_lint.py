@@ -1,41 +1,21 @@
 #!/usr/bin/env python3
 """
-wiki_lint.py
+wiki_lint.py — checks docs/wiki/ against the code. Each page lists what it
+describes in front matter:
 
-Health check for docs/wiki/ — the source wiki an LLM reads instead of the source
-(see docs/wiki/index.md). A stale code wiki is worse than none, because it answers
-confidently and wrongly, so every page declares what it covers and this checks the
-claim.
-
-Each page's front matter lists real repo paths:
-
-    ---
     covers:
-      - scripts/sync_content.py
-      - layouts/_partials/recent.html
-    ---
-
-A **file** entry means "this page describes what is in that file": the page is
-STALE when the file changed more recently than the page did. A **directory**
-entry means "this page describes the set of files here" — an index or overview —
-so it goes stale only when a file under it is added, deleted or renamed, not on
-every edit.
+      - scripts/sync_content.py     # file: stale on any edit to it
+      - layouts                     # dir: stale only when files are added/removed
 
 Reports:
-  STALE    a covered path changed after its page last did
-  MISSING  a `covers:` path that no longer exists
-  BARE     a wiki page with no `covers:` front matter — nothing can check it
-  UNMAPPED a source file the map in docs/wiki/index.md does not mention. The map's
-           whole job is to say where everything is, so a file missing from it is
-           a file nobody can be routed to.
+  STALE    a covered path changed after its page did
+  MISSING  a `covers:` path that doesn't exist
+  BARE     a page with no `covers:`
+  UNMAPPED a source file docs/wiki/index.md's map doesn't mention
 
-Uncommitted changes count as "now", so the lint is useful *before* committing:
-edit code, run it, see which page to update in the same commit.
+Uncommitted changes count as "now", so run it before committing.
 
-Usage:
-    python scripts/wiki_lint.py [--wiki docs/wiki] [--quiet]
-
-Exits 1 when anything is reported, 0 when clean.
+Usage: python scripts/wiki_lint.py [--wiki docs/wiki] [--quiet]. Exits 1 on any report.
 """
 
 import re

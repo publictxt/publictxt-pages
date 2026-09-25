@@ -1,8 +1,7 @@
 {{/*
-  Every page that is a bookmark, recently updated first: the pages under
-  `bookmarks/` plus any page elsewhere whose front matter names a `bookmark:`
-  URL (see bookmark-urls.html). The argument is ignored (call it through
-  partialCached — it scans every page in the site).
+  Every bookmark page, recently updated first: `bookmarks/` plus any page with
+  a bookmark URL (bookmark-urls.html). Argument ignored; call via
+  partialCached — it scans the site.
 */}}
 {{ $pages := slice }}
 {{ with site.GetPage "bookmarks" }}{{ $pages = .RegularPagesRecursive }}{{ end }}

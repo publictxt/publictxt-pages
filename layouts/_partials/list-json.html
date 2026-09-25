@@ -1,9 +1,6 @@
 {{/*
-  A page collection as the JSON the list renderer (assets/js/list.js) reads:
-  one object per page with what a card shows and what filters and sorts need.
-  Expects a page collection; returns a JSON string. Dates are RFC 3339 so the
-  browser can compare them; `summary` is the same plain, truncated text the
-  server-rendered cards used to show.
+  A page collection as index.json items (shape: cards.js). Returns a JSON
+  string; dates RFC 3339.
 */}}
 {{ $items := slice }}
 {{ range . }}

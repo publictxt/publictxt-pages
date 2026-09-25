@@ -1,50 +1,24 @@
 #!/usr/bin/env python3
 """
-sync_content.py
+sync_content.py — copy a PublicTxt/Obsidian repo into Hugo's content dir,
+fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
-Copies a PublicTxt/Obsidian Markdown repository into a Hugo content directory,
-normalising the few things Hugo cannot handle natively:
+  * `index.md`/`home.md` -> `_index.md` (else Hugo reads the folder as a leaf
+    bundle and hides its siblings); links to them rewritten to match.
+  * No `title:` -> the leading `# H1` (removed from the body), else filename.
+  * No `created:`/`updated:` -> dates.py ladders; `date:`/`lastmod:` renamed.
+    Section indexes take their newest descendant's `updated`.
+  * Folder with Markdown but no index -> generated `_index.md`.
+  * Post folder (one non-index .md + attachments, no subfolders) -> its .md
+    becomes `index.md`: a leaf bundle, one page.
+  * `#hashtags` linkified (hashtags.py).
+  * `source_path:` records the pre-rename path, for the edit link.
 
-  * `index.md` / `home.md` inside a folder  ->  `_index.md`
-    (Hugo treats a folder containing `index.md` as a *leaf bundle* and hides
-    every sibling page inside it as a resource — fatal for a wiki.)
-  * Missing `title:`  ->  taken from the first `# H1` (which is then removed
-    from the body so it isn't rendered twice), else from the filename.
-  * Missing `created:` / `updated:`  ->  every page gets both, via the ladders
-    in dates.py (filename/path -> Git history -> file times -> build time).
-    The rung `created` came from is recorded as `created_source:`. Section
-    indexes take the newest `updated` among their descendants. The legacy
-    keys `date:` and `lastmod:` are accepted and renamed in the copy.
-  * Link destinations pointing at `index.md` / `home.md` are rewritten to
-    `_index.md` so Hugo's embedded link render hook can resolve them.
-  * Folders containing Markdown but no index page get a minimal `_index.md`
-    (title = folder name) so every folder is a browsable section.
-  * A folder holding exactly one non-index Markdown file plus attachments, and
-    no subfolders, is a **post folder** (e.g. `Post-Name/title.md` +
-    `image.png`): the Markdown is renamed to `index.md` (lowercase, no
-    underscore) so Hugo reads the folder as a *leaf bundle* — one page, with
-    the attachments as its page resources — instead of getting an auto
-    section index.
-  * Inline `#hashtags` become links to their tag page (see hashtags.py for what
-    counts as one — code, links and URL fragments are left alone).
-  * Every copied page records its path in the source repo as `source_path:`,
-    since the renames above make Hugo's own file path unreliable for that. The
-    "Edit this page" link (layouts/_partials/footer.html) is built from it;
-    generated indexes have no source file, so no key and no link.
-
-Repo housekeeping files (README, LICENSE, CONTRIBUTING, CNAME, .obsidian,
-.git, .trash, *.gitkeep) are skipped, as is any page whose front matter says
-`publish: off` (or false / no / 0) — and with it, a post folder's attachments
-when its one page is unpublished. The site hides such a page; it is still in
-the source repo for anyone to read.
- Non-Markdown files (media) are copied
+Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep) and `publish: off`
+pages, with an unpublished post folder's attachments. Other files are copied
 verbatim.
 
-The source directory is never modified. The destination is wiped first —
-treat it as a build artefact.
-
-Usage:
-    python3 scripts/sync_content.py <source_repo> <dest_content_dir>
+Usage: python3 scripts/sync_content.py <source_repo> <dest_content_dir>
 """
 
 import re
@@ -59,16 +33,14 @@ from hashtags import linkify
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
 INDEX_NAMES = {"index.md", "home.md"}
-# `publish:` values that keep a page off the site. YAML reads `off` / `no` as
-# false, so all spellings are one intent.
+# `publish:` values that keep a page off the site (YAML reads off/no as false).
 UNPUBLISHED = {"off", "false", "no", "0"}
 
 FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)^---\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
-# Legacy front matter keys, renamed in the generated copy so build/content
-# speaks one vocabulary. The source file is untouched.
+# Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 
 
@@ -178,12 +150,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
 
 
 def find_leaf_bundle_dirs(src: Path) -> set[Path]:
-    """
-    Source folders that are a Hugo leaf bundle in disguise: one non-index
-    Markdown post plus its attachments, no subfolders (spec: `title.md` +
-    `image.png` in one folder). Detected structurally, not by filename —
-    `index.md`/`home.md` keep meaning "section index".
-    """
+    """Post folders: one non-index .md + attachments, no subfolders. By structure, not name."""
     bundles = set()
     for d in src.rglob("*"):
         if not d.is_dir() or any(part in SKIP_DIRS for part in d.relative_to(src).parts):
@@ -278,14 +245,7 @@ def newest_updated_by_folder(dest: Path, pages: dict[Path, Stamp]) -> dict[Path,
 
 
 def inherit_index_dates(indexes: dict[Path, Stamp], newest: dict[Path, str]) -> None:
-    """
-    Push every section index's inferred `updated` forward to the newest
-    `updated` among its descendants. A section is recent when its contents
-    are — the landing page's own history alone says nothing useful about that.
-
-    An authored `updated:` is left alone, as is any index with no descendant
-    pages or one that was itself touched more recently than its contents.
-    """
+    """Move each index's inferred `updated` up to its newest descendant's; authored ones stay."""
     for index, stamp in indexes.items():
         latest = newest.get(index.parent)
         if stamp.updated_authored or latest is None:
@@ -302,15 +262,8 @@ def add_missing_indexes(
     dest: Path, built_at: str, newest: dict[Path, str], leaf_bundle_dests: set[Path]
 ) -> int:
     """
-    Give every folder that contains Markdown (at any depth) an `_index.md` if it
-    has none. Hugo only treats a folder as a section — browsable, and present in
-    breadcrumbs — when it has one; nested wiki folders usually don't.
-
-    A generated index has no history of its own, so it is dated by its
-    contents: `updated` is the newest among the folder's pages.
-
-    Leaf bundles (post folders, see `find_leaf_bundle_dirs`) are skipped: they
-    are meant to be a single page, not a section wrapping one.
+    An `_index.md` for every folder with Markdown below it and none of its own —
+    Hugo needs one for a section. Dated by its newest page. Leaf bundles excluded.
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):

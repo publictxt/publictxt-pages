@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 """
-hashtags.py
+hashtags.py — the one definition of an inline #hashtag, shared by
+sync_content.py (linkify) and extract_hashtags.py (front matter `tags`), so
+visible tags and the tag cloud agree.
 
-One definition of what counts as an inline #hashtag, shared by the two
-preprocessing scripts: sync_content.py linkifies hashtags, extract_hashtags.py
-merges them into front matter `tags`. Sharing the rule is what stops a page's
-visible tags and the tag cloud from disagreeing.
-
-A hashtag is `#` followed by a letter, then letters/digits/`_`/`-`, and must not
-follow a word character, `/` or `&`. Hashtags are not recognised inside fenced
-or inline code, HTML tags, existing links, or URLs — a fragment such as
-`https://example.org/page/#section` is not a tag.
-
-An already-linkified hashtag (`[#tag](/tags/tag/)`) still counts as that tag and
-is never re-linked, so both operations are idempotent and can run in any order.
+`#` + a letter, then letters/digits/`_`/`-`; not after a word char, `/` or `&`.
+Not inside code, HTML tags, links or URLs (`/page/#section` is no tag). An
+already-linkified `[#tag](...)` counts but is never re-linked: both operations
+are idempotent.
 """
 
 import re
@@ -50,13 +44,9 @@ def find_hashtags(body: str) -> list[str]:
 
 def linkify(body: str) -> str:
     """
-    Turn bare `#hashtag`s into links to their tag page, leaving the visible text
-    as `#hashtag` so the page still reads as plain text in Obsidian or on GitHub.
-
-    The destination is the site-relative term path; Hugo's embedded link render
-    hook resolves it to the term page's RelPermalink, so subpath deployments get
-    the right prefix. The slug is the lowercased tag, matching both Hugo's
-    urlize and what extract_hashtags.py writes to front matter.
+    Bare `#tag` -> `[#tag](/tags/tag/)`, text unchanged. Hugo's link render hook
+    resolves the path (so sub-path deploys work); the lowercased slug matches
+    urlize and extract_hashtags.py.
     """
     def repl(m: re.Match) -> str:
         tag = m.group("tag")

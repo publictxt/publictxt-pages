@@ -9,16 +9,11 @@ covers:
 
 # Tags
 
-Front matter `tags:` and inline `#hashtags` merge into one list, so a page's visible
-tags and the tag cloud can never disagree *([D3](../decisions/D3.md))*. What counts
-as a hashtag is defined once in `hashtags.py`: `#` + a letter + letters/digits/`_`/
-`-`, not after a word character, `/` or `&`, never inside code, links or URLs.
+Front matter `tags:` and inline `#hashtags` merge into one list, so visible tags and
+the tag cloud agree *([D3](../decisions/D3.md))*. `hashtags.py` defines a hashtag once;
+sync linkifies them (text stays `#tag`, so files read the same in Obsidian or on
+GitHub) and `extract_hashtags.py` merges them into front matter.
 
-`sync_content.py` linkifies `#tag` to its tag page **leaving the visible text as
-`#tag`**, so the file still reads as plain text in Obsidian or on GitHub.
-`extract_hashtags.py` merges body tags into front matter, de-duplicated, and never
-strips them from the body. Both are idempotent and order-independent.
-
-`/tags/` is the full cloud; `/tags/<term>/` is a browse list plus a deep link to
-`/search/?tag=<term>`; the sidebar shows the top `params.tagCloudLimit` terms in four
+`/tags/` is the full cloud; `/tags/<term>/` a browse list plus a link to
+`/search/?tag=<term>`; the sidebar shows the top `params.tagCloudLimit` in four
 weight buckets.

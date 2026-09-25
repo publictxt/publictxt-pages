@@ -1,11 +1,7 @@
 {{/*
-  The web resource(s) a page bookmarks, as a slice of URL strings (empty when
-  none). Expects a page.
-
-  Read from front matter `bookmark:` (spec key) or `bookmarks:` (the plural
-  already in use in the wild), each either a single URL or a list. A page
-  carrying one is a bookmark wherever it lives — the Bookmarks section lists it
-  alongside the native `bookmarks/` pages (see bookmark-pages.html).
+  A page's bookmarked URLs as a slice (empty when none), from `bookmark:` or
+  `bookmarks:`, each a URL or a list. The only reader of those keys. Expects a
+  page.
 */}}
 {{ $urls := slice }}
 {{ range slice .Params.bookmark .Params.bookmarks }}

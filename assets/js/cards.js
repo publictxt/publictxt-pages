@@ -1,7 +1,5 @@
-// The one page-card renderer, shared by the browse lists (list.js) and the
-// search page (search.js). Takes the item shape of index.json:
+// The one page card, for list.js and search.js. Item shape = index.json's:
 //   { url, title, type, section, tags[], created, updated, summary, bookmarks[], rating }
-// Search maps Pagefind results onto the same shape.
 
 export function escapeHTML(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -16,7 +14,7 @@ export function formatDate(iso) {
   return isNaN(d) ? "" : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-// Same rule as page-date.html: show "updated" only when it is more than a day after "created".
+// Same rule as page-date.html: "updated" only when >1 day after "created".
 export function dateHTML(item) {
   if (!item.created) return "";
   let html = `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(formatDate(item.created))}</time>`;
@@ -37,9 +35,7 @@ export function ratingHTML(item) {
   return r ? ` <span class="rating" role="img" aria-label="Rated ${r} of 5">${"★".repeat(r)}${"☆".repeat(5 - r)}</span>` : "";
 }
 
-// The rating filter, as `?rating=` spells it: "1"–"5" means that or better,
-// "unrated" means no rating; anything else is no filter. Shared by list.js and
-// search.js so both read the URL the same way.
+// `?rating=`: "1"–"5" = that or better, "unrated", else no filter.
 export const UNRATED_FILTER = "unrated";
 export function ratingFilter(v) {
   return /^[1-5]$/.test(v || "") || v === UNRATED_FILTER ? v : "";
@@ -50,8 +46,7 @@ export function ratingFilterLabel(v) {
   return v === UNRATED_FILTER ? "Unrated" : `★${v}${Number(v) < 5 ? "+" : ""}`;
 }
 
-// Tag pages live at <base>/tags/<term>/; the base path comes from
-// <html data-base> so a site served from a sub-path still resolves.
+// <base>/tags/<term>/, base from <html data-base> for sub-path deploys.
 export function tagURL(name) {
   const base = document.documentElement.dataset.base || "/";
   return base.replace(/\/?$/, "/") + "tags/" + encodeURIComponent(name.toLowerCase()) + "/";
