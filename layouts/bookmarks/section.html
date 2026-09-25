@@ -16,8 +16,8 @@
 <div class="prose" data-pagefind-body>{{ . }}</div>
 {{ end }}
 
-{{/* The top-level Bookmarks page also gathers pages elsewhere that carry a `bookmark:` URL;
-     its sub-folders list their own subtree like any section. The scope matches. */}}
+{{/* The top-level Bookmarks page lists every page carrying a `bookmark:` URL, wherever it
+     lives; its sub-folders list their own subtree like any section. The scope matches. */}}
 {{ $all := .RegularPagesRecursive }}
 {{ $scope := dict "kind" "section" "value" .RelPermalink }}
 {{ if eq .Parent site.Home }}

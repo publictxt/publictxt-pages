@@ -13,6 +13,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     becomes `index.md`: a leaf bundle, one page.
   * `#hashtags` linkified (hashtags.py).
   * `source_path:` records the pre-rename path, for the edit link.
+  * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
+    `bookmark:` URL — only that key makes a bookmark.
 
 Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep) and `publish: off`
 pages, with an unpublished post folder's attachments. Other files are copied
@@ -35,6 +37,7 @@ SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", 
 INDEX_NAMES = {"index.md", "home.md"}
 # `publish:` values that keep a page off the site (YAML reads off/no as false).
 UNPUBLISHED = {"off", "false", "no", "0"}
+BOOKMARK_KEYS = ("bookmark", "bookmarks")
 
 FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)^---\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
@@ -72,6 +75,13 @@ def front_matter_value(fm: str | None, key: str) -> str:
 def is_unpublished(text: str) -> bool:
     fm, _ = split_front_matter(text)
     return front_matter_value(fm, "publish").lower() in UNPUBLISHED
+
+
+def lacks_bookmark_url(rel: str, fm: str | None, is_index: bool) -> bool:
+    """A bookmark page, by location, missing the key that actually makes it one."""
+    if is_index or not rel.startswith("bookmarks/") or rel.startswith("bookmarks/wiki/"):
+        return False
+    return not any(front_matter_value(fm, k) for k in BOOKMARK_KEYS)
 
 
 def rename_legacy_keys(fm: str | None) -> str | None:
@@ -214,6 +224,9 @@ def sync(src: Path, dest: Path) -> tuple[int, int, int]:
                 unpublished += 1
                 continue
             fm, _ = split_front_matter(text)
+            if lacks_bookmark_url(rel, fm, is_index):
+                print(f"warning: {rel} is under bookmarks/ but has no bookmark: URL — "
+                      "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(normalise_md(text, rel, stamp, is_leaf_bundle), encoding="utf-8")
