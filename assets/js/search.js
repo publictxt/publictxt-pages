@@ -17,7 +17,7 @@ const PAGE = 20;
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
 const $ = (id) => document.getElementById(id);
 const el = {
-  root: $("search"), q: $("search-q"), clear: $("search-clear"),
+  root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
   type: $("filter-type"), category: $("filter-category"), categoryGroup: $("filter-category-group"),
   year: $("filter-year"), yearGroup: $("filter-year-group"),
   tag: $("filter-tag"), tagHint: $("filter-tag-hint"), sort: $("search-sort"),
@@ -176,12 +176,10 @@ window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run
 readURL();
 el.q.value = state.q;
 // Below the stacking breakpoint (main.css, 900px) the filters sit above the
-// results: start with only the groups already in use open, so results show
-// without scrolling. Once, at load; after that the reader's toggling stands.
+// results: start folded unless a filter is in use, so results show without
+// scrolling. Once, at load; after that the reader's toggling stands.
 if (matchMedia("(max-width: 900px)").matches) {
-  for (const [ctl, inUse] of [[el.type, state.type], [el.year, state.year], [el.tag, state.tags.size]]) {
-    ctl.closest("details").open = Boolean(inUse);
-  }
+  el.filters.open = Boolean(state.type || state.category || state.year || state.tags.size);
 }
 await run();
 if (!state.q) el.q.focus();

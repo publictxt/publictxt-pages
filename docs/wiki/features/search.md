@@ -27,8 +27,8 @@ the current result set and would print "0" beside years that do have pages. Chip
 counts run higher than a browse list's: Pagefind also indexes section index bodies,
 which `index.json` does not carry.
 
-Each filter group is a `<details>`, open by default. Below the 900px stacking
-breakpoint `search.js` closes, once at load, every group with nothing selected, so the
+The filter groups share one `<details>`, open by default. Below the 900px stacking
+breakpoint `search.js` closes it, once at load, when nothing is selected, so the
 results aren't pushed off a phone screen; that width is spelled in both `main.css` and
 `search.js`, so change them together.
 

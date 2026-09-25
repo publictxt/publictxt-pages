@@ -34,7 +34,7 @@ JS for the live one. Changing one alone makes the two views disagree:
 The >1-day date rule is implemented a **third** time, in `sidebar.html`.
 
 Not server/client, same hazard: the 900px stacking breakpoint in `main.css` is repeated
-as a `matchMedia` query in `search.js`, which folds the filter groups on narrow screens.
+as a `matchMedia` query in `search.js`, which folds the filters on narrow screens.
 
 `yearOf()` slices the year out of the RFC 3339 string rather than building a `Date`: a
 local-zone `getFullYear()` would disagree with the year Hugo baked into the Pagefind
