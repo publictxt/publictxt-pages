@@ -38,6 +38,10 @@ own tag. Chips sit most-frequent-first, years newest-first. Year options count o
 `forYear` — the set filtered by everything *but* year — so a single-select option
 never reads "0" when picking it would return pages; the type chips still show 0s.
 
+The controls are a `<details>` ("Sort & filter"), open by default; below the 900px
+stacking breakpoint `list.js` closes it at load unless the URL carries a filter or
+sort — same rule as [search.md](search.md).
+
 A page's **year is its `created` year in the page's own offset**: `yearOf()` slices it
 off the RFC 3339 string to match what Hugo gives Pagefind ([../traps.md](../traps.md)).
 `updated` has no facet. State lives in

@@ -98,8 +98,15 @@ async function mount(root) {
 
   // ---- DOM ------------------------------------------------------------------
   root.replaceChildren();
-  const controls = document.createElement("div");
-  controls.className = "list-controls";
+  // A <details> so the controls fold away; only `body` is re-rendered, so the
+  // reader's open/closed choice survives every filter click.
+  const controls = document.createElement("details");
+  controls.className = "list-controls fold";
+  controls.open = true;
+  controls.innerHTML = `<summary><span class="side-heading">Sort &amp; filter</span></summary>`;
+  const body = document.createElement("div");
+  body.className = "list-controls-body";
+  controls.append(body);
   const status = document.createElement("p");
   status.className = "list-status muted";
   const list = document.createElement("ul");
@@ -154,7 +161,7 @@ async function mount(root) {
   // `forYear` is `filtered` minus the year filter: a single-select option must
   // count what picking it gives, not what the current year leaves.
   function renderControls(filtered, forYear) {
-    controls.replaceChildren();
+    body.replaceChildren();
     const head = document.createElement("div");
     head.className = "list-controls-head";
     const selects = document.createElement("div");
@@ -193,16 +200,16 @@ async function mount(root) {
       });
       head.append(clear);
     }
-    controls.append(head);
+    body.append(head);
 
     const within = (key) => new Map(counts(filtered, key));
     if (hasTypes) {
       const c = within("type");
-      controls.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
+      body.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
     }
     if (categoryFacet.length) {
       const c = within("category");
-      controls.append(facetRow("Category", categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0, state.category === n))));
+      body.append(facetRow("Category", categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0, state.category === n))));
     }
     if (tagFacet.length) {
       const c = within("tags");
@@ -219,7 +226,7 @@ async function mount(root) {
         more.addEventListener("click", () => { state.moreTags = !state.moreTags; render(false); });
         chips.push(more);
       }
-      controls.append(facetRow("Tags", chips));
+      body.append(facetRow("Tags", chips));
     }
   }
 
@@ -294,6 +301,11 @@ async function mount(root) {
 
   window.addEventListener("popstate", () => { readURL(); render(false); });
   readURL();
+  // Below the stacking breakpoint (main.css, 900px), as on the search page:
+  // start folded unless the URL brought a filter or sort, so cards show first.
+  if (matchMedia("(max-width: 900px)").matches) {
+    controls.open = Boolean(state.type || state.category || state.year || state.tags.size || state.sort !== defaultSort);
+  }
   render(false);
 }
 
