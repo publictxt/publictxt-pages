@@ -12,7 +12,7 @@
 {{ $f := site.Params.footer | default dict }}
 {{ $text := "PublicTxt, plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)." }}
 {{ if isset $f "text" }}{{ $text = $f.text }}{{ end }}
-{{ $contact := "Reach me on" }}
+{{ $contact := "Contact me on" }}
 {{ if isset $f "contact" }}{{ $contact = $f.contact }}{{ end }}
 <footer class="site-footer">
   <p>

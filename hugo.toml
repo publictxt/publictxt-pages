@@ -39,16 +39,15 @@ capitalizeListTitles = false
   # Optional Mastodon profile URL. Rendered in the footer as <a rel="me">,
   # which Mastodon's profile verification looks for on this site.
   # Example: "https://mastodon.social/@username"
-
   mastodon = "https://hachyderm.io/@jaysen"
 
   # Footer wording (layouts/_partials/footer.html). Both optional; omit for the
   # defaults shown, or set to "" to hide a line.
   #   text     markdown, inline
   #   contact  lead-in before the Mastodon link; only shown when `mastodon` is set
-  # [params.footer]
-  #   text = "PublicTxt, plain-text knowledge, published with [publictxt-hugo](https://github.com/publictxt/txt-hugo)."
-  #   contact = "Reach me on"
+  [params.footer]
+    text = "PublicTxt, plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)."
+    contact = "Reach me on"
 
   # Order of sections in the sidebar and on the home page (folder names).
   # Sections not listed here follow, alphabetically.
