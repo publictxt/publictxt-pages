@@ -1,11 +1,10 @@
 {{/*
-  Every bookmark page, recently updated first: `bookmarks/` plus any page with
-  a bookmark URL (bookmark-urls.html). Argument ignored; call via
+  Every bookmark page, recently updated first: any page with a bookmark URL
+  (bookmark-urls.html), wherever it lives. Argument ignored; call via
   partialCached — it scans the site.
 */}}
 {{ $pages := slice }}
-{{ with site.GetPage "bookmarks" }}{{ $pages = .RegularPagesRecursive }}{{ end }}
 {{ range site.RegularPages }}
   {{ if partial "bookmark-urls.html" . }}{{ $pages = $pages | append . }}{{ end }}
 {{ end }}
-{{ return partial "recent.html" ($pages | uniq) }}
+{{ return partial "recent.html" $pages }}

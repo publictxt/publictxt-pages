@@ -71,7 +71,7 @@ layouts/_partials/
   list-per-page.html    perPage: cascade
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
-  bookmark-pages.html   bookmarks/ + pages with a bookmark URL  (partialCached)
+  bookmark-pages.html   every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row
   bookmark-label.html   one URL's short form
   category.html         only reader of category:

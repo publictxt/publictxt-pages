@@ -26,8 +26,7 @@ function byUpdated(items) {
  * The pages a list shows.
  *   section    every page below this section's path (.RegularPagesRecursive)
  *   tag        every page carrying this tag (term .Pages)
- *   bookmarks  the bookmarks/ subtree plus any page carrying a bookmark URL
- *              (_partials/bookmark-pages.html)
+ *   bookmarks  every page carrying a bookmark URL (_partials/bookmark-pages.html)
  *   recent     the N most recently updated, site-wide (home)
  */
 export function scope(items, kind, value) {
@@ -39,7 +38,7 @@ export function scope(items, kind, value) {
       return items.filter((it) => (it.tags || []).some((t) => t.toLowerCase() === want));
     }
     case "bookmarks":
-      return items.filter((it) => it.url.startsWith(value) || (it.bookmarks || []).length);
+      return items.filter((it) => (it.bookmarks || []).length);
     case "recent": {
       const n = parseInt(value, 10) || 0;
       const ordered = byUpdated(items);

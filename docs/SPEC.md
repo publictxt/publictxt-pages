@@ -47,7 +47,7 @@ Items marked **(TBD)** are not built.
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
-  - frontmatter 'bookmark' properties merged with bookmarks in section, without moving the page
+  - A page is a bookmark only if it has a `bookmark:`/`bookmarks:` URL, wherever it lives; `bookmarks/` is just a filing folder
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
@@ -68,7 +68,8 @@ blog/20260509-title.md                  (YYYYMMDD prefix date)
 blog/2024/09/20240922-title.md          (YYYYMMDD prefix date)
 blog/2026/09/22/Post-Name/title.md & blog/2026/09/22/Post-Name/image.png     (converts to Hugo content bundle)
 
-bookmarks/sites/domain/page.md     (one file per resource)
+bookmarks/sites/domain/page.md     (one file per resource; needs `bookmark:` URL)
+bookmarks/wiki/topic.md            (pages about bookmarks; no URL needed)
 
 posts/post-name.md
 notes/note-name.md
@@ -91,7 +92,7 @@ All front matter optional; sync derives the rest.
 | `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
 | `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
 | `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
-| `bookmark`, `bookmarks` | URL or list                | Merges page into bookmarks section                                              |
+| `bookmark`, `bookmarks` | URL or list                | Makes the page a bookmark (the only thing that does)                            |
 | `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.

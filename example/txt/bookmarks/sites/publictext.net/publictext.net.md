@@ -1,11 +1,9 @@
+---
+bookmark: https://publictext.net
+---
 # publictext.net
 
-### Description:
-This is a sample bookmarks page for publictext.net — one file per web resource.
-Bookmarks notes can also reference the bookmarks wiki: [sample-page.md](../../wiki/sample-page.md)
+A sample bookmark page: the `bookmark:` URL makes it one; the body is optional notes.
+Bookmark notes can also reference the wiki: [Personal Wiki software](../../../wiki/Software/Personal-Wiki-software.md)
 
-### Tags:
 #publictext #website #sample
-
-### Links:
-- [publictext.net](https://publictext.net)
