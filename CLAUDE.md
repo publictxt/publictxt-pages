@@ -1,4 +1,4 @@
-# PublicTxt-Hugo — Project Context
+# publictxt-pages — Project Context
 
 Static site interface (Hugo + Pagefind) for browsing/searching a single PublicTxt Git repository.
 This should fulfill the **Static Website Generation** portion of PublicTxt. See `PublicTxt-README.md`
