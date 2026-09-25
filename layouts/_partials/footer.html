@@ -10,13 +10,13 @@
   Set either to "" to hide it.
 */}}
 {{ $f := site.Params.footer | default dict }}
-{{ $text := "PublicTxt, plain-text knowledge, published with [publictxt-hugo](https://github.com/publictxt/txt-hugo)." }}
+{{ $text := "PublicTxt, plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)." }}
 {{ if isset $f "text" }}{{ $text = $f.text }}{{ end }}
 {{ $contact := "Reach me on" }}
 {{ if isset $f "contact" }}{{ $contact = $f.contact }}{{ end }}
 <footer class="site-footer">
   <p>
     {{ with $text }}{{ . | markdownify }}{{ end }}
-    {{ with site.Params.mastodon }}{{ with $contact }}{{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Mastodon</a>{{ end }}
+    {{ with site.Params.mastodon }}{{ with $contact }}{{ . | markdownify }} {{ end }}<a target="_blank" rel="me noopener" href="{{ . }}">Reach me on Mastodon</a>{{ end }}
   </p>
 </footer>
