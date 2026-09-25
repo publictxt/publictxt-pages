@@ -66,8 +66,8 @@ jobs:
           HUGO_BASEURL: https://publictxt.net/
           HUGO_TITLE: "A PublicTxt instance"
           HUGO_PARAMS_DESCRIPTION: "A PublicTxt repository — browsable, searchable, plain-text first."
-          # Optional Mastodon profile URL. Rendered in the footer as <a rel="me">,
-          # which Mastodon's profile verification looks for on this site.
+          # Optional Mastodon profile URL. Rendered, invisibly, as <link rel="me">
+          # in the page <head>, which Mastodon's profile verification looks for.
           # Example: "https://mastodon.social/@username"
           # "Edit this page" links: this content repo's edit URL on the branch
           # being built. Works as-is for any repo; set "" to hide the links.

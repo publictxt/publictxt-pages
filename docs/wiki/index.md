@@ -70,7 +70,7 @@ layouts/404.html
 layouts/bookmarks/section.html    section.html with the gathered bookmark collection
 
 layouts/_partials/
-  head.html             title, description, favicon, stylesheet
+  head.html             title, description, favicon, Mastodon rel="me", stylesheet
   sidebar.html          sections / page meta / tag cloud
   breadcrumbs.html      .Ancestors trail
   footer.html           footer; wording from [params.footer]; edit-in-repo link

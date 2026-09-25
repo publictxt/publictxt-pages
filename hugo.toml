@@ -36,8 +36,8 @@ capitalizeListTitles = false
   # Relative URL or file path to the favicon; a publishing site can override this,
   # or replace static/favicon.svg outright to change the default.
   favicon = "favicon.png"
-  # Optional Mastodon profile URL. Rendered in the footer as <a rel="me">,
-  # which Mastodon's profile verification looks for on this site.
+  # Optional Mastodon profile URL. Rendered, invisibly, as <link rel="me"> in
+  # every page's <head>, which Mastodon's profile verification looks for.
   # Example: "https://mastodon.social/@username"
   mastodon = "https://hachyderm.io/@jaysen"
   # Optional footer "Edit this page" link: a prefix the page's path in the
@@ -49,12 +49,10 @@ capitalizeListTitles = false
   # Footer wording (layouts/_partials/footer.html). All optional; omit for the
   # defaults shown, or set to "" to hide a line.
   #   text     markdown, inline
-  #   contact  lead-in before the Mastodon link; only shown when `mastodon` is set
   #   edit     edit-link label, appended to the footer line; only shown when
   #            `editURL` is set
   [params.footer]
     text = "PublicTxt, plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)"
-    contact = "Reach me on"
     edit = "Improve this page"
 
   # Order of sections in the sidebar and on the home page (folder names).
