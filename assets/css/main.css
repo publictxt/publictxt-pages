@@ -327,6 +327,8 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   padding: 0.7rem 0.9rem;
   margin-bottom: 0.8rem;
+}
+.list-controls-body {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
