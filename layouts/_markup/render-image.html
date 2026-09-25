@@ -1,0 +1,30 @@
+{{/*
+  Markdown image hook. A YouTube URL (watch, youtu.be, shorts, embed, live)
+  becomes a privacy-enhanced (youtube-nocookie) iframe titled by the alt text;
+  `t=` becomes `start=` (seconds, trailing `s` ok). Anything else renders as
+  Goldmark's plain <img>. The iframe is phrasing content, so it sits validly in
+  the <p> Goldmark wraps around a standalone image.
+*/}}
+{{- $u := urls.Parse .Destination -}}
+{{- $host := strings.TrimPrefix "www." (strings.TrimPrefix "m." $u.Host) -}}
+{{- $id := "" -}}
+{{- if eq $host "youtu.be" -}}
+  {{- $id = strings.TrimPrefix "/" $u.Path -}}
+{{- else if in (slice "youtube.com" "music.youtube.com" "youtube-nocookie.com") $host -}}
+  {{- if eq $u.Path "/watch" -}}
+    {{- $id = $u.Query.Get "v" -}}
+  {{- else -}}
+    {{- with findRESubmatch `^/(?:shorts|embed|live)/([^/]+)` $u.Path 1 -}}
+      {{- $id = index (index . 0) 1 -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if findRE `^[A-Za-z0-9_-]{11}$` $id -}}
+  {{- $src := printf "https://www.youtube-nocookie.com/embed/%s" $id -}}
+  {{- with findRE `^\d+$` (strings.TrimSuffix "s" ($u.Query.Get "t")) -}}
+    {{- $src = printf "%s?start=%s" $src (index . 0) -}}
+  {{- end -}}
+  <iframe class="video" src="{{ $src }}" title="{{ or .PlainText "YouTube video" }}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+{{- else -}}
+  <img src="{{ .Destination | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>
+{{- end -}}

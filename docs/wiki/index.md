@@ -76,6 +76,9 @@ layouts/_partials/
   bookmark-label.html   one URL's short form
   category.html         only reader of category:
   rating.html           only reader of rating:
+
+layouts/_markup/
+  render-image.html     YouTube URL -> iframe, else plain <img>
 ```
 
 ### Browser
