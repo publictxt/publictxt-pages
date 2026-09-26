@@ -26,6 +26,6 @@ the facet on empty data — no JS knows about `enabled`. A deploy can flip it wi
 `HUGO_PARAMS_CATEGORIES_ENABLED=false`.
 
 Not a Hugo taxonomy, so no term pages: the sidebar links to `/search/?category=<c>`
-instead — a page's own chips, and a site-wide block from `category-counts.html`
+instead — a page's own chips, and site-wide chips (tag-cloud style) from `category-counts.html`
 (config order, used only). Its counts include sections, as Pagefind's do, so they
 match the search. Sync passes the keys through.
