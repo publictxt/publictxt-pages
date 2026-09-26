@@ -43,6 +43,13 @@
       {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
     </dd>
     {{ end }}
+    {{/* No category pages (D11): each links to search, filtered. */}}
+    {{ with partial "categories.html" . }}
+    <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip" href="{{ "search/" | relURL }}?category={{ . | urlquery }}">{{ . }}</a>{{ end }}
+    </dd>
+    {{ end }}
     {{ with .GetTerms "tags" }}
     <dt>Tags</dt>
     <dd class="chip-row">
@@ -51,6 +58,19 @@
     {{ end }}
   </dl>
 </div>
+{{ end }}
+
+{{/* Hidden when unused or disabled. Links to search, as there are no category pages (D11). */}}
+{{ with partialCached "category-counts.html" . }}
+<nav class="side-block" aria-label="Categories">
+  <h2 class="side-heading">Categories</h2>
+  {{/* The tag cloud's chips, unweighted: few, curated values. */}}
+  <div class="tag-cloud">
+    {{ range . }}
+    <a class="chip" href="{{ "search/" | relURL }}?category={{ .name | urlquery }}" title="{{ .count }} page{{ if ne .count 1 }}s{{ end }}">{{ .name }}<span class="count">{{ .count }}</span></a>
+    {{ end }}
+  </div>
+</nav>
 {{ end }}
 
 <div class="side-block" aria-label="Top tags">
