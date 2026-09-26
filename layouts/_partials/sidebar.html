@@ -5,7 +5,7 @@
     {{ range partialCached "sections.html" . }}
     {{ $active := eq $current.FirstSection . }}
     {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
-    <a class="chip{{ if $active }} active{{ end }}" href="{{ .RelPermalink }}"{{ if $active }} aria-current="true"{{ end }}>
+    <a class="chip chip-section{{ if $active }} active{{ end }}" href="{{ .RelPermalink }}"{{ if $active }} aria-current="true"{{ end }}>
       {{- .Section | humanize -}}
       <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partialCached "bookmark-pages.html" .) }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span></a>
     {{ end }}

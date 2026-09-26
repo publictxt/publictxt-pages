@@ -140,6 +140,10 @@ a:hover { text-decoration: underline; }
 .side-heading a { color: inherit; }
 .side-heading a:hover { color: var(--accent); text-decoration: none; }
 
+/* Sections are navigation: a step up from the tag and category chips. */
+.chip-section { font-size: 0.86rem; padding: 0.2rem 0.75rem; }
+.chip-section .count { font-size: 0.74rem; }
+
 /* Search, full width under the section chips. */
 .side-search {
   display: block;
