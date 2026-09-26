@@ -216,9 +216,14 @@ a:hover { text-decoration: underline; }
 .tag-cloud .tag-w3 { font-size: 0.9rem; }
 .tag-cloud .tag-w4 { font-size: 0.98rem; font-weight: 600; }
 
-/* Sections are navigation: a step up from the tag and category chips.
-   After .chip, which would otherwise win at equal specificity. */
-.chip-section { font-size: 0.86rem; padding: 0.2rem 0.75rem; }
+/* Sections are navigation: shaped like the Search button beneath them
+   (.btn-ghost), not a pill. After .chip, which would otherwise win. */
+.chip-section {
+  border-radius: var(--radius);
+  background: transparent;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.7rem;
+}
 .chip-section .count { font-size: 0.74rem; }
 
 /* ---------- Home ---------- */
