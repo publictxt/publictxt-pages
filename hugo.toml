@@ -56,9 +56,7 @@ capitalizeListTitles = false
   # absent = no categories anywhere.
   [params.categories]
     enabled = true
-    list = ["sci", "comp-sci", "political", "project", "personal"]
-
-  # Ratings need no config: `rating: 1`–`5` in front matter.
+    list = ["Project", "Personal", "Tech", "Politics", "Science", "CompSci", "Art", "Content"]
 
 [markup]
   [markup.goldmark.renderHooks.link]

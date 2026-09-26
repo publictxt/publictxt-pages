@@ -5,7 +5,7 @@ updated: 2026-09-16T09:00:00+02:00
 tags: ["announcement", "publictxt"]
 author: "example"
 source_repo: "example-txt"
-category: essay
+category: Personal
 rating: 4
 ---
 

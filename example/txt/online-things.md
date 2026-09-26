@@ -1,7 +1,7 @@
 ---
 title: "Online things"
 web: https://example.org
-category: reference
+category: Personal
 ---
 
 A root-level page **with** front matter, including a custom `web:` key that must be preserved.
