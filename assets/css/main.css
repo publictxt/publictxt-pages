@@ -206,8 +206,8 @@ a:hover { text-decoration: underline; }
 .tag-cloud .tag-w3 { font-size: 0.9rem; }
 .tag-cloud .tag-w4 { font-size: 0.98rem; font-weight: 600; }
 
-/* Sections are navigation: shaped like the Search button beneath them
-   (.btn-ghost), not a pill. After .chip, which would otherwise win. */
+/* Sections (and "Search all") are navigation: rounded rectangles, not pills.
+   After .chip, which would otherwise win. */
 .chip-section {
   border-radius: var(--radius);
   background: transparent;
@@ -509,19 +509,6 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   cursor: pointer;
 }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-/* Sidebar Search, full width under the section chips and styled like them,
-   a step smaller. After .btn-ghost, which would otherwise win. */
-.side-search {
-  display: block;
-  margin-top: 0.7rem;
-  text-align: center;
-  color: var(--text);
-  font-size: 0.86rem;
-  padding: 0.3rem 0.75rem;
-}
-.side-search:hover { text-decoration: none; }
-.side-search.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
 .search-layout {
   display: grid;
