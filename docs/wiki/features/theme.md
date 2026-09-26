@@ -8,7 +8,7 @@ covers:
 
 # Theme
 
-Dark two-column shell: sticky header with search, sidebar (section chips + "Search all",
+Dark two-column shell: sticky header with search, sidebar ("Search all" + section chips,
 page meta, category and tag chips), content, footer. Plain CSS with `:root` properties, no Sass
 *([D9](../decisions/D9.md))*. `baseof.html` carries `data-base` (sub-path deploys) and
 `data-index`.

@@ -215,6 +215,7 @@ a:hover { text-decoration: underline; }
   padding: 0.3rem 0.75rem;
 }
 .chip-section .count { font-size: 0.78rem; }
+.chip-all { flex: 1 1 100%; text-align: center; }
 
 /* ---------- Home ---------- */
 

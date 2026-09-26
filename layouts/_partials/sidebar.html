@@ -1,6 +1,13 @@
 <nav class="side-block" aria-label="Sections">
   <h2 class="side-heading">Sections</h2>
   <div class="tag-cloud">
+    {{/* First, a full line: every page. */}}
+    {{ $onSearch := eq .Layout "search" }}
+    {{/* Less the search page itself, a regular page from site-content/ — by lookup, not a per-page scan. */}}
+    {{ $all := len site.RegularPages }}{{ with site.GetPage "/search" }}{{ $all = sub $all 1 }}{{ end }}
+    <a class="chip chip-section chip-all{{ if $onSearch }} active{{ end }}" href="{{ "search/" | relURL }}"{{ if $onSearch }} aria-current="page"{{ end }}>
+      {{- "Search all" -}}
+      <span class="count">{{ $all }}</span></a>
     {{ $current := . }}
     {{ range partialCached "sections.html" . }}
     {{ $active := eq $current.FirstSection . }}
@@ -9,13 +16,6 @@
       {{- .Section | humanize -}}
       <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partialCached "bookmark-pages.html" .) }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span></a>
     {{ end }}
-    {{/* Last, as one more section: every page. */}}
-    {{ $onSearch := eq .Layout "search" }}
-    {{/* Less the search page itself, a regular page from site-content/ — by lookup, not a per-page scan. */}}
-    {{ $all := len site.RegularPages }}{{ with site.GetPage "/search" }}{{ $all = sub $all 1 }}{{ end }}
-    <a class="chip chip-section{{ if $onSearch }} active{{ end }}" href="{{ "search/" | relURL }}"{{ if $onSearch }} aria-current="page"{{ end }}>
-      {{- "Search all" -}}
-      <span class="count">{{ $all }}</span></a>
   </div>
 </nav>
 
