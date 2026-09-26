@@ -16,7 +16,6 @@
       <h3>{{ .Section | humanize }}</h3>
       {{ $n := len .RegularPagesRecursive }}{{ if eq .Section "bookmarks" }}{{ $n = len (partialCached "bookmark-pages.html" .) }}{{ end }}
       <p class="muted">{{ $n }} page{{ if ne $n 1 }}s{{ end }}</p>
-      {{ partial "page-date.html" (dict "page" .) }}
     </a>
     {{ end }}
     <a class="card card-accent" href="{{ "search/" | relURL }}">
