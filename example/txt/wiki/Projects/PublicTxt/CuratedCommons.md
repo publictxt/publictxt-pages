@@ -1,5 +1,5 @@
 ---
-categories: [Project, Content]
+categories: [Project, Tech]
 rating: 5
 tags:
   - publictxt

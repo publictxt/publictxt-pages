@@ -1,5 +1,5 @@
 ---
-bookmark: https://publictext.net
+bookmark: https://publictxt.net
 ---
 # publictext.net
 

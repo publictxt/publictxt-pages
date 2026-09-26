@@ -1,3 +1,8 @@
+--- 
+categories: 
+    - Tech
+    - Politics
+---
 # Free Software
 
 [Computer Science](index.md) -> Free Software #free-software #info-politics

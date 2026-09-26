@@ -8,7 +8,6 @@ bookmark: https://www.youtube.com/watch?v=QW_jlUn4gA8
 rating: 4
 categories:
   - Science
-  - politics
 ---
 The Fermi Paradox assumes that if advanced civilizations existed, we would see them. This assumes a particular model of progress: that civilizations consume ever more energy and expand ever further into space. The Kardashev Scale formalizes this view, categorizing civilizations by energy use at planetary, stellar, and galactic scales. Under this framework, advanced civilizations should be visible. Their absence is what makes the paradox puzzling.
 

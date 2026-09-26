@@ -1,3 +1,8 @@
+--- 
+categories: 
+    - Tech
+    - Politics
+---
 # CopyLeft
 
 [Computer Science](index.md) -> [Free Software](Free-Software.md) -> CopyLeft #free-software #licensing

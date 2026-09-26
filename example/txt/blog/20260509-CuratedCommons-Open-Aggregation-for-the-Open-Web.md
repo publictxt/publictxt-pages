@@ -1,11 +1,10 @@
 ---
 rating: 3
+categories: 
+    - Tech
+    - Politics # Curated Commons: Open Aggregation for the Open Web
 ---
-# Curated Commons: Open Aggregation for the Open Web
-
 _A PublicTxt Project Post_
-
----
 
 There's a quiet irony at the heart of the modern web. We have Creative Commons licensing for content, but the *conversation* around that content — the commentary, the curation — still belongs to the platform.
 

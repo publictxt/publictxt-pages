@@ -1,4 +1,9 @@
-- The idea that we collectively choose a platform owned by a data-mining ad company, when publicly-owned alternatives exist.
+--- 
+categories: 
+    - Tech
+    - Politics 
+--- 
+The idea that we collectively choose a platform owned by a data-mining ad company, when publicly-owned alternatives exist.
 
 Filename has spaces and a dot; folder has a space. No H1. #info-politics #social-software
 
