@@ -1,13 +1,16 @@
 // Browse lists: each `[data-list]` swaps Hugo's fallback <ul> for sortable,
 // filterable, paged cards from the site index. State lives in the URL:
-// ?tag=a&tag=b&category=a&category=b&type=&year=&rating=&sort=&page= (`q` is search's).
+// ?tag=&category=&type=&year=&rating=&sort=&page= (`q` is search's); tag and
+// category also take -not / -match (facets.js).
 //
 //   data-scope-kind   section | tag | bookmarks | recent
 //   data-scope-value  a path, a tag, or a limit
 //   data-order        default sort (sorts.js)
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL (home Recent)
-import { card, escapeHTML, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+import { addsPages, chipState, clearFacet, cycle, describe, emptyFacet, filterChip, isSet, matches, matchToggle,
+  readFacet, toggleInclude, writeFacet } from "./facets.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -18,8 +21,8 @@ function yearOf(it) {
   return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
-// Each facet's values per page and chip order. Tags AND, categories OR; the
-// rest single-select.
+// Each facet's values per page and chip order. Tags and categories per
+// facets.js; the rest single-select.
 // Rating is a minimum, handled in render(). Disabled categories leave no data,
 // so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
@@ -64,16 +67,16 @@ async function mount(root) {
   }
 
   // ---- state <-> URL --------------------------------------------------
-  const state = { sort: defaultSort, type: "", categories: new Set(), year: "", rating: "", tags: new Set(), page: 1, moreTags: false };
+  const state = { sort: defaultSort, type: "", category: emptyFacet("category"), year: "", rating: "", tag: emptyFacet("tag"), page: 1, moreTags: false };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     state.type = p.get("type") || "";
-    state.categories = new Set(p.getAll("category").filter(Boolean));
+    state.category = readFacet(p, "category");
     state.year = p.get("year") || "";
     state.rating = ratingFilter(p.get("rating"));
-    state.tags = new Set(p.getAll("tag").filter(Boolean));
+    state.tag = readFacet(p, "tag");
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
   }
   function url(overrides = {}) {
@@ -81,10 +84,10 @@ async function mount(root) {
     const p = new URLSearchParams();
     if (s.sort !== defaultSort) p.set("sort", s.sort);
     if (s.type) p.set("type", s.type);
-    for (const c of s.categories) p.append("category", c);
+    writeFacet(p, s.category);
     if (s.year) p.set("year", s.year);
     if (s.rating) p.set("rating", s.rating);
-    for (const t of s.tags) p.append("tag", t);
+    writeFacet(p, s.tag);
     if (s.page > 1) p.set("page", String(s.page));
     const qs = p.toString();
     return location.pathname + (qs ? "?" + qs : "");
@@ -130,29 +133,26 @@ async function mount(root) {
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
 
-  function chip(kind, name, n, active) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "chip filter-chip" + (active ? " active" : "") + (n === 0 ? " empty" : "");
-    b.setAttribute("aria-pressed", String(active));
-    b.innerHTML = (kind === "tag" ? "#" : "") + escapeHTML(name) + `<span class="count">${n}</span>`;
-    b.addEventListener("click", () => {
-      const set = kind === "category" ? state.categories : state.tags;
+  function chip(kind, name, n) {
+    const onClick = () => {
       if (kind === "type") state.type = state.type === name ? "" : name;
-      else if (set.has(name)) set.delete(name);
-      else set.add(name);
+      else cycle(state[kind], name);
       state.page = 1;
       render(true);
-    });
-    return b;
+    };
+    return kind === "type" ? filterChip(name, n, state.type === name ? "include" : "", onClick)
+      : filterChip((kind === "tag" ? "#" : "") + name, n, chipState(state[kind], name), onClick, true);
   }
 
-  function facetRow(label, chips) {
+  // `f`: a facets.js facet, for its match toggle.
+  function facetRow(label, chips, f) {
     const row = document.createElement("div");
     row.className = "list-facet";
     const lab = document.createElement("span");
     lab.className = "facet-label";
     lab.textContent = label;
+    const toggle = f && matchToggle(f, () => { state.page = 1; render(true); });
+    if (toggle) lab.append(" ", toggle);
     const wrap = document.createElement("div");
     wrap.className = "chip-row";
     wrap.append(...chips);
@@ -160,9 +160,9 @@ async function mount(root) {
     return row;
   }
 
-  // forYear / forRating / forCategory: `filtered` minus that filter, so options
-  // count what picking them gives.
-  function renderControls(filtered, forYear, forRating, forCategory) {
+  // forYear / forRating / forFacet(key): `filtered` minus that filter, so
+  // options count what picking them gives.
+  function renderControls(filtered, forYear, forRating, forFacet) {
     body.replaceChildren();
     const head = document.createElement("div");
     head.className = "list-controls-head";
@@ -213,28 +213,26 @@ async function mount(root) {
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        state.type = ""; state.categories.clear(); state.year = ""; state.rating = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
+        state.type = ""; clearFacet(state.category); state.year = ""; state.rating = ""; clearFacet(state.tag); state.sort = defaultSort; state.page = 1; render(true);
       });
       head.append(clear);
     }
     body.append(head);
 
-    const within = (key) => new Map(counts(filtered, key));
     if (hasTypes) {
-      const c = within("type");
-      body.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
+      const c = new Map(counts(filtered, "type"));
+      body.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0))));
     }
     if (categoryFacet.length) {
-      const c = new Map(counts(forCategory, "category"));
-      body.append(facetRow(state.categories.size > 1 ? "Category (any)" : "Category",
-        categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0, state.categories.has(n)))));
+      const c = new Map(counts(forFacet("category"), "category"));
+      body.append(facetRow("Category", categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0)), state.category));
     }
     if (tagFacet.length) {
-      const c = within("tags");
+      const c = new Map(counts(forFacet("tag"), "tags"));
       const visible = state.moreTags ? tagFacet : tagFacet.slice(0, TAG_CHIPS);
-      const chips = visible.map(([n]) => chip("tag", n, c.get(n) || 0, state.tags.has(n)));
-      for (const t of state.tags) {
-        if (!visible.some(([n]) => n === t)) chips.push(chip("tag", t, c.get(t) || 0, true));
+      const chips = visible.map(([n]) => chip("tag", n, c.get(n) || 0));
+      for (const t of [...state.tag.inc, ...state.tag.exc]) {
+        if (!visible.some(([n]) => n === t)) chips.push(chip("tag", t, c.get(t) || 0));
       }
       if (tagFacet.length > TAG_CHIPS) {
         const more = document.createElement("button");
@@ -244,7 +242,7 @@ async function mount(root) {
         more.addEventListener("click", () => { state.moreTags = !state.moreTags; render(false); });
         chips.push(more);
       }
-      body.append(facetRow("Tags", chips));
+      body.append(facetRow("Tags", chips, state.tag));
     }
   }
 
@@ -286,35 +284,38 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  const filtering = () => Boolean(state.type || state.categories.size || state.year || state.rating || state.tags.size);
+  const filtering = () => Boolean(state.type || isSet(state.category) || state.year || state.rating || isSet(state.tag));
+
+  // Each filter as a test; `own` false drops a facet's includes (addsPages).
+  const tests = {
+    type: (it) => !state.type || it.type === state.type,
+    year: (it) => !state.year || yearOf(it) === state.year,
+    rating: (it) => !state.rating
+      || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating)),
+    tag: (it, own) => matches(state.tag, it.tags || [], own),
+    category: (it, own) => matches(state.category, it.categories || [], own),
+  };
+  // Passes every test but `skip`'s; a skipped facet keeps its excludes.
+  const passes = (it, skip) => Object.entries(tests).every(([k, test]) =>
+    k !== skip ? test(it, true) : k === "tag" || k === "category" ? test(it, false) : true);
 
   function render(pushHistory) {
-    let base = items;
-    if (state.type) base = base.filter((it) => it.type === state.type);
-    for (const t of state.tags) base = base.filter((it) => (it.tags || []).includes(t));
-    const byYear = (it) => !state.year || yearOf(it) === state.year;
-    const byRating = (it) => !state.rating
-      || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating));
-    const byCategory = (it) => !state.categories.size || (it.categories || []).some((c) => state.categories.has(c));
-    const forYear = base.filter((it) => byRating(it) && byCategory(it));
-    const forRating = base.filter((it) => byYear(it) && byCategory(it));
-    const forCategory = base.filter((it) => byYear(it) && byRating(it));
-    const filtered = sorted(forYear.filter(byYear), state.sort);
-
+    const filtered = sorted(items.filter((it) => passes(it)), state.sort);
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
     if (state.page > total) state.page = total;
     const slice = compact ? filtered : filtered.slice((state.page - 1) * perPage, state.page * perPage);
     const onTag = compact ? null : (t) => {
-      if (state.tags.has(t)) state.tags.delete(t); else state.tags.add(t);
+      toggleInclude(state.tag, t);
       state.page = 1; render(true);
     };
-    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tags, onTag })));
+    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag.inc, onTag })));
     if (compact) return;
 
-    renderControls(filtered, forYear, forRating, forCategory);
+    const forFacet = (k) => addsPages(state[k]) ? items.filter((it) => passes(it, k)) : filtered;
+    renderControls(filtered, items.filter((it) => passes(it, "year")), items.filter((it) => passes(it, "rating")), forFacet);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, [...state.categories].join(" or "), ...[...state.tags].map((t) => "#" + t), state.year,
+    const what = [state.type, ...describe(state.category), ...describe(state.tag, "#"), state.year,
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`

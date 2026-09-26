@@ -4,11 +4,15 @@
 // Sorting is Pagefind's, on pagefind-keys.html's keys, and replaces relevance
 // outright: "Relevance" is offered, and default, only with a query. Rating is
 // a minimum: `?rating=4` = any of "4", "5"; `unrated` is its own value.
-// Categories OR (`?category=a&category=b`), tags AND.
+// Tags and categories: include / exclude / any-or-all, as facets.js.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+import { addsPages, chipState, clearFacet, cycle, describe, emptyFacet, filterChip, isSet, matchToggle,
+  pagefindConditions, readFacet, toggleInclude, writeFacet } from "./facets.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const PAGE = 20;
+const TYPING_MS = 400;   // pause before a keystroke searches; Enter searches now
+const MULTI = ["tag", "category"];
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
 const $ = (id) => document.getElementById(id);
 const el = {
@@ -34,8 +38,8 @@ el.root.hidden = false;
 // ---- state <-> URL --------------------------------------------------
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
-const state = { q: "", type: "", categories: new Set(), year: "", rating: "", tags: new Set(), sort: null };
-const filtering = () => Boolean(state.type || state.categories.size || state.year || state.rating || state.tags.size);
+const state = { q: "", type: "", category: emptyFacet("category"), year: "", rating: "", tag: emptyFacet("tag"), sort: null };
+const filtering = () => Boolean(state.type || isSet(state.category) || state.year || state.rating || isSet(state.tag));
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -46,10 +50,10 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
   state.type = p.get("type") || "";
-  state.categories = new Set(p.getAll("category").filter(Boolean));
+  state.category = readFacet(p, "category");
   state.year = p.get("year") || "";
   state.rating = ratingFilter(p.get("rating"));
-  state.tags = new Set(p.getAll("tag").filter(Boolean));
+  state.tag = readFacet(p, "tag");
   const s = p.get("sort");
   state.sort = !s ? null : s === RELEVANCE ? RELEVANCE : normaliseSort(s);
 }
@@ -57,20 +61,16 @@ function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
   if (state.type) p.set("type", state.type);
-  for (const c of state.categories) p.append("category", c);
+  writeFacet(p, state.category);
   if (state.year) p.set("year", state.year);
   if (state.rating) p.set("rating", state.rating);
-  for (const t of state.tags) p.append("tag", t);
+  writeFacet(p, state.tag);
   const sort = activeSort();
   if (state.sort && sort !== defaultSort()) p.set("sort", sort);
   const qs = p.toString();
   history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
 }
-function toggle(set, v) {
-  if (set.has(v)) set.delete(v); else set.add(v);
-  run();
-}
-const toggleTag = (t) => toggle(state.tags, t);
+const toggleTag = (t) => { toggleInclude(state.tag, t); run(); };
 
 // ---- filter chips -------------------------------------------------------
 const allFilters = await pagefind.filters();   // { tag: {name: count}, type: {…}, category: {…}, year: {…}, rating: {…} }
@@ -78,33 +78,24 @@ const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[
 // Years newest-first, as in the browse lists.
 const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(a));
 
-function chip(kind, name, count, active) {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.className = "chip filter-chip" + (active ? " active" : "") + (count === 0 ? " empty" : "");
-  b.setAttribute("aria-pressed", String(active));
-  b.append((kind === "tag" ? "#" : "") + name);
-  const n = document.createElement("span");
-  n.className = "count";
-  n.textContent = count;
-  b.append(n);
-  b.addEventListener("click", () => {
-    if (kind === "type") { state.type = state.type === name ? "" : name; run(); }
-    else toggle(kind === "category" ? state.categories : state.tags, name);
-  });
-  return b;
+function chip(kind, name, count) {
+  if (kind === "type") {
+    return filterChip(name, count, state.type === name ? "include" : "", () => { state.type = state.type === name ? "" : name; run(); });
+  }
+  const f = state[kind];
+  return filterChip((kind === "tag" ? "#" : "") + name, count, chipState(f, name), () => { cycle(f, name); run(); }, true);
 }
 
 // counts: filter counts within the current result set (or totals when idle);
-// categoryCounts: the same without the category filter, as picking one adds pages.
-function renderFilters(counts, categoryCounts) {
+// facetCounts: tag / category counts, per addsPages().
+function renderFilters(counts, facetCounts) {
   el.type.replaceChildren(...sortedKeys(allFilters.type).map((n) =>
-    chip("type", n, (counts.type || {})[n] ?? 0, state.type === n)));
+    chip("type", n, (counts.type || {})[n] ?? 0)));
   const categories = sortedKeys(allFilters.category);
   el.categoryGroup.hidden = categories.length === 0;
   el.category.replaceChildren(...categories.map((n) =>
-    chip("category", n, (categoryCounts || {})[n] ?? 0, state.categories.has(n))));
-  el.categoryHint.textContent = state.categories.size > 1 ? "— any selected may match" : "";
+    chip("category", n, (facetCounts.category || {})[n] ?? 0)));
+  el.categoryHint.replaceChildren(...[matchToggle(state.category, run)].filter(Boolean));
   // No year counts: Pagefind's are per result set, so would read "0" beside real years.
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
@@ -118,8 +109,8 @@ function renderFilters(counts, categoryCounts) {
     ...ratings.map((r) => new Option(ratingFilterLabel(r), r, false, r === state.rating)),
     ...(hasUnrated ? [new Option("Unrated", UNRATED_FILTER, false, state.rating === UNRATED_FILTER)] : []));
   el.tag.replaceChildren(...sortedKeys(allFilters.tag).map((n) =>
-    chip("tag", n, (counts.tag || {})[n] ?? 0, state.tags.has(n))));
-  el.tagHint.textContent = state.tags.size > 1 ? "— all selected must match" : "";
+    chip("tag", n, (facetCounts.tag || {})[n] ?? 0)));
+  el.tagHint.replaceChildren(...[matchToggle(state.tag, run)].filter(Boolean));
 }
 
 function renderSort() {
@@ -129,34 +120,47 @@ function renderSort() {
 }
 
 // ---- search ---------------------------------------------------------------
-let shown = 0, current = [];
-async function run() {
-  writeURL();
+// Pagefind filters for the state; `skip` names a facet whose includes are
+// left out (its addsPages counts).
+function pagefindFilters(skip) {
   const filters = {};
   if (state.type) filters.type = state.type;
   if (state.year) filters.year = state.year;
   if (state.rating === UNRATED_FILTER) filters.rating = UNRATED_FILTER;
   else if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
-  if (state.tags.size) filters.tag = [...state.tags];     // array = AND
+  const all = MULTI.flatMap((k) => pagefindConditions(state[k], k !== skip));
+  if (all.length) filters.all = all;
+  return filters;
+}
+
+let shown = 0, current = [], runs = 0;
+async function run() {
+  const id = ++runs;
+  writeURL();
   const sort = activeSort();
-  const opts = { filters: state.categories.size ? { ...filters, category: { any: [...state.categories] } } : filters };
+  const opts = { filters: pagefindFilters() };
   if (sort !== RELEVANCE) { const { field, dir } = parseSort(sort); opts.sort = { [field]: dir }; }
   const query = hasQuery() ? state.q : null;
-  // Category counts ignore the category filter: a second search, or the totals
-  // when nothing else narrows.
-  const [res, anyCategory] = await Promise.all([
-    pagefind.search(query, opts),
-    state.categories.size && (query || Object.keys(filters).length) ? pagefind.search(query, { filters }) : null,
-  ]);
+  // An addsPages facet counts from a search without its includes, or the
+  // totals when nothing else narrows.
+  const recount = MULTI.filter((k) => addsPages(state[k]));
+  const without = (k) => {
+    const filters = pagefindFilters(k);
+    return query || Object.keys(filters).length ? pagefind.search(query, { filters }) : null;
+  };
+  const [res, ...others] = await Promise.all([pagefind.search(query, opts), ...recount.map(without)]);
+  if (id !== runs) return;   // superseded while searching
   current = res.results; shown = 0;
   el.list.replaceChildren();
   const counts = res.filters || allFilters;
-  const categoryCounts = !state.categories.size ? counts.category
-    : anyCategory ? anyCategory.filters?.category : allFilters.category;
-  renderFilters(counts, categoryCounts);
+  const facetCounts = Object.fromEntries(MULTI.map((k) => {
+    const i = recount.indexOf(k);
+    return [k, i < 0 ? counts[k] : (others[i]?.filters || allFilters)[k]];
+  }));
+  renderFilters(counts, facetCounts);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", state.type, [...state.categories].join(" or "), ...[...state.tags].map((t) => "#" + t), state.year,
+  const what = [hasQuery() ? `“${state.q}”` : "", state.type, ...describe(state.category), ...describe(state.tag, "#"), state.year,
     state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
@@ -164,8 +168,10 @@ async function run() {
 }
 
 async function showMore() {
+  const mine = current;
   const batch = current.slice(shown, shown + PAGE);
   const data = await Promise.all(batch.map((r) => r.data()));
+  if (mine !== current) return;   // a newer run replaced the list
   for (const d of data) el.list.appendChild(resultCard(d));
   shown += batch.length;
   el.more.hidden = shown >= current.length;
@@ -182,16 +188,18 @@ function resultCard(d) {
     updated: d.meta?.updated || "",
     rating: Number(d.meta?.rating) || 0,
   };
-  return card(item, { activeTags: state.tags, onTag: toggleTag, summaryHTML: d.excerpt || "" });
+  return card(item, { activeTags: state.tag.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });
 }
 
 // ---- wiring -------------------------------------------------------------
 let timer;
-el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => { state.q = el.q.value; run(); }, 200); });
+const typed = () => { clearTimeout(timer); state.q = el.q.value; run(); };
+el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(typed, TYPING_MS); });
+el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
 el.rating.addEventListener("change", () => { state.rating = el.rating.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; state.categories.clear(); state.year = ""; state.rating = ""; state.tags.clear(); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; clearFacet(state.category); state.year = ""; state.rating = ""; clearFacet(state.tag); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 

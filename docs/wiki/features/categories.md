@@ -17,8 +17,8 @@ a page's `categories:` and/or `category:` (each a value or a list) from
 `categories.html` is the only reader, returning a deduped list in the config's
 spelling. It feeds `list-json.html` (`categories[]`, a browse-list chip row) and
 `pagefind-keys.html` (a search filter, one hidden span per value), both
-`?category=`, repeatable. Chips OR: selected categories widen the list, and count
-without the category filter.
+`?category=`, repeatable. Chips AND by default (`?category-match=any` ORs) and can
+exclude, as tags ([search.md](search.md)).
 Unlisted values warn (`warnidf` id `category-unknown`, silenced via `ignoreLogs`).
 
 **The toggle lives in one place**: disabled, no page has a category, so both UIs hide
