@@ -140,10 +140,6 @@ a:hover { text-decoration: underline; }
 .side-heading a { color: inherit; }
 .side-heading a:hover { color: var(--accent); text-decoration: none; }
 
-/* Sections are navigation: a step up from the tag and category chips. */
-.chip-section { font-size: 0.86rem; padding: 0.2rem 0.75rem; }
-.chip-section .count { font-size: 0.74rem; }
-
 /* Search, full width under the section chips. */
 .side-search {
   display: block;
@@ -219,6 +215,11 @@ a:hover { text-decoration: underline; }
 .tag-cloud .tag-w2 { font-size: 0.84rem; }
 .tag-cloud .tag-w3 { font-size: 0.9rem; }
 .tag-cloud .tag-w4 { font-size: 0.98rem; font-weight: 600; }
+
+/* Sections are navigation: a step up from the tag and category chips.
+   After .chip, which would otherwise win at equal specificity. */
+.chip-section { font-size: 0.86rem; padding: 0.2rem 0.75rem; }
+.chip-section .count { font-size: 0.74rem; }
 
 /* ---------- Home ---------- */
 
