@@ -43,6 +43,13 @@
       {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
     </dd>
     {{ end }}
+    {{/* No category pages (D11): each links to search, filtered. */}}
+    {{ with partial "categories.html" . }}
+    <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip" href="{{ "search/" | relURL }}?category={{ . | urlquery }}">{{ . }}</a>{{ end }}
+    </dd>
+    {{ end }}
     {{ with .GetTerms "tags" }}
     <dt>Tags</dt>
     <dd class="chip-row">

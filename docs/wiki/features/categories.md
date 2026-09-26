@@ -3,6 +3,7 @@ covers:
   - layouts/_partials/categories.html
   - layouts/_partials/list-json.html
   - layouts/_partials/pagefind-keys.html
+  - layouts/_partials/sidebar.html
   - hugo.toml
 ---
 
@@ -23,4 +24,5 @@ Unlisted values warn (`warnidf` id `category-unknown`, silenced via `ignoreLogs`
 the facet on empty data — no JS knows about `enabled`. A deploy can flip it with
 `HUGO_PARAMS_CATEGORIES_ENABLED=false`.
 
-Not a Hugo taxonomy: no term pages or sidebar chip. Sync passes the keys through.
+Not a Hugo taxonomy, so no term pages: the sidebar's page-meta chips link to
+`/search/?category=<c>` instead. Sync passes the keys through.
