@@ -140,16 +140,6 @@ a:hover { text-decoration: underline; }
 .side-heading a { color: inherit; }
 .side-heading a:hover { color: var(--accent); text-decoration: none; }
 
-/* Search, full width under the section chips. */
-.side-search {
-  display: block;
-  margin-top: 0.7rem;
-  text-align: center;
-  padding: 0.3rem 0.9rem;
-}
-.side-search:hover { text-decoration: none; }
-.side-search.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-
 .meta-list {
   margin: 0;
   font-size: 0.88rem;
@@ -216,10 +206,16 @@ a:hover { text-decoration: underline; }
 .tag-cloud .tag-w3 { font-size: 0.9rem; }
 .tag-cloud .tag-w4 { font-size: 0.98rem; font-weight: 600; }
 
-/* Sections are navigation: a step up from the tag and category chips.
-   After .chip, which would otherwise win at equal specificity. */
-.chip-section { font-size: 0.86rem; padding: 0.2rem 0.75rem; }
-.chip-section .count { font-size: 0.74rem; }
+/* Sections (and "Search all") are navigation: rounded rectangles, not pills.
+   After .chip, which would otherwise win. */
+.chip-section {
+  border-radius: var(--radius);
+  background: transparent;
+  font-size: 0.92rem;
+  padding: 0.3rem 0.75rem;
+}
+.chip-section .count { font-size: 0.78rem; }
+.chip-all { flex: 1 1 100%; display: flex; justify-content: space-between; align-items: baseline; }
 
 /* ---------- Home ---------- */
 

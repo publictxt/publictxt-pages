@@ -9,9 +9,14 @@
       {{- .Section | humanize -}}
       <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partialCached "bookmark-pages.html" .) }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span></a>
     {{ end }}
+    {{/* Last, a full line: Search every page. */}}
+    {{ $onSearch := eq .Layout "search" }}
+    {{/* Less the search page itself, a regular page from site-content/ — by lookup, not a per-page scan. */}}
+    {{ $all := len site.RegularPages }}{{ with site.GetPage "/search" }}{{ $all = sub $all 1 }}{{ end }}
+    <a class="chip chip-section chip-all{{ if $onSearch }} active{{ end }}" href="{{ "search/" | relURL }}"{{ if $onSearch }} aria-current="page"{{ end }}>
+      {{- "Search Site " -}}
+      <span class="count">{{ $all }}</span></a>
   </div>
-  <a class="btn-ghost side-search{{ if eq .Layout "search" }} active{{ end }}" href="{{ "search/" | relURL }}"
-    {{- if eq .Layout "search" }} aria-current="page"{{ end }}>Search</a>
 </nav>
 
 {{ if and .IsPage (ne .Layout "search") }}
