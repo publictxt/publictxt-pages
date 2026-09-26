@@ -510,14 +510,15 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
 }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-/* Sidebar Search, full width under the section chips; a touch smaller than
-   the section chips. After .btn-ghost, which would otherwise win. */
+/* Sidebar Search, full width under the section chips and styled like them,
+   a step smaller. After .btn-ghost, which would otherwise win. */
 .side-search {
   display: block;
   margin-top: 0.7rem;
   text-align: center;
-  font-size: 0.78rem;
-  padding: 0.25rem 0.8rem;
+  color: var(--text);
+  font-size: 0.86rem;
+  padding: 0.3rem 0.75rem;
 }
 .side-search:hover { text-decoration: none; }
 .side-search.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
