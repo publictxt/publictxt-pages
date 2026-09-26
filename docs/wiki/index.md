@@ -88,6 +88,7 @@ layouts/_markup/
 assets/js/site-index.js   fetch index.json once per document; scope() subsets
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value
+assets/js/facets.js       tag/category include, exclude, match any/all; shared
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette in :root

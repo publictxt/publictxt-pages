@@ -569,6 +569,27 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   cursor: pointer;
 }
 .filter-chip.empty:not(.active) { opacity: 0.45; }
+/* An excluded filter (facets.js); :hover would otherwise drop the strike. */
+.filter-chip.excluded, .filter-chip.excluded:hover {
+  border-style: dashed;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+/* "match all / any" beside a facet heading. */
+.match-toggle {
+  font: inherit;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  color: var(--accent);
+  padding: 0 0.45rem;
+  cursor: pointer;
+}
+.match-toggle:hover { border-color: var(--accent); }
 
 .result-list {
   list-style: none;

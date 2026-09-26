@@ -16,7 +16,8 @@ page meta, category and tag chips), content, footer. Plain CSS with `:root` prop
 In `main.css`: `.list-selects` holds the Sort / Year / Rating selects, and
 `.filter-group .list-sort` reuses them full width in search; `.fold` is the
 collapsible `<details>` for list controls and search filters; `.chip-section` squares the sidebar section chips; `.chip.active` marks a
-selected filter or the current section; `.rating` colours the
+selected filter or the current section, `.filter-chip.excluded` an excluded one;
+`.match-toggle` is a facet's all/any switch; `.rating` colours the
 stars; `.video` sizes YouTube embeds ([embeds.md](embeds.md)).
 
 **Edit this page** = `params.editURL` + the page's `source_path` (sync writes it,
