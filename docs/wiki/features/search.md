@@ -18,15 +18,16 @@ with no tiebreak: *Relevance* is offered (and default) only with a query.
 
 Same facets and URL spelling as the browse lists. Tags and categories go through
 `facets.js`, shared with the lists: a chip click cycles include → exclude → off, and
-with two includes a toggle sets match all / any (defaults: tags all, categories any;
+with two includes a toggle sets match all / any (default all — it narrows, so no recount search;
 `?tag-not=`, `?tag-match=`). The rest are single-select. Pagefind gets them as a
 compound `all: [...]`. A facet matching *any* counts from a second search without
 its own includes, since picking a value adds pages.
 
-Typing waits 400 ms (`TYPING_MS`; Enter doesn't); a superseded run's results are dropped.
 Category hides when the index has none; year when the site spans one year; rating
 when nothing is rated. Selects show no counts — Pagefind's are per result set. Chip
 counts run higher than a browse list's: Pagefind also indexes section index bodies.
+
+Typing waits 400 ms (`TYPING_MS`; Enter doesn't); a superseded run's results are dropped.
 
 Filters fold on narrow screens when nothing is selected. No JS, or no index yet,
 each get a notice.

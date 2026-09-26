@@ -32,7 +32,7 @@ Items marked **(TBD)** are not built.
   - Inline `#hashtags` merged into `tags`.
   - Facets: tags, type.
   - tag pages
-  - Tag and category facets: include or exclude values; match all or any of the included (tags default all, categories any). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
+  - Tag and category facets: include or exclude values; match all or any of the included (default all). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
   - Sorting in all by Date, Recency, Alphabetical.

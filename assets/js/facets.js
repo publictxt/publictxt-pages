@@ -2,9 +2,10 @@
 // lists and search read the URL and match pages alike. A value is included,
 // excluded or neither; includes match `all` or `any`, excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c
-// `-match` is written only when not the default: tags all, categories any.
+// `-match` is written only when `any`: the default is `all`, which narrows and
+// so needs no recount search (addsPages).
 
-export const DEFAULT_MATCH = { tag: "all", category: "any" };
+export const DEFAULT_MATCH = "all";
 
 export function readFacet(p, key) {
   const match = p.get(key + "-match");
@@ -12,7 +13,7 @@ export function readFacet(p, key) {
     key,
     inc: new Set(p.getAll(key).filter(Boolean)),
     exc: new Set(p.getAll(key + "-not").filter(Boolean)),
-    match: match === "all" || match === "any" ? match : DEFAULT_MATCH[key],
+    match: match === "any" ? "any" : DEFAULT_MATCH,
   };
 }
 export const emptyFacet = (key) => readFacet(new URLSearchParams(), key);
@@ -20,12 +21,12 @@ export const emptyFacet = (key) => readFacet(new URLSearchParams(), key);
 export function writeFacet(p, f) {
   for (const v of f.inc) p.append(f.key, v);
   for (const v of f.exc) p.append(f.key + "-not", v);
-  if (f.match !== DEFAULT_MATCH[f.key]) p.set(f.key + "-match", f.match);
+  if (f.match !== DEFAULT_MATCH) p.set(f.key + "-match", f.match);
 }
 
 export const isSet = (f) => f.inc.size > 0 || f.exc.size > 0;
 export function clearFacet(f) {
-  f.inc.clear(); f.exc.clear(); f.match = DEFAULT_MATCH[f.key];
+  f.inc.clear(); f.exc.clear(); f.match = DEFAULT_MATCH;
 }
 
 // Facet chip click: neither → included → excluded → neither.
