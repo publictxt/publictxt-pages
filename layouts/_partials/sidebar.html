@@ -1,18 +1,17 @@
 <nav class="side-block" aria-label="Sections">
   <h2 class="side-heading">Sections</h2>
-  <ul class="section-list">
+  <div class="tag-cloud">
     {{ $current := . }}
     {{ range partialCached "sections.html" . }}
-    <li class="{{ if eq $current.FirstSection . }}active{{ end }}">
-      {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
-      <a href="{{ .RelPermalink }}">{{ .Section | humanize }}</a>
-      <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partialCached "bookmark-pages.html" .) }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span>
-    </li>
+    {{ $active := eq $current.FirstSection . }}
+    {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
+    <a class="chip chip-section{{ if $active }} active{{ end }}" href="{{ .RelPermalink }}"{{ if $active }} aria-current="true"{{ end }}>
+      {{- .Section | humanize -}}
+      <span class="count">{{ if eq .Section "bookmarks" }}{{ len (partialCached "bookmark-pages.html" .) }}{{ else }}{{ len .RegularPagesRecursive }}{{ end }}</span></a>
     {{ end }}
-    <li class="{{ if eq .Layout "search" }}active{{ end }}">
-      <a href="{{ "search/" | relURL }}">Search</a>
-    </li>
-  </ul>
+  </div>
+  <a class="btn-ghost side-search{{ if eq .Layout "search" }} active{{ end }}" href="{{ "search/" | relURL }}"
+    {{- if eq .Layout "search" }} aria-current="page"{{ end }}>Search</a>
 </nav>
 
 {{ if and .IsPage (ne .Layout "search") }}
