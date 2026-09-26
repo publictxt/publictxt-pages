@@ -28,7 +28,7 @@ shape is in `cards.js`. Each list names its subset, mirroring its server collect
 Controls: sort (`sorts.js`), type / category / tag chips, year and minimum-rating
 selects ([ratings.md](ratings.md)). A facet hides when the list doesn't vary on it —
 how a tag page hides its own tag. Single-select options count what picking them
-gives. URL spelling is shared with [search.md](search.md). The controls fold on
+gives; a category chip matches pages that include it. URL spelling is shared with [search.md](search.md). The controls fold on
 narrow screens unless the URL sets a filter or sort. Home *Recent* is `data-compact`:
 cards only.
 

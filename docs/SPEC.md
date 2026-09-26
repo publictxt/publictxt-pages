@@ -25,9 +25,9 @@ Items marked **(TBD)** are not built.
   - page meta (type, dates, tags) in sidebar.
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
-  - Currently: One `category:` per page from a closed list in `hugo.toml`; feature toggleable *(D11)*.
-  - Future: Allow multiple `categories:` per page (TBD)
-  - Category pages / sidebar list (TBD)
+  - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable *(D11, D12)*.
+  - Category pages (TBD)
+  - Sidebar list (TBD)
 - Tags
   - Inline `#hashtags` merged into `tags`.
   - Facets: tags (AND-able), type.

@@ -51,9 +51,9 @@ capitalizeListTitles = false
   listOrder = "created"
   listPerPage = 20
 
-  # Categories: one `category:` per page from this closed list (matched
-  # case-insensitively; unlisted values warned and ignored). Disabled or
-  # absent = no categories anywhere.
+  # Categories: a page's `categories:` / `category:` (a value or a list) from
+  # this closed list (matched case-insensitively; unlisted values warned and
+  # ignored). Disabled or absent = no categories anywhere.
   [params.categories]
     enabled = true
     list = ["Project", "Personal", "Tech", "Politics", "Science", "CompSci", "Art", "Content"]

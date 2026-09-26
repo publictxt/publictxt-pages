@@ -1,0 +1,28 @@
+{{/*
+  A page's categories: `categories:` and `category:` (each a value or a list),
+  matched case-insensitively against params.categories.list and returned in its
+  spelling, deduped, in page order; [] when disabled or absent, unlisted values
+  warned and dropped. The only reader of the keys, so lists, search and the
+  toggle agree. Expects a page.
+*/}}
+{{ $out := slice }}
+{{ $cfg := site.Params.categories }}
+{{ if and $cfg $cfg.enabled }}
+  {{ $raw := slice }}
+  {{ range slice .Params.categories .Params.category }}
+    {{ if reflect.IsSlice . }}{{ $raw = $raw | append . }}{{ else if . }}{{ $raw = $raw | append . }}{{ end }}
+  {{ end }}
+  {{ range $raw }}
+    {{ $v := lower (string .) }}
+    {{ $hit := "" }}
+    {{ range $cfg.list }}
+      {{ if and (not $hit) (eq (lower .) $v) }}{{ $hit = . }}{{ end }}
+    {{ end }}
+    {{ if not $hit }}
+      {{ warnidf "category-unknown" "%s: category %q is not in params.categories.list — ignored" $.Path (string .) }}
+    {{ else if not (in $out $hit) }}
+      {{ $out = $out | append $hit }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ return $out }}

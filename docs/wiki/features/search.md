@@ -15,7 +15,8 @@ lives in `site-content/`.
 Sorts are Pagefind's, over `pagefind-keys.html`'s keys, and **replace** relevance
 with no tiebreak: *Relevance* is offered (and default) only with a query.
 
-Same facets and URL spelling as the browse lists. Tags AND; the rest single-select.
+Same facets and URL spelling as the browse lists. Tags AND; the rest single-select
+(a page matches any one of its categories).
 Category hides when the index has none; year when the site spans one year; rating
 when nothing is rated. Selects show no counts — Pagefind's are per result set. Chip
 counts run higher than a browse list's: Pagefind also indexes section index bodies.
