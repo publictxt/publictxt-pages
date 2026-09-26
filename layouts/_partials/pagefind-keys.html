@@ -1,17 +1,21 @@
 {{/*
-  Hidden Pagefind keys for one page, on an empty element so none is indexed as
+  Hidden Pagefind keys for one page, on empty elements so none is indexed as
   text. Sorts: dates as Unix seconds, title lower-cased (Pagefind compares
   case-sensitively), rating (2.5 unrated, = UNRATED in sorts.js). Filters:
-  `created` year (= yearOf() in list.js), category, rating ("unrated" when none).
+  `created` year (= yearOf() in list.js), rating ("unrated" when none), and
+  category — one span per value, as an attribute holds only one.
 
   Every `data-pagefind-body` template must include this, or the page drops out
   of sorted and filtered results. See docs/wiki/traps.md.
 */}}
-{{ $category := partial "category.html" . }}
+{{ $categories := partial "categories.html" . }}
 {{ $rating := partial "rating.html" . }}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title], rating[data-rating-sort]"
-  data-pagefind-filter="year[data-year], rating[data-rating]{{ with $category }}, category[data-category]{{ end }}"
+  data-pagefind-filter="year[data-year], rating[data-rating]"
   {{- with $rating }} data-pagefind-meta="rating[data-rating]"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
-  data-year="{{ .Date.Format "2006" }}"{{ with $category }} data-category="{{ . }}"{{ end }}
+  data-year="{{ .Date.Format "2006" }}"
   data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}"></span>
+{{- range $categories }}
+<span hidden data-pagefind-filter="category[data-category]" data-category="{{ . }}"></span>
+{{- end }}

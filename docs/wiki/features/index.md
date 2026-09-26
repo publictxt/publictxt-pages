@@ -16,7 +16,7 @@ One page per capability and the files that do it. See the map in
 | [sections.md](sections.md) | folders as sections, ordering, post-folder leaf bundles, `publish: off` |
 | [browse-lists.md](browse-lists.md) | the site index, sortable/filterable/paged lists |
 | [search.md](search.md) | Pagefind full-text + facets, filter-only, sorting |
-| [categories.md](categories.md) | closed `category:` list, facets, toggle |
+| [categories.md](categories.md) | closed `categories:` list, facets, toggle |
 | [ratings.md](ratings.md) | `rating:` 1–5, minimum / *Unrated* filter, rating sorts, stars |
 | [tags.md](tags.md) | inline `#hashtags`, tag pages, tag cloud |
 | [dates.md](dates.md) | `created`/`updated` ladders and display |

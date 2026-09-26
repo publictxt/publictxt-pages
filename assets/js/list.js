@@ -18,13 +18,14 @@ function yearOf(it) {
   return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
-// Each facet's values per page and chip order. Tags AND; the rest single-select.
+// Each facet's values per page and chip order. Tags AND; the rest single-select
+// (a category chip matches pages that include it).
 // Rating is a minimum, handled in render(). Disabled categories leave no data,
 // so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
   type: { values: (it) => [it.type], order: byCount },
-  category: { values: (it) => [it.category], order: byCount },
+  category: { values: (it) => it.categories || [], order: byCount },
   tags: { values: (it) => it.tags || [], order: byCount },
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
 };
@@ -287,7 +288,7 @@ async function mount(root) {
   function render(pushHistory) {
     let base = items;
     if (state.type) base = base.filter((it) => it.type === state.type);
-    if (state.category) base = base.filter((it) => it.category === state.category);
+    if (state.category) base = base.filter((it) => (it.categories || []).includes(state.category));
     for (const t of state.tags) base = base.filter((it) => (it.tags || []).includes(t));
     const byYear = (it) => !state.year || yearOf(it) === state.year;
     const byRating = (it) => !state.rating

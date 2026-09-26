@@ -74,7 +74,7 @@ layouts/_partials/
   bookmark-pages.html   every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row
   bookmark-label.html   one URL's short form
-  category.html         only reader of category:
+  categories.html       only reader of categories:/category:
   rating.html           only reader of rating:
 
 layouts/_markup/

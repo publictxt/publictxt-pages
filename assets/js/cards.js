@@ -1,5 +1,5 @@
 // The one page card, for list.js and search.js. Item shape = index.json's:
-//   { url, title, type, section, tags[], created, updated, summary, bookmarks[], rating }
+//   { url, title, type, section, tags[], categories[], created, updated, summary, bookmarks[], rating }
 
 export function escapeHTML(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

@@ -35,6 +35,7 @@ Dates are when the record was *written*. Most decisions predate this log; those 
 | [D9](D9.md) | Plain CSS, no Sass |
 | [D10](D10.md) | Section order is configured, not derived |
 | [D11](D11.md) | Categories are a configured closed list, read from front matter |
+| [D12](D12.md) | A page may have several categories |
 
 ---
 
