@@ -1,6 +1,6 @@
 // Browse lists: each `[data-list]` swaps Hugo's fallback <ul> for sortable,
 // filterable, paged cards from the site index. State lives in the URL:
-// ?tag=a&tag=b&type=&category=&year=&rating=&sort=&page= (`q` is search's).
+// ?tag=a&tag=b&category=a&category=b&type=&year=&rating=&sort=&page= (`q` is search's).
 //
 //   data-scope-kind   section | tag | bookmarks | recent
 //   data-scope-value  a path, a tag, or a limit
@@ -18,8 +18,8 @@ function yearOf(it) {
   return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
 }
 
-// Each facet's values per page and chip order. Tags AND; the rest single-select
-// (a category chip matches pages that include it).
+// Each facet's values per page and chip order. Tags AND, categories OR; the
+// rest single-select.
 // Rating is a minimum, handled in render(). Disabled categories leave no data,
 // so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
@@ -64,13 +64,13 @@ async function mount(root) {
   }
 
   // ---- state <-> URL --------------------------------------------------
-  const state = { sort: defaultSort, type: "", category: "", year: "", rating: "", tags: new Set(), page: 1, moreTags: false };
+  const state = { sort: defaultSort, type: "", categories: new Set(), year: "", rating: "", tags: new Set(), page: 1, moreTags: false };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     state.type = p.get("type") || "";
-    state.category = p.get("category") || "";
+    state.categories = new Set(p.getAll("category").filter(Boolean));
     state.year = p.get("year") || "";
     state.rating = ratingFilter(p.get("rating"));
     state.tags = new Set(p.getAll("tag").filter(Boolean));
@@ -81,7 +81,7 @@ async function mount(root) {
     const p = new URLSearchParams();
     if (s.sort !== defaultSort) p.set("sort", s.sort);
     if (s.type) p.set("type", s.type);
-    if (s.category) p.set("category", s.category);
+    for (const c of s.categories) p.append("category", c);
     if (s.year) p.set("year", s.year);
     if (s.rating) p.set("rating", s.rating);
     for (const t of s.tags) p.append("tag", t);
@@ -137,9 +137,10 @@ async function mount(root) {
     b.setAttribute("aria-pressed", String(active));
     b.innerHTML = (kind === "tag" ? "#" : "") + escapeHTML(name) + `<span class="count">${n}</span>`;
     b.addEventListener("click", () => {
-      if (kind === "type" || kind === "category") state[kind] = state[kind] === name ? "" : name;
-      else if (state.tags.has(name)) state.tags.delete(name);
-      else state.tags.add(name);
+      const set = kind === "category" ? state.categories : state.tags;
+      if (kind === "type") state.type = state.type === name ? "" : name;
+      else if (set.has(name)) set.delete(name);
+      else set.add(name);
       state.page = 1;
       render(true);
     });
@@ -159,8 +160,9 @@ async function mount(root) {
     return row;
   }
 
-  // forYear / forRating: `filtered` minus that filter, so options count what picking them gives.
-  function renderControls(filtered, forYear, forRating) {
+  // forYear / forRating / forCategory: `filtered` minus that filter, so options
+  // count what picking them gives.
+  function renderControls(filtered, forYear, forRating, forCategory) {
     body.replaceChildren();
     const head = document.createElement("div");
     head.className = "list-controls-head";
@@ -211,7 +213,7 @@ async function mount(root) {
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        state.type = ""; state.category = ""; state.year = ""; state.rating = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
+        state.type = ""; state.categories.clear(); state.year = ""; state.rating = ""; state.tags.clear(); state.sort = defaultSort; state.page = 1; render(true);
       });
       head.append(clear);
     }
@@ -223,8 +225,9 @@ async function mount(root) {
       body.append(facetRow("Type", typeFacet.map(([n]) => chip("type", n, c.get(n) || 0, state.type === n))));
     }
     if (categoryFacet.length) {
-      const c = within("category");
-      body.append(facetRow("Category", categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0, state.category === n))));
+      const c = new Map(counts(forCategory, "category"));
+      body.append(facetRow(state.categories.size > 1 ? "Category (any)" : "Category",
+        categoryFacet.map(([n]) => chip("category", n, c.get(n) || 0, state.categories.has(n)))));
     }
     if (tagFacet.length) {
       const c = within("tags");
@@ -283,18 +286,19 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  const filtering = () => Boolean(state.type || state.category || state.year || state.rating || state.tags.size);
+  const filtering = () => Boolean(state.type || state.categories.size || state.year || state.rating || state.tags.size);
 
   function render(pushHistory) {
     let base = items;
     if (state.type) base = base.filter((it) => it.type === state.type);
-    if (state.category) base = base.filter((it) => (it.categories || []).includes(state.category));
     for (const t of state.tags) base = base.filter((it) => (it.tags || []).includes(t));
     const byYear = (it) => !state.year || yearOf(it) === state.year;
     const byRating = (it) => !state.rating
       || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating));
-    const forYear = base.filter(byRating);
-    const forRating = base.filter(byYear);
+    const byCategory = (it) => !state.categories.size || (it.categories || []).some((c) => state.categories.has(c));
+    const forYear = base.filter((it) => byRating(it) && byCategory(it));
+    const forRating = base.filter((it) => byYear(it) && byCategory(it));
+    const forCategory = base.filter((it) => byYear(it) && byRating(it));
     const filtered = sorted(forYear.filter(byYear), state.sort);
 
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
@@ -307,10 +311,10 @@ async function mount(root) {
     list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tags, onTag })));
     if (compact) return;
 
-    renderControls(filtered, forYear, forRating);
+    renderControls(filtered, forYear, forRating, forCategory);
     renderPager(total);
     const n = filtered.length;
-    const what = [state.type, state.category, ...[...state.tags].map((t) => "#" + t), state.year,
+    const what = [state.type, [...state.categories].join(" or "), ...[...state.tags].map((t) => "#" + t), state.year,
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`

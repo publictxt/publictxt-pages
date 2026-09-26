@@ -37,7 +37,7 @@ Items marked **(TBD)** are not built.
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
   - Sorting in all by Date, Recency, Alphabetical.
   - Filter by Type, and by Year (the `created` year).
-  - Filter by Category (also in Search)
+  - Filter by Category, several as OR (also in Search)
   - Sort by Source/Author (TBD)
   - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search)
 - Search
