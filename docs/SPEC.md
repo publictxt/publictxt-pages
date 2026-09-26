@@ -30,14 +30,14 @@ Items marked **(TBD)** are not built.
   - Sidebar: a page's categories, and a site-wide list with counts; both link to search
 - Tags
   - Inline `#hashtags` merged into `tags`.
-  - Facets: tags (AND-able), type.
+  - Facets: tags, type.
   - tag pages
-  - Facets: tags OR-able (TBD)
+  - Tag and category facets: include or exclude values; match all or any of the included (tags default all, categories any). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
   - Sorting in all by Date, Recency, Alphabetical.
   - Filter by Type, and by Year (the `created` year).
-  - Filter by Category, several as OR (also in Search)
+  - Filter by Category and Tag, as the facets above (also in Search)
   - Sort by Source/Author (TBD)
   - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search)
 - Search
