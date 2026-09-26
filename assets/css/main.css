@@ -140,26 +140,15 @@ a:hover { text-decoration: underline; }
 .side-heading a { color: inherit; }
 .side-heading a:hover { color: var(--accent); text-decoration: none; }
 
-.section-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* Search, full width under the section chips. */
+.side-search {
+  display: block;
+  margin-top: 0.7rem;
+  text-align: center;
+  padding: 0.3rem 0.9rem;
 }
-.section-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 6px;
-}
-.section-list li a {
-  flex: 1;
-  color: var(--text);
-  padding: 0.3rem 0.5rem;
-}
-.section-list li a:hover { color: var(--accent); text-decoration: none; }
-.section-list li .count { color: var(--text-muted); font-size: 0.8rem; padding-right: 0.5rem; }
-.section-list li.active { background: var(--accent-soft); }
-.section-list li.active a { color: var(--accent); font-weight: 600; }
+.side-search:hover { text-decoration: none; }
+.side-search.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
 .meta-list {
   margin: 0;
@@ -190,6 +179,12 @@ a:hover { text-decoration: underline; }
 }
 .chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 .chip .count { color: var(--text-muted); font-size: 0.7rem; margin-left: 0.35rem; }
+/* Any chip: a selected filter, or the current section. */
+.chip.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 .chip-type {
   background: var(--chip-type-bg);
@@ -571,11 +566,6 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   font: inherit;
   font-size: 0.78rem;
   cursor: pointer;
-}
-.filter-chip.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--accent);
 }
 .filter-chip.empty:not(.active) { opacity: 0.45; }
 
