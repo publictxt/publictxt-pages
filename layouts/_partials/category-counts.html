@@ -1,0 +1,18 @@
+{{/*
+  Site-wide categories as [{name, count}], in params.categories.list order,
+  used ones only. Counts pages and sections — what Pagefind indexes — so they
+  match the search it links to. Walks every page: call via partialCached.
+  No argument.
+*/}}
+{{ $counts := dict }}
+{{ range where site.Pages "Kind" "in" (slice "page" "section") }}
+  {{ range partial "categories.html" . }}
+    {{ $k := lower . }}{{/* merge lower-cases keys */}}
+    {{ $counts = merge $counts (dict $k (add 1 (index $counts $k | default 0))) }}
+  {{ end }}
+{{ end }}
+{{ $out := slice }}
+{{ range $name := site.Params.categories.list | default slice }}
+  {{ with index $counts (lower $name) }}{{ $out = $out | append (dict "name" $name "count" .) }}{{ end }}
+{{ end }}
+{{ return $out }}

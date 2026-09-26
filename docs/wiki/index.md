@@ -75,6 +75,7 @@ layouts/_partials/
   bookmark-links.html   the chip row
   bookmark-label.html   one URL's short form
   categories.html       only reader of categories:/category:
+  category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating:
 
 layouts/_markup/

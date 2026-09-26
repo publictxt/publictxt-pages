@@ -22,12 +22,12 @@ Items marked **(TBD)** are not built.
   - Section index bodies render as prose and are search-indexed.
 - Sidebar
   - Tag cloud
-  - page meta (type, dates, tags) in sidebar.
+  - page meta (type, dates, categories, tags) in sidebar.
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
   - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable *(D11, D12)*.
   - Category pages (TBD)
-  - Sidebar list (TBD)
+  - Sidebar: a page's categories, and a site-wide list with counts; both link to search
 - Tags
   - Inline `#hashtags` merged into `tags`.
   - Facets: tags (AND-able), type.

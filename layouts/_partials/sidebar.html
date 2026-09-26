@@ -60,6 +60,21 @@
 </div>
 {{ end }}
 
+{{/* Hidden when unused or disabled. Links to search, as there are no category pages (D11). */}}
+{{ with partialCached "category-counts.html" . }}
+<nav class="side-block" aria-label="Categories">
+  <h2 class="side-heading">Categories</h2>
+  <ul class="section-list">
+    {{ range . }}
+    <li>
+      <a href="{{ "search/" | relURL }}?category={{ .name | urlquery }}">{{ .name }}</a>
+      <span class="count">{{ .count }}</span>
+    </li>
+    {{ end }}
+  </ul>
+</nav>
+{{ end }}
+
 <div class="side-block" aria-label="Top tags">
   <h2 class="side-heading"><a href="{{ "tags/" | relURL }}">Tags</a></h2>
   {{ partial "tag-cloud.html" (dict "limit" (site.Params.tagCloudLimit | default 20)) }}
