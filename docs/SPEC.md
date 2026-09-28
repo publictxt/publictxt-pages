@@ -20,6 +20,7 @@ Items marked **(TBD)** are not built.
   - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*.
   - Section index bodies render as prose and are search-indexed.
+  - A page can have several types: its folder, `type:`, `types:`, and `bookmarks` when it has a URL. A top-level section lists every page of its type, wherever filed (a `posts/` page with `types: [blog]` shows in Blog too); sub-folders list their own subtree.
 - Sidebar
   - Tag cloud
   - page meta (type, dates, categories, tags) in sidebar.
@@ -47,7 +48,7 @@ Items marked **(TBD)** are not built.
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
-  - A page is a bookmark only if it has a `bookmark:`/`bookmarks:` URL, wherever it lives; `bookmarks/` is just a filing folder
+  - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives (it gains type `bookmarks`); pages filed under `bookmarks/` are too, by folder
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
@@ -88,11 +89,12 @@ All front matter optional; sync derives the rest.
 | ----------------------- | -------------------------- | ------------------------------------------------------------------------------- |
 | `title`                 | Page title                 | Falls back to first H1 (removed from body), then filename                       |
 | `type`                  | Override folder-based type | Defaults to top-level folder name                                               |
+| `types`                 | Extra types, value or list | Page also lists under those top-level sections and type filters                 |
 | `tags`                  | Inline or block list       | Merged with `#hashtags`; deduplicated                                           |
 | `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
 | `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
 | `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
-| `bookmark`, `bookmarks` | URL or list                | Makes the page a bookmark (the only thing that does)                            |
+| `bookmark`, `bookmarks` | URL or list                | Adds type `bookmarks`, wherever the page lives                                  |
 | `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.

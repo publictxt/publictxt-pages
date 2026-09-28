@@ -1,9 +1,18 @@
 {{/*
-  A page's type facet values: its folder type, plus "bookmarks" when it carries a
-  bookmark URL (bookmark-urls.html), wherever it lives. Feeds both the Pagefind
-  `type` filter (page.html) and index.json `types` (list-json.html), so search
-  and lists agree. Expects a page.
+  A page's types, lower-cased and deduped: its top-level section, its Hugo .Type (differs only
+  when `type:` overrides it), each of `types:` (a value or a list), and
+  "bookmarks" when it carries a bookmark URL (bookmark-urls.html). The only
+  reader of `types:`. Feeds the type chips, the Pagefind `type` filter,
+  index.json `types`, and type-pages.html — so a top-level section lists every
+  page of its type, wherever it's filed. Expects a page.
 */}}
-{{ $types := slice .Type }}
+{{ $types := slice }}
+{{ with .Section }}{{ $types = $types | append . }}{{ end }}
+{{ $types = $types | append .Type }}
+{{ with .Params.types }}
+  {{ range (cond (reflect.IsSlice .) . (slice .)) }}
+    {{ with (printf "%v" . | strings.TrimSpace) }}{{ $types = $types | append . }}{{ end }}
+  {{ end }}
+{{ end }}
 {{ if partial "bookmark-urls.html" . }}{{ $types = $types | append "bookmarks" }}{{ end }}
-{{ return ($types | uniq) }}
+{{ return (apply $types "lower" "." | uniq) }}

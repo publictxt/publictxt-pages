@@ -13,7 +13,7 @@ already know to open. **Read before editing templates or the pipeline.**
 ## Pagefind drops pages silently
 
 Every `data-pagefind-body` template **must** call `pagefind-keys.html` (now:
-`page.html`, `section.html`, `bookmarks/section.html`). Pagefind drops a page lacking
+`page.html`, `section.html`). Pagefind drops a page lacking
 the key it sorts on, or the filter selected — so a template without it vanishes from
 sorted and filtered results, no error. Hence the rating sort key and filter are on
 every page, rated or not.
@@ -44,7 +44,7 @@ disagree with Hugo's year for far-off readers.
 
 ## `partialCached` on site-scanning partials
 
-`site-index.html`, `sections.html`, `bookmark-pages.html`, `category-counts.html`
+`site-index.html`, `sections.html`, `type-pages.html`, `category-counts.html`
 walk every page; uncached, the build goes O(pages²).
 
 ## Build order and `public/`

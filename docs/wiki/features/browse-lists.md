@@ -20,9 +20,9 @@ shape is in `cards.js`. Each list names its subset, mirroring its server collect
 
 | `data-scope-kind` | Server equivalent |
 |---|---|
-| `section` | `.RegularPagesRecursive` |
+| `section` | sub-folder: `.RegularPagesRecursive` |
+| `type` | top-level section: `type-pages.html` |
 | `tag` | term `.Pages` |
-| `bookmarks` | `bookmark-pages.html` |
 | `recent` | home, N most recently updated |
 
 Controls: sort (`sorts.js`), type / category / tag chips, year and minimum-rating

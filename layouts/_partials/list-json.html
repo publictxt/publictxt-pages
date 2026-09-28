@@ -8,7 +8,6 @@
   {{ $item := dict
       "url" .RelPermalink
       "title" .Title
-      "type" .Type
       "types" (partial "page-types.html" .)
       "section" .Section
       "tags" $tags

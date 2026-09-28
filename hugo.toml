@@ -42,7 +42,7 @@ capitalizeListTitles = false
     edit = "Improve this page"
 
   # Section order in sidebar and home (folder names); unlisted follow A→Z.
-  sectionOrder = ["blog", "wiki", "posts", "notes", "bookmarks"]
+  sectionOrder = ["bookmarks", "blog", "wiki", "posts", "notes"]
   tagCloudLimit = 30   # sidebar tag cloud
   recentLimit = 8      # home Recent list
   # Browse list defaults: sort "<field> [asc|desc]" over created (newest first),

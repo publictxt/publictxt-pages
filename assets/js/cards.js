@@ -1,5 +1,5 @@
 // The one page card, for list.js and search.js. Item shape = index.json's:
-//   { url, title, type, types[], section, tags[], categories[], created, updated, summary, bookmarks[], rating }
+//   { url, title, types[], section, tags[], categories[], created, updated, summary, bookmarks[], rating }
 
 export function escapeHTML(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -69,7 +69,7 @@ export function card(item, opts = {}) {
   li.innerHTML = `
     <div class="page-card-head">
       <a class="page-card-title" href="${escapeHTML(item.url)}">${escapeHTML(item.title || item.url)}</a>
-      ${item.type ? `<span class="chip chip-type">${escapeHTML(item.type)}</span>` : ""}
+      ${(item.types || []).map((t) => `<span class="chip chip-type">${escapeHTML(t)}</span>`).join("")}
     </div>
     ${dateHTML(item)}${ratingHTML(item)}
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((u) =>
