@@ -75,6 +75,8 @@ layouts/_partials/
   collection-pages.html every page of a collection        (partialCached)
   section-pages.html    what a section lists, + its scope
   bookmark-label.html   one URL's short form
+  source-urls.html      only reader of params.sources keys (facebook:, …)
+  source-links.html     "Posted on" chips
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating:

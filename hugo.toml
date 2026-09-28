@@ -58,6 +58,16 @@ capitalizeListTitles = false
     enabled = true
     list = ["Project", "Personal", "Tech", "Politics", "Science", "CompSci", "Art", "Content"]
 
+  # Post sources: front matter keys holding a URL (or list) where a page was
+  # also posted, shown as "Posted on" links; key → label. Unlisted keys are
+  # ignored. (A page's `mastodon:` is a post; params.mastodon is the profile.)
+  [params.sources]
+    facebook = "Facebook"
+    twitter = "Twitter"
+    substack = "Substack"
+    mastodon = "Mastodon"
+    github = "GitHub"
+
 [markup]
   [markup.goldmark.renderHooks.link]
     # Resolves relative `.md` links (Obsidian style) to page URLs.

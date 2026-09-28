@@ -46,6 +46,10 @@
       {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
     </dd>
     {{ end }}
+    {{ with partial "source-links.html" . }}
+    <dt>Posted on</dt>
+    <dd class="chip-row">{{ . }}</dd>
+    {{ end }}
     {{/* No category pages (D11): each links to search, filtered. */}}
     {{ with partial "categories.html" . }}
     <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>
