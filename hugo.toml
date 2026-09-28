@@ -55,7 +55,7 @@ capitalizeListTitles = false
   # this closed list (matched case-insensitively; unlisted values warned and
   # ignored). Disabled or absent = no categories anywhere.
   [params.categories]
-    enabled = true
+    enabled = false
     list = ["Project", "Personal", "Tech", "Politics", "Science", "CompSci", "Art", "Content"]
 
   # Post sources: front matter keys holding a URL (or list) where a page was
