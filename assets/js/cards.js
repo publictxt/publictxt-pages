@@ -69,7 +69,8 @@ export function card(item, opts = {}) {
   li.innerHTML = `
     <div class="page-card-head">
       <a class="page-card-title" href="${escapeHTML(item.url)}">${escapeHTML(item.title || item.url)}</a>
-      ${(item.types || []).map((t) => `<span class="chip chip-type">${escapeHTML(t)}</span>`).join("")}
+      ${(item.types || []).length ? `<span class="page-card-types">${item.types.map((t) =>
+        `<span class="chip chip-type">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>
     ${dateHTML(item)}${ratingHTML(item)}
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((u) =>
