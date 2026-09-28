@@ -14,10 +14,16 @@ covers:
 Every top-level folder is a section; its name is the default `type`. Root-level `.md`
 are plain pages.
 
-A page has several types, lower-cased (`page-types.html`): its section, `.Type`, `types:`, and
-`bookmarks` if it has a URL. A top-level section lists every page of its type,
-wherever filed (`type-pages.html`); a sub-folder its own subtree. `section-pages.html`
-picks, for the list, the home and sidebar counts, and list.js's scope.
+**Types** (rules for authors: [SPEC.md § Types](../SPEC.md#types)). One partial each:
+
+- `page-types.html` — a page's types: section + `.Type` + `types:` + `bookmarks` if it
+  has a URL, lower-cased, deduped. Every chip, the Pagefind `type` filter and
+  index.json `types` read it.
+- `type-pages.html` — every page of a type (partialCached; scans the site).
+- `section-pages.html` — what a section lists: top-level → `type-pages.html` of its
+  lower-cased name, scope `type`; sub-folder → `.RegularPagesRecursive`, scope
+  `section`. The list, home and sidebar counts, and list.js's `scope()` all go through
+  it, so they agree.
 
 Hugo needs `_index.md` for a section, and reads a folder with `index.md` as a leaf
 bundle, hiding its siblings. So sync renames `index.md`/`home.md` → `_index.md`,
