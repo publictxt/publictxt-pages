@@ -1,0 +1,9 @@
+{{/*
+  A page's type facet values: its folder type, plus "bookmarks" when it carries a
+  bookmark URL (bookmark-urls.html), wherever it lives. Feeds both the Pagefind
+  `type` filter (page.html) and index.json `types` (list-json.html), so search
+  and lists agree. Expects a page.
+*/}}
+{{ $types := slice .Type }}
+{{ if partial "bookmark-urls.html" . }}{{ $types = $types | append "bookmarks" }}{{ end }}
+{{ return ($types | uniq) }}

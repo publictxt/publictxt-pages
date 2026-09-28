@@ -26,7 +26,7 @@ shape is in `cards.js`. Each list names its subset, mirroring its server collect
 | `recent` | home, N most recently updated |
 
 Controls: sort (`sorts.js`), type / category / tag chips, year and minimum-rating
-selects ([ratings.md](ratings.md)). A facet hides when the list doesn't vary on it —
+selects ([ratings.md](ratings.md)). A page counts under each of its types (`page-types.html`). A facet hides when the list doesn't vary on it —
 how a tag page hides its own tag. Tag and category chips include, exclude or match
 any/all as in search (`facets.js`). Options count what picking them gives: single-selects,
 and chips of a facet matching *any*. URL spelling is shared with [search.md](search.md). The controls fold on

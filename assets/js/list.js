@@ -27,7 +27,7 @@ function yearOf(it) {
 // so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
-  type: { values: (it) => [it.type], order: byCount },
+  type: { values: (it) => it.types || [it.type], order: byCount },
   category: { values: (it) => it.categories || [], order: byCount },
   tags: { values: (it) => it.tags || [], order: byCount },
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
@@ -288,7 +288,7 @@ async function mount(root) {
 
   // Each filter as a test; `own` false drops a facet's includes (addsPages).
   const tests = {
-    type: (it) => !state.type || it.type === state.type,
+    type: (it) => !state.type || FACETS.type.values(it).includes(state.type),
     year: (it) => !state.year || yearOf(it) === state.year,
     rating: (it) => !state.rating
       || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating)),

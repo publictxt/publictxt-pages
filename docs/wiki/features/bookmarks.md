@@ -3,6 +3,7 @@ covers:
   - layouts/_partials/bookmark-urls.html
   - layouts/_partials/bookmark-pages.html
   - layouts/bookmarks/section.html
+  - layouts/_partials/page-types.html
 ---
 
 # Bookmarks
@@ -11,7 +12,9 @@ A page is a bookmark **only** if it has `bookmark:` / `bookmarks:`, wherever it 
 the `bookmarks/` folder is just filing (`sites/<domain>/` for URL pages, `wiki/` for
 pages about them). `bookmark-urls.html` is the only reader of those keys;
 `bookmark-pages.html` gathers the set for the top-level Bookmarks page, mirrored by the
-`bookmarks` kind in `scope()` (`site-index.js`). Sub-folders are ordinary sections.
+`bookmarks` kind in `scope()` (`site-index.js`). Sub-folders are ordinary sections. The type facet follows suit: `page-types.html` adds
+`bookmarks` to any such page's types (Pagefind filter and index.json `types`), so a page
+can count under two types.
 Sync warns on a page under `bookmarks/` (outside `wiki/`) with no URL.
 
 URLs show in the page header, sidebar and cards, labelled by `bookmark-label.html` /

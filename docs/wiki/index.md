@@ -73,6 +73,7 @@ layouts/_partials/
   bookmark-urls.html    only reader of bookmark:/bookmarks:
   bookmark-pages.html   every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row
+  page-types.html       type facet values: folder + "bookmarks" if it has a URL
   bookmark-label.html   one URL's short form
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
