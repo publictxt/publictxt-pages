@@ -16,8 +16,8 @@ are plain pages.
 
 **Types** (rules for authors: [SPEC.md § Types](../SPEC.md#types)). One partial each:
 
-- `page-types.html` — a page's types: section + `.Type` + `types:` + `bookmarks` if it
-  has a URL, lower-cased, deduped. Every chip, the Pagefind `type` filter and
+- `page-types.html` — a page's types: section (`page` at root) + `collections:` +
+  `bookmarks` if it has a URL, lower-cased, deduped. `type:` is Hugo's; adds nothing. Every chip, the Pagefind `type` filter and
   index.json `types` read it.
 - `type-pages.html` — every page of a type (partialCached; scans the site).
 - `section-pages.html` — what a section lists: top-level → `type-pages.html` of its

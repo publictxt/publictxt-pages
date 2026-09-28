@@ -89,8 +89,7 @@ Type filter in lists and search, and decide which top-level section lists it.
 | Source                          | Type it adds         |
 | ------------------------------- | -------------------- |
 | top-level folder it's filed in  | that folder's name   |
-| `type:` in front matter         | that value           |
-| `types:` (a value or a list)    | each value           |
+| `collections:` (value or list) | each value           |
 | `bookmark:` / `bookmarks:` URL  | `bookmarks`          |
 
 - **Adds, never replaces** — the folder's type always stays. Root-level pages get `page`.
@@ -98,13 +97,13 @@ Type filter in lists and search, and decide which top-level section lists it.
 - **Top-level sections gather by type**: `/notes/` lists every page of type `notes`,
   wherever filed; home and sidebar counts match. **Sub-folders don't** — they list only
   what's filed under them.
-- **A type with no folder** (`types: [recipe]`) is still a chip and a filter value; it
+- **A type with no folder** (`collections: [recipe]`) is still a chip and a filter value; it
   just has no section page.
-- Prefer `types:` to `type:` — Hugo also uses `type:` to choose the page's layout.
+- `type:` is Hugo's (it picks the layout) and adds no type.
 
 ```yaml
 # posts/2026-09-28-hello.md — listed in Posts and Blog, filterable as either
-types: [blog]
+collections: [blog]
 ```
 
 ## Front Matter Reference
@@ -114,8 +113,7 @@ All front matter optional; sync derives the rest.
 | Key                     | Purpose                    | Notes                                                                           |
 | ----------------------- | -------------------------- | ------------------------------------------------------------------------------- |
 | `title`                 | Page title                 | Falls back to first H1 (removed from body), then filename                       |
-| `type`                  | One extra type             | Adds to the folder type, not replaces; also picks Hugo's layout. See [Types](#types) |
-| `types`                 | Extra types, value or list | Page also lists under those top-level sections and type filters. See [Types](#types) |
+| `collections`           | Extra types, value or list | Page also lists under those top-level sections and type filters. See [Types](#types) |
 | `tags`                  | Inline or block list       | Merged with `#hashtags`; deduplicated                                           |
 | `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
 | `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
