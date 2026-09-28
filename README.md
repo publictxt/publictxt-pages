@@ -5,10 +5,10 @@ to GitHub/GitLab Pages for free, with no backend required.
 
 Python preprocessing + Hugo build produce the static site; a dynamic
 client-side layer (Pagefind + JS) adds full-text search and faceted
-tag/type browsing on top.
+tag/collection browsing on top.
 
 Works directly against a standard Obsidian-style Markdown vault —
-relative links, inline `#hashtags`, and folder-derived types — with
+relative links, inline `#hashtags`, and folder-derived collections — with
 minimal reliance on PublicTxt-specific syntax transforms.
 
 ## docs
