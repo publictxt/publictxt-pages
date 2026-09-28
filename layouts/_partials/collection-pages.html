@@ -1,0 +1,13 @@
+{{/*
+  Every regular page whose collections (page-collections.html) include the
+  given one,
+  recently updated first — what a top-level section lists, mirrored by the
+  `collection` kind in scope() (site-index.js). Expects a collection name; call via
+  partialCached keyed on it — it scans the site.
+*/}}
+{{ $collection := . }}
+{{ $pages := slice }}
+{{ range site.RegularPages }}
+  {{ if in (partial "page-collections.html" .) $collection }}{{ $pages = $pages | append . }}{{ end }}
+{{ end }}
+{{ return partial "recent.html" $pages }}

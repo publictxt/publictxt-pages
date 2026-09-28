@@ -44,7 +44,7 @@ disagree with Hugo's year for far-off readers.
 
 ## `partialCached` on site-scanning partials
 
-`site-index.html`, `sections.html`, `type-pages.html`, `category-counts.html`
+`site-index.html`, `sections.html`, `collection-pages.html`, `category-counts.html`
 walk every page; uncached, the build goes O(pages²).
 
 ## Build order and `public/`

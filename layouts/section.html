@@ -3,7 +3,7 @@
   <h1 data-pagefind-meta="title">{{ .Title }}</h1>
   {{ partial "pagefind-keys.html" . }}
   <div class="single-meta">
-    <span class="chip chip-type" data-pagefind-filter="type">{{ .Type }}</span>
+    {{ range partial "page-collections.html" . }}<span class="chip chip-collection" data-pagefind-filter="collection">{{ . }}</span>{{ end }}
     {{ partial "page-date.html" (dict "page" . "detail" true) }}
     {{ range .GetTerms "tags" }}
     <a class="chip" href="{{ .RelPermalink }}" data-pagefind-filter="tag">{{ .LinkTitle }}</a>

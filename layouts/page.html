@@ -4,8 +4,8 @@
     <h1>{{ .Title }}</h1>
     {{ partial "pagefind-keys.html" . }}
     <div class="single-meta">
-      {{ range partial "page-types.html" . }}
-      <span class="chip chip-type" data-pagefind-filter="type">{{ . }}</span>
+      {{ range partial "page-collections.html" . }}
+      <span class="chip chip-collection" data-pagefind-filter="collection">{{ . }}</span>
       {{ end }}
       {{ partial "page-date.html" (dict "page" . "detail" true) }}
       {{ range .GetTerms "tags" }}

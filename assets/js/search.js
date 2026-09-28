@@ -17,7 +17,7 @@ const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/")
 const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
-  type: $("filter-type"), category: $("filter-category"), categoryGroup: $("filter-category-group"),
+  collection: $("filter-collection"), category: $("filter-category"), categoryGroup: $("filter-category-group"),
   categoryHint: $("filter-category-hint"),
   year: $("filter-year"), yearGroup: $("filter-year-group"),
   rating: $("filter-rating"), ratingGroup: $("filter-rating-group"),
@@ -38,8 +38,8 @@ el.root.hidden = false;
 // ---- state <-> URL --------------------------------------------------
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
-const state = { q: "", type: "", category: emptyFacet("category"), year: "", rating: "", tag: emptyFacet("tag"), sort: null };
-const filtering = () => Boolean(state.type || isSet(state.category) || state.year || state.rating || isSet(state.tag));
+const state = { q: "", collection: "", category: emptyFacet("category"), year: "", rating: "", tag: emptyFacet("tag"), sort: null };
+const filtering = () => Boolean(state.collection || isSet(state.category) || state.year || state.rating || isSet(state.tag));
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -49,7 +49,7 @@ function activeSort() {
 function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
-  state.type = p.get("type") || "";
+  state.collection = p.get("collection") || "";
   state.category = readFacet(p, "category");
   state.year = p.get("year") || "";
   state.rating = ratingFilter(p.get("rating"));
@@ -60,7 +60,7 @@ function readURL() {
 function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
-  if (state.type) p.set("type", state.type);
+  if (state.collection) p.set("collection", state.collection);
   writeFacet(p, state.category);
   if (state.year) p.set("year", state.year);
   if (state.rating) p.set("rating", state.rating);
@@ -73,14 +73,14 @@ function writeURL() {
 const toggleTag = (t) => { toggleInclude(state.tag, t); run(); };
 
 // ---- filter chips -------------------------------------------------------
-const allFilters = await pagefind.filters();   // { tag: {name: count}, type: {…}, category: {…}, year: {…}, rating: {…} }
+const allFilters = await pagefind.filters();   // { tag: {name: count}, collection: {…}, category: {…}, year: {…}, rating: {…} }
 const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[a]) || a.localeCompare(b));
 // Years newest-first, as in the browse lists.
 const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(a));
 
 function chip(kind, name, count) {
-  if (kind === "type") {
-    return filterChip(name, count, state.type === name ? "include" : "", () => { state.type = state.type === name ? "" : name; run(); });
+  if (kind === "collection") {
+    return filterChip(name, count, state.collection === name ? "include" : "", () => { state.collection = state.collection === name ? "" : name; run(); });
   }
   const f = state[kind];
   return filterChip((kind === "tag" ? "#" : "") + name, count, chipState(f, name), () => { cycle(f, name); run(); }, true);
@@ -89,8 +89,8 @@ function chip(kind, name, count) {
 // counts: filter counts within the current result set (or totals when idle);
 // facetCounts: tag / category counts, per addsPages().
 function renderFilters(counts, facetCounts) {
-  el.type.replaceChildren(...sortedKeys(allFilters.type).map((n) =>
-    chip("type", n, (counts.type || {})[n] ?? 0)));
+  el.collection.replaceChildren(...sortedKeys(allFilters.collection).map((n) =>
+    chip("collection", n, (counts.collection || {})[n] ?? 0)));
   const categories = sortedKeys(allFilters.category);
   el.categoryGroup.hidden = categories.length === 0;
   el.category.replaceChildren(...categories.map((n) =>
@@ -124,7 +124,7 @@ function renderSort() {
 // left out (its addsPages counts).
 function pagefindFilters(skip) {
   const filters = {};
-  if (state.type) filters.type = state.type;
+  if (state.collection) filters.collection = state.collection;
   if (state.year) filters.year = state.year;
   if (state.rating === UNRATED_FILTER) filters.rating = UNRATED_FILTER;
   else if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
@@ -160,7 +160,7 @@ async function run() {
   renderFilters(counts, facetCounts);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", state.type, ...describe(state.category), ...describe(state.tag, "#"), state.year,
+  const what = [hasQuery() ? `“${state.q}”` : "", state.collection, ...describe(state.category), ...describe(state.tag, "#"), state.year,
     state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
@@ -182,7 +182,7 @@ function resultCard(d) {
   const item = {
     url: d.url,
     title: d.meta?.title || d.url,
-    types: d.filters?.type || [],
+    collections: d.filters?.collection || [],
     tags: d.filters?.tag || [],
     created: d.meta?.created || "",
     updated: d.meta?.updated || "",
@@ -199,7 +199,7 @@ el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
 el.rating.addEventListener("change", () => { state.rating = el.rating.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; state.type = ""; clearFacet(state.category); state.year = ""; state.rating = ""; clearFacet(state.tag); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; state.collection = ""; clearFacet(state.category); state.year = ""; state.rating = ""; clearFacet(state.tag); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 

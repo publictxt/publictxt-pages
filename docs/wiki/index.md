@@ -71,8 +71,8 @@ layouts/_partials/
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
   bookmark-links.html   the chip row
-  page-types.html       only reader of types:; + section, .Type, "bookmarks" if URL
-  type-pages.html       every page of a type              (partialCached)
+  page-collections.html only reader of collections:; + section, "bookmarks" if URL
+  collection-pages.html every page of a collection        (partialCached)
   section-pages.html    what a section lists, + its scope
   bookmark-label.html   one URL's short form
   categories.html       only reader of categories:/category:

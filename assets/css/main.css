@@ -11,7 +11,7 @@
   --accent: #53a4c7;
   --accent-soft: rgba(57, 117, 145, 0.18);
   --chip-bg: #1d2930;
-  --chip-type-bg: rgba(53, 117, 133, 0.12);
+  --chip-collection-bg: rgba(53, 117, 133, 0.12);
   --radius: 8px;
   --sidebar-width: 264px;
   --content-max: 76ch;
@@ -176,8 +176,8 @@ a:hover { text-decoration: underline; }
   color: var(--accent);
 }
 
-.chip-type {
-  background: var(--chip-type-bg);
+.chip-collection {
+  background: var(--chip-collection-bg);
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -307,7 +307,7 @@ a:hover { text-decoration: underline; }
 
 .page-card-title { font-weight: 600; font-size: 1.02rem; }
 
-.page-card-types { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; flex-shrink: 0; }
+.page-card-collections { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; flex-shrink: 0; }
 
 .page-card-summary {
   margin: 0.4rem 0 0.5rem;

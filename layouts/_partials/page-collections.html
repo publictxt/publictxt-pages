@@ -1,0 +1,18 @@
+{{/*
+  A page's collections, lower-cased and deduped: its top-level section ("page" at
+  root), each of `collections:` (a value or a list), and "bookmarks" when it
+  carries a bookmark URL (bookmark-urls.html). The only reader of `collections:`;
+  `type:` is left to Hugo (layout choice) and adds nothing. Feeds the
+  collection chips, the Pagefind `collection` filter, index.json `collections`,
+  and collection-pages.html — so a top-level section lists every page of its
+  collection, wherever it's filed.
+  Expects a page.
+*/}}
+{{ $collections := slice (or .Section "page") }}
+{{ with .Params.collections }}
+  {{ range (cond (reflect.IsSlice .) . (slice .)) }}
+    {{ with (printf "%v" . | strings.TrimSpace) }}{{ $collections = $collections | append . }}{{ end }}
+  {{ end }}
+{{ end }}
+{{ if partial "bookmark-urls.html" . }}{{ $collections = $collections | append "bookmarks" }}{{ end }}
+{{ return (apply $collections "lower" "." | uniq) }}

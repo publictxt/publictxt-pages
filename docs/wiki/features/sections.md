@@ -4,24 +4,25 @@ covers:
   - layouts/_partials/sections.html
   - layouts/section.html
   - layouts/_partials/section-pages.html
-  - layouts/_partials/type-pages.html
-  - layouts/_partials/page-types.html
+  - layouts/_partials/collection-pages.html
+  - layouts/_partials/page-collections.html
   - hugo.toml
 ---
 
 # Sections
 
-Every top-level folder is a section; its name is the default `type`. Root-level `.md`
+Every top-level folder is a section; its name is the page's default collection. Root-level `.md`
 are plain pages.
 
-**Types** (rules for authors: [SPEC.md § Types](../SPEC.md#types)). One partial each:
+**Collections** (rules for authors: [SPEC.md § Collections](../SPEC.md#collections)). One partial each:
 
-- `page-types.html` — a page's types: section + `.Type` + `types:` + `bookmarks` if it
-  has a URL, lower-cased, deduped. Every chip, the Pagefind `type` filter and
-  index.json `types` read it.
-- `type-pages.html` — every page of a type (partialCached; scans the site).
-- `section-pages.html` — what a section lists: top-level → `type-pages.html` of its
-  lower-cased name, scope `type`; sub-folder → `.RegularPagesRecursive`, scope
+- `page-collections.html` — a page's collections: section (`page` at root) +
+  `collections:` + `bookmarks` if it has a URL, lower-cased, deduped. `type:` is Hugo's;
+  adds nothing. Every chip, the Pagefind `collection` filter and index.json
+  `collections` read it.
+- `collection-pages.html` — every page of a collection (partialCached; scans the site).
+- `section-pages.html` — what a section lists: top-level → `collection-pages.html` of its
+  lower-cased name, scope `collection`; sub-folder → `.RegularPagesRecursive`, scope
   `section`. The list, home and sidebar counts, and list.js's `scope()` all go through
   it, so they agree.
 
