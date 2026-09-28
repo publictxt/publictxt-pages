@@ -38,7 +38,7 @@ capitalizeListTitles = false
   # Footer wording, optional; "" hides a line. `text` is inline markdown;
   # `edit` labels the edit link (shown only with editURL).
   [params.footer]
-    text = "PublicTxt, plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)"
+    text = "[PublicTxt](https://github.com/publictxt/publictext), plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)"
     edit = "Improve this page"
 
   # Section order in sidebar and home (folder names); unlisted follow A→Z.
