@@ -26,7 +26,7 @@ function byUpdated(items) {
  * The pages a list shows.
  *   section    every page below this section's path (.RegularPagesRecursive)
  *   tag        every page carrying this tag (term .Pages)
- *   type       every page of this type, wherever filed (_partials/type-pages.html)
+ *   collection every page of this collection, wherever filed (_partials/collection-pages.html)
  *   recent     the N most recently updated, site-wide (home)
  */
 export function scope(items, kind, value) {
@@ -37,8 +37,8 @@ export function scope(items, kind, value) {
       const want = String(value).toLowerCase();
       return items.filter((it) => (it.tags || []).some((t) => t.toLowerCase() === want));
     }
-    case "type":
-      return items.filter((it) => (it.types || []).includes(value));
+    case "collection":
+      return items.filter((it) => (it.collections || []).includes(value));
     case "recent": {
       const n = parseInt(value, 10) || 0;
       const ordered = byUpdated(items);

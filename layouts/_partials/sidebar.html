@@ -23,9 +23,9 @@
 <div class="side-block page-meta" aria-label="Page metadata">
   <h2 class="side-heading">This page</h2>
   <dl class="meta-list">
-    <dt>Type</dt>
-    {{/* page-types.html; each links to its section when one exists */}}
-    <dd>{{ range $t := partial "page-types.html" . }}{{ with site.GetPage $t }}<a class="chip chip-type" href="{{ .RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-type">{{ $t }}</span>{{ end }} {{ end }}</dd>
+    <dt>Collection</dt>
+    {{/* page-collections.html; each links to its section when one exists */}}
+    <dd>{{ range $t := partial "page-collections.html" . }}{{ with site.GetPage $t }}<a class="chip chip-collection" href="{{ .RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
     {{ if not .Date.IsZero }}
     <dt>Created</dt>
     <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006" }}</time></dd>

@@ -1,15 +1,15 @@
 ---
 covers:
   - layouts/_partials/bookmark-urls.html
-  - layouts/_partials/page-types.html
+  - layouts/_partials/page-collections.html
 ---
 
 # Bookmarks
 
-A page with `bookmark:` / `bookmarks:` gains type `bookmarks` (`page-types.html`), so
+A page with `bookmark:` / `bookmarks:` joins collection `bookmarks` (`page-collections.html`), so
 the top-level Bookmarks section lists it wherever it lives — no special template, just
-the type rule in [sections.md](sections.md). Pages filed under `bookmarks/` are that
-type by folder, URL or not (`sites/<domain>/` for URL pages, `wiki/` for pages about
+the collection rule in [sections.md](sections.md). Pages filed under `bookmarks/` are in it
+by folder, URL or not (`sites/<domain>/` for URL pages, `wiki/` for pages about
 them). `bookmark-urls.html` is the only reader of the keys. Sync warns on a page under
 `bookmarks/` (outside `wiki/`) with no URL.
 

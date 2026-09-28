@@ -1,12 +1,12 @@
 {{/*
-  The pages a section lists: a top-level section, every page of its type
-  (type-pages.html), wherever filed; a sub-folder, its own subtree. Returns
+  The pages a section lists: a top-level section, every page of its
+  collection (collection-pages.html), wherever filed; a sub-folder, its own subtree. Returns
   dict pages (recently updated first) and scope (for list-container.html),
   so the list, its count on home and the sidebar, and list.js agree.
   Expects a section page.
 */}}
 {{ if eq .Parent site.Home }}
-  {{ $type := lower .Section }}{{/* page-types.html lower-cases */}}
-  {{ return dict "pages" (partialCached "type-pages.html" $type $type) "scope" (dict "kind" "type" "value" $type) }}
+  {{ $c := lower .Section }}{{/* page-collections.html lower-cases */}}
+  {{ return dict "pages" (partialCached "collection-pages.html" $c $c) "scope" (dict "kind" "collection" "value" $c) }}
 {{ end }}
 {{ return dict "pages" (partial "recent.html" .RegularPagesRecursive) "scope" (dict "kind" "section" "value" .RelPermalink) }}
