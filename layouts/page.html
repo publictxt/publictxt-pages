@@ -13,6 +13,7 @@
       {{ end }}
     </div>
     {{ partial "bookmark-links.html" . }}
+    {{ with partial "source-links.html" . }}<div class="chip-row source-links"><span class="muted">Posted on</span> {{ . }}</div>{{ end }}
   </header>
   <div class="prose">
     {{ .Content }}

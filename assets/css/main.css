@@ -189,7 +189,8 @@ a:hover { text-decoration: underline; }
 .rating { color: var(--accent); letter-spacing: 0.05em; white-space: nowrap; }
 
 .chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace; }
-.bookmark-links { margin-top: 0.4rem; }
+.bookmark-links, .source-links { margin-top: 0.4rem; }
+.source-links { align-items: center; }
 
 .chip-row {
   display: flex;

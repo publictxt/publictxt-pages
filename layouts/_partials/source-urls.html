@@ -1,0 +1,14 @@
+{{/*
+  Where a page was also posted: one dict (label, url) per URL under each
+  front matter key listed in params.sources (key → label; A→Z by key), each
+  a URL or a list. The only reader of those keys. Expects a page.
+*/}}
+{{ $out := slice }}
+{{ range $key, $label := site.Params.sources }}
+  {{ with index $.Params $key }}
+    {{ range (cond (reflect.IsSlice .) . (slice .)) }}
+      {{ with (printf "%v" . | strings.TrimSpace) }}{{ $out = $out | append (dict "label" $label "url" .) }}{{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ return $out }}

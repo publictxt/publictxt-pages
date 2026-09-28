@@ -1,0 +1,4 @@
+{{/* Link chips to where a page was also posted (source-urls.html); nothing if none. Expects a page. */}}
+{{- range partial "source-urls.html" . -}}
+<a class="chip chip-link" href="{{ .url }}" rel="noopener external" target="_blank">↗ {{ .label }}</a>
+{{ end -}}

@@ -22,6 +22,7 @@ One page per capability and the files that do it. See the map in
 | [dates.md](dates.md) | `created`/`updated` ladders and display |
 | [embeds.md](embeds.md) | YouTube links in image syntax become players |
 | [bookmarks.md](bookmarks.md) | `bookmark:` front matter, the section, link chips |
+| [post-sources.md](post-sources.md) | `facebook:`, `mastodon:`, … — "Posted on" links |
 | [breadcrumbs.md](breadcrumbs.md) | ancestor trail |
 | [theme.md](theme.md) | page shell, sidebar, CSS, footer |
 
