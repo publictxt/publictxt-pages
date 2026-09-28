@@ -20,6 +20,7 @@ Items marked **(TBD)** are not built.
   - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*.
   - Section index bodies render as prose and are search-indexed.
+  - Types: see [Types](#types) — a top-level section lists every page of its type, wherever filed.
 - Sidebar
   - Tag cloud
   - page meta (type, dates, categories, tags) in sidebar.
@@ -47,7 +48,7 @@ Items marked **(TBD)** are not built.
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
-  - A page is a bookmark only if it has a `bookmark:`/`bookmarks:` URL, wherever it lives; `bookmarks/` is just a filing folder
+  - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives (it gains type `bookmarks`); pages filed under `bookmarks/` are too, by folder
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
@@ -80,6 +81,32 @@ README*, LICENSE*, CNAME, .git/    (skipped during sync)
 
 ```
 
+## Types
+
+A page has one or more types. They show as chips on the page and its cards, drive the
+Type filter in lists and search, and decide which top-level section lists it.
+
+| Source                          | Type it adds         |
+| ------------------------------- | -------------------- |
+| top-level folder it's filed in  | that folder's name   |
+| `type:` in front matter         | that value           |
+| `types:` (a value or a list)    | each value           |
+| `bookmark:` / `bookmarks:` URL  | `bookmarks`          |
+
+- **Adds, never replaces** — the folder's type always stays. Root-level pages get `page`.
+- **Case-insensitive** — `Notes`, `notes`, `NOTES` are one type; shown lower-case.
+- **Top-level sections gather by type**: `/notes/` lists every page of type `notes`,
+  wherever filed; home and sidebar counts match. **Sub-folders don't** — they list only
+  what's filed under them.
+- **A type with no folder** (`types: [recipe]`) is still a chip and a filter value; it
+  just has no section page.
+- Prefer `types:` to `type:` — Hugo also uses `type:` to choose the page's layout.
+
+```yaml
+# posts/2026-09-28-hello.md — listed in Posts and Blog, filterable as either
+types: [blog]
+```
+
 ## Front Matter Reference
 
 All front matter optional; sync derives the rest.
@@ -87,12 +114,13 @@ All front matter optional; sync derives the rest.
 | Key                     | Purpose                    | Notes                                                                           |
 | ----------------------- | -------------------------- | ------------------------------------------------------------------------------- |
 | `title`                 | Page title                 | Falls back to first H1 (removed from body), then filename                       |
-| `type`                  | Override folder-based type | Defaults to top-level folder name                                               |
+| `type`                  | One extra type             | Adds to the folder type, not replaces; also picks Hugo's layout. See [Types](#types) |
+| `types`                 | Extra types, value or list | Page also lists under those top-level sections and type filters. See [Types](#types) |
 | `tags`                  | Inline or block list       | Merged with `#hashtags`; deduplicated                                           |
 | `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
 | `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
 | `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
-| `bookmark`, `bookmarks` | URL or list                | Makes the page a bookmark (the only thing that does)                            |
+| `bookmark`, `bookmarks` | URL or list                | Adds type `bookmarks`, wherever the page lives. See [Types](#types)             |
 | `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.

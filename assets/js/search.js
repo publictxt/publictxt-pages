@@ -182,7 +182,7 @@ function resultCard(d) {
   const item = {
     url: d.url,
     title: d.meta?.title || d.url,
-    type: (d.filters?.type || [])[0] || "",
+    types: d.filters?.type || [],
     tags: d.filters?.tag || [],
     created: d.meta?.created || "",
     updated: d.meta?.updated || "",

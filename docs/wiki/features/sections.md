@@ -3,6 +3,9 @@ covers:
   - scripts/sync_content.py
   - layouts/_partials/sections.html
   - layouts/section.html
+  - layouts/_partials/section-pages.html
+  - layouts/_partials/type-pages.html
+  - layouts/_partials/page-types.html
   - hugo.toml
 ---
 
@@ -10,6 +13,17 @@ covers:
 
 Every top-level folder is a section; its name is the default `type`. Root-level `.md`
 are plain pages.
+
+**Types** (rules for authors: [SPEC.md § Types](../SPEC.md#types)). One partial each:
+
+- `page-types.html` — a page's types: section + `.Type` + `types:` + `bookmarks` if it
+  has a URL, lower-cased, deduped. Every chip, the Pagefind `type` filter and
+  index.json `types` read it.
+- `type-pages.html` — every page of a type (partialCached; scans the site).
+- `section-pages.html` — what a section lists: top-level → `type-pages.html` of its
+  lower-cased name, scope `type`; sub-folder → `.RegularPagesRecursive`, scope
+  `section`. The list, home and sidebar counts, and list.js's `scope()` all go through
+  it, so they agree.
 
 Hugo needs `_index.md` for a section, and reads a folder with `index.md` as a leaf
 bundle, hiding its siblings. So sync renames `index.md`/`home.md` → `_index.md`,

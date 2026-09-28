@@ -52,7 +52,6 @@ layouts/term.html                 /tags/<term>/
 layouts/taxonomy.html             /tags/
 layouts/search.html               search UI shell; search.js fills it
 layouts/404.html
-layouts/bookmarks/section.html    section.html + the gathered bookmarks
 
 layouts/_partials/
   head.html             title, description, favicon, Mastodon rel="me", stylesheet
@@ -71,8 +70,10 @@ layouts/_partials/
   list-per-page.html    perPage: cascade
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
-  bookmark-pages.html   every page with a bookmark URL  (partialCached)
   bookmark-links.html   the chip row
+  page-types.html       only reader of types:; + section, .Type, "bookmarks" if URL
+  type-pages.html       every page of a type              (partialCached)
+  section-pages.html    what a section lists, + its scope
   bookmark-label.html   one URL's short form
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
