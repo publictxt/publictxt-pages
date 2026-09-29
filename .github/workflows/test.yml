@@ -1,4 +1,4 @@
-# Pipeline tests (tests/, stdlib unittest) on every push and PR.
+# Pipeline tests (tests/, stdlib unittest) and the map check on every push and PR.
 # Oldest supported Python on Linux, newest on Windows (CRLF output).
 
 name: Test
@@ -29,3 +29,4 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m unittest -v
+      - run: python scripts/map_lint.py

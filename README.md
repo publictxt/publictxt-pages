@@ -14,12 +14,13 @@ minimal reliance on PublicTxt-specific syntax transforms.
 ## docs
 
 - [docs/SPEC.md](docs/SPEC.md) — what it does and should do
-- [docs/wiki/](docs/wiki/index.md) — how it works
+- [docs/wiki/](docs/wiki/index.md) — the file map, and traps that span files
 
 ## Requirements
 
 - **Hugo v0.158+** (plain works — no Sass). Distro packages are often stale; check
   `hugo version`.
+- **Python 3.10+** — no packages.
 - **Pagefind** — `npx pagefind` (Node) or the [standalone binary](https://github.com/Pagefind/pagefind/releases).
 
 ## Authoring in Obsidian
@@ -40,7 +41,16 @@ scripts/build.sh --serve                 # local preview
 .\scripts\build.ps1 -Serve
 ```
 
-Pipeline, dev-server notes: [docs/wiki/build.md](docs/wiki/build.md).
+Pipeline order and flags: the build scripts' headers. `--serve` needs a prior full build
+for search, and a re-run of sync for content changes.
+
+## Tests
+
+```bash
+python -m unittest        # stdlib only; CI runs it on push and PR
+```
+
+A golden snapshot of the pipeline's output; refreshing it: `tests/test_golden.py`.
 
 ## Publishing (GitHub Pages)
 
@@ -49,4 +59,6 @@ at build time. Copy [`deploy/publish-to-github-pages.yml`](deploy/publish-to-git
 to `.github/workflows/publish.yml` there, set `HUGO_BASEURL`, and switch that repo's
 **Settings → Pages → Source** to *GitHub Actions*.
 
-Details: [docs/wiki/deploy.md](docs/wiki/deploy.md).
+Per-site settings: `HUGO_*` env vars on its Build step, or the content repo's
+`settings/site.toml` (commented example: `example/txt/settings/site.toml`). Keep
+`fetch-depth: 0` — page dates come from Git history.
