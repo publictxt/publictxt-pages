@@ -20,7 +20,7 @@ SOURCE_GLOBS = (
     "layouts/**/*.html",
     "assets/**/*.js", "assets/**/*.css",
     "deploy/*.yml", ".github/workflows/*.yml",
-    "tests/*.py",
+    "tests/*.py", "tests/js/*.mjs",
     "hugo.toml",
 )
 SOURCE_EXCLUDE = {"tests/__init__.py"}

@@ -19,7 +19,8 @@ appears or goes — and a trap fixed in code or covered by a test comes off the 
 
 ## Tests
 
-Run `python -m unittest` after changing `scripts/` or `example/`. A golden failure from an
+Run `python -m unittest` after changing `scripts/`, `example/` or templates, and
+`node --test "tests/js/*.test.mjs"` after changing `assets/js/`. A golden failure from an
 intended change: refresh (`GOLDEN_UPDATE=1 python -m unittest tests.test_golden`), then read
 `git diff tests/golden` and tell the user what moved — never refresh to silence a surprise.
 
