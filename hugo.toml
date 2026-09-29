@@ -58,6 +58,18 @@ capitalizeListTitles = false
     enabled = false
     list = ["Project", "Personal", "Tech", "Politics", "Science", "CompSci", "Art", "Content"]
 
+  # Filter chips in browse lists and search, in this order. `key`: collection,
+  # category or tag; leave one out to drop its chips. Absent = all three.
+  [[params.chipFacets]]
+    key = "collection"
+    label = "Collection"
+  [[params.chipFacets]]
+    key = "category"
+    label = "Category"
+  [[params.chipFacets]]
+    key = "tag"
+    label = "Tags"
+
   # Post sources: front matter keys holding a URL (or list) where a page was
   # also posted, shown as "Posted on" links; key → label. Unlisted keys are
   # ignored. (A page's `mastodon:` is a post; params.mastodon is the profile.)

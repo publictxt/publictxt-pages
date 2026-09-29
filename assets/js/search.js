@@ -4,12 +4,14 @@
 // Sorting is Pagefind's, on pagefind-keys.html's keys, and replaces relevance
 // outright: "Relevance" is offered, and default, only with a query. Rating is
 // a minimum: `?rating=4` = any of "4", "5"; `unrated` is its own value.
-// Chip facets (CHIP_FACETS): include / exclude / any-or-all, as facets.js.
+// Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
-import { addsPages, anySet, chipState, CHIP_FACETS, CHIP_KEYS, clearFacets, cycle, describeFacets, filterChip,
-  matchToggle, pagefindConditions, readFacets, toggleInclude, writeFacets } from "./facets.js";
+import * as params from "@params";   // js-params.html
+import { addsPages, chipFacets, chipState, cycle, filterChip, matchToggle, pagefindConditions,
+  toggleInclude } from "./facets.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
+const CHIPS = chipFacets(params.chipFacets);
 const PAGE = 20;
 const TYPING_MS = 400;   // pause before a keystroke searches; Enter searches now
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
@@ -21,7 +23,7 @@ const el = {
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
 // Per chip facet, search.html's filter-{key}-group / filter-{key} / filter-{key}-hint.
-const groups = Object.fromEntries(CHIP_KEYS.map((k) => [k, {
+const groups = Object.fromEntries(CHIPS.keys.map((k) => [k, {
   group: $(`filter-${k}-group`), chips: $(`filter-${k}`), hint: $(`filter-${k}-hint`),
 }]));
 
@@ -38,8 +40,8 @@ el.root.hidden = false;
 // ---- state <-> URL --------------------------------------------------
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
-const state = { q: "", ...readFacets(), year: "", rating: "", sort: null };
-const filtering = () => Boolean(anySet(state) || state.year || state.rating);
+const state = { q: "", ...CHIPS.read(), year: "", rating: "", sort: null };
+const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -49,7 +51,7 @@ function activeSort() {
 function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
-  Object.assign(state, readFacets(p));
+  Object.assign(state, CHIPS.read(p));
   state.year = p.get("year") || "";
   state.rating = ratingFilter(p.get("rating"));
   const s = p.get("sort");
@@ -58,7 +60,7 @@ function readURL() {
 function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
-  writeFacets(p, state);
+  CHIPS.write(p, state);
   if (state.year) p.set("year", state.year);
   if (state.rating) p.set("rating", state.rating);
   const sort = activeSort();
@@ -66,7 +68,8 @@ function writeURL() {
   const qs = p.toString();
   history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
 }
-const toggleTag = (t) => { toggleInclude(state.tag, t); run(); };
+// Card tags filter only while tag is a chip facet; else they link.
+const toggleTag = state.tag ? (t) => { toggleInclude(state.tag, t); run(); } : null;
 
 // ---- filter chips -------------------------------------------------------
 const allFilters = await pagefind.filters();   // { tag: {name: count}, collection: {…}, category: {…}, year: {…}, rating: {…} }
@@ -83,7 +86,7 @@ function chip(d, name, count) {
 // facetCounts: chip facet counts, per addsPages(). A chip facet the index
 // lacks hides — categories when disabled.
 function renderFilters(counts, facetCounts) {
-  for (const d of CHIP_FACETS) {
+  for (const d of CHIPS.defs) {
     const g = groups[d.key];
     const names = sortedKeys(allFilters[d.key]);
     g.group.hidden = names.length === 0;
@@ -118,7 +121,7 @@ function pagefindFilters(skip) {
   if (state.year) filters.year = state.year;
   if (state.rating === UNRATED_FILTER) filters.rating = UNRATED_FILTER;
   else if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
-  const all = CHIP_KEYS.flatMap((k) => pagefindConditions(state[k], k !== skip));
+  const all = CHIPS.keys.flatMap((k) => pagefindConditions(state[k], k !== skip));
   if (all.length) filters.all = all;
   return filters;
 }
@@ -133,7 +136,7 @@ async function run() {
   const query = hasQuery() ? state.q : null;
   // An addsPages facet counts from a search without its includes, or the
   // totals when nothing else narrows.
-  const recount = CHIP_KEYS.filter((k) => addsPages(state[k]));
+  const recount = CHIPS.keys.filter((k) => addsPages(state[k]));
   const without = (k) => {
     const filters = pagefindFilters(k);
     return query || Object.keys(filters).length ? pagefind.search(query, { filters }) : null;
@@ -143,14 +146,14 @@ async function run() {
   current = res.results; shown = 0;
   el.list.replaceChildren();
   const counts = res.filters || allFilters;
-  const facetCounts = Object.fromEntries(CHIP_KEYS.map((k) => {
+  const facetCounts = Object.fromEntries(CHIPS.keys.map((k) => {
     const i = recount.indexOf(k);
     return [k, i < 0 ? counts[k] : (others[i]?.filters || allFilters)[k]];
   }));
   renderFilters(counts, facetCounts);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", ...describeFacets(state), state.year,
+  const what = [hasQuery() ? `“${state.q}”` : "", ...CHIPS.describe(state), state.year,
     state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
@@ -178,7 +181,7 @@ function resultCard(d) {
     updated: d.meta?.updated || "",
     rating: Number(d.meta?.rating) || 0,
   };
-  return card(item, { activeTags: state.tag.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });
+  return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });
 }
 
 // ---- wiring -------------------------------------------------------------
@@ -189,7 +192,7 @@ el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
 el.rating.addEventListener("change", () => { state.rating = el.rating.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; clearFacets(state); state.year = ""; state.rating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; CHIPS.clear(state); state.year = ""; state.rating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 

@@ -9,10 +9,12 @@
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL (home Recent)
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
-import { addsPages, anySet, chipState, CHIP_FACETS, CHIP_KEYS, clearFacets, cycle, describeFacets, filterChip, matches,
-  matchToggle, readFacets, toggleInclude, writeFacets } from "./facets.js";
+import * as params from "@params";   // js-params.html
+import { addsPages, chipFacets, chipState, cycle, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
+
+const CHIPS = chipFacets(params.chipFacets);
 
 // Sliced, not parsed as a local Date, to match Hugo's year (traps.md).
 function yearOf(it) {
@@ -20,11 +22,11 @@ function yearOf(it) {
 }
 
 // Each facet's values per page and chip order. The chip facets per facets.js
-// (CHIP_FACETS); year single-select. Rating is a minimum, handled in render().
+// (CHIPS); year single-select. Rating is a minimum, handled in render().
 // Disabled categories leave no data, so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
-  ...Object.fromEntries(CHIP_FACETS.map((d) => [d.key, { values: (it) => it[d.item] || [], order: byCount }])),
+  ...Object.fromEntries(CHIPS.defs.map((d) => [d.key, { values: (it) => it[d.item] || [], order: byCount }])),
   year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
 };
 
@@ -62,13 +64,13 @@ async function mount(root) {
   }
 
   // ---- state <-> URL --------------------------------------------------
-  // Chip facets by key (readFacets); `more`: keys showing past their limit.
-  const state = { sort: defaultSort, ...readFacets(), year: "", rating: "", page: 1, more: new Set() };
+  // Chip facets by key (CHIPS.read); `more`: keys showing past their limit.
+  const state = { sort: defaultSort, ...CHIPS.read(), year: "", rating: "", page: 1, more: new Set() };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
-    Object.assign(state, readFacets(p));
+    Object.assign(state, CHIPS.read(p));
     state.year = p.get("year") || "";
     state.rating = ratingFilter(p.get("rating"));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
@@ -77,7 +79,7 @@ async function mount(root) {
     const s = { ...state, ...overrides };
     const p = new URLSearchParams();
     if (s.sort !== defaultSort) p.set("sort", s.sort);
-    writeFacets(p, s);
+    CHIPS.write(p, s);
     if (s.year) p.set("year", s.year);
     if (s.rating) p.set("rating", s.rating);
     if (s.page > 1) p.set("page", String(s.page));
@@ -117,7 +119,7 @@ async function mount(root) {
   // or more values — shared ones too, as membership is worth seeing — less a
   // list's own.
   const own = (d) => root.dataset.scopeKind === d.key ? root.dataset.scopeValue : null;
-  const chipValues = Object.fromEntries(CHIP_FACETS.map((d) => {
+  const chipValues = Object.fromEntries(CHIPS.defs.map((d) => {
     const all = counts(items, d.key);
     const shown = d.shared ? (all.length > 1 ? all : []) : all.filter(([, n]) => n < items.length);
     return [d.key, shown.filter(([n]) => n !== own(d))];
@@ -203,14 +205,14 @@ async function mount(root) {
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        clearFacets(state); state.year = ""; state.rating = ""; state.sort = defaultSort; state.page = 1; render(true);
+        CHIPS.clear(state); state.year = ""; state.rating = ""; state.sort = defaultSort; state.page = 1; render(true);
       });
       head.append(clear);
     }
     body.append(head);
 
     // Past a facet's `limit`, chips fold behind "more"; selected ones stay.
-    for (const d of CHIP_FACETS) {
+    for (const d of CHIPS.defs) {
       const values = chipValues[d.key];
       if (!values.length) continue;
       const f = state[d.key];
@@ -274,36 +276,37 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  const filtering = () => Boolean(anySet(state) || state.year || state.rating);
+  const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
 
   // Each filter as a test; `own` false drops a facet's includes (addsPages).
   const tests = {
-    ...Object.fromEntries(CHIP_KEYS.map((k) => [k, (it, own) => matches(state[k], FACETS[k].values(it), own)])),
+    ...Object.fromEntries(CHIPS.keys.map((k) => [k, (it, own) => matches(state[k], FACETS[k].values(it), own)])),
     year: (it) => !state.year || yearOf(it) === state.year,
     rating: (it) => !state.rating
       || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating)),
   };
   // Passes every test but `skip`'s; a skipped facet keeps its excludes.
   const passes = (it, skip) => Object.entries(tests).every(([k, test]) =>
-    k !== skip ? test(it, true) : CHIP_KEYS.includes(k) ? test(it, false) : true);
+    k !== skip ? test(it, true) : CHIPS.keys.includes(k) ? test(it, false) : true);
 
   function render(pushHistory) {
     const filtered = sorted(items.filter((it) => passes(it)), state.sort);
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
     if (state.page > total) state.page = total;
     const slice = compact ? filtered : filtered.slice((state.page - 1) * perPage, state.page * perPage);
-    const onTag = compact ? null : (t) => {
+    // Card tags filter only while tag is a chip facet; else they link.
+    const onTag = compact || !state.tag ? null : (t) => {
       toggleInclude(state.tag, t);
       state.page = 1; render(true);
     };
-    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag.inc, onTag })));
+    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag?.inc, onTag })));
     if (compact) return;
 
     const forFacet = (k) => addsPages(state[k]) ? items.filter((it) => passes(it, k)) : filtered;
     renderControls(filtered, items.filter((it) => passes(it, "year")), items.filter((it) => passes(it, "rating")), forFacet);
     renderPager(total);
     const n = filtered.length;
-    const what = [...describeFacets(state), state.year,
+    const what = [...CHIPS.describe(state), state.year,
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`

@@ -1,7 +1,6 @@
 ---
 covers:
   - assets/js/search.js
-  - assets/js/facets.js
   - layouts/search.html
   - layouts/_partials/pagefind-keys.html
   - layouts/_partials/rating.html
@@ -16,12 +15,9 @@ lives in `site-content/`.
 Sorts are Pagefind's, over `pagefind-keys.html`'s keys, and **replace** relevance
 with no tiebreak: *Relevance* is offered (and default) only with a query.
 
-Same facets and URL spelling as the browse lists. The chip facets (`CHIP_FACETS`:
-collection, category, tag) go through `facets.js`, shared with the lists: a chip click cycles include → exclude → off, and
-with two includes a toggle sets match all / any (default all — it narrows, so no recount search;
-`?tag-not=`, `?tag-match=`). The rest are single-select. Pagefind gets them as a
-compound `all: [...]`. A facet matching *any* counts from a second search without
-its own includes, since picking a value adds pages.
+Same facets and URL spelling as the browse lists. Collection, category and tag are
+[filter chips](filter-chips.md); year and rating single-select. Pagefind gets the chips
+as a compound `all: [...]`; a facet matching *any* counts from a second search.
 
 A chip facet hides when the index has none (categories when disabled); year when the site spans one year; rating
 when nothing is rated. Selects show no counts — Pagefind's are per result set. Chip

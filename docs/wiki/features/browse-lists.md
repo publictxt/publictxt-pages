@@ -27,8 +27,8 @@ shape is in `cards.js`. Each list names its subset, mirroring its server collect
 
 Controls: sort (`sorts.js`), collection / category / tag chips, year and minimum-rating
 selects ([ratings.md](ratings.md)). A page counts under each of its collections (`page-collections.html`). A facet hides when the list doesn't vary on it —
-how a tag page hides its own tag; collections hide only a collection list's own. The chip facets
-(`CHIP_FACETS` in `facets.js`) include, exclude or match any/all as in search; tags fold past 20. Options count what picking them gives: single-selects,
+how a tag page hides its own tag; collections hide only a collection list's own. Collection, category
+and tag are [filter chips](filter-chips.md); tags fold past 20. Options count what picking them gives: single-selects,
 and chips of a facet matching *any*. URL spelling is shared with [search.md](search.md). The controls fold on
 narrow screens unless the URL sets a filter or sort. Home *Recent* is `data-compact`:
 cards only.

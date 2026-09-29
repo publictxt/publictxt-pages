@@ -31,9 +31,8 @@ Implemented twice, once server-side (no-JS render) and once in JS:
 | `pagefind-keys.html`'s `data-year` | `yearOf()` in `list.js` |
 | stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
-| `search.html` chip groups (key, label, order) | `CHIP_FACETS` in `facets.js` |
 
-A `CHIP_FACETS` key (`facets.js`) is the URL param **and** the Pagefind filter
+A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.
 

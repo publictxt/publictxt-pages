@@ -1,21 +1,36 @@
-// Multi-select chip facets (CHIP_FACETS) for list.js and search.js, so the
-// lists and search read the URL and match pages alike. A value is included,
-// excluded or neither; includes match `all` or `any`, excludes match none.
+// Multi-select chip facets for list.js and search.js, so the lists and search
+// read the URL and match pages alike. A value is included, excluded or
+// neither; includes match `all` or `any`, excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c
 // `-match` is written only when `any`: the default is `all`, which narrows and
 // so needs no recount search (addsPages).
 
 export const DEFAULT_MATCH = "all";
 
-// The chip facets, in display order. `key` is the URL param and Pagefind filter
-// (traps.md); `item` the index.json field; `label` as search.html's headings.
-// Lists only: `shared` shows values every listed page has; `limit` chips before "more".
-export const CHIP_FACETS = [
-  { key: "collection", item: "collections", label: "Collection", prefix: "", shared: true },
-  { key: "category", item: "categories", label: "Category", prefix: "" },
-  { key: "tag", item: "tags", label: "Tags", prefix: "#", limit: 20 },
-];
-export const CHIP_KEYS = CHIP_FACETS.map((d) => d.key);
+// What config can't change, per key. `key` is the URL param and Pagefind filter
+// (traps.md); `item` the index.json field. Lists only: `shared` shows values
+// every listed page has; `limit` chips before "more".
+const BUILTIN = {
+  collection: { item: "collections", prefix: "", shared: true },
+  category: { item: "categories", prefix: "" },
+  tag: { item: "tags", prefix: "#", limit: 20 },
+};
+
+// The chip facets from config — @params' chipFacets (chip-facets.html: order,
+// label), passed in so this module stays Hugo-free. `defs` in display order;
+// the rest handle every facet at once, keyed on a caller's state object.
+export function chipFacets(config) {
+  const defs = config.filter((c) => c.key in BUILTIN).map((c) => ({ ...BUILTIN[c.key], ...c }));
+  const keys = defs.map((d) => d.key);
+  return {
+    defs, keys,
+    read: (p = new URLSearchParams()) => Object.fromEntries(defs.map((d) => [d.key, readFacet(p, d.key)])),
+    write: (p, s) => keys.forEach((k) => writeFacet(p, s[k])),
+    clear: (s) => keys.forEach((k) => clearFacet(s[k])),
+    anySet: (s) => keys.some((k) => isSet(s[k])),
+    describe: (s) => defs.flatMap((d) => describe(s[d.key], d.prefix)),
+  };
+}
 
 export function readFacet(p, key) {
   const match = p.get(key + "-match");
@@ -26,7 +41,6 @@ export function readFacet(p, key) {
     match: match === "any" ? "any" : DEFAULT_MATCH,
   };
 }
-export const emptyFacet = (key) => readFacet(new URLSearchParams(), key);
 
 export function writeFacet(p, f) {
   for (const v of f.inc) p.append(f.key, v);
@@ -38,13 +52,6 @@ export const isSet = (f) => f.inc.size > 0 || f.exc.size > 0;
 export function clearFacet(f) {
   f.inc.clear(); f.exc.clear(); f.match = DEFAULT_MATCH;
 }
-
-// Every chip facet at once, keyed as CHIP_KEYS on a caller's state object.
-export const readFacets = (p = new URLSearchParams()) => Object.fromEntries(CHIP_KEYS.map((k) => [k, readFacet(p, k)]));
-export const writeFacets = (p, s) => CHIP_KEYS.forEach((k) => writeFacet(p, s[k]));
-export const clearFacets = (s) => CHIP_KEYS.forEach((k) => clearFacet(s[k]));
-export const anySet = (s) => CHIP_KEYS.some((k) => isSet(s[k]));
-export const describeFacets = (s) => CHIP_FACETS.flatMap((d) => describe(s[d.key], d.prefix));
 
 // Facet chip click: neither → included → excluded → neither.
 export function cycle(f, v) {

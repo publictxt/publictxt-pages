@@ -46,4 +46,5 @@ search.html         → search.js  + facets.js, cards.js, sorts.js
 
 Shared modules are **copied into each bundle** — two independent `facets.js`, one per
 page type. So anything set per `js.Build` call (options, `params` → `@params`) must match
-across both calls, or lists and search drift apart silently.
+across both calls, or lists and search drift apart silently — hence `js-params.html`, the
+one source of `@params`.

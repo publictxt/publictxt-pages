@@ -1,0 +1,7 @@
+{{/*
+  The `@params` for every js.Build (list-container.html, search.html): one
+  source, as shared modules are copied per bundle (build.md, JS modules).
+  Expects the surface, "lists" or "search" — unused yet, for per-surface
+  settings.
+*/}}
+{{ return dict "chipFacets" (partialCached "chip-facets.html" site) }}

@@ -33,10 +33,9 @@
           <h3 class="side-heading">Rating</h3>
           <label class="list-sort"><select id="filter-rating" aria-label="Filter by minimum rating"></select></label>
         </div>
-        {{/* The chip facets: keys, labels and order as CHIP_FACETS in facets.js.
-             search.js fills each and hides a group no indexed page has —
-             categories when params.categories is disabled. */}}
-        {{ range slice (dict "key" "collection" "label" "Collection") (dict "key" "category" "label" "Category") (dict "key" "tag" "label" "Tags") }}
+        {{/* The chip facets (chip-facets.html). search.js fills each and hides
+             a group no indexed page has — categories when disabled. */}}
+        {{ range partialCached "chip-facets.html" site }}
         <div class="filter-group" id="filter-{{ .key }}-group" hidden>
           <h3 class="side-heading">{{ .label }} <span class="muted" id="filter-{{ .key }}-hint"></span></h3>
           <div id="filter-{{ .key }}" class="chip-row"></div>
@@ -57,7 +56,7 @@
 </div>
 
 {{ with resources.Get "js/search.js" }}
-{{ $js := . | js.Build (dict "format" "esm" "minify" hugo.IsProduction) }}
+{{ $js := . | js.Build (dict "format" "esm" "minify" hugo.IsProduction "params" (partial "js-params.html" "search")) }}
 {{ if hugo.IsProduction }}{{ $js = $js | fingerprint }}{{ end }}
 <script type="module" src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
 {{ end }}
