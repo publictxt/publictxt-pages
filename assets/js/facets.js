@@ -132,7 +132,7 @@ export function filterChip(f, v, label, count, onPress) {
   body.title = on ? "Click to clear" : "Click to " + f.states[0] + (withX ? "; ✕ to exclude" : "");
   if (withX) {
     const x = button("chip-x", true);
-    x.textContent = "✕";
+    x.textContent = "×";
     x.setAttribute("aria-pressed", String(on === "exclude"));
     x.setAttribute("aria-label", (on === "exclude" ? "Stop excluding " : "Exclude ") + label);
     x.title = on === "exclude" ? "Stop excluding" : "Exclude";
