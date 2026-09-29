@@ -17,17 +17,13 @@ export function siteIndex() {
   return pending;
 }
 
-// Same order as recent.html: a stable sort over Hugo's default order breaks ties.
-function byUpdated(items) {
-  return [...items].sort((a, b) => (Date.parse(b.updated) || 0) - (Date.parse(a.updated) || 0));
-}
-
 /**
  * The pages a list shows.
  *   section    every page below this section's path (.RegularPagesRecursive)
  *   tag        every page carrying this tag (term .Pages)
  *   collection every page of this collection, wherever filed (_partials/collection-pages.html)
- *   recent     the N most recently updated, site-wide (home)
+ *   recent     the N most recently updated, site-wide (home): the index
+ *              arrives in recent.html's order, so a slice
  */
 export function scope(items, kind, value) {
   switch (kind) {
@@ -41,8 +37,7 @@ export function scope(items, kind, value) {
       return items.filter((it) => (it.collections || []).includes(value));
     case "recent": {
       const n = parseInt(value, 10) || 0;
-      const ordered = byUpdated(items);
-      return n > 0 ? ordered.slice(0, n) : ordered;
+      return n > 0 ? items.slice(0, n) : items;
     }
     default:
       return items;

@@ -46,10 +46,12 @@ class SiteIndexTest(unittest.TestCase):
         build(WORK)
         (WORK / "mounts.toml").write_text(MOUNTS, encoding="utf-8")
         configs = ["hugo.toml", "build/test/site.toml", "build/test/mounts.toml"]
-        subprocess.run(
-            [HUGO, "--quiet", "--environment", "development", "--config", ",".join(configs),
+        hugo = subprocess.run(
+            [HUGO, "--environment", "development", "--config", ",".join(configs),
              "--destination", "build/test/public"],
-            cwd=ROOT, check=True)
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+        if hugo.returncode:
+            raise RuntimeError("hugo failed:\n" + hugo.stdout + hugo.stderr)
         cls.index = canonical(json.loads((WORK / "public" / "index.json").read_text(encoding="utf-8")))
         if os.environ.get("GOLDEN_UPDATE"):
             INDEX.write_text(cls.index, encoding="utf-8", newline="\n")

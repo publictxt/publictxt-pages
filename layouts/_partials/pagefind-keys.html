@@ -2,17 +2,25 @@
   Hidden Pagefind keys for one page, on empty elements so none is indexed as
   text. Sorts: dates as Unix seconds, title lower-cased (Pagefind compares
   case-sensitively), rating (2.5 unrated, = UNRATED in sorts.js). Filters:
-  `created` year (= yearOf() in list.js), rating ("unrated" when none), and
-  category — one span per value, as an attribute holds only one.
+  `created` year (= index.json `year`), rating ("unrated" when none), and
+  category — one span per value, as an attribute holds only one. Meta: the
+  date labels (date-labels.html) and rating, for result cards.
 
   Every `data-pagefind-body` template must include this, or the page drops out
   of sorted and filtered results. See docs/wiki/traps.md.
 */}}
 {{ $categories := partial "categories.html" . }}
 {{ $rating := partial "rating.html" . }}
+{{ $d := partial "date-labels.html" . }}
+{{ $meta := slice }}
+{{ with $d.created }}{{ $meta = $meta | append "created_label[data-created-label]" }}{{ end }}
+{{ with $d.updated }}{{ $meta = $meta | append "updated_label[data-updated-label]" }}{{ end }}
+{{ with $rating }}{{ $meta = $meta | append "rating[data-rating]" }}{{ end }}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title], rating[data-rating-sort]"
   data-pagefind-filter="year[data-year], rating[data-rating]"
-  {{- with $rating }} data-pagefind-meta="rating[data-rating]"{{ end }}
+  {{- with $meta }} data-pagefind-meta="{{ delimit . ", " }}"{{ end }}
+  {{- with $d.created }} data-created-label="{{ . }}"{{ end }}
+  {{- with $d.updated }} data-updated-label="{{ . }}"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
   data-year="{{ .Date.Format "2006" }}"
   data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}"></span>

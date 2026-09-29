@@ -13,15 +13,13 @@ every page, rated or not.
 
 ## Pairs that must change together
 
-Implemented twice, once server-side (no-JS render) and once in JS:
+Display values (date labels, year, bookmark labels, recent order) are made once, in Hugo,
+and reach JS as data: `index.json` for lists, Pagefind meta (`pagefind-keys.html`) for
+search. Add one to both, or search cards go without it. What's still implemented twice:
 
 | Server | Client |
 |---|---|
-| `recent.html` order | `byUpdated()` in `site-index.js` |
-| `page-date.html` >1-day rule (+ a third copy in `sidebar.html`) | `dateHTML()` in `cards.js` |
-| `bookmark-label.html` | `bookmarkLabel()` in `cards.js` |
 | each list template's page collection | its kind in `scope()` |
-| `pagefind-keys.html`'s `data-year` | `yearOf()` in `list.js` |
 | stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
 
@@ -37,9 +35,6 @@ against its JS API, so a bump means checking search too.
 
 Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js` and
 `search.js`.
-
-`yearOf()` slices the year off the RFC 3339 string: a local-zone `getFullYear()` would
-disagree with Hugo's year for far-off readers.
 
 ## Two JS bundles, one `@params`
 
