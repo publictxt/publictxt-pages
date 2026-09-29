@@ -36,6 +36,9 @@ A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.
 
+A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
+entry): change the default and shared links without it change meaning.
+
 Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js` and
 `search.js`.
 
