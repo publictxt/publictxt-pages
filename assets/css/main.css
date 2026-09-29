@@ -583,7 +583,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   padding: 0;
   cursor: pointer;
 }
-.chip-x { margin-left: 0.35rem; font-size: 0.65rem; color: var(--text-muted); }
+.chip-x { margin-left: 0.3rem; font-size: 0.55rem; color: var(--text-muted); }
 .chip-x:hover, .filter-chip.excluded .chip-x { color: var(--accent); }
 /* ✕ on set chips; on off chips it keeps its space (no reflow) and shows on
    hover or keyboard focus — touch has no hover, so it's gone: include first. */
