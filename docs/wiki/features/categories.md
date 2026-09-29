@@ -10,9 +10,9 @@ covers:
 
 # Categories
 
-A **closed, curated** vocabulary beside open-ended tags *([D11](../decisions/D11.md))*:
+A **closed, curated** vocabulary beside open-ended tags:
 a page's `categories:` and/or `category:` (each a value or a list) from
-`[params.categories] list` in `hugo.toml` *([D12](../decisions/D12.md))*.
+`[params.categories] list` in `hugo.toml`.
 
 `categories.html` is the only reader, returning a deduped list in the config's
 spelling. It feeds `list-json.html` (`categories[]`, a browse-list chip row) and

@@ -1,6 +1,8 @@
 {{/*
   A browse list: a plain link list for crawlers and no-JS, which list.js
   replaces with cards from the site index. Names its subset, not its data.
+  Client-side, not .Paginate: that fixes order and membership at build time,
+  so sorting and filtering could only act on one page.
   Expects a dict:
     pages    — the page collection, in the order the fallback should show
     scope    — dict: kind (section | collection | tag | recent), value

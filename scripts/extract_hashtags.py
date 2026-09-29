@@ -3,6 +3,9 @@
 extract_hashtags.py — merge each page's inline #hashtags (hashtags.py) into
 its front matter `tags`. Body untouched. Idempotent.
 
+A preprocess, not template logic: Hugo builds taxonomies from front matter before
+rendering, so inline tags would miss /tags/ pages and the tag cloud.
+
 Not a YAML parser: only `tags` is read (inline `[a, b]`, block `- a`, or a
 scalar) and rewritten inline; other lines pass through. Needing more means a
 real parser, not a bigger regex.

@@ -1,8 +1,7 @@
 # Spec
 
 What the site does and should do. Implementation lives in [`docs/wiki/`](wiki/index.md) —
-read that before the source. Reasoning is in [`docs/wiki/decisions/`](wiki/decisions/DECISIONS.md),
-cited as *(Dn)*.
+read that before the source. The *why* of a choice is a comment at the code that makes it.
 
 Items marked **(TBD)** are not built.
 
@@ -18,7 +17,7 @@ Items marked **(TBD)** are not built.
 
 - Sections
   - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-  - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*. (TBD-ISSUE)
+  - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
 - Sidebar
@@ -26,7 +25,7 @@ Items marked **(TBD)** are not built.
   - page meta (collections, dates, categories, tags) in sidebar.
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
-  - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable *(D11, D12)*.
+  - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable.
   - Category pages (TBD)
   - Sidebar: a page's categories, and a site-wide list with counts; both link to search
 - Tags
@@ -35,7 +34,7 @@ Items marked **(TBD)** are not built.
   - tag pages
   - Tag and category facets: include or exclude values; match all or any of the included (default all). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
 - Browse Lists
-  - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback *(D6, D7)*.
+  - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
   - Sorting in all by Date, Recency, Alphabetical.
   - Filter by Collection, and by Year (the `created` year).
   - Filter by Category and Tag, as the facets above (also in Search)
@@ -139,3 +138,12 @@ Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `upda
 Build outputs to `public/`. GitHub Actions workflow (`deploy/publish-to-github-pages.yml`) checks out the content repo, runs the build pipeline, and deploys via `actions/deploy-pages`.
 
 Per-site settings: `HUGO_*` env vars in the workflow, or the content repo's `settings/site.toml`, merged over `hugo.toml` (env vars win).
+
+## Not built, and what would prompt it (TBD)
+
+- `[[wikilink]]` conversion at sync — a repo in hand where legacy wikilinks bite.
+- `author` / `source_repo` filters — carried already, but one value per site, so the facets would hide; multi-repo or multi-author content.
+- Multi-repo fan-in — aggregation is upstream PublicTxt's job; needs a defined aggregate content model.
+- Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index (per-page fetch), a count in it.
+- Link weights, trust tiers — no data source yet; a subscriber-declared tier in subscription config is the honest v1 shape.
+- Related pages by tag co-occurrence — the site index already holds the data.

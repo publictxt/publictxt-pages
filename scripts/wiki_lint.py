@@ -121,9 +121,6 @@ def check_page(root: Path, times: Times, page: Path) -> list[str]:
     rel_page = page.relative_to(root).as_posix()
     declared = covers(page)
     if declared is None:
-        # Decision records describe reasoning rather than files.
-        if "decisions/" in rel_page:
-            return []
         return [f"BARE    {rel_page} - no covers: front matter"]
 
     page_t = times.of(rel_page)

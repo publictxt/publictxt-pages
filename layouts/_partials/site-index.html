@@ -2,6 +2,9 @@
   Publishes the site's one page index and returns its URL; every browse list
   is a subset (site-index.js). Fingerprinted in production, so cached until it
   changes. Call via partialCached — it walks every page.
+  One file, not one per list: per-list files repeated each page once per
+  ancestor and tag, and cost a fetch per navigation. Cost: the first list
+  downloads the whole corpus — revisit if that gets visible.
 */}}
 {{ $json := partial "list-json.html" site.RegularPages }}
 {{ $r := resources.FromString "index.json" $json }}
