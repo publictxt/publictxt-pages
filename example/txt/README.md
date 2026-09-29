@@ -34,6 +34,7 @@ git diff tests/golden                                  # read it: every change s
 | Post sources (`mastodon:`, `substack:` list) | `blog/20260915-a-post-with-full-front-matter.md` |
 | Custom keys passed through | `online-things.md` (`web:`), `wiki/Science/Kurzgesagt.md` (`web-links:`) |
 | YouTube embed in image syntax | `notes/embeds.md` |
+| ` ```dataview ` tag list, with `LIMIT`; unsupported query left as code | `notes/tag-lists.md` |
 | `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `index.md`, `Projects.md`, `online-things.md` |
 | Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |

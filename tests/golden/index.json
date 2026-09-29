@@ -390,6 +390,21 @@
  },
  {
   "collections": [
+   "notes"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "notes",
+  "summary": "A Dataview block lists the pages with a tag:\n20260925 Another Issue with the Fermi Paradox the Barrow Scale blog bookmarks 25 Sep 2026 Cosmology wiki 1 Jan 2025 · updated 1 Mar …",
+  "tags": [],
+  "title": "Tag lists",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/notes/tag-lists/",
+  "year": "2025"
+ },
+ {
+  "collections": [
    "blog"
   ],
   "created": "2024-10-13T00:00:00Z",
