@@ -31,7 +31,7 @@ Across everything:
 
 - **Hugo never reads the source repo** — only `build/content/` and `build/site.toml`,
   which sync writes.
-- **One index, many lists** *([D7](../decisions/D7.md))*; **one sort vocabulary**
+- **One index, many lists**; **one sort vocabulary**
   (`sorts.js`) and **one card** (`cards.js`) for lists and search.
 - **"Recent" = recently updated**, only on home and the `recent` scope; lists and
   search default to Newest (`created`).

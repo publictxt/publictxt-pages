@@ -9,7 +9,7 @@ covers:
 # Search
 
 Full-text plus facets **with or without a query** — hence a custom UI on Pagefind's JS
-API, whose stock UI can't search filters alone *([D8](../decisions/D8.md))*. The page
+API, whose stock UI can't search filters alone. The page
 lives in `site-content/`.
 
 Sorts are Pagefind's, over `pagefind-keys.html`'s keys, and **replace** relevance

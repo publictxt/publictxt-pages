@@ -15,7 +15,6 @@ minimal reliance on PublicTxt-specific syntax transforms.
 
 - [docs/SPEC.md](docs/SPEC.md) — what it does and should do
 - [docs/wiki/](docs/wiki/index.md) — how it works
-- [docs/wiki/decisions/](docs/wiki/decisions/DECISIONS.md) — why
 
 ## Requirements
 

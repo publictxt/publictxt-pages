@@ -13,6 +13,9 @@ sync_content.py. Every page gets both.
 
 `updated`: explicit `updated:` (or `lastmod:`) -> last commit -> mtime -> build.
 
+Build time is last: as a default it would float every undated page to the top
+of "recent" on each build.
+
 A shallow clone collapses rung 3 to one timestamp; sync warns. Use
 `fetch-depth: 0` in CI.
 """

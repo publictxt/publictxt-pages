@@ -14,9 +14,7 @@ find the right file/s, then read those files.
 - `docs/wiki/traps.md` — cross-file invariants. **Read before editing templates or the pipeline.**
 - `docs/wiki/build.md`, `docs/wiki/deploy.md` — pipeline and publishing
 - `docs/SPEC.md` — what the site *should* do, including unbuilt **(TBD)** items; best understanding, not contract
-- DO NOT WASTE TOKENS reading these unless a wiki page points you at one:
-  - `docs/wiki/decisions/` — why, one record per decision, cited as *(Dn)*
-  - `docs/retros/*` — session retrospectives
+- `docs/retros/*` — session retrospectives. DO NOT WASTE TOKENS reading these unless pointed at one.
 
 **When you change code, update its wiki page in the same change.** `python scripts/wiki_lint.py`
 reports pages whose covered files moved on without them, and files missing from the map.

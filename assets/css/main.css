@@ -1,5 +1,6 @@
 /* publictxt-pages — dark theme
-   Palette lives in CSS custom properties so it can be tweaked without a build step. */
+   Palette lives in CSS custom properties so it can be tweaked without a build step.
+   Plain CSS, no Sass: runs on plain (non-extended) Hugo. */
 
 :root {
   --bg: #0e1116;

@@ -9,7 +9,7 @@ covers:
 # Dates
 
 Every page gets both `created` and `updated`, from the ladders in `dates.py`;
-build time only as a last resort *([D4](../decisions/D4.md))*. `created_source:`
+build time only as a last resort. `created_source:`
 records the rung, so a bad inference shows in the generated front matter. Generated
 section indexes use `children`: their newest page's `updated`.
 
