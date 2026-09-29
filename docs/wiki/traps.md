@@ -30,8 +30,8 @@ together.
 A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
 entry): change the default and shared links without it change meaning.
 
-The Pagefind version is pinned twice, `build.sh` and `build.ps1`; `search.js` is written
-against its JS API, so a bump means checking search too.
+The Pagefind version is pinned in `build.py`; `search.js` is written against its JS
+API, so a bump means checking search too.
 
 Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js` and
 `search.js`.
@@ -56,7 +56,7 @@ walk every page; uncached, the build goes O(pages²).
 ## Build order and `public/`
 
 `sync → hugo → pagefind`, each reading the last one's output. Remove
-`public/` before `hugo` — it keeps stale pages. Both build scripts do this.
+`public/` before `hugo` — it keeps stale pages. `build.py` does this.
 
 ## `fetch-depth: 0` in CI
 

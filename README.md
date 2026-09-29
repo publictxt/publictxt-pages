@@ -21,7 +21,7 @@ minimal reliance on PublicTxt-specific syntax transforms.
 - **Hugo v0.158+** (plain works — no Sass). Distro packages are often stale; check
   `hugo version`.
 - **Python 3.10+** — no packages.
-- **Pagefind 1.5.2** (pinned in the build scripts) — the [standalone binary](https://github.com/Pagefind/pagefind/releases)
+- **Pagefind 1.5.2** (pinned in `build.py`) — the [standalone binary](https://github.com/Pagefind/pagefind/releases)
   on `PATH`, else the scripts fetch it with `npx` (Node).
 
 ## Authoring in Obsidian
@@ -32,18 +32,14 @@ minimal reliance on PublicTxt-specific syntax transforms.
 ## Quickstart
 
 ```bash
-scripts/build.sh                        # builds example/txt -> public/
-scripts/build.sh --source ../my-repo     # your own PublicTxt repo
-scripts/build.sh --serve                 # local preview
+python scripts/build.py                        # builds example/txt -> public/
+python scripts/build.py --source ../my-repo    # your own PublicTxt repo
+python scripts/build.py --serve                # local preview
 ```
 
-```powershell
-.\scripts\build.ps1 -Source ..\my-repo
-.\scripts\build.ps1 -Serve
-```
-
-Pipeline order and flags: the build scripts' headers. `--serve` needs a prior full build
-for search, and a re-run of sync for content changes.
+Any OS (`python3` where `python` is Python 2). Relative `--source` paths are from this
+repo's root. Flags: `--help`. `--serve` needs a prior full build for search, and a
+re-run for content changes.
 
 ## Tests
 
