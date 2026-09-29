@@ -4,26 +4,26 @@
 // Sorting is Pagefind's, on pagefind-keys.html's keys, and replaces relevance
 // outright: "Relevance" is offered, and default, only with a query. Rating is
 // a minimum: `?rating=4` = any of "4", "5"; `unrated` is its own value.
-// Tags, categories and collections: include / exclude / any-or-all, as facets.js.
+// Chip facets (CHIP_FACETS): include / exclude / any-or-all, as facets.js.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
-import { addsPages, chipState, clearFacet, cycle, describe, emptyFacet, filterChip, isSet, matchToggle,
-  pagefindConditions, readFacet, toggleInclude, writeFacet } from "./facets.js";
+import { addsPages, anySet, chipState, CHIP_FACETS, CHIP_KEYS, clearFacets, cycle, describeFacets, filterChip,
+  matchToggle, pagefindConditions, readFacets, toggleInclude, writeFacets } from "./facets.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const PAGE = 20;
 const TYPING_MS = 400;   // pause before a keystroke searches; Enter searches now
-const MULTI = ["tag", "category", "collection"];
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
 const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
-  collection: $("filter-collection"), collectionHint: $("filter-collection-hint"), category: $("filter-category"), categoryGroup: $("filter-category-group"),
-  categoryHint: $("filter-category-hint"),
   year: $("filter-year"), yearGroup: $("filter-year-group"),
-  rating: $("filter-rating"), ratingGroup: $("filter-rating-group"),
-  tag: $("filter-tag"), tagHint: $("filter-tag-hint"), sort: $("search-sort"),
+  rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
+// Per chip facet, search.html's filter-{key}-group / filter-{key} / filter-{key}-hint.
+const groups = Object.fromEntries(CHIP_KEYS.map((k) => [k, {
+  group: $(`filter-${k}-group`), chips: $(`filter-${k}`), hint: $(`filter-${k}-hint`),
+}]));
 
 let pagefind;
 try {
@@ -38,8 +38,8 @@ el.root.hidden = false;
 // ---- state <-> URL --------------------------------------------------
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
-const state = { q: "", collection: emptyFacet("collection"), category: emptyFacet("category"), year: "", rating: "", tag: emptyFacet("tag"), sort: null };
-const filtering = () => Boolean(isSet(state.collection) || isSet(state.category) || state.year || state.rating || isSet(state.tag));
+const state = { q: "", ...readFacets(), year: "", rating: "", sort: null };
+const filtering = () => Boolean(anySet(state) || state.year || state.rating);
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -49,22 +49,18 @@ function activeSort() {
 function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
-  state.collection = readFacet(p, "collection");
-  state.category = readFacet(p, "category");
+  Object.assign(state, readFacets(p));
   state.year = p.get("year") || "";
   state.rating = ratingFilter(p.get("rating"));
-  state.tag = readFacet(p, "tag");
   const s = p.get("sort");
   state.sort = !s ? null : s === RELEVANCE ? RELEVANCE : normaliseSort(s);
 }
 function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
-  writeFacet(p, state.collection);
-  writeFacet(p, state.category);
+  writeFacets(p, state);
   if (state.year) p.set("year", state.year);
   if (state.rating) p.set("rating", state.rating);
-  writeFacet(p, state.tag);
   const sort = activeSort();
   if (state.sort && sort !== defaultSort()) p.set("sort", sort);
   const qs = p.toString();
@@ -78,22 +74,22 @@ const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[
 // Years newest-first, as in the browse lists.
 const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(a));
 
-function chip(kind, name, count) {
-  const f = state[kind];
-  return filterChip((kind === "tag" ? "#" : "") + name, count, chipState(f, name), () => { cycle(f, name); run(); }, true);
+function chip(d, name, count) {
+  const f = state[d.key];
+  return filterChip(d.prefix + name, count, chipState(f, name), () => { cycle(f, name); run(); }, true);
 }
 
 // counts: filter counts within the current result set (or totals when idle);
-// facetCounts: MULTI facet counts, per addsPages().
+// facetCounts: chip facet counts, per addsPages(). A chip facet the index
+// lacks hides — categories when disabled.
 function renderFilters(counts, facetCounts) {
-  el.collection.replaceChildren(...sortedKeys(allFilters.collection).map((n) =>
-    chip("collection", n, (facetCounts.collection || {})[n] ?? 0)));
-  el.collectionHint.replaceChildren(...[matchToggle(state.collection, run)].filter(Boolean));
-  const categories = sortedKeys(allFilters.category);
-  el.categoryGroup.hidden = categories.length === 0;
-  el.category.replaceChildren(...categories.map((n) =>
-    chip("category", n, (facetCounts.category || {})[n] ?? 0)));
-  el.categoryHint.replaceChildren(...[matchToggle(state.category, run)].filter(Boolean));
+  for (const d of CHIP_FACETS) {
+    const g = groups[d.key];
+    const names = sortedKeys(allFilters[d.key]);
+    g.group.hidden = names.length === 0;
+    g.chips.replaceChildren(...names.map((n) => chip(d, n, (facetCounts[d.key] || {})[n] ?? 0)));
+    g.hint.replaceChildren(...[matchToggle(state[d.key], run)].filter(Boolean));
+  }
   // No year counts: Pagefind's are per result set, so would read "0" beside real years.
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
@@ -106,9 +102,6 @@ function renderFilters(counts, facetCounts) {
   el.rating.replaceChildren(new Option("Any rating", "", false, !state.rating),
     ...ratings.map((r) => new Option(ratingFilterLabel(r), r, false, r === state.rating)),
     ...(hasUnrated ? [new Option("Unrated", UNRATED_FILTER, false, state.rating === UNRATED_FILTER)] : []));
-  el.tag.replaceChildren(...sortedKeys(allFilters.tag).map((n) =>
-    chip("tag", n, (facetCounts.tag || {})[n] ?? 0)));
-  el.tagHint.replaceChildren(...[matchToggle(state.tag, run)].filter(Boolean));
 }
 
 function renderSort() {
@@ -125,7 +118,7 @@ function pagefindFilters(skip) {
   if (state.year) filters.year = state.year;
   if (state.rating === UNRATED_FILTER) filters.rating = UNRATED_FILTER;
   else if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
-  const all = MULTI.flatMap((k) => pagefindConditions(state[k], k !== skip));
+  const all = CHIP_KEYS.flatMap((k) => pagefindConditions(state[k], k !== skip));
   if (all.length) filters.all = all;
   return filters;
 }
@@ -140,7 +133,7 @@ async function run() {
   const query = hasQuery() ? state.q : null;
   // An addsPages facet counts from a search without its includes, or the
   // totals when nothing else narrows.
-  const recount = MULTI.filter((k) => addsPages(state[k]));
+  const recount = CHIP_KEYS.filter((k) => addsPages(state[k]));
   const without = (k) => {
     const filters = pagefindFilters(k);
     return query || Object.keys(filters).length ? pagefind.search(query, { filters }) : null;
@@ -150,14 +143,14 @@ async function run() {
   current = res.results; shown = 0;
   el.list.replaceChildren();
   const counts = res.filters || allFilters;
-  const facetCounts = Object.fromEntries(MULTI.map((k) => {
+  const facetCounts = Object.fromEntries(CHIP_KEYS.map((k) => {
     const i = recount.indexOf(k);
     return [k, i < 0 ? counts[k] : (others[i]?.filters || allFilters)[k]];
   }));
   renderFilters(counts, facetCounts);
   renderSort();
   const n = current.length;
-  const what = [hasQuery() ? `“${state.q}”` : "", ...describe(state.collection), ...describe(state.category), ...describe(state.tag, "#"), state.year,
+  const what = [hasQuery() ? `“${state.q}”` : "", ...describeFacets(state), state.year,
     state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
     + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
@@ -196,7 +189,7 @@ el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
 el.rating.addEventListener("change", () => { state.rating = el.rating.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; clearFacet(state.collection); clearFacet(state.category); state.year = ""; state.rating = ""; clearFacet(state.tag); state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; clearFacets(state); state.year = ""; state.rating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 

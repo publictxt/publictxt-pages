@@ -23,7 +23,7 @@ with two includes a toggle sets match all / any (default all — it narrows, so 
 compound `all: [...]`. A facet matching *any* counts from a second search without
 its own includes, since picking a value adds pages.
 
-Category hides when the index has none; year when the site spans one year; rating
+A chip facet hides when the index has none (categories when disabled); year when the site spans one year; rating
 when nothing is rated. Selects show no counts — Pagefind's are per result set. Chip
 counts run higher than a browse list's: Pagefind also indexes section index bodies.
 
