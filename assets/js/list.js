@@ -7,7 +7,8 @@
 //   data-scope-value  a path, a collection, a tag, or a limit
 //   data-order        default sort (sorts.js)
 //   data-per-page     cards per page
-//   data-compact      cards only: no controls, pager or URL (home Recent)
+//   data-compact      cards only: no controls, pager or URL (home Recent, dataview)
+//   data-limit        compact: the first N only
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
@@ -50,6 +51,7 @@ function counts(items, key) {
 async function mount(root) {
   const compact = "compact" in root.dataset;
   const perPage = Math.max(1, parseInt(root.dataset.perPage, 10) || 20);
+  const limit = parseInt(root.dataset.limit, 10) || undefined;
   const defaultSort = normaliseSort(root.dataset.order);
   let items;
   try {
@@ -287,7 +289,7 @@ async function mount(root) {
     const filtered = sorted(items.filter((it) => passes(it)), state.sort);
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
     if (state.page > total) state.page = total;
-    const slice = compact ? filtered : filtered.slice((state.page - 1) * perPage, state.page * perPage);
+    const slice = compact ? filtered.slice(0, limit) : filtered.slice((state.page - 1) * perPage, state.page * perPage);
     // Card tags filter only while tag is a chip facet that includes; else they link.
     const onTag = compact || !state.tag?.states.includes("include") ? null : (t) => {
       toggleInclude(state.tag, t);
