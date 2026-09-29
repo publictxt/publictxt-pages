@@ -33,9 +33,10 @@ SOURCE_GLOBS = (
     "assets/**/*.js", "assets/**/*.css",
     "deploy/*.yml",
     "hugo.toml",
+    "tests/*.py",
 )
 # The linter is described in the map's prose rather than listed as a path.
-SOURCE_EXCLUDE = {"scripts/wiki_lint.py"}
+SOURCE_EXCLUDE = {"scripts/wiki_lint.py", "tests/__init__.py"}
 # The page whose map must mention every source file.
 MAP_PAGE = "index.md"
 

@@ -5,6 +5,7 @@ covers:
   - assets
   - hugo.toml
   - deploy
+  - tests
 ---
 
 # Source Wiki
@@ -38,6 +39,13 @@ scripts/extract_hashtags.py body hashtags -> front matter `tags`
 scripts/build.sh            full pipeline, POSIX       -> build.md
 scripts/build.ps1           full pipeline, PowerShell  -> build.md
 scripts/wiki_lint.py        staleness check for this wiki
+```
+
+### Tests (stdlib unittest) -> [build.md](build.md#tests)
+
+```txt
+tests/test_golden.py        example/txt through sync + hashtags vs tests/golden/
+tests/test_dates.py         the date ladder, which the golden test fixes
 ```
 
 ### Templates
@@ -105,8 +113,9 @@ ES modules bundled per entry point by Hugo's built-in esbuild — no Node to bui
 ```txt
 hugo.toml                            mounts, front matter mapping, params
 deploy/publish-to-github-pages.yml   template for the CONTENT repo -> deploy.md
+.github/workflows/test.yml           tests/ on push and PR -> build.md#tests
 site-content/                        site-owned pages (search)
-example/txt/                         synthetic default source repo
+example/txt/                         default source repo + golden-test fixture
 static/                              favicons, logo
 ```
 

@@ -63,8 +63,9 @@ the same date. Sync warns — check the log if dates look wrong.
 ## Front matter handling is not a YAML parser
 
 Both scripts edit front matter line by line; nested or multi-line keys are invisible.
-Swap in a real parser rather than extend the regexes. `extract_hashtags.py` expects
-bare `\n` — safe only because it runs on sync output.
+Swap in a real parser rather than extend the regexes. Sync accepts `---` fences
+with trailing spaces; `extract_hashtags.py` expects bare `---` and `\n` — safe only because
+it runs on sync output.
 
 ## Hashtag regex alternation order is the logic
 

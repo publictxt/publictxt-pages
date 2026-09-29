@@ -4,4 +4,3 @@
 
 #brain #sci
 
-- [Consciousness](Consciousness.md)

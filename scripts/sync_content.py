@@ -41,7 +41,8 @@ SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.tom
 UNPUBLISHED = {"off", "false", "no", "0"}
 BOOKMARK_KEYS = ("bookmark", "bookmarks")
 
-FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)^---\r?\n?", re.DOTALL | re.MULTILINE)
+# Fences may carry trailing spaces (`--- `), as editors leave them.
+FRONT_MATTER_RE = re.compile(r"^---[ \t]*\r?\n(.*?)^---[ \t]*\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
@@ -179,7 +180,8 @@ def find_leaf_bundle_dirs(src: Path) -> set[Path]:
     return bundles
 
 
-def sync(src: Path, dest: Path) -> tuple[int, int, int]:
+def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[int, int, int]:
+    """`resolver`: a test's fixed dates; default reads this repo's Git history."""
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir(parents=True)
@@ -189,7 +191,7 @@ def sync(src: Path, dest: Path) -> tuple[int, int, int]:
         shutil.copy2(src / SITE_CONFIG, config)
         print(f"site settings: {SITE_CONFIG} -> {config}")
 
-    resolver = DateResolver(src)
+    resolver = resolver or DateResolver(src)
     if resolver.shallow_clone:
         print("warning: source repo is a shallow clone — every tracked file reports the "
               "same commit time. Check out with fetch-depth: 0 for real dates.",

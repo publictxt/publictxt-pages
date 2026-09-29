@@ -8,4 +8,3 @@ order: title
 - [Computer Science](Computer-Science/index.md)
 - [Science](Science/index.md)
 - [Projects](Projects/PublicTxt/PublicTxt.md)
-- [bliki](bliki.md)

@@ -1,20 +1,34 @@
 # Example PublicTxt repository
 
-This folder mimics a real PublicTxt / Obsidian repository, deliberately including every
-characteristic the Hugo pipeline has to cope with:
+The default build source and the golden-test fixture (`tests/test_golden.py`). Each file
+earns its place with a case the pipeline must handle; keep it that way — a new case, a
+new (small) file. After changing anything here, refresh the snapshot and read its diff.
 
-- **No front matter** on most files — titles come from the first `# H1`, `created` dates from filenames or Git history
-- `index.md` / `home.md` used as folder index pages (Hugo would treat `index.md` as a leaf bundle)
-- Blog posts in three layouts: `blog/YYYY/MM/DD/YYYYMMDD.md`, `blog/YYYY/YYYYMMDD-title.md`, `blog/YYYYMMDD-title.md`
-- Wiki pages nested several folders deep, with their own `index.md`
-- Spaces and dots in filenames (`Other Software.md`, `The WhatsApp Mess . 20240816.md`, `Obsidian.md.md`)
-- Front matter with YAML **block-style** `tags:` lists and custom keys (`web:`, `web-links:`)
-- Inline `#hashtags`, including inside code (which must be ignored)
-- `[[wikilinks]]` (unsupported in v1 — render as literal text)
-- Relative links to `index.md` / `home.md`, cross-section links, dangling links
-- Root-level pages outside any section (`Projects.md`, `online-things.md`)
-- An empty section (`posts/`) and an empty folder holding only `.gitkeep`
-- Non-Markdown assets (`media/`)
-- Repo housekeeping files that must be skipped: this README, `LICENSE`, `CNAME`, `.obsidian/`
-
-Files skipped by the sync step are never published; everything else is.
+| Case | File(s) |
+|---|---|
+| Title from the first `# H1`, removed from the body | `wiki/Science/Cosmology.md` |
+| … with a line before the H1 | `wiki/Projects/PublicTxt/PublicTxt.md` |
+| … `title:` set, so the H1 stays | `blog/20260915-a-post-with-full-front-matter.md` |
+| Title from the file name (no H1) | `notes/sample.md`, `wiki/Science/Kurzgesagt.md` |
+| `created` from `YYYYMMDD` / `YYYY-MM-DD` in the name | `blog/2024/20241013-…`, `blog/20260509-…`, `notes/Info politics/The WhatsApp Mess . 20240816.md` |
+| `created` from a `YYYY/MM/DD/` path only | `blog/2023/12/17/another-post.md` |
+| `created`/`updated` authored, with offsets | `blog/20260915-a-post-with-full-front-matter.md` |
+| Quoted date-only `created:` | `blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md` |
+| `index.md` / `home.md` as folder index | `blog/index.md`, `blog/2024/home.md`, `wiki/**/index.md` |
+| Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Science/brain/` |
+| Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
+| `publish: off` | `notes/unpublished.md` |
+| Spaces and dots in names; `.md` in a folder name | `wiki/Projects/PublicTxt/Other Software.md`, `Obsidian.md.md`, `bookmarks/sites/obsidian.md/` |
+| Front matter fence with trailing space (`--- `) | `wiki/Computer-Science/CopyLeft.md`, `Free-Software.md`, `notes/Info politics/…` |
+| Block, flow, scalar and quoted-`#` `tags:`; merged with hashtags | `wiki/Science/Kurzgesagt.md`, `wiki/Projects/PublicTxt/CuratedCommons.md`, `bookmarks/sites/obsidian.md/Obsidian Web Clipper Plugin.md` |
+| Hashtags that are not tags: code, URL fragments, `issue #42`, `C#` | `wiki/Computer-Science/Free-Software.md`, `CopyLeft.md`, `wiki/Science/Cosmology.md` |
+| `categories:` / `category:`, `rating:`, `collections:` | `blog/20260509-…`, `blog/20260915-…`, `online-things.md` |
+| `bookmark:` / `bookmarks:`, in and outside `bookmarks/` | `bookmarks/sites/gitcms.dev/gitcms.dev.md`, `wiki/Projects/PublicTxt/Obsidian.md.md`, `wiki/Science/Kurzgesagt.md` |
+| Post sources (`mastodon:`, `substack:` list) | `blog/20260915-a-post-with-full-front-matter.md` |
+| Custom keys passed through | `online-things.md` (`web:`), `wiki/Science/Kurzgesagt.md` (`web-links:`) |
+| YouTube embed in image syntax | `notes/embeds.md` |
+| `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
+| Root-level pages | `index.md`, `Projects.md`, `online-things.md` |
+| Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/`, `.gitkeep` | — |
+| Non-Markdown copied verbatim | `media/logo.svg` |
+| Site settings, not content | `settings/site.toml` |
