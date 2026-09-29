@@ -23,7 +23,9 @@ HUGO_BASEURL=https://host/ scripts/build.sh
 .\scripts\build.ps1 -Source C:\repo\txt   # also -Serve, -BaseUrl
 ```
 
-Both scripts `cd` to the repo root. Sync wipes `build/content`; `public/` is removed
+Both scripts `cd` to the repo root. Sync wipes `build/content` and rewrites
+`build/site.toml` from the source's `settings/site.toml`, overlaid on `hugo.toml` when
+present ([deploy.md](deploy.md)); `public/` is removed
 before `hugo`, which doesn't delete stale pages. Pagefind runs from `PATH`, else `npx`.
 
 **`--serve`** runs `hugo server -D -M --renderStaticToDisk`: `-M` keeps dev markup out

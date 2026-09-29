@@ -18,3 +18,10 @@ as [config overrides](https://gohugo.io/configuration/introduction/#configure-wi
 `HUGO_TITLE`, `HUGO_PARAMS_DESCRIPTION`, `HUGO_PARAMS_MASTODON`, … `build.sh` passes
 `HUGO_BASEURL` as `-b`. `HUGO_PARAMS_EDITURL` is prefilled from the GitHub context, so
 edit links work for any repo; `""` hides them.
+
+**Or a file: `settings/site.toml` in the content repo**, for what env vars can't carry
+(lists of tables, e.g. `[[params.chipFacets]]`). Sync copies it to `build/site.toml`
+(not content); the build scripts pass `--config hugo.toml,build/site.toml`. Tables merge
+key by key; **a list replaces the default whole**. Env vars beat both. Meant for `title`,
+`baseURL` and `[params]` — nothing stops it overriding mounts or `contentDir`, which
+break the build. Commented example: `example/txt/settings/site.toml`.
