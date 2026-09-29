@@ -28,6 +28,7 @@ scripts/map_lint.py         this map vs the tree
 tests/test_golden.py        example/txt through sync + hashtags vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
+tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 ```
 
 ## Templates
