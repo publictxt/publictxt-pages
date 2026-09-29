@@ -373,7 +373,7 @@ a:hover { text-decoration: underline; }
 }
 .list-facet .chip-row { flex: 1 1 auto; min-width: 0; }
 .list-reset { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
-.list-status { margin: 0 0 0.8rem; font-size: 1.2rem; font-weight: 600;}
+.list-status { margin: 0 0 0.8rem; font-size: 1.15rem; font-weight: 700;}
 .filter-chip.more { border-style: dashed; color: var(--text-muted); }
 
 .pagination {
