@@ -21,3 +21,5 @@ Ladders run on the **source** path, so sync's renames never change a page's date
 
 Display: `created`, plus "· updated" only when >1 day later — implemented three
 times ([../traps.md](../traps.md)). "Recently updated" order is `recent.html`.
+
+Tested by `tests/test_dates.py`; the golden test fixes Git dates, so it doesn't cover the ladder.

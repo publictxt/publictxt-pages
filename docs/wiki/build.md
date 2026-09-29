@@ -2,6 +2,7 @@
 covers:
   - scripts/build.sh
   - scripts/build.ps1
+  - tests
 ---
 
 # Build
@@ -35,6 +36,20 @@ server watches `build/content`, not the source.
 
 **Needs:** Hugo 0.158+ (plain is fine — no Sass), Python 3.10+, Pagefind (binary or
 `npx`).
+
+## Tests
+
+Python stdlib `unittest`, no dependencies; covers the pipeline up to Hugo.
+
+```console
+python -m unittest                                  # all
+GOLDEN_UPDATE=1 python -m unittest tests.test_golden  # refresh the snapshot
+```
+
+**Golden**: sync + hashtags over `example/txt/`, compared with `tests/golden/`
+(text by content, the rest by path; Git dates fixed). Refresh after an intended
+change **and read the diff** — reviewing it is the test. Each example file covers a
+case, listed in `example/txt/README.md`; a new case gets a new small file.
 
 ## JS modules
 

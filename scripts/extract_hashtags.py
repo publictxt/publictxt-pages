@@ -102,14 +102,20 @@ def main():
         print(f"error: {content_dir} is not a directory", file=sys.stderr)
         sys.exit(1)
 
+    changed = extract_all(content_dir, verbose=True)
+    print(f"done — {changed} file(s) updated")
+
+
+def extract_all(content_dir: Path, verbose: bool = False) -> int:
+    """process_file() on every page under `content_dir`; returns how many changed."""
     changed = 0
     for path in content_dir.rglob("*.md"):
         # Folders match too: bookmark domain folders like `obsidian.md/`.
         if path.is_file() and process_file(path):
             changed += 1
-            print(f"updated: {path}")
-
-    print(f"done — {changed} file(s) updated")
+            if verbose:
+                print(f"updated: {path}")
+    return changed
 
 
 if __name__ == "__main__":
