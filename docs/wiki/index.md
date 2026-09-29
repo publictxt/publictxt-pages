@@ -1,34 +1,15 @@
----
-covers:
-  - scripts
-  - layouts
-  - assets
-  - hugo.toml
-  - deploy
-  - tests
----
+# Map
 
-# Source Wiki
+Every source file, one line — to find the right files, then read those: every script
+has a docstring, every partial a `{{/* */}}` contract. Code wins any disagreement.
+[traps.md](traps.md) holds what spans files; **read it before editing templates or the
+pipeline.** [SPEC.md](../SPEC.md) is what the site *should* do.
 
-Read before the source, to find the right files; then read those — every script
-has a docstring, every partial a `{{/* */}}` contract. The wiki holds only what no
-single file can: where things are, and what spans files. Code wins any disagreement.
+Add, move or remove a file: update this map. `python scripts/map_lint.py` checks both ways.
 
-| Page | For |
-|---|---|
-| this one | the map: every file, one line |
-| [features/](features/index.md) | a capability and the files that do it |
-| [traps.md](traps.md) | cross-file invariants. **Read before editing templates or the pipeline.** |
-| [build.md](build.md) · [deploy.md](deploy.md) | running and shipping |
+## Python — pipeline (no dependencies; 3.10+)
 
-[SPEC.md](../SPEC.md) is what the site *should* do, including **(TBD)** items.
-
-**Change code and its wiki page in the same commit**; `python scripts/wiki_lint.py`
-flags pages that fell behind and files missing from the map.
-
-## Map
-
-### Python — pipeline (no dependencies; 3.10+)
+Hugo never reads the source repo — only what sync writes: `build/content/`, `build/site.toml`.
 
 ```txt
 scripts/sync_content.py     source repo -> build/content: renames, titles, dates,
@@ -36,19 +17,20 @@ scripts/sync_content.py     source repo -> build/content: renames, titles, dates
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE, find_hashtags, linkify — used by both scripts
 scripts/extract_hashtags.py body hashtags -> front matter `tags`
-scripts/build.sh            full pipeline, POSIX       -> build.md
-scripts/build.ps1           full pipeline, PowerShell  -> build.md
-scripts/wiki_lint.py        staleness check for this wiki
+scripts/build.sh            full pipeline, POSIX; header has usage
+scripts/build.ps1           full pipeline, PowerShell
+scripts/map_lint.py         this map vs the tree
 ```
 
-### Tests (stdlib unittest) -> [build.md](build.md#tests)
+## Tests (stdlib unittest) — `python -m unittest`
 
 ```txt
-tests/test_golden.py        example/txt through sync + hashtags vs tests/golden/
+tests/test_golden.py        example/txt through sync + hashtags vs tests/golden/;
+                            docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
 ```
 
-### Templates
+## Templates
 
 ```txt
 layouts/baseof.html               shell; data-base + data-index on <html>
@@ -73,7 +55,7 @@ layouts/_partials/
   site-index.html       publishes index.json, returns URL    (partialCached)
   list-json.html        pages -> index.json items
   list-container.html   [data-list] + no-JS <ul> + loads list.js
-  js-params.html        @params for every js.Build — see build.md
+  js-params.html        @params for every js.Build — see traps.md
   chip-facets.html      only reader of params.chipFacets   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
   list-per-page.html    perPage: cascade
@@ -94,7 +76,7 @@ layouts/_markup/
   render-image.html     YouTube URL -> iframe, else plain <img>
 ```
 
-### Browser
+## Browser
 
 ```txt
 assets/js/site-index.js   fetch index.json once per document; scope() subsets
@@ -106,16 +88,18 @@ assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette in :root
 ```
 
-ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build; see [build.md](build.md#js-modules).
+ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build. One
+sort vocabulary, one card and one facet module serve lists and search; see traps.md.
 
-### Config and delivery
+## Config and delivery
 
 ```txt
 hugo.toml                            mounts, front matter mapping, params
-deploy/publish-to-github-pages.yml   template for the CONTENT repo -> deploy.md
-.github/workflows/test.yml           tests/ on push and PR -> build.md#tests
+deploy/publish-to-github-pages.yml   template for the CONTENT repo; header has setup
+.github/workflows/test.yml           tests + map_lint on push and PR
 site-content/                        site-owned pages (search)
-example/txt/                         default source repo + golden-test fixture
+example/txt/                         default source repo + golden-test fixture;
+                                     its README maps case -> file
 static/                              favicons, logo
 ```
 

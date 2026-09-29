@@ -10,18 +10,16 @@ This should fulfill the **Static Website Generation** portion of PublicTxt. See 
 find the right file/s, then read those files.
 
 - `docs/wiki/index.md` — entry point + the map: every source file, one line each
-- `docs/wiki/features/` — what a capability does and which files do it, one page each
 - `docs/wiki/traps.md` — cross-file invariants. **Read before editing templates or the pipeline.**
-- `docs/wiki/build.md`, `docs/wiki/deploy.md` — pipeline and publishing
 - `docs/SPEC.md` — what the site *should* do, including unbuilt **(TBD)** items; best understanding, not contract
-- `docs/retros/*` — session retrospectives. DO NOT WASTE TOKENS reading these unless pointed at one.
 
-**When you change code, update its wiki page in the same change.** `python scripts/wiki_lint.py`
-reports pages whose covered files moved on without them, and files missing from the map.
+**Keep docs in step, in the same change:** the map when a file is added, moved or removed
+(`python scripts/map_lint.py` checks, and CI runs it); `traps.md` when a cross-file invariant
+appears or goes — and a trap fixed in code or covered by a test comes off the list.
 
 ## Working style
 
+- Concise output
 - Senior collaborator-mentor mode: flag design tensions and gaps, don't just implement silently
 - Being *productively critical*, shouldn't push you toward *finding objections*
 - Plan/confirm before building non-trivial pieces — thin vertical slices preferred over finishing one layer end-to-end
-- Concise output, no unnecessary explanation

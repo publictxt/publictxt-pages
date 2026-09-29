@@ -1,10 +1,3 @@
----
-covers:
-  - layouts
-  - scripts
-  - assets/js
----
-
 # Traps
 
 Cross-file invariants — each is otherwise documented only in a file you'd have to
@@ -45,6 +38,18 @@ Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js
 `yearOf()` slices the year off the RFC 3339 string: a local-zone `getFullYear()` would
 disagree with Hugo's year for far-off readers.
 
+## Two JS bundles, one `@params`
+
+`js.Build` bundles each entry point (`list.js` from `list-container.html`, `search.js`
+from `search.html`) with its imports, so shared modules are **copied into each**. Anything
+set per call — options, `params` — must match across both, or lists and search drift
+silently. Hence `js-params.html`, the one source of `@params`.
+
+## Search counts run higher than list counts
+
+Pagefind also indexes section index bodies (`section.html`); browse lists hold regular
+pages only. `category-counts.html` counts sections too, to match the search it links to.
+
 ## `partialCached` on site-scanning partials
 
 `site-index.html`, `sections.html`, `collection-pages.html`, `category-counts.html`
@@ -53,7 +58,7 @@ walk every page; uncached, the build goes O(pages²).
 ## Build order and `public/`
 
 `sync → hashtags → hugo → pagefind`, each reading the last one's output. Remove
-`public/` before `hugo` — it keeps stale pages. See [build.md](build.md).
+`public/` before `hugo` — it keeps stale pages. Both build scripts do this.
 
 ## `fetch-depth: 0` in CI
 

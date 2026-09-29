@@ -1,7 +1,8 @@
 # Site settings for publictxt-pages, merged over its hugo.toml at build time.
 # Tables merge key by key; a list (e.g. [[params.chipFacets]]) replaces the
 # default whole. Meant for title, baseURL and [params]; the deploy
-# workflow's HUGO_* env vars override this file. Uncomment to use.
+# workflow's HUGO_* env vars override this file. Overriding mounts or
+# contentDir breaks the build. Uncomment to use.
 
 # title = "My notes"
 
