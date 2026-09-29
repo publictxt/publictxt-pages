@@ -11,7 +11,7 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
   * Folder with Markdown but no index -> generated `_index.md`.
   * Post folder (one non-index .md + attachments, no subfolders) -> its .md
     becomes `index.md`: a leaf bundle, one page.
-  * `#hashtags` linkified (hashtags.py).
+  * `#hashtags` linkified and merged into `tags:` (hashtags.py).
   * `source_path:` records the pre-rename path, for the edit link.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
@@ -31,7 +31,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dates import DateResolver, sort_key
-from hashtags import linkify
+from hashtags import linkify, merge_tags
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
@@ -159,6 +159,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
     body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
+    fm_lines = merge_tags(fm_lines, body)
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 
 

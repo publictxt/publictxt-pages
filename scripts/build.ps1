@@ -1,4 +1,4 @@
-# Full build pipeline: sync -> hashtags -> hugo -> pagefind
+# Full build pipeline: sync -> hugo -> pagefind
 # Usage: .\scripts\build.ps1 [-Source <repo dir>] [-BaseUrl https://host/] [-Serve]
 # The source's settings/site.toml (sync copies it to build/) overlays hugo.toml.
 [CmdletBinding(PositionalBinding = $false)]
@@ -25,7 +25,6 @@ if (-not (Test-Path -LiteralPath $Source -PathType Container)) {
 }
 
 Invoke-Step python scripts/sync_content.py $Source build/content
-Invoke-Step python scripts/extract_hashtags.py build/content
 
 $config = if (Test-Path build/site.toml) { "hugo.toml,build/site.toml" } else { "hugo.toml" }
 

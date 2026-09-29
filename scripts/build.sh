@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Full build pipeline: sync -> hashtags -> hugo -> pagefind
+# Full build pipeline: sync -> hugo -> pagefind
 # Usage: scripts/build.sh [--source <repo dir>] [--serve]
 #   HUGO_BASEURL=https://host/  overrides baseURL from hugo.toml
 # The source's settings/site.toml (sync copies it to build/) overlays hugo.toml.
@@ -77,7 +77,6 @@ if [ ! -d "$SOURCE" ]; then
 fi
 
 python3 scripts/sync_content.py "$SOURCE" build/content
-python3 scripts/extract_hashtags.py build/content
 
 CONFIG="hugo.toml"
 if [ -f build/site.toml ]; then CONFIG="hugo.toml,build/site.toml"; fi

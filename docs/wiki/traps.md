@@ -55,7 +55,7 @@ walk every page; uncached, the build goes O(pages²).
 
 ## Build order and `public/`
 
-`sync → hashtags → hugo → pagefind`, each reading the last one's output. Remove
+`sync → hugo → pagefind`, each reading the last one's output. Remove
 `public/` before `hugo` — it keeps stale pages. Both build scripts do this.
 
 ## `fetch-depth: 0` in CI
@@ -65,10 +65,8 @@ the same date. Sync warns — check the log if dates look wrong.
 
 ## Front matter handling is not a YAML parser
 
-Both scripts edit front matter line by line; nested or multi-line keys are invisible.
-Swap in a real parser rather than extend the regexes. Sync accepts `---` fences
-with trailing spaces; `extract_hashtags.py` expects bare `---` and `\n` — safe only because
-it runs on sync output.
+Sync edits front matter line by line (`tags` in `hashtags.py`); nested or multi-line
+keys are invisible. Swap in a real parser rather than extend the regexes.
 
 ## Hashtag regex alternation order is the logic
 

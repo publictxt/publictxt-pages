@@ -1,5 +1,5 @@
 """
-test_golden.py — sync + hashtags over example/txt, compared with the committed
+test_golden.py — sync over example/txt, compared with the committed
 snapshot in tests/golden/. Any difference fails; the diff says what moved.
 
 Dates are fixed: every file reads as first committed at CREATED and last at
@@ -25,7 +25,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from dates import DateResolver          # noqa: E402
-from extract_hashtags import extract_all  # noqa: E402
 from sync_content import sync           # noqa: E402
 
 EXAMPLE = ROOT / "example" / "txt"
@@ -49,10 +48,8 @@ class FixedDates(DateResolver):
 
 def build(out: Path) -> None:
     """build/ as the pipeline makes it: out/content + out/site.toml."""
-    content = out / "content"
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-        sync(EXAMPLE, content, FixedDates(EXAMPLE))
-        extract_all(content)
+        sync(EXAMPLE, out / "content", FixedDates(EXAMPLE))
 
 
 def outputs(root: Path) -> list[str]:
