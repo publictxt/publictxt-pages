@@ -60,12 +60,12 @@ capitalizeListTitles = false
 
   # Filter chips in browse lists and search, in this order. `key`: collection,
   # category or tag; leave one out to drop its chips. Absent = all three.
-  # `states`: what a click cycles through after off — ["include"],
-  # ["exclude"] or both (the default). A card's tags filter only if tag
-  # includes; else they link to the tag page. `match`: how two or more
-  # includes combine, "all" and/or "any", the first the default; one fixes
-  # it, hiding the toggle. Default ["all", "any"]. Changing a default changes
-  # what shared links without `-match` mean.
+  # `states`: what a chip can do — ["include"] or ["exclude"] (a click
+  # toggles it), or both (click includes, ✕ excludes; the default).
+  # A card's tags filter only if tag includes; else they link to the tag
+  # page. `match`: how two or more includes combine, "all" and/or "any", the
+  # first the default; one fixes it, hiding the toggle. Default ["all", "any"].
+  # Changing a default changes what shared links without `-match` mean.
   [[params.chipFacets]]
     key = "collection"
     label = "Collection"

@@ -16,7 +16,7 @@ Sorts are Pagefind's, over `pagefind-keys.html`'s keys, and **replace** relevanc
 with no tiebreak: *Relevance* is offered (and default) only with a query.
 
 Same facets and URL spelling as the browse lists. Collection, category and tag are
-[filter chips](filter-chips.md) (the intro only says "hover for the next click": `states` vary); year and rating single-select. Pagefind gets the chips
+[filter chips](filter-chips.md); year and rating single-select. Pagefind gets the chips
 as a compound `all: [...]`; a facet matching *any* counts from a second search.
 
 A chip facet hides when the index has none (categories when disabled); year when the site spans one year; rating
