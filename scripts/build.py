@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-build.py — the full pipeline: sync -> hugo -> pagefind. One script for every
-OS, so the steps can't drift between shells.
+build.py — the full pipeline: sync -> hugo -> pagefind -> check the search
+index. One script for every OS, so the steps can't drift between shells.
 
   python scripts/build.py                        example/txt -> public/
   python scripts/build.py --source ../my-repo    your own repo (a bare path works too)
@@ -14,10 +14,12 @@ Any failing step stops the build with its exit code.
 """
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
 import sys
+from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -46,6 +48,55 @@ def pagefind() -> None:
         run("pagefind", "--site", "public")
     else:
         run("npx", "--yes", f"pagefind@{PAGEFIND_VERSION}", "--site", "public")
+
+
+class _PageKeys(HTMLParser):
+    """A page's data-pagefind-body flag and pagefind-keys.html span, if any."""
+
+    def __init__(self):
+        super().__init__()
+        self.body = False
+        self.sorts: set[str] | None = None
+        self.filters: set[str] | None = None
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        self.body = self.body or "data-pagefind-body" in a
+        if self.sorts is None and "data-pagefind-sort" in a:
+            names = lambda v: {k.split("[")[0].strip() for k in (v or "").split(",") if k.strip()}
+            self.sorts = names(a["data-pagefind-sort"])
+            self.filters = names(a.get("data-pagefind-filter"))
+
+
+def check_search_index(public: Path) -> list[str]:
+    """
+    Pagefind loses pages silently, so fail loudly. Problems (none = fine):
+    its page count differs from the data-pagefind-body pages; or a body page
+    lacks a sort key or filter another has — Pagefind drops it from any search
+    sorted or filtered on that key (pagefind-keys.html, traps.md).
+    """
+    pages = {}
+    for f in public.rglob("*.html"):
+        if f.is_relative_to(public / "pagefind"):
+            continue
+        p = _PageKeys()
+        p.feed(f.read_text(encoding="utf-8"))
+        if p.body:
+            pages[f.relative_to(public).as_posix()] = p
+    entry = json.loads((public / "pagefind" / "pagefind-entry.json").read_text(encoding="utf-8"))
+    indexed = sum(lang["page_count"] for lang in entry["languages"].values())
+
+    problems = []
+    if indexed != len(pages):
+        problems.append(f"Pagefind indexed {indexed} page(s); {len(pages)} have data-pagefind-body")
+    all_sorts = set().union(*(p.sorts or set() for p in pages.values()))
+    all_filters = set().union(*(p.filters or set() for p in pages.values()))
+    for path, p in sorted(pages.items()):
+        if p.sorts is None:
+            problems.append(f"{path}: no pagefind-keys.html span — gone from every sorted or filtered search")
+        elif missing := sorted((all_sorts - p.sorts) | (all_filters - p.filters)):
+            problems.append(f"{path}: lacks {', '.join(missing)} — gone from searches using them")
+    return problems
 
 
 def main() -> int:
@@ -78,6 +129,8 @@ def main() -> int:
         shutil.rmtree(ROOT / "public", ignore_errors=True)
         run("hugo", "--minify", "--config", config, *(["-b", args.base_url] if args.base_url else []))
         pagefind()
+        if problems := check_search_index(ROOT / "public"):
+            raise StepFailed("search index check:\n  " + "\n  ".join(problems))
     except StepFailed as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

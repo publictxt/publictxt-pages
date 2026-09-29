@@ -3,13 +3,14 @@
 Cross-file invariants — each is otherwise documented only in a file you'd have to
 already know to open. **Read before editing templates or the pipeline.**
 
-## Pagefind drops pages silently
+## Pagefind drops pages silently — `build.py` fails the build instead
 
 Every `data-pagefind-body` template **must** call `pagefind-keys.html` (now:
 `page.html`, `section.html`). Pagefind drops a page lacking
 the key it sorts on, or the filter selected — so a template without it vanishes from
 sorted and filtered results, no error. Hence the rating sort key and filter are on
-every page, rated or not.
+every page, rated or not. `check_search_index()` catches a page without them, and an
+index count that differs from the body pages; `hugo server` builds skip it.
 
 ## Pairs that must change together
 
