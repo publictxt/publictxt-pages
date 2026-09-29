@@ -572,12 +572,31 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   cursor: pointer;
 }
 .filter-chip.empty:not(.active) { opacity: 0.45; }
-/* An excluded filter (facets.js); :hover would otherwise drop the strike. */
+/* A facet chip (facets.js): the pill is a <span> around a body button and, if
+   the facet excludes, a ✕ button; both inherit the pill's look. */
+span.filter-chip { display: inline-flex; align-items: baseline; }
+.filter-chip > button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.chip-x { margin-left: 0.35rem; font-size: 0.65rem; color: var(--text-muted); }
+.chip-x:hover, .filter-chip.excluded .chip-x { color: var(--accent); }
+/* ✕ on set chips; on off chips it keeps its space (no reflow) and shows on
+   hover or keyboard focus — touch has no hover, so it's gone: include first. */
+.filter-chip:not(.active):not(.excluded):not(:hover) .chip-x:not(:focus-visible) { opacity: 0; }
+@media (hover: none) {
+  .filter-chip:not(.active):not(.excluded) .chip-x { display: none; }
+}
+/* An excluded filter; :hover would otherwise drop the strike. */
 .filter-chip.excluded, .filter-chip.excluded:hover {
   border-style: dashed;
   color: var(--text-muted);
-  text-decoration: line-through;
 }
+.filter-chip.excluded .chip-body { text-decoration: line-through; }
 /* "match all / any" beside a facet heading. */
 .match-toggle {
   font: inherit;

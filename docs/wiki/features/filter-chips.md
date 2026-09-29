@@ -17,8 +17,10 @@ is the one source for `search.html`'s groups and, via `js-params.html`, both bun
 `chipFacets(config)` merges each entry over its `BUILTIN` (index field, `#` prefix,
 lists-only `shared` / `limit`). Keys are fixed — see [traps.md](../traps.md).
 
-**Behaviour.** A chip click cycles off → each allowed state → off (`states`, default
-include, exclude). With two includes, a toggle sets match all / any if
+**Behaviour.** A chip's body toggles its facet's first state (`states`, default include,
+exclude); with both, a ✕ toggles exclude (`press()`). Neither passes through the opposite
+filter on the way to off. The ✕ shows on set chips, else on hover / focus — not on touch,
+where you include, then ✕. With two includes, a toggle sets match all / any if
 `match` allows both; its first is the default, which `?tag-match=` omits. Config beats
 the URL: `readFacet` drops what `states` / `match` disallow, so nothing filters that no
 chip can clear. A facet matching *any* counts without its own includes, since picking a

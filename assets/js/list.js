@@ -10,7 +10,7 @@
 //   data-compact      cards only: no controls, pager or URL (home Recent)
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, chipState, cycle, filterChip, matches, matchToggle, nextState, toggleInclude } from "./facets.js";
+import { addsPages, chipFacets, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -132,8 +132,7 @@ async function mount(root) {
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
 
   function chip(d, name, n) {
-    const onClick = () => { cycle(state[d.key], name); state.page = 1; render(true); };
-    return filterChip(d.prefix + name, n, chipState(state[d.key], name), nextState(state[d.key], name), onClick);
+    return filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
   }
 
   // `f`: a facets.js facet, for its match toggle.

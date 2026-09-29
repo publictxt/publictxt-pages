@@ -7,7 +7,7 @@
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, chipState, cycle, filterChip, matchToggle, nextState, pagefindConditions,
+import { addsPages, chipFacets, filterChip, matchToggle, pagefindConditions,
   toggleInclude } from "./facets.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -78,8 +78,7 @@ const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[
 const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(a));
 
 function chip(d, name, count) {
-  const f = state[d.key];
-  return filterChip(d.prefix + name, count, chipState(f, name), nextState(f, name), () => { cycle(f, name); run(); });
+  return filterChip(state[d.key], name, d.prefix + name, count, run);
 }
 
 // counts: filter counts within the current result set (or totals when idle);
