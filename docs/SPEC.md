@@ -10,7 +10,6 @@ Items marked **(TBD)** are not built.
 - No PublicTxt.Syntax / .NET dependency
 - Build operates on generated copy `build/content/`.
 - Hugo renders `.md` extensions to `.html`
-- `![alt](youtube-url)` embeds the video; other images stay images.
 - Sections
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
@@ -54,6 +53,7 @@ Items marked **(TBD)** are not built.
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
+  - `![alt](youtube-url)` embeds the video; other images stay images.
 - Date Properties
   - Converts from YYYYMMDD to required format (TBD)
 - Chips

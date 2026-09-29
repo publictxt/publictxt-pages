@@ -19,7 +19,7 @@ content/bookmarks/sites/gitcms.dev/_index.md
 content/bookmarks/sites/gitcms.dev/gitcms.dev.md
 content/bookmarks/sites/obsidian.md/Obsidian Web Clipper Plugin.md
 content/bookmarks/sites/obsidian.md/_index.md
-content/media/logo.svg
+content/media/favicon-180.png
 content/notes/Info politics/The WhatsApp Mess . 20240816.md
 content/notes/Info politics/_index.md
 content/notes/_index.md

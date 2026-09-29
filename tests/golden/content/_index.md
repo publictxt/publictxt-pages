@@ -5,20 +5,11 @@ created_source: git
 updated: 2026-09-25
 source_path: "index.md"
 ---
-## about
-
-A fictional author's public text repository — used to exercise the publictxt-pages pipeline.
-
-Spend time on and thinking about:
-
-- free software and info-politics
-- social software and public information infrastructure
-- armchair science
-
 See also:
+
 - Recent things
-	- [Curated Commons post](blog/20260509-CuratedCommons-Open-Aggregation-for-the-Open-Web.md)
-	- [PublicTxt](wiki/Projects/PublicTxt/PublicTxt.md)
+  - [Curated Commons post](blog/20260509-CuratedCommons-Open-Aggregation-for-the-Open-Web.md)
+  - [PublicTxt](wiki/Projects/PublicTxt/PublicTxt.md)
 - [Online things](online-things.md)
 - [Projects](Projects.md)
 

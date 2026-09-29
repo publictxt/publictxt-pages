@@ -2,7 +2,7 @@
 rating: 3
 categories: 
     - Tech
-    - Politics # Curated Commons: Open Aggregation for the Open Web
+    - Politics
 collections: notes
 title: "20260509 CuratedCommons Open Aggregation for the Open Web"
 created: 2026-05-09

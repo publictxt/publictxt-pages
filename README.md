@@ -51,7 +51,13 @@ for search, and a re-run of sync for content changes.
 python -m unittest        # stdlib only; CI runs it on push and PR
 ```
 
-A golden snapshot of the pipeline's output; refreshing it: `tests/test_golden.py`.
+`tests/golden/` is a snapshot of the pipeline's output over `example/txt/`. After an
+intended change to either, refresh it and review the diff:
+
+```bash
+GOLDEN_UPDATE=1 python -m unittest tests.test_golden   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden; Remove-Item Env:GOLDEN_UPDATE
+git diff tests/golden                                  # read it: every change should be one you meant
+```
 
 ## Publishing (GitHub Pages)
 

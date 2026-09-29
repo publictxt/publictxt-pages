@@ -2,7 +2,14 @@
 
 The default build source and the golden-test fixture (`tests/test_golden.py`). Each file
 earns its place with a case the pipeline must handle; keep it that way — a new case, a
-new (small) file. After changing anything here, refresh the snapshot and read its diff.
+new (small) file, and a row in the table below.
+
+After changing anything here, refresh the snapshot, then read its diff before committing:
+
+```bash
+GOLDEN_UPDATE=1 python -m unittest tests.test_golden   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden; Remove-Item Env:GOLDEN_UPDATE
+git diff tests/golden                                  # read it: every change should be one you meant
+```
 
 | Case | File(s) |
 |---|---|
@@ -14,7 +21,7 @@ new (small) file. After changing anything here, refresh the snapshot and read it
 | `created` from a `YYYY/MM/DD/` path only | `blog/2023/12/17/another-post.md` |
 | `created`/`updated` authored, with offsets | `blog/20260915-a-post-with-full-front-matter.md` |
 | Quoted date-only `created:` | `blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md` |
-| `index.md` / `home.md` as folder index | `blog/index.md`, `blog/2024/home.md`, `wiki/**/index.md` |
+| `index.md` / `home.md` as folder index | `blog/index.md`, `notes/home.md`, `wiki/**/index.md` |
 | Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Science/brain/` |
 | Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
 | `publish: off` | `notes/unpublished.md` |
@@ -29,6 +36,6 @@ new (small) file. After changing anything here, refresh the snapshot and read it
 | YouTube embed in image syntax | `notes/embeds.md` |
 | `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `index.md`, `Projects.md`, `online-things.md` |
-| Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/`, `.gitkeep` | — |
-| Non-Markdown copied verbatim | `media/logo.svg` |
+| Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
+| Non-Markdown copied verbatim | `media/favicon-180.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
 | Site settings, not content | `settings/site.toml` |

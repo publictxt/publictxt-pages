@@ -7,7 +7,7 @@ author: "example"
 source_repo: "example-txt"
 category: Personal
 rating: 4
-collections: [posts, announcements]
+collections: [posts, notes]
 mastodon: https://mastodon.social/@example/113000000000000000
 substack:
   - https://example.substack.com/p/full-front-matter
