@@ -10,7 +10,7 @@ covers:
 # Tags
 
 Front matter `tags:` and inline `#hashtags` merge into one list, so visible tags and
-the tag cloud agree *([D3](../decisions/D3.md))*. `hashtags.py` defines a hashtag once;
+the tag cloud agree. `hashtags.py` defines a hashtag once;
 sync linkifies them (text stays `#tag`, so files read the same in Obsidian or on
 GitHub) and `extract_hashtags.py` merges them into front matter.
 

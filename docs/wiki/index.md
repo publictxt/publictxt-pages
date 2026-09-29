@@ -19,7 +19,6 @@ single file can: where things are, and what spans files. Code wins any disagreem
 | [features/](features/index.md) | a capability and the files that do it |
 | [traps.md](traps.md) | cross-file invariants. **Read before editing templates or the pipeline.** |
 | [build.md](build.md) · [deploy.md](deploy.md) | running and shipping |
-| [decisions/](decisions/DECISIONS.md) | why, cited as *(Dn)* |
 
 [SPEC.md](../SPEC.md) is what the site *should* do, including **(TBD)** items.
 

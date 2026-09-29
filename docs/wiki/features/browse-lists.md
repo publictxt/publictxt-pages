@@ -12,10 +12,10 @@ covers:
 
 Home *Recent*, sections, tag pages and Bookmarks are one component: Hugo renders a
 plain `<ul>` (crawlers, no-JS; kept if the index fetch fails), then `list.js` replaces
-it with sortable, filterable, paged cards *([D6](../decisions/D6.md))*.
+it with sortable, filterable, paged cards.
 
 Data is one fingerprinted `index.json` of `site.RegularPages`
-(`site-index.html`), fetched once per document *([D7](../decisions/D7.md))*; item
+(`site-index.html`), fetched once per document; item
 shape is in `cards.js`. Each list names its subset, mirroring its server collection:
 
 | `data-scope-kind` | Server equivalent |

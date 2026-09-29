@@ -3,7 +3,8 @@
   matched case-insensitively against params.categories.list and returned in its
   spelling, deduped, in page order; [] when disabled or absent, unlisted values
   warned and dropped. The only reader of the keys, so lists, search and the
-  toggle agree. Expects a page.
+  toggle agree. Expects a page. Closed, unlike tags (the open vocabulary): a
+  typo warns instead of minting a category. No taxonomy, so no category pages.
 */}}
 {{ $out := slice }}
 {{ $cfg := site.Params.categories }}

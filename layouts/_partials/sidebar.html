@@ -50,7 +50,7 @@
     <dt>Posted on</dt>
     <dd class="chip-row">{{ . }}</dd>
     {{ end }}
-    {{/* No category pages (D11): each links to search, filtered. */}}
+    {{/* No category pages: each links to search, filtered. */}}
     {{ with partial "categories.html" . }}
     <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>
     <dd class="chip-row">
@@ -67,7 +67,7 @@
 </div>
 {{ end }}
 
-{{/* Hidden when unused or disabled. Links to search, as there are no category pages (D11). */}}
+{{/* Hidden when unused or disabled. Links to search, as there are no category pages. */}}
 {{ with partialCached "category-counts.html" . }}
 <nav class="side-block" aria-label="Categories">
   <h2 class="side-heading">Categories</h2>
