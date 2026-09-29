@@ -1,4 +1,4 @@
-// Multi-select facets (tags, categories) for list.js and search.js, so the
+// Multi-select facets (tags, categories, collections) for list.js and search.js, so the
 // lists and search read the URL and match pages alike. A value is included,
 // excluded or neither; includes match `all` or `any`, excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c

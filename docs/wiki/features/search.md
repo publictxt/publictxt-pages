@@ -16,8 +16,8 @@ lives in `site-content/`.
 Sorts are Pagefind's, over `pagefind-keys.html`'s keys, and **replace** relevance
 with no tiebreak: *Relevance* is offered (and default) only with a query.
 
-Same facets and URL spelling as the browse lists. Tags and categories go through
-`facets.js`, shared with the lists: a chip click cycles include → exclude → off, and
+Same facets and URL spelling as the browse lists. Tags, categories and collections
+go through `facets.js`, shared with the lists: a chip click cycles include → exclude → off, and
 with two includes a toggle sets match all / any (default all — it narrows, so no recount search;
 `?tag-not=`, `?tag-match=`). The rest are single-select. Pagefind gets them as a
 compound `all: [...]`. A facet matching *any* counts from a second search without
