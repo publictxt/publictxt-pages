@@ -1,4 +1,4 @@
-# Example bliki & public txt instance
+# Example public txt instance
 
 ## about
 
@@ -27,4 +27,3 @@ See also:
 -----
 
 More [about PublicTxt](wiki/Projects/PublicTxt/PublicTxt.md), and its [GitHub repo](https://github.com/publictxt/publictext).
-See also notes on [bliki](wiki/bliki.md) - blog and wiki hybrids.
