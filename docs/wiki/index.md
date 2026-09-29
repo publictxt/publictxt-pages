@@ -97,7 +97,7 @@ assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette in :root
 ```
 
-ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build.
+ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build; see [build.md](build.md#js-modules).
 
 ### Config and delivery
 
