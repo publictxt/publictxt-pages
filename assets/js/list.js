@@ -121,9 +121,12 @@ async function mount(root) {
   else root.append(controls, status, list, pager);
 
   // A facet shows only when the list varies on it (a tag page hides its own
-  // tag, a collection section its collection). A missing value counts as no
-  // value, so a lone category shows unless every page has it.
-  const collectionFacet = counts(items, "collection").filter(([, n]) => n < items.length);
+  // tag). A missing value counts as no value, so a lone category shows unless
+  // every page has it. Collections show when there are two or more — shared
+  // ones too, as membership is worth seeing — less a collection list's own.
+  const own = root.dataset.scopeKind === "collection" ? root.dataset.scopeValue : null;
+  const allCollections = counts(items, "collection");
+  const collectionFacet = allCollections.length > 1 ? allCollections.filter(([n]) => n !== own) : [];
   const yearFacet = counts(items, "year");
   const hasYears = yearFacet.length > 1;
   const tagFacet = counts(items, "tags").filter(([, n]) => n < items.length);
