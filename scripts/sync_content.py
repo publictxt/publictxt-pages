@@ -41,7 +41,8 @@ SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.tom
 UNPUBLISHED = {"off", "false", "no", "0"}
 BOOKMARK_KEYS = ("bookmark", "bookmarks")
 
-FRONT_MATTER_RE = re.compile(r"^---\r?\n(.*?)^---\r?\n?", re.DOTALL | re.MULTILINE)
+# Fences may carry trailing spaces (`--- `), as editors leave them.
+FRONT_MATTER_RE = re.compile(r"^---[ \t]*\r?\n(.*?)^---[ \t]*\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
