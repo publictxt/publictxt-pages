@@ -60,16 +60,14 @@ export function clearFacet(f) {
   f.inc.clear(); f.exc.clear(); f.match = f.modes[0];
 }
 
-// Facet chip click: neither → each allowed state → neither.
-export function nextState(f, v) {
-  const order = ["", ...f.states];
-  return order[(order.indexOf(chipState(f, v)) + 1) % order.length];
-}
-export function cycle(f, v) {
-  const next = nextState(f, v);
+// Facet chip press. Body: set → off, off → the facet's first state. ✕ (both
+// states allowed): excluded → off, else excluded. Never passes through the
+// opposite filter on the way to off.
+export function press(f, v, x = false) {
+  const was = chipState(f, v);
+  const next = x ? (was === "exclude" ? "" : "exclude") : (was ? "" : f.states[0]);
   f.inc.delete(v); f.exc.delete(v);
-  if (next === "include") f.inc.add(v);
-  else if (next === "exclude") f.exc.add(v);
+  if (next) (next === "include" ? f.inc : f.exc).add(v);
 }
 // Card tag click: include or not, never exclude. Only where `include` is allowed.
 export function toggleInclude(f, v) {
@@ -104,25 +102,42 @@ export function describe(f, prefix = "") {
 
 export const chipState = (f, v) => f.inc.has(v) ? "include" : f.exc.has(v) ? "exclude" : "";
 
-// A filter chip; `on` and `next` (the click's result) are "", "include" or
-// "exclude". Excluded chips drop the count — it would always be 0.
-export function filterChip(label, count, on, next, onClick) {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.className = "chip filter-chip" + (on === "include" ? " active" : on === "exclude" ? " excluded" : "")
+// A filter chip for facet `f`: a body button and, with both states allowed,
+// a ✕ that excludes (main.css shows it on set chips, else on hover / focus).
+// `onPress(x)` after press(). Excluded chips drop the count — always 0.
+export function filterChip(f, v, label, count, onPress) {
+  const on = chipState(f, v);
+  const withX = f.states.length > 1;
+  const wrap = document.createElement("span");
+  wrap.className = "chip filter-chip" + (on === "include" ? " active" : on === "exclude" ? " excluded" : "")
     + (count === 0 && on !== "exclude" ? " empty" : "");
-  b.setAttribute("aria-pressed", String(on === "include"));
-  b.append(label);
-  if (on === "exclude") b.setAttribute("aria-label", "not " + label);
+  const button = (cls, x) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = cls;
+    b.addEventListener("click", () => { press(f, v, x); onPress(); });
+    wrap.append(b);
+    return b;
+  };
+  const body = button("chip-body", false);
+  body.append(label);
+  body.setAttribute("aria-pressed", String(withX ? on === "include" : on !== ""));
+  if (on === "exclude") body.setAttribute("aria-label", "not " + label);
   else {
     const n = document.createElement("span");
     n.className = "count";
     n.textContent = count;
-    b.append(n);
+    body.append(n);
   }
-  b.title = "Click to " + (next || "clear");
-  b.addEventListener("click", onClick);
-  return b;
+  body.title = on ? "Click to clear" : "Click to " + f.states[0] + (withX ? "; ✕ to exclude" : "");
+  if (withX) {
+    const x = button("chip-x", true);
+    x.textContent = "✕";
+    x.setAttribute("aria-pressed", String(on === "exclude"));
+    x.setAttribute("aria-label", (on === "exclude" ? "Stop excluding " : "Exclude ") + label);
+    x.title = on === "exclude" ? "Stop excluding" : "Exclude";
+  }
+  return wrap;
 }
 
 // "match all" / "match any" beside a facet's heading, once two values are

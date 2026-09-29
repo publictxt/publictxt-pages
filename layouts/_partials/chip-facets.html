@@ -2,7 +2,7 @@
   The chip facets for browse lists and search: params.chipFacets in its order,
   or all three when absent. `key` is collection, category or tag (facets.js
   holds the rest); others and repeats warned and dropped. `label` defaults to
-  the key; `states` (what a click cycles through after off) and `match` (how
+  the key; `states` (what a chip can do: include, exclude) and `match` (how
   includes combine, first the default) to both, unknown values warned and
   dropped. The one source for search.html and
   js-params.html. Returns a slice of dicts {key, label, states, match}; expects

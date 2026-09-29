@@ -61,8 +61,8 @@ Items marked **(TBD)** are not built.
   - Converts from YYYYMMDD to required format (TBD)
 - Chips
   - Chips showing tags/categories/collections
-  - Some chips can toggle in 3 states - include/exclude/off
-  - The ui of chip shows toggle exclude as a small 'x' button to the right of all chips when excluded (TBD)
+  - Some chips can toggle in 3 states - include/exclude/off (per facet: `params.chipFacets` `states`, `match`)
+  - Click a chip to include it (again to clear); a small ✕ at its right excludes it. The ✕ shows on set chips, and on others on hover / focus
 
 ## Content Structure
 
