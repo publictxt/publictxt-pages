@@ -308,11 +308,12 @@ async function mount(root) {
     const what = [...CHIPS.describe(state), state.year,
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
     const label = sortLabel(state.sort);
-    status.textContent = `${n} page${n === 1 ? "" : "s"}`
-      + (n !== items.length ? ` of ${items.length}` : "")
-      + (what ? `: ${what}` : "")
-      + ` · ${label}`
-      + (total > 1 ? ` · page ${state.page} of ${total}` : "");
+    const detail = document.createElement("span");
+    detail.className = "muted";
+    detail.textContent = ` (${[what, label, total > 1 && `page ${state.page} of ${total}`]
+      .filter(Boolean).join(" · ")})`;
+    status.replaceChildren(
+      `${n} page${n === 1 ? "" : "s"}` + (n !== items.length ? ` of ${items.length}` : ""), detail);
     writeURL(pushHistory);
   }
 
