@@ -18,7 +18,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
 Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep) and `publish: off`
 pages, with an unpublished post folder's attachments. Other files are copied
-verbatim.
+verbatim — except SITE_CONFIG, the repo's site settings: not content, it goes
+beside dest as `site.toml`, which the build scripts overlay on hugo.toml.
 
 Usage: python3 scripts/sync_content.py <source_repo> <dest_content_dir>
 """
@@ -35,6 +36,7 @@ from hashtags import linkify
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
 INDEX_NAMES = {"index.md", "home.md"}
+SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.toml
 # `publish:` values that keep a page off the site (YAML reads off/no as false).
 UNPUBLISHED = {"off", "false", "no", "0"}
 BOOKMARK_KEYS = ("bookmark", "bookmarks")
@@ -181,6 +183,11 @@ def sync(src: Path, dest: Path) -> tuple[int, int, int]:
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir(parents=True)
+    config = dest.parent / "site.toml"
+    config.unlink(missing_ok=True)
+    if (src / SITE_CONFIG).is_file():
+        shutil.copy2(src / SITE_CONFIG, config)
+        print(f"site settings: {SITE_CONFIG} -> {config}")
 
     resolver = DateResolver(src)
     if resolver.shallow_clone:
@@ -204,6 +211,8 @@ def sync(src: Path, dest: Path) -> tuple[int, int, int]:
         if path.is_dir():
             continue
         if path.name in SKIP_FILES or path.name.endswith(".gitkeep"):
+            continue
+        if path.relative_to(src).as_posix() == SITE_CONFIG:
             continue
         if path.parent in hidden_bundles:
             unpublished += path.suffix.lower() == ".md"

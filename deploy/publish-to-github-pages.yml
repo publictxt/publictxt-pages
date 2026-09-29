@@ -3,6 +3,8 @@
 # Copy into the CONTENT repo as .github/workflows/publish.yml, and set its
 # Settings -> Pages -> Source to "GitHub Actions". Then edit the Build step's
 # env: — HUGO_-prefixed variables override hugo.toml, so no fork is needed.
+# Settings too rich for env vars (e.g. [[params.chipFacets]]) go in the
+# content repo's settings/site.toml, merged over hugo.toml; env vars win.
 
 name: Publish site
 
