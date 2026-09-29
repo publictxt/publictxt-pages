@@ -19,7 +19,7 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep) and `publish: off`
 pages, with an unpublished post folder's attachments. Other files are copied
 verbatim — except SITE_CONFIG, the repo's site settings: not content, it goes
-beside dest as `site.toml`, which the build scripts overlay on hugo.toml.
+beside dest as `site.toml`, which build.py overlays on hugo.toml.
 
 Usage: python3 scripts/sync_content.py <source_repo> <dest_content_dir>
 """

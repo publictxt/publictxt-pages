@@ -17,8 +17,7 @@ scripts/sync_content.py     source repo -> build/content: renames, titles, dates
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`)
 scripts/build.py            full pipeline, any OS; docstring has usage
-scripts/build.sh            full pipeline, POSIX; header has usage
-scripts/build.ps1           full pipeline, PowerShell
+scripts/build.sh            shim -> build.py, for deploy workflows copied before it
 scripts/map_lint.py         this map vs the tree
 ```
 
