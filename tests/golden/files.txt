@@ -16,7 +16,6 @@ content/blog/_index.md
 content/bookmarks/_index.md
 content/bookmarks/sites/_index.md
 content/bookmarks/sites/gitcms.dev/_index.md
-content/bookmarks/sites/gitcms.dev/gitcms.dev.md
 content/bookmarks/sites/obsidian.md/Obsidian Web Clipper Plugin.md
 content/bookmarks/sites/obsidian.md/_index.md
 content/media/favicon-180.png
@@ -35,7 +34,6 @@ content/wiki/Computer-Science/_index.md
 content/wiki/Projects/PublicTxt/CuratedCommons.md
 content/wiki/Projects/PublicTxt/Obsidian.md.md
 content/wiki/Projects/PublicTxt/Other Software.md
-content/wiki/Projects/PublicTxt/PublicTxt.md
 content/wiki/Projects/PublicTxt/_index.md
 content/wiki/Projects/_index.md
 content/wiki/Science/Cosmology.md
