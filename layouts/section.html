@@ -11,9 +11,16 @@
   </div>
 </header>
 
-{{/* The index body is content, indexed like a page; the list below is not. */}}
+{{/* The index body is content, indexed like a page; the list below is not.
+     No body: the folder note's, unindexed — search finds it at its own URL. */}}
 {{ with .Content }}
 <div class="prose" data-pagefind-body>{{ . }}</div>
+{{ else }}
+{{ with partial "folder-note.html" . }}
+<div class="prose folder-note">{{ .Content }}
+  <p class="muted"><a href="{{ .RelPermalink }}">{{ .Title }}</a> — this folder's note</p>
+</div>
+{{ end }}
 {{ end }}
 
 {{ $list := partial "section-pages.html" . }}
