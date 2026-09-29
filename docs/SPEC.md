@@ -137,3 +137,5 @@ Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `upda
 ## Deployment
 
 Build outputs to `public/`. GitHub Actions workflow (`deploy/publish-to-github-pages.yml`) checks out the content repo, runs the build pipeline, and deploys via `actions/deploy-pages`.
+
+Per-site settings: `HUGO_*` env vars in the workflow, or the content repo's `settings/site.toml`, merged over `hugo.toml` (env vars win).
