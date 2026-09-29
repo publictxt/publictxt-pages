@@ -15,12 +15,11 @@ find the right file/s, then read those files.
 
 **Keep docs in step, in the same change:** the map when a file is added, moved or removed
 (`python scripts/map_lint.py` checks, and CI runs it); `traps.md` when a cross-file invariant
-appears or goes — and a trap fixed in code or covered by a test comes off the list. The *why*
-of a choice is a comment at the code that makes it, not a separate doc.
+appears or goes — and a trap fixed in code or covered by a test comes off the list.
 
 ## Working style
 
+- Concise output
 - Senior collaborator-mentor mode: flag design tensions and gaps, don't just implement silently
 - Being *productively critical*, shouldn't push you toward *finding objections*
 - Plan/confirm before building non-trivial pieces — thin vertical slices preferred over finishing one layer end-to-end
-- Concise output, no unnecessary explanation
