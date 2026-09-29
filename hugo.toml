@@ -55,7 +55,7 @@ capitalizeListTitles = false
   # this closed list (matched case-insensitively; unlisted values warned and
   # ignored). Disabled or absent = no categories anywhere.
   [params.categories]
-    enabled = false
+    enabled = true
     list = ["Project", "Personal", "Tech", "Politics", "Science", "CompSci", "Art", "Content"]
 
   # Filter chips in browse lists and search, in this order. `key`: collection,
@@ -69,9 +69,13 @@ capitalizeListTitles = false
   [[params.chipFacets]]
     key = "collection"
     label = "Collection"
+    states = ["include", "exclude"]
+    match = ["any"]
   [[params.chipFacets]]
     key = "category"
     label = "Category"
+    states = ["include"]
+    match = ["any"]
   [[params.chipFacets]]
     key = "tag"
     label = "Tags"
