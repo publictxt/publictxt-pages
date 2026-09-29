@@ -16,18 +16,13 @@ import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js"
 
 const CHIPS = chipFacets(params.chipFacets);
 
-// Sliced, not parsed as a local Date, to match Hugo's year (traps.md).
-function yearOf(it) {
-  return (/^(\d{4})-/.exec(it.created || "") || ["", ""])[1];
-}
-
 // Each facet's values per page and chip order. The chip facets per facets.js
 // (CHIPS); year single-select. Rating is a minimum, handled in render().
 // Disabled categories leave no data, so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = {
   ...Object.fromEntries(CHIPS.defs.map((d) => [d.key, { values: (it) => it[d.item] || [], order: byCount }])),
-  year: { values: (it) => [yearOf(it)], order: (a, b) => b[0].localeCompare(a[0]) },
+  year: { values: (it) => [it.year], order: (a, b) => b[0].localeCompare(a[0]) },
 };
 
 // Rating ties: newest first either way.
@@ -280,7 +275,7 @@ async function mount(root) {
   // Each filter as a test; `own` false drops a facet's includes (addsPages).
   const tests = {
     ...Object.fromEntries(CHIPS.keys.map((k) => [k, (it, own) => matches(state[k], FACETS[k].values(it), own)])),
-    year: (it) => !state.year || yearOf(it) === state.year,
+    year: (it) => !state.year || it.year === state.year,
     rating: (it) => !state.rating
       || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating)),
   };

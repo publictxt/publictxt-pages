@@ -28,6 +28,7 @@ scripts/map_lint.py         this map vs the tree
 tests/test_golden.py        example/txt through sync + hashtags vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
+tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 ```
 
 ## Templates
@@ -50,10 +51,11 @@ layouts/_partials/
   crumb-label.html      one crumb's label; date folders literal
   sections.html         top-level sections in sectionOrder   (partialCached)
   recent.html           the one "recently updated first"
-  page-date.html        created, + updated when >1 day later
+  page-date.html        created, + updated when shown
+  date-labels.html      the one date form + >1-day rule, for page, sidebar, JSON, Pagefind
   tag-cloud.html        weighted term chips
   site-index.html       publishes index.json, returns URL    (partialCached)
-  list-json.html        pages -> index.json items
+  list-json.html        pages -> index.json items, with Hugo-made display values
   list-container.html   [data-list] + no-JS <ul> + loads list.js
   js-params.html        @params for every js.Build — see traps.md
   chip-facets.html      only reader of params.chipFacets   (partialCached)
@@ -65,7 +67,7 @@ layouts/_partials/
   page-collections.html only reader of collections:; + section, "bookmarks" if URL
   collection-pages.html every page of a collection        (partialCached)
   section-pages.html    what a section lists, + its scope
-  bookmark-label.html   one URL's short form
+  bookmark-label.html   one URL's short form (returns it)
   source-urls.html      only reader of params.sources keys (facebook:, …)
   source-links.html     "Posted on" chips
   categories.html       only reader of categories:/category:
@@ -79,7 +81,7 @@ layouts/_markup/
 ## Browser
 
 ```txt
-assets/js/site-index.js   fetch index.json once per document; scope() subsets
+assets/js/site-index.js   fetch index.json (recent-first) once per document; scope() subsets
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; shared

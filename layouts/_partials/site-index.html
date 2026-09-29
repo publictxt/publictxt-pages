@@ -6,7 +6,8 @@
   ancestor and tag, and cost a fetch per navigation. Cost: the first list
   downloads the whole corpus — revisit if that gets visible.
 */}}
-{{ $json := partial "list-json.html" site.RegularPages }}
+{{/* Recently updated first, so the `recent` scope is a slice. */}}
+{{ $json := partial "list-json.html" (partial "recent.html" site.RegularPages) }}
 {{ $r := resources.FromString "index.json" $json }}
 {{ if hugo.IsProduction }}{{ $r = $r | fingerprint }}{{ end }}
 {{ return $r.RelPermalink }}

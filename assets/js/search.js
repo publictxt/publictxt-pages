@@ -178,6 +178,8 @@ function resultCard(d) {
     tags: d.filters?.tag || [],
     created: d.meta?.created || "",
     updated: d.meta?.updated || "",
+    createdLabel: d.meta?.created_label || "",
+    updatedLabel: d.meta?.updated_label || "",
     rating: Number(d.meta?.rating) || 0,
   };
   return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });

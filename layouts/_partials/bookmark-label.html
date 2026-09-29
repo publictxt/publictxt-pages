@@ -1,2 +1,2 @@
-{{/* Short display form of a bookmark URL: scheme, www. and trailing slash dropped. Expects a URL string. */}}
-{{- "↗ " }}{{ replaceRE `^https?://(www\.)?` "" . | strings.TrimSuffix "/" -}}
+{{/* Short display form of a bookmark URL: scheme, www. and trailing slash dropped. Returns a string. Expects a URL string. */}}
+{{ return printf "↗ %s" (replaceRE `^https?://(www\.)?` "" . | strings.TrimSuffix "/") }}

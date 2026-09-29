@@ -1,0 +1,14 @@
+{{/*
+  A page's display dates — the one "2 Jan 2006" form and >1-day rule, for the
+  page, sidebar, index.json and Pagefind, so JS never formats a date (a
+  reader's zone would shift the day). Returns dict created, updated: ""
+  when undated; updated "" unless over a day after created. Expects a page.
+*/}}
+{{ $created := "" }}
+{{ $updated := "" }}
+{{ if not .Date.IsZero }}
+  {{ $created = .Date.Format "2 Jan 2006" }}
+  {{/* An edit on the day of writing is not an update. */}}
+  {{ if gt (int (sub .Lastmod.Unix .Date.Unix)) 86400 }}{{ $updated = .Lastmod.Format "2 Jan 2006" }}{{ end }}
+{{ end }}
+{{ return dict "created" $created "updated" $updated }}

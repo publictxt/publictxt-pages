@@ -1,32 +1,21 @@
-// The one page card, for list.js and search.js. Item shape = index.json's:
-//   { url, title, collections[], section, tags[], categories[], created, updated, summary, bookmarks[], rating }
+// The one page card, for list.js and search.js. Item shape = index.json's
+// (list-json.html): { url, title, collections[], section, tags[], categories[],
+// created, updated, year, createdLabel, updatedLabel, summary,
+// bookmarks[{url, label}], rating }. Display values come from Hugo; JS never
+// formats a date or a label.
 
 export function escapeHTML(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-const DAY = 86400e3;
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-// "2 Jan 2006", the same form Hugo's page-date.html renders.
-export function formatDate(iso) {
-  const d = new Date(iso);
-  return isNaN(d) ? "" : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-// Same rule as page-date.html: "updated" only when >1 day after "created".
+// As page-date.html; the labels and the "updated" rule are date-labels.html's.
 export function dateHTML(item) {
-  if (!item.created) return "";
-  let html = `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(formatDate(item.created))}</time>`;
-  if (item.updated && new Date(item.updated) - new Date(item.created) > DAY) {
-    html += ` <span class="muted">· updated <time datetime="${escapeHTML(item.updated)}">${escapeHTML(formatDate(item.updated))}</time></span>`;
+  if (!item.createdLabel) return "";
+  let html = `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(item.createdLabel)}</time>`;
+  if (item.updatedLabel) {
+    html += ` <span class="muted">· updated <time datetime="${escapeHTML(item.updated)}">${escapeHTML(item.updatedLabel)}</time></span>`;
   }
   return html;
-}
-
-// Same as bookmark-label.html: scheme, www. and trailing slash dropped.
-export function bookmarkLabel(url) {
-  return "↗ " + url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 }
 
 // Same stars as sidebar.html. `rating` is 1–5, absent when unrated.
@@ -73,8 +62,8 @@ export function card(item, opts = {}) {
         `<span class="chip chip-collection">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>
     ${dateHTML(item)}${ratingHTML(item)}
-    ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((u) =>
-      `<a class="chip chip-link" href="${escapeHTML(u)}" rel="noopener external" target="_blank">${escapeHTML(bookmarkLabel(u))}</a>`).join("")}</div>` : ""}
+    ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((b) =>
+      `<a class="chip chip-link" href="${escapeHTML(b.url)}" rel="noopener external" target="_blank">${escapeHTML(b.label)}</a>`).join("")}</div>` : ""}
     ${opts.summaryHTML ? `<p class="page-card-summary">${opts.summaryHTML}</p>`
       : item.summary ? `<p class="page-card-summary">${escapeHTML(item.summary)}</p>` : ""}
     ${tags.length ? `<div class="chip-row">${tags.slice(0, 6).map(tagChip).join("")}</div>` : ""}`;

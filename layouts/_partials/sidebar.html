@@ -26,14 +26,14 @@
     <dt>Collection</dt>
     {{/* page-collections.html; each links to its section when one exists */}}
     <dd>{{ range $t := partial "page-collections.html" . }}{{ with site.GetPage $t }}<a class="chip chip-collection" href="{{ .RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
-    {{ if not .Date.IsZero }}
+    {{ $d := partial "date-labels.html" . }}
+    {{ with $d.created }}
     <dt>Created</dt>
-    <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2 Jan 2006" }}</time></dd>
-    {{/* Same threshold as page-date.html: an edit on the day of writing is not an update. */}}
-    {{ if gt (int (sub .Lastmod.Unix .Date.Unix)) 86400 }}
-    <dt>Updated</dt>
-    <dd><time datetime="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Lastmod.Format "2 Jan 2006" }}</time></dd>
+    <dd><time datetime="{{ $.Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ . }}</time></dd>
     {{ end }}
+    {{ with $d.updated }}
+    <dt>Updated</dt>
+    <dd><time datetime="{{ $.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ . }}</time></dd>
     {{ end }}
     {{/* Same stars as ratingHTML() in cards.js. */}}
     {{ with partial "rating.html" . }}
