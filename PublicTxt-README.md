@@ -28,7 +28,5 @@ v1 folders:
 - `blog/` (`YYYY/MM/YYYYMMDD-title.md`),
 - `wiki/`,
 - `notes/`,
-- `media/`,
-- `tags/`,
-- `indexes/`  (repo-wide indexes),
+- `indexes/`  (repo-wide indexes. link and tag indexes, etc)
 - `settings/` (site.toml)

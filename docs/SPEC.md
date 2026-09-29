@@ -16,10 +16,13 @@ Items marked **(TBD)** are not built.
 ## Feature list
 
 - Sections
-  - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
+  - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
+  - Sections move to specialised Views over Collections (TBD)
+    - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
+    - Bookmarks should show Bookmark specialised view (TBD)
 - Sidebar
   - Tag cloud
   - page meta (collections, dates, categories, tags) in sidebar.
@@ -52,7 +55,6 @@ Items marked **(TBD)** are not built.
   - A URL (or list) under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link on the page.
   - Filter by source, source chips on cards (TBD)
   - Any page with post sources, should be put in Posts collection (TBD)
-  - Keys updated to differentiate between my posts and others (TBD - UNSURE)
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
