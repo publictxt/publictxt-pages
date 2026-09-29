@@ -1,0 +1,50 @@
+{{/*
+  ```dataview fence -> a compact list of the pages with a tag. A subset of
+  Obsidian Dataview, so the block renders there too and reads as code
+  elsewhere:
+    LIST FROM #tag
+    LIMIT n            (optional)
+  Case-insensitive keywords, one per line. Anything else stays a code block,
+  with a warning. Recently updated first; the host page lists too if tagged,
+  as in Dataview. Past LIMIT, a link to the tag page.
+  data-pagefind-ignore: the list's titles aren't the host page's text.
+*/}}
+{{- $lines := slice -}}
+{{- range split (trim .Inner "\n\r ") "\n" -}}
+  {{- with trim . " \t\r" }}{{ $lines = $lines | append . }}{{ end -}}
+{{- end -}}
+{{- $tag := "" -}}
+{{- $limit := 0 -}}
+{{- $ok := false -}}
+{{- with $lines -}}
+  {{- with findRESubmatch `(?i)^LIST\s+FROM\s+#([A-Za-z][A-Za-z0-9_-]*)$` (index . 0) 1 -}}
+    {{- $tag = index (index . 0) 1 -}}
+    {{- $ok = true -}}
+  {{- end -}}
+  {{- range after 1 . -}}
+    {{- with findRESubmatch `(?i)^LIMIT\s+([0-9]+)$` . 1 -}}
+      {{- $limit = int (index (index . 0) 1) -}}
+    {{- else -}}
+      {{- $ok = false -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if $ok -}}
+  {{- $key := $tag | lower | urlize -}}
+  {{- $term := index site.Taxonomies.tags $key -}}
+  {{- $pages := slice -}}
+  {{- with $term }}{{ $pages = partial "recent.html" (where .Pages "Kind" "page") }}{{ end -}}
+  <div class="dataview" data-pagefind-ignore="all">
+  {{- with $pages }}
+    {{ partial "list-container.html" (dict "pages" (cond (gt $limit 0) (first $limit .) .) "compact" true "limit" $limit "order" "updated" "scope" (dict "kind" "tag" "value" $tag)) }}
+    {{- if and (gt $limit 0) (gt (len .) $limit) }}
+    <p class="dataview-more"><a href="{{ (site.GetPage (printf "/tags/%s" $key)).RelPermalink }}">All {{ len . }} pages tagged #{{ $tag }} →</a></p>
+    {{- end }}
+  {{- else }}
+    <p class="muted">No pages tagged #{{ $tag }}.</p>
+  {{- end }}
+  </div>
+{{- else -}}
+  {{- warnf "%s: unsupported dataview query, shown as code (supported: LIST FROM #tag, LIMIT n)" .Page.File.Path -}}
+  {{- highlight .Inner "text" "" -}}
+{{- end -}}

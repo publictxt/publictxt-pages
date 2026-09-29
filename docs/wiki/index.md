@@ -77,6 +77,7 @@ layouts/_partials/
 
 layouts/_markup/
   render-image.html     YouTube URL -> iframe, else plain <img>
+  render-codeblock-dataview.html  ```dataview LIST FROM #tag -> compact list, else code
 ```
 
 ## Browser

@@ -25,6 +25,7 @@ content/notes/Info politics/_index.md
 content/notes/_index.md
 content/notes/embeds.md
 content/notes/sample.md
+content/notes/tag-lists.md
 content/online-things.md
 content/posts/20260426-come-on-lets-be-alive.md
 content/posts/_index.md

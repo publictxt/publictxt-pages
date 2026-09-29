@@ -20,7 +20,7 @@ search. Add one to both, or search cards go without it. What's still implemented
 
 | Server | Client |
 |---|---|
-| each list template's page collection | its kind in `scope()` |
+| each list template's page collection (incl. the dataview hook) | its kind in `scope()` |
 | stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
 
