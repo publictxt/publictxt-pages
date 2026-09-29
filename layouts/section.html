@@ -20,7 +20,6 @@
 {{ $pages := $list.pages }}
 {{ if $pages }}
 <section class="list-section">
-  <h2>Pages <span class="muted">({{ len $pages }})</span></h2>
   {{ partial "list-container.html" (dict "pages" $pages "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .) "scope" $list.scope) }}
 </section>
 {{ else }}
