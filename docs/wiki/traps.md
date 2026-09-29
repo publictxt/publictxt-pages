@@ -32,7 +32,7 @@ Implemented twice, once server-side (no-JS render) and once in JS:
 | stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
 
-A `facets.js` key (`tag`, `category`) is the URL param **and** the Pagefind filter
+A `CHIP_FACETS` key (`facets.js`) is the URL param **and** the Pagefind filter
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.
 

@@ -1,4 +1,4 @@
-// Multi-select facets (tags, categories, collections) for list.js and search.js, so the
+// Multi-select chip facets (CHIP_FACETS) for list.js and search.js, so the
 // lists and search read the URL and match pages alike. A value is included,
 // excluded or neither; includes match `all` or `any`, excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c
@@ -6,6 +6,16 @@
 // so needs no recount search (addsPages).
 
 export const DEFAULT_MATCH = "all";
+
+// The chip facets, in display order. `key` is the URL param and Pagefind filter
+// (traps.md); `item` the index.json field; `label` as search.html's headings.
+// Lists only: `shared` shows values every listed page has; `limit` chips before "more".
+export const CHIP_FACETS = [
+  { key: "collection", item: "collections", label: "Collection", prefix: "", shared: true },
+  { key: "category", item: "categories", label: "Category", prefix: "" },
+  { key: "tag", item: "tags", label: "Tags", prefix: "#", limit: 20 },
+];
+export const CHIP_KEYS = CHIP_FACETS.map((d) => d.key);
 
 export function readFacet(p, key) {
   const match = p.get(key + "-match");
@@ -28,6 +38,13 @@ export const isSet = (f) => f.inc.size > 0 || f.exc.size > 0;
 export function clearFacet(f) {
   f.inc.clear(); f.exc.clear(); f.match = DEFAULT_MATCH;
 }
+
+// Every chip facet at once, keyed as CHIP_KEYS on a caller's state object.
+export const readFacets = (p = new URLSearchParams()) => Object.fromEntries(CHIP_KEYS.map((k) => [k, readFacet(p, k)]));
+export const writeFacets = (p, s) => CHIP_KEYS.forEach((k) => writeFacet(p, s[k]));
+export const clearFacets = (s) => CHIP_KEYS.forEach((k) => clearFacet(s[k]));
+export const anySet = (s) => CHIP_KEYS.some((k) => isSet(s[k]));
+export const describeFacets = (s) => CHIP_FACETS.flatMap((d) => describe(s[d.key], d.prefix));
 
 // Facet chip click: neither → included → excluded → neither.
 export function cycle(f, v) {
