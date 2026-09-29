@@ -2,7 +2,7 @@
 rating: 3
 categories: 
     - Tech
-    - Politics # Curated Commons: Open Aggregation for the Open Web
+    - Politics
 collections: notes
 ---
 _A PublicTxt Project Post_
