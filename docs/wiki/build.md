@@ -3,6 +3,7 @@ covers:
   - scripts/build.sh
   - scripts/build.ps1
   - tests
+  - .github/workflows/test.yml
 ---
 
 # Build
@@ -45,6 +46,9 @@ Python stdlib `unittest`, no dependencies; covers the pipeline up to Hugo.
 python -m unittest                                  # all
 GOLDEN_UPDATE=1 python -m unittest tests.test_golden  # refresh the snapshot
 ```
+
+CI: `.github/workflows/test.yml`, on push to `main` and every PR — Python 3.10 on
+Linux (the floor), latest on Windows (CRLF output).
 
 **Golden**: sync + hashtags over `example/txt/`, compared with `tests/golden/`
 (text by content, the rest by path; Git dates fixed). Refresh after an intended

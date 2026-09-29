@@ -114,6 +114,7 @@ ES modules bundled per entry point by Hugo's built-in esbuild — no Node to bui
 ```txt
 hugo.toml                            mounts, front matter mapping, params
 deploy/publish-to-github-pages.yml   template for the CONTENT repo -> deploy.md
+.github/workflows/test.yml           tests/ on push and PR -> build.md#tests
 site-content/                        site-owned pages (search)
 example/txt/                         default source repo + golden-test fixture
 static/                              favicons, logo
