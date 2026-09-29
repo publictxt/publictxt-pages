@@ -21,7 +21,8 @@ minimal reliance on PublicTxt-specific syntax transforms.
 - **Hugo v0.158+** (plain works — no Sass). Distro packages are often stale; check
   `hugo version`.
 - **Python 3.10+** — no packages.
-- **Pagefind** — `npx pagefind` (Node) or the [standalone binary](https://github.com/Pagefind/pagefind/releases).
+- **Pagefind 1.5.2** (pinned in the build scripts) — the [standalone binary](https://github.com/Pagefind/pagefind/releases)
+  on `PATH`, else the scripts fetch it with `npx` (Node).
 
 ## Authoring in Obsidian
 

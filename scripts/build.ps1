@@ -10,12 +10,22 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
 
+# search.js is written against this Pagefind's JS API; bump both together.
+$PagefindVersion = "1.5.2"
+
+# "Stop" doesn't cover native commands in Windows PowerShell 5.1: check each exit code,
+# or a failed sync still builds and indexes a partial site.
+function Invoke-Step {
+    & $args[0] @($args | Select-Object -Skip 1)
+    if ($LASTEXITCODE -ne 0) { throw "$($args[0]) failed (exit $LASTEXITCODE)" }
+}
+
 if (-not (Test-Path -LiteralPath $Source -PathType Container)) {
     throw "Source directory not found: '$Source'. Use -Source <path>, e.g. .\scripts\build.ps1 -Source C:\repo\txt"
 }
 
-python scripts/sync_content.py $Source build/content
-python scripts/extract_hashtags.py build/content
+Invoke-Step python scripts/sync_content.py $Source build/content
+Invoke-Step python scripts/extract_hashtags.py build/content
 
 $config = if (Test-Path build/site.toml) { "hugo.toml,build/site.toml" } else { "hugo.toml" }
 
@@ -34,10 +44,12 @@ if ($BaseUrl) { $hugoArgs += @("-b", $BaseUrl) }
 
 # Hugo does not remove stale pages from a previous build
 if (Test-Path public) { Remove-Item -Recurse -Force public }
-hugo @hugoArgs
+Invoke-Step hugo @hugoArgs
 
 if (Get-Command pagefind -ErrorAction SilentlyContinue) {
-    pagefind --site public
+    $found = ((pagefind --version) -split " ")[1]
+    if ($found -ne $PagefindVersion) { Write-Warning "pagefind $found on PATH; this site pins $PagefindVersion" }
+    Invoke-Step pagefind --site public
 } else {
-    npx pagefind --site public
+    Invoke-Step npx --yes "pagefind@$PagefindVersion" --site public
 }
