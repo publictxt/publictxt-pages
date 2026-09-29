@@ -1,20 +1,16 @@
 # Spec
 
 What the site does and should do. Implementation lives in [`docs/wiki/`](wiki/index.md) —
-read that before the source. The *why* of a choice is a comment at the code that makes it.
+read that before the source.
 
 Items marked **(TBD)** are not built.
 
-## Principles
-
-- **No PublicTxt.Syntax / .NET dependency.** Works with real wikis: relative links, no front matter required.
-- Source repo never modified; build operates on generated copy `build/content/`. (UNSURE - Indexes and temp data could be useful for PublicTxt repos and collation)
-- Links are `[label](../wiki/page.md)` - No `[[wikilinks]]`
-- Hugo renders `.md` extensions to `.html`
-- `![alt](youtube-url)` embeds the video; other images stay images.
-
 ## Feature list
 
+- No PublicTxt.Syntax / .NET dependency
+- Build operates on generated copy `build/content/`.
+- Hugo renders `.md` extensions to `.html`
+- `![alt](youtube-url)` embeds the video; other images stay images.
 - Sections
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
@@ -74,7 +70,6 @@ index.md, Projects.md                   (home + root pages)
 wiki/index.md, wiki/A/index.md          (folder index = section page (any depth))
 
 blog/2023/12/17/x.md                    (dates derived from path)
-blog/2024/home.md                       (home.md also acts as folder index)
 blog/20260509-title.md                  (YYYYMMDD prefix date)
 blog/2024/09/20240922-title.md          (YYYYMMDD prefix date)
 blog/2026/09/22/Post-Name/title.md & blog/2026/09/22/Post-Name/image.png     (converts to Hugo content bundle)
@@ -110,7 +105,6 @@ lists it.
   what's filed under them.
 - **A collection with no folder** (`collections: [recipe]`) is still a chip and a filter
   value; it just has no section page.
-- `type:` is Hugo's (it picks the layout); it adds no collection.
 
 ```yaml
 # posts/2026-09-28-hello.md — listed in Posts and Blog, filterable as either
