@@ -32,6 +32,9 @@ together.
 A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
 entry): change the default and shared links without it change meaning.
 
+The Pagefind version is pinned twice, `build.sh` and `build.ps1`; `search.js` is written
+against its JS API, so a bump means checking search too.
+
 Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js` and
 `search.js`.
 

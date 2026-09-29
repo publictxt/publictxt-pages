@@ -6,6 +6,9 @@
 set -e
 cd "$(dirname "$0")/.."
 
+# search.js is written against this Pagefind's JS API; bump both together.
+PAGEFIND_VERSION="1.5.2"
+
 SOURCE="example/txt"
 SERVE=""
 SOURCE_SET=""
@@ -97,7 +100,9 @@ else
 fi
 
 if command -v pagefind >/dev/null 2>&1; then
+  found="$(pagefind --version | awk '{print $2}')"
+  [ "$found" = "$PAGEFIND_VERSION" ] || echo "warning: pagefind $found on PATH; this site pins $PAGEFIND_VERSION" >&2
   pagefind --site public
 else
-  npx pagefind --site public
+  npx --yes "pagefind@$PAGEFIND_VERSION" --site public
 fi
