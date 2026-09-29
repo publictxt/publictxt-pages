@@ -60,6 +60,9 @@ capitalizeListTitles = false
 
   # Filter chips in browse lists and search, in this order. `key`: collection,
   # category or tag; leave one out to drop its chips. Absent = all three.
+  # `states`: what a click cycles through after off — ["include"],
+  # ["exclude"] or both (the default). A card's tags filter only if tag
+  # includes; else they link to the tag page.
   [[params.chipFacets]]
     key = "collection"
     label = "Collection"

@@ -7,7 +7,7 @@
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, chipState, cycle, filterChip, matchToggle, pagefindConditions,
+import { addsPages, chipFacets, chipState, cycle, filterChip, matchToggle, nextState, pagefindConditions,
   toggleInclude } from "./facets.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -68,8 +68,8 @@ function writeURL() {
   const qs = p.toString();
   history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
 }
-// Card tags filter only while tag is a chip facet; else they link.
-const toggleTag = state.tag ? (t) => { toggleInclude(state.tag, t); run(); } : null;
+// Card tags filter only while tag is a chip facet that includes; else they link.
+const toggleTag = state.tag?.states.includes("include") ? (t) => { toggleInclude(state.tag, t); run(); } : null;
 
 // ---- filter chips -------------------------------------------------------
 const allFilters = await pagefind.filters();   // { tag: {name: count}, collection: {…}, category: {…}, year: {…}, rating: {…} }
@@ -79,7 +79,7 @@ const yearKeys = (obj) => Object.keys(obj || {}).sort((a, b) => b.localeCompare(
 
 function chip(d, name, count) {
   const f = state[d.key];
-  return filterChip(d.prefix + name, count, chipState(f, name), () => { cycle(f, name); run(); }, true);
+  return filterChip(d.prefix + name, count, chipState(f, name), nextState(f, name), () => { cycle(f, name); run(); });
 }
 
 // counts: filter counts within the current result set (or totals when idle);

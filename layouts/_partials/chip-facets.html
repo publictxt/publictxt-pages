@@ -2,10 +2,13 @@
   The chip facets for browse lists and search: params.chipFacets in its order,
   or all three when absent. `key` is collection, category or tag (facets.js
   holds the rest); others and repeats warned and dropped. `label` defaults to
-  the key. The one source for search.html and js-params.html. Returns a slice
-  of dicts {key, label}; expects nothing.
+  the key; `states` (what a click cycles through after off) to both, unknown
+  values warned and dropped. The one source for search.html and
+  js-params.html. Returns a slice of dicts {key, label, states}; expects
+  nothing.
 */}}
 {{ $known := slice "collection" "category" "tag" }}
+{{ $allStates := slice "include" "exclude" }}
 {{ $cfg := site.Params.chipFacets | default (slice
   (dict "key" "collection" "label" "Collection")
   (dict "key" "category" "label" "Category")
@@ -18,7 +21,12 @@
     {{ warnidf "chip-facet-key" "params.chipFacets: key %q is unknown or repeated — ignored (collection, category, tag)" $key }}
   {{ else }}
     {{ $seen = $seen | append $key }}
-    {{ $out = $out | append (dict "key" $key "label" (.label | default $key)) }}
+    {{ $states := slice }}
+    {{ range .states | default $allStates }}
+      {{ if in $allStates . }}{{ $states = $states | append . }}
+      {{ else }}{{ warnidf "chip-facet-state" "params.chipFacets %s: state %q is not include or exclude — ignored" $key (string .) }}{{ end }}
+    {{ end }}
+    {{ $out = $out | append (dict "key" $key "label" (.label | default $key) "states" ($states | default $allStates | uniq)) }}
   {{ end }}
 {{ end }}
 {{ return $out }}

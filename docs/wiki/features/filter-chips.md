@@ -10,14 +10,17 @@ covers:
 Collection, category and tag chips in [browse lists](browse-lists.md) and
 [search](search.md): one module, `facets.js`, so both read the URL and match pages alike.
 
-**Config.** `[[params.chipFacets]]` in `hugo.toml`: order and `label`; leave a key out
-to drop its chips. `chip-facets.html` checks it (unknown or repeated keys warned) and
+**Config.** `[[params.chipFacets]]` in `hugo.toml`: order, `label`, `states`; leave a
+key out to drop its chips. `chip-facets.html` checks it (unknown or repeated keys warned) and
 is the one source for `search.html`'s groups and, via `js-params.html`, both bundles'
 `@params` ([build.md](../build.md#js-modules)). `facets.js` stays Hugo-free:
 `chipFacets(config)` merges each entry over its `BUILTIN` (index field, `#` prefix,
 lists-only `shared` / `limit`). Keys are fixed — see [traps.md](../traps.md).
 
-**Behaviour.** A chip click cycles include → exclude → off; with two includes a toggle
+**Behaviour.** A chip click cycles off → each allowed state → off (`states`, default
+include, exclude). Config beats the URL: `readFacet` drops a part `states` disallow,
+so no filter is left that no chip can clear. With two includes a toggle
 sets match all / any (default all — it narrows, so no recount; `?tag-not=`,
 `?tag-match=`). A facet matching *any* counts without its own includes, since picking a
-value adds pages (`addsPages`). A card's tags only include.
+value adds pages (`addsPages`). A card's tags only include — and link instead when
+tag can't.

@@ -10,7 +10,7 @@
 //   data-compact      cards only: no controls, pager or URL (home Recent)
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, chipState, cycle, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
+import { addsPages, chipFacets, chipState, cycle, filterChip, matches, matchToggle, nextState, toggleInclude } from "./facets.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
@@ -133,7 +133,7 @@ async function mount(root) {
 
   function chip(d, name, n) {
     const onClick = () => { cycle(state[d.key], name); state.page = 1; render(true); };
-    return filterChip(d.prefix + name, n, chipState(state[d.key], name), onClick, true);
+    return filterChip(d.prefix + name, n, chipState(state[d.key], name), nextState(state[d.key], name), onClick);
   }
 
   // `f`: a facets.js facet, for its match toggle.
@@ -294,8 +294,8 @@ async function mount(root) {
     const total = Math.max(1, Math.ceil(filtered.length / perPage));
     if (state.page > total) state.page = total;
     const slice = compact ? filtered : filtered.slice((state.page - 1) * perPage, state.page * perPage);
-    // Card tags filter only while tag is a chip facet; else they link.
-    const onTag = compact || !state.tag ? null : (t) => {
+    // Card tags filter only while tag is a chip facet that includes; else they link.
+    const onTag = compact || !state.tag?.states.includes("include") ? null : (t) => {
       toggleInclude(state.tag, t);
       state.page = 1; render(true);
     };

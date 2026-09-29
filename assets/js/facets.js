@@ -1,11 +1,13 @@
 // Multi-select chip facets for list.js and search.js, so the lists and search
 // read the URL and match pages alike. A value is included, excluded or
-// neither; includes match `all` or `any`, excludes match none.
+// neither — as a facet's `states` allow; includes match `all` or `any`,
+// excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c
 // `-match` is written only when `any`: the default is `all`, which narrows and
 // so needs no recount search (addsPages).
 
 export const DEFAULT_MATCH = "all";
+export const STATES = ["include", "exclude"];
 
 // What config can't change, per key. `key` is the URL param and Pagefind filter
 // (traps.md); `item` the index.json field. Lists only: `shared` shows values
@@ -17,14 +19,15 @@ const BUILTIN = {
 };
 
 // The chip facets from config — @params' chipFacets (chip-facets.html: order,
-// label), passed in so this module stays Hugo-free. `defs` in display order;
+// label, states), passed in so this module stays Hugo-free. `defs` in display order;
 // the rest handle every facet at once, keyed on a caller's state object.
 export function chipFacets(config) {
-  const defs = config.filter((c) => c.key in BUILTIN).map((c) => ({ ...BUILTIN[c.key], ...c }));
+  const defs = config.filter((c) => c.key in BUILTIN)
+    .map((c) => ({ ...BUILTIN[c.key], ...c, states: STATES.filter((s) => (c.states || STATES).includes(s)) }));
   const keys = defs.map((d) => d.key);
   return {
     defs, keys,
-    read: (p = new URLSearchParams()) => Object.fromEntries(defs.map((d) => [d.key, readFacet(p, d.key)])),
+    read: (p = new URLSearchParams()) => Object.fromEntries(defs.map((d) => [d.key, readFacet(p, d.key, d.states)])),
     write: (p, s) => keys.forEach((k) => writeFacet(p, s[k])),
     clear: (s) => keys.forEach((k) => clearFacet(s[k])),
     anySet: (s) => keys.some((k) => isSet(s[k])),
@@ -32,12 +35,15 @@ export function chipFacets(config) {
   };
 }
 
-export function readFacet(p, key) {
+// Config beats the URL: a part the facet's `states` don't allow is dropped,
+// not left filtering where no chip can clear it.
+export function readFacet(p, key, states = STATES) {
   const match = p.get(key + "-match");
+  const values = (k, s) => new Set(states.includes(s) ? p.getAll(k).filter(Boolean) : []);
   return {
-    key,
-    inc: new Set(p.getAll(key).filter(Boolean)),
-    exc: new Set(p.getAll(key + "-not").filter(Boolean)),
+    key, states,
+    inc: values(key, "include"),
+    exc: values(key + "-not", "exclude"),
     match: match === "any" ? "any" : DEFAULT_MATCH,
   };
 }
@@ -53,13 +59,18 @@ export function clearFacet(f) {
   f.inc.clear(); f.exc.clear(); f.match = DEFAULT_MATCH;
 }
 
-// Facet chip click: neither → included → excluded → neither.
-export function cycle(f, v) {
-  if (f.inc.has(v)) { f.inc.delete(v); f.exc.add(v); }
-  else if (f.exc.has(v)) f.exc.delete(v);
-  else f.inc.add(v);
+// Facet chip click: neither → each allowed state → neither.
+export function nextState(f, v) {
+  const order = ["", ...f.states];
+  return order[(order.indexOf(chipState(f, v)) + 1) % order.length];
 }
-// Card tag click: include or not, never exclude.
+export function cycle(f, v) {
+  const next = nextState(f, v);
+  f.inc.delete(v); f.exc.delete(v);
+  if (next === "include") f.inc.add(v);
+  else if (next === "exclude") f.exc.add(v);
+}
+// Card tag click: include or not, never exclude. Only where `include` is allowed.
 export function toggleInclude(f, v) {
   f.exc.delete(v);
   if (f.inc.has(v)) f.inc.delete(v); else f.inc.add(v);
@@ -92,9 +103,9 @@ export function describe(f, prefix = "") {
 
 export const chipState = (f, v) => f.inc.has(v) ? "include" : f.exc.has(v) ? "exclude" : "";
 
-// A filter chip; `on` is "", "include" or "exclude". Excluded chips drop the
-// count — it would always be 0. `triState` titles the next click.
-export function filterChip(label, count, on, onClick, triState = false) {
+// A filter chip; `on` and `next` (the click's result) are "", "include" or
+// "exclude". Excluded chips drop the count — it would always be 0.
+export function filterChip(label, count, on, next, onClick) {
   const b = document.createElement("button");
   b.type = "button";
   b.className = "chip filter-chip" + (on === "include" ? " active" : on === "exclude" ? " excluded" : "")
@@ -108,7 +119,7 @@ export function filterChip(label, count, on, onClick, triState = false) {
     n.textContent = count;
     b.append(n);
   }
-  if (triState) b.title = on === "include" ? "Click to exclude" : on === "exclude" ? "Click to clear" : "Click to include";
+  b.title = "Click to " + (next || "clear");
   b.addEventListener("click", onClick);
   return b;
 }
