@@ -63,6 +63,13 @@ class SiteIndexTest(unittest.TestCase):
         self.assertTrue(INDEX.is_file(), "no snapshot yet — run with GOLDEN_UPDATE=1")
         self.assertEqual(INDEX.read_text(encoding="utf-8").replace("\r\n", "\n"), self.index)
 
+    def test_folder_note(self):
+        """wiki/Projects/PublicTxt/PublicTxt.md: shown on its (bodiless) section, still a page."""
+        html = (self.public / "wiki" / "projects" / "publictxt" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('class="prose folder-note"', html)
+        self.assertIn("an experiment in using Git repositories", html)
+        self.assertIn('"/wiki/projects/publictxt/publictxt/"', self.index)
+
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #sci` + `LIMIT 2` of 5; a TABLE query stays code."""
         html = (self.public / "notes" / "tag-lists" / "index.html").read_text(encoding="utf-8")

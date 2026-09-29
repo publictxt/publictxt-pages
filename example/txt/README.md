@@ -22,6 +22,7 @@ git diff tests/golden                                  # read it: every change s
 | `created`/`updated` authored, with offsets | `blog/20260915-a-post-with-full-front-matter.md` |
 | Quoted date-only `created:` | `blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md` |
 | `index.md` / `home.md` as folder index | `blog/index.md`, `notes/home.md`, `wiki/**/index.md` |
+| Folder note (`Foo/Foo.md`) shown on its section; lone one too | `wiki/Projects/PublicTxt/PublicTxt.md`, `bookmarks/sites/gitcms.dev/gitcms.dev.md` |
 | Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Science/brain/` |
 | Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
 | `publish: off` | `notes/unpublished.md` |

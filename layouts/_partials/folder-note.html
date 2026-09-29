@@ -1,0 +1,14 @@
+{{/*
+  A section's folder note: the regular page directly in it named as the
+  folder (`Foo/Foo.md`, any case), or nil. section.html shows its content
+  when the index has no body of its own; the note stays a page — in lists,
+  at its own URL, where links point. Expects a section page.
+*/}}
+{{ $note := false }}
+{{ with .File }}
+  {{ $folder := lower (path.Base (replace .Dir "\\" "/")) }}
+  {{ range $.RegularPages }}
+    {{ if and .File (eq (lower .File.ContentBaseName) $folder) }}{{ $note = . }}{{ end }}
+  {{ end }}
+{{ end }}
+{{ return $note }}

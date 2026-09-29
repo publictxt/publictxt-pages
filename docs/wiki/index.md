@@ -74,6 +74,7 @@ layouts/_partials/
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating:
+  folder-note.html      `Foo/Foo.md`, shown on Foo's section when it has no body
 
 layouts/_markup/
   render-image.html     YouTube URL -> iframe, else plain <img>
