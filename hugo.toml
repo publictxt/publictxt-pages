@@ -92,6 +92,9 @@ capitalizeListTitles = false
     github = "GitHub"
 
 [markup]
+  # render-image.html adds the <p> back, except around note embeds (a <div>).
+  [markup.goldmark.parser]
+    wrapStandAloneImageWithinParagraph = false
   [markup.goldmark.renderHooks.link]
     # Resolves relative `.md` links (Obsidian style) to page URLs.
     useEmbedded = "fallback"

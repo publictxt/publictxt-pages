@@ -1,11 +1,34 @@
 {{/*
-  Markdown image hook. A YouTube URL (watch, youtu.be, shorts, embed, live)
-  becomes a privacy-enhanced (youtube-nocookie) iframe titled by the alt text;
-  `t=` becomes `start=` (seconds, trailing `s` ok). Anything else renders as
-  Goldmark's plain <img>. The iframe is phrasing content, so it sits validly in
-  the <p> Goldmark wraps around a standalone image.
+  Markdown image hook.
+  - `![](page.md)`, standalone: Obsidian's note embed — that page's content,
+    boxed, titled with a link to it. Kept out of Pagefind (search finds it at
+    its own URL). Inline, with a `#heading`, or unresolved: a plain link (a
+    warning if unresolved). One level: the embedded page is re-rendered from
+    source with its own `.md` embeds made links — through .Content, a cycle
+    (A embeds B embeds A) hangs the build.
+  - A YouTube URL (watch, youtu.be, shorts, embed, live) becomes a
+    privacy-enhanced (youtube-nocookie) iframe titled by the alt text; `t=`
+    becomes `start=` (seconds, trailing `s` ok).
+  - Anything else: a plain <img>.
+  hugo.toml turns off Goldmark's <p> around standalone images (a <div> can't
+  sit in a <p>), so this adds it back for everything but embeds.
 */}}
 {{- $u := urls.Parse .Destination -}}
+{{- if and (not $u.Host) (strings.HasSuffix (lower $u.Path) ".md") -}}
+  {{- $p := .PageInner.GetPage $u.Path -}}
+  {{- if and $p .IsBlock (not $u.Fragment) (ne $p .PageInner) -}}
+<div class="embed" data-pagefind-ignore="all">
+  <a class="embed-title" href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+  {{- $src := replaceRE `!\[\]\(([^)\s]*?\.md(?:#[^)]*)?)\)` "[$1]($1)" $p.RawContent -}}
+  {{- $src = replaceRE `!(\[[^\]\n]*\]\([^)\s]*?\.md(?:#[^)]*)?\))` "$1" $src }}
+  <div class="embed-body">{{ $p.RenderString (dict "display" "block") $src }}</div>
+</div>
+  {{- else -}}
+    {{- if not $p }}{{ warnf "%s: embed target not found: %s" .Page.File.Path .Destination }}{{ end -}}
+    {{- $link := printf `<a href="%s">%s</a>` (cond (ne $p nil) (printf "%s%s" $p.RelPermalink (cond (ne $u.Fragment "") (printf "#%s" (anchorize $u.Fragment)) "")) .Destination) (or .PlainText (cond (ne $p nil) $p.Title .Destination) | htmlEscape) -}}
+    {{- if .IsBlock }}<p>{{ $link | safeHTML }}</p>{{ else }}{{ $link | safeHTML }}{{ end -}}
+  {{- end -}}
+{{- else -}}
 {{- $host := strings.TrimPrefix "www." (strings.TrimPrefix "m." $u.Host) -}}
 {{- $id := "" -}}
 {{- if eq $host "youtu.be" -}}
@@ -19,6 +42,7 @@
     {{- end -}}
   {{- end -}}
 {{- end -}}
+{{- if .IsBlock }}<p>{{ end -}}
 {{- if findRE `^[A-Za-z0-9_-]{11}$` $id -}}
   {{- $src := printf "https://www.youtube-nocookie.com/embed/%s" $id -}}
   {{- with findRE `^\d+$` (strings.TrimSuffix "s" ($u.Query.Get "t")) -}}
@@ -27,4 +51,6 @@
   <iframe class="video" src="{{ $src }}" title="{{ or .PlainText "YouTube video" }}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 {{- else -}}
   <img src="{{ .Destination | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>
+{{- end -}}
+{{- if .IsBlock }}</p>{{ end -}}
 {{- end -}}

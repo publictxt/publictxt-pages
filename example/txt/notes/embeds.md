@@ -7,3 +7,9 @@ A YouTube link in image syntax embeds the video:
 Short links and start times work too:
 
 ![The Barrow Scale, from 1:30](https://youtu.be/QW_jlUn4gA8?t=90)
+
+A Markdown link to a note in image syntax embeds the note, as in Obsidian:
+
+![](../wiki/Science/Cosmology.md)
+
+Inline, ![](sample.md) is just a link.
