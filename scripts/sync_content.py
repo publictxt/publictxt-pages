@@ -225,8 +225,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
         target = dest / rel
 
         if path.suffix.lower() == ".md":
-            # Folder note: `Foo/Foo.md` is Foo's index too (WIP: no guards yet).
-            is_index = path.name in INDEX_NAMES or path.stem.lower() == path.parent.name.lower()
+            is_index = path.name in INDEX_NAMES
             is_leaf_bundle = path.parent in leaf_bundles
             if is_index:
                 target = target.with_name("_index.md")

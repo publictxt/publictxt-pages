@@ -208,6 +208,33 @@
  {
   "bookmarks": [
    {
+    "label": "↗ GitCMS.dev",
+    "url": "https://GitCMS.dev"
+   }
+  ],
+  "collections": [
+   "bookmarks"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "bookmarks",
+  "summary": " [[PublicTxt]] like offering - without the collaboration. Also very AI and Agent happy MCP: https://mcp.gitcms.dev ",
+  "tags": [
+   "km",
+   "PKM",
+   "git",
+   "sw",
+   "paid"
+  ],
+  "title": "gitcms.dev",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/bookmarks/sites/gitcms.dev/gitcms.dev/",
+  "year": "2025"
+ },
+ {
+  "bookmarks": [
+   {
     "label": "↗ kurzgesagt.org",
     "url": "https://kurzgesagt.org/"
    }
@@ -311,6 +338,24 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/wiki/projects/publictxt/other-software/",
+  "year": "2025"
+ },
+ {
+  "collections": [
+   "wiki"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "wiki",
+  "summary": "see the repo here https://github.com/publictxt/publictext\nPublicTxt is an experiment in using Git repositories as an interoperability layer for public knowledge: plain Markdown, …",
+  "tags": [
+   "publictxt",
+   "commons"
+  ],
+  "title": "Project PublicTxt",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/wiki/projects/publictxt/publictxt/",
   "year": "2025"
  },
  {
