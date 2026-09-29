@@ -55,6 +55,7 @@ Items marked **(TBD)** are not built.
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
   - `![alt](youtube-url)` embeds the video; other images stay images.
+  - `![](page.md)` on its own line embeds that page's content, as Obsidian does; inline, a link. One level deep (nested embeds become links). `#heading` section embeds (TBD — a link for now).
   - A ` ```dataview ` block `LIST FROM #tag` (optional `LIMIT n`) embeds a compact list of that tag's pages, recently updated first; other Dataview queries stay code. Multiple tags, `WHERE`, `SORT` (TBD).
 - Date Properties
   - Converts from YYYYMMDD to required format (TBD)

@@ -70,6 +70,15 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn("an experiment in using Git repositories", html)
         self.assertIn('"/wiki/projects/publictxt/publictxt/"', self.index)
 
+    def test_note_embed(self):
+        """notes/embeds.md: a standalone `![](…/Cosmology.md)` embeds; inline, a link; videos keep their <p>."""
+        html = (self.public / "notes" / "embeds" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<div class="embed" data-pagefind-ignore="all">', html)
+        self.assertIn('<a class="embed-title" href="/wiki/science/cosmology/">Cosmology</a>', html)
+        self.assertIn("issue #42", html)
+        self.assertIn('Inline, <a href="/notes/sample/">sample</a> is just a link.', html)
+        self.assertIn('<p><iframe class="video"', html)
+
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #sci` + `LIMIT 2` of 5; a TABLE query stays code."""
         html = (self.public / "notes" / "tag-lists" / "index.html").read_text(encoding="utf-8")

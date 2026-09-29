@@ -175,7 +175,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "notes",
-  "summary": "A YouTube link in image syntax embeds the video:\nShort links and start times work too:\n",
+  "summary": "A YouTube link in image syntax embeds the video:\nShort links and start times work too:\nA Markdown link to a note in image syntax embeds the note, as in Obsidian:\nCosmology Wiki …",
   "tags": [],
   "title": "Embeds",
   "updated": "2025-03-01T12:00:00Z",
