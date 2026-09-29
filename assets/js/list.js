@@ -104,7 +104,7 @@ async function mount(root) {
   body.className = "list-controls-body";
   controls.append(body);
   const status = document.createElement("p");
-  status.className = "list-status muted";
+  status.className = "list-status";
   const list = document.createElement("ul");
   list.className = "page-list";
   const pager = document.createElement("nav");
@@ -310,7 +310,7 @@ async function mount(root) {
     const label = sortLabel(state.sort);
     status.textContent = `${n} page${n === 1 ? "" : "s"}`
       + (n !== items.length ? ` of ${items.length}` : "")
-      + (what ? ` — ${what}` : "")
+      + (what ? `: ${what}` : "")
       + ` · ${label}`
       + (total > 1 ? ` · page ${state.page} of ${total}` : "");
     writeURL(pushHistory);
