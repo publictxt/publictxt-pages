@@ -34,3 +34,13 @@ jobs:
           hugo-version: "0.166.0"
       - run: python -m unittest -v
       - run: python scripts/map_lint.py
+
+  js:
+    # Browser modules' pure logic (tests/js/); no packages, so no npm install.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test "tests/js/*.test.mjs"

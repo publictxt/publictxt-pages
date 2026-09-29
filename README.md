@@ -44,7 +44,8 @@ re-run for content changes.
 ## Tests
 
 ```bash
-python -m unittest        # stdlib only; CI runs it on push and PR
+python -m unittest                    # stdlib only; CI runs both on push and PR
+node --test "tests/js/*.test.mjs"     # browser modules' logic; Node 22+, no packages
 ```
 
 `tests/golden/` is a snapshot of the pipeline's output over `example/txt/`. After an

@@ -21,7 +21,7 @@ scripts/build.sh            shim -> build.py, for deploy workflows copied before
 scripts/map_lint.py         this map vs the tree
 ```
 
-## Tests (stdlib unittest) — `python -m unittest`
+## Tests — `python -m unittest` (stdlib), `node --test "tests/js/*.test.mjs"`
 
 ```txt
 tests/test_golden.py        example/txt through sync vs tests/golden/;
@@ -29,6 +29,7 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
+tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
 ```
 
 ## Templates
