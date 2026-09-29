@@ -1,41 +1,77 @@
-// Multi-select facets (tags, categories, collections) for list.js and search.js, so the
-// lists and search read the URL and match pages alike. A value is included,
-// excluded or neither; includes match `all` or `any`, excludes match none.
+// Multi-select chip facets for list.js and search.js, so the lists and search
+// read the URL and match pages alike. A value is included, excluded or
+// neither — as a facet's `states` allow; includes match `all` or `any`, as its
+// `modes` allow, excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c
-// `-match` is written only when `any`: the default is `all`, which narrows and
-// so needs no recount search (addsPages).
+// `-match` is written only off the facet's default, modes[0] — so a URL
+// without it means whatever the config's default is now.
 
-export const DEFAULT_MATCH = "all";
+export const STATES = ["include", "exclude"];
+export const MODES = ["all", "any"];
 
-export function readFacet(p, key) {
-  const match = p.get(key + "-match");
+// What config can't change, per key. `key` is the URL param and Pagefind filter
+// (traps.md); `item` the index.json field. Lists only: `shared` shows values
+// every listed page has; `limit` chips before "more".
+const BUILTIN = {
+  collection: { item: "collections", prefix: "", shared: true },
+  category: { item: "categories", prefix: "" },
+  tag: { item: "tags", prefix: "#", limit: 20 },
+};
+
+// The chip facets from config — @params' chipFacets (chip-facets.html: order,
+// label, states, match → `modes`), passed in so this module stays Hugo-free. `defs` in display order;
+// the rest handle every facet at once, keyed on a caller's state object.
+export function chipFacets(config) {
+  const allowed = (all, want) => { const ok = (want || []).filter((v) => all.includes(v)); return ok.length ? ok : all; };
+  const defs = config.filter((c) => c.key in BUILTIN)
+    .map((c) => ({ ...BUILTIN[c.key], ...c, states: allowed(STATES, c.states), modes: allowed(MODES, c.match) }));
+  const keys = defs.map((d) => d.key);
   return {
-    key,
-    inc: new Set(p.getAll(key).filter(Boolean)),
-    exc: new Set(p.getAll(key + "-not").filter(Boolean)),
-    match: match === "any" ? "any" : DEFAULT_MATCH,
+    defs, keys,
+    read: (p = new URLSearchParams()) => Object.fromEntries(defs.map((d) => [d.key, readFacet(p, d.key, d.states, d.modes)])),
+    write: (p, s) => keys.forEach((k) => writeFacet(p, s[k])),
+    clear: (s) => keys.forEach((k) => clearFacet(s[k])),
+    anySet: (s) => keys.some((k) => isSet(s[k])),
+    describe: (s) => defs.flatMap((d) => describe(s[d.key], d.prefix)),
   };
 }
-export const emptyFacet = (key) => readFacet(new URLSearchParams(), key);
+
+// Config beats the URL: a part the facet's `states` or `modes` don't allow is
+// dropped, not left filtering where no chip can clear it.
+export function readFacet(p, key, states = STATES, modes = MODES) {
+  const match = p.get(key + "-match");
+  const values = (k, s) => new Set(states.includes(s) ? p.getAll(k).filter(Boolean) : []);
+  return {
+    key, states, modes,
+    inc: values(key, "include"),
+    exc: values(key + "-not", "exclude"),
+    match: modes.includes(match) ? match : modes[0],
+  };
+}
 
 export function writeFacet(p, f) {
   for (const v of f.inc) p.append(f.key, v);
   for (const v of f.exc) p.append(f.key + "-not", v);
-  if (f.match !== DEFAULT_MATCH) p.set(f.key + "-match", f.match);
+  if (f.match !== f.modes[0]) p.set(f.key + "-match", f.match);
 }
 
 export const isSet = (f) => f.inc.size > 0 || f.exc.size > 0;
 export function clearFacet(f) {
-  f.inc.clear(); f.exc.clear(); f.match = DEFAULT_MATCH;
+  f.inc.clear(); f.exc.clear(); f.match = f.modes[0];
 }
 
-// Facet chip click: neither → included → excluded → neither.
-export function cycle(f, v) {
-  if (f.inc.has(v)) { f.inc.delete(v); f.exc.add(v); }
-  else if (f.exc.has(v)) f.exc.delete(v);
-  else f.inc.add(v);
+// Facet chip click: neither → each allowed state → neither.
+export function nextState(f, v) {
+  const order = ["", ...f.states];
+  return order[(order.indexOf(chipState(f, v)) + 1) % order.length];
 }
-// Card tag click: include or not, never exclude.
+export function cycle(f, v) {
+  const next = nextState(f, v);
+  f.inc.delete(v); f.exc.delete(v);
+  if (next === "include") f.inc.add(v);
+  else if (next === "exclude") f.exc.add(v);
+}
+// Card tag click: include or not, never exclude. Only where `include` is allowed.
 export function toggleInclude(f, v) {
   f.exc.delete(v);
   if (f.inc.has(v)) f.inc.delete(v); else f.inc.add(v);
@@ -68,9 +104,9 @@ export function describe(f, prefix = "") {
 
 export const chipState = (f, v) => f.inc.has(v) ? "include" : f.exc.has(v) ? "exclude" : "";
 
-// A filter chip; `on` is "", "include" or "exclude". Excluded chips drop the
-// count — it would always be 0. `triState` titles the next click.
-export function filterChip(label, count, on, onClick, triState = false) {
+// A filter chip; `on` and `next` (the click's result) are "", "include" or
+// "exclude". Excluded chips drop the count — it would always be 0.
+export function filterChip(label, count, on, next, onClick) {
   const b = document.createElement("button");
   b.type = "button";
   b.className = "chip filter-chip" + (on === "include" ? " active" : on === "exclude" ? " excluded" : "")
@@ -84,16 +120,17 @@ export function filterChip(label, count, on, onClick, triState = false) {
     n.textContent = count;
     b.append(n);
   }
-  if (triState) b.title = on === "include" ? "Click to exclude" : on === "exclude" ? "Click to clear" : "Click to include";
+  b.title = "Click to " + (next || "clear");
   b.addEventListener("click", onClick);
   return b;
 }
 
 // "match all" / "match any" beside a facet's heading, once two values are
-// included — before then the mode changes nothing. Else null.
+// included — before then the mode changes nothing — and both modes allowed.
+// Else null.
 export function matchToggle(f, onChange) {
-  if (f.inc.size < 2) return null;
-  const other = f.match === "any" ? "all" : "any";
+  if (f.inc.size < 2 || f.modes.length < 2) return null;
+  const other = f.modes.find((m) => m !== f.match);
   const b = document.createElement("button");
   b.type = "button";
   b.className = "match-toggle";

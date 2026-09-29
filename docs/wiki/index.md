@@ -66,6 +66,8 @@ layouts/_partials/
   site-index.html       publishes index.json, returns URL    (partialCached)
   list-json.html        pages -> index.json items
   list-container.html   [data-list] + no-JS <ul> + loads list.js
+  js-params.html        @params for every js.Build — see build.md
+  chip-facets.html      only reader of params.chipFacets   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
   list-per-page.html    perPage: cascade
   pagefind-keys.html    hidden sort keys + filters — see traps.md
@@ -91,13 +93,13 @@ layouts/_markup/
 assets/js/site-index.js   fetch index.json once per document; scope() subsets
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value
-assets/js/facets.js       tag/category include, exclude, match any/all; shared
+assets/js/facets.js       chip facets from config; include, exclude, match any/all; shared
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette in :root
 ```
 
-ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build.
+ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build; see [build.md](build.md#js-modules).
 
 ### Config and delivery
 

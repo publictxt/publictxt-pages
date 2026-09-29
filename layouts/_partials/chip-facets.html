@@ -1,0 +1,40 @@
+{{/*
+  The chip facets for browse lists and search: params.chipFacets in its order,
+  or all three when absent. `key` is collection, category or tag (facets.js
+  holds the rest); others and repeats warned and dropped. `label` defaults to
+  the key; `states` (what a click cycles through after off) and `match` (how
+  includes combine, first the default) to both, unknown values warned and
+  dropped. The one source for search.html and
+  js-params.html. Returns a slice of dicts {key, label, states, match}; expects
+  nothing.
+*/}}
+{{ $known := slice "collection" "category" "tag" }}
+{{ $allStates := slice "include" "exclude" }}
+{{ $allMatch := slice "all" "any" }}
+{{ $cfg := site.Params.chipFacets | default (slice
+  (dict "key" "collection" "label" "Collection")
+  (dict "key" "category" "label" "Category")
+  (dict "key" "tag" "label" "Tags")) }}
+{{ $out := slice }}
+{{ $seen := slice }}
+{{ range $cfg }}
+  {{ $key := string .key }}
+  {{ if or (not (in $known $key)) (in $seen $key) }}
+    {{ warnidf "chip-facet-key" "params.chipFacets: key %q is unknown or repeated — ignored (collection, category, tag)" $key }}
+  {{ else }}
+    {{ $seen = $seen | append $key }}
+    {{ $states := slice }}
+    {{ range .states | default $allStates }}
+      {{ if in $allStates . }}{{ $states = $states | append . }}
+      {{ else }}{{ warnidf "chip-facet-state" "params.chipFacets %s: state %q is not include or exclude — ignored" $key (string .) }}{{ end }}
+    {{ end }}
+    {{ $match := slice }}
+    {{ range .match | default $allMatch }}
+      {{ if in $allMatch . }}{{ $match = $match | append . }}
+      {{ else }}{{ warnidf "chip-facet-match" "params.chipFacets %s: match %q is not all or any — ignored" $key (string .) }}{{ end }}
+    {{ end }}
+    {{ $out = $out | append (dict "key" $key "label" (.label | default $key)
+      "states" ($states | default $allStates | uniq) "match" ($match | default $allMatch | uniq)) }}
+  {{ end }}
+{{ end }}
+{{ return $out }}

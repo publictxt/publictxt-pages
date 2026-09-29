@@ -33,3 +33,18 @@ server watches `build/content`, not the source.
 
 **Needs:** Hugo 0.158+ (plain is fine — no Sass), Python 3.10+, Pagefind (binary or
 `npx`).
+
+## JS modules
+
+No Node: Hugo's built-in esbuild (`js.Build`) bundles each **entry point** with
+everything it imports into one file. Two entry points:
+
+```txt
+list-container.html → list.js    + facets.js, cards.js, sorts.js, site-index.js
+search.html         → search.js  + facets.js, cards.js, sorts.js
+```
+
+Shared modules are **copied into each bundle** — two independent `facets.js`, one per
+page type. So anything set per `js.Build` call (options, `params` → `@params`) must match
+across both calls, or lists and search drift apart silently — hence `js-params.html`, the
+one source of `@params`.

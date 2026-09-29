@@ -32,9 +32,12 @@ Implemented twice, once server-side (no-JS render) and once in JS:
 | stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
 
-A `facets.js` key (`tag`, `category`) is the URL param **and** the Pagefind filter
+A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.
+
+A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
+entry): change the default and shared links without it change meaning.
 
 Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js` and
 `search.js`.

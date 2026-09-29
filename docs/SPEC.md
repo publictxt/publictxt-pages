@@ -9,7 +9,7 @@ Items marked **(TBD)** are not built.
 ## Principles
 
 - **No PublicTxt.Syntax / .NET dependency.** Works with real wikis: relative links, no front matter required.
-- Source repo never modified; build operates on generated copy `build/content/`.
+- Source repo never modified; build operates on generated copy `build/content/`. (UNSURE - Indexes and temp data could be useful for PublicTxt repos and collation)
 - Links are `[label](../wiki/page.md)` - No `[[wikilinks]]`
 - Hugo renders `.md` extensions to `.html`
 - `![alt](youtube-url)` embeds the video; other images stay images.
@@ -18,7 +18,7 @@ Items marked **(TBD)** are not built.
 
 - Sections
   - Single repo;  top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-  - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*.
+  - home list sections by folder name, ordered by `params.sectionOrder` *(D10)*. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
 - Sidebar
@@ -52,11 +52,17 @@ Items marked **(TBD)** are not built.
 - Post sources
   - A URL (or list) under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link on the page.
   - Filter by source, source chips on cards (TBD)
+  - Any page with post sources, should be put in Posts collection (TBD)
+  - Keys updated to differentiate between my posts and others (TBD - UNSURE)
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources.
   - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
 - Date Properties
   - Converts from YYYYMMDD to required format (TBD)
+- Chips
+  - Chips showing tags/categories/collections
+  - Some chips can toggle in 3 states - include/exclude/off
+  - The ui of chip shows toggle exclude as a small 'x' button to the right of all chips when excluded (TBD)
 
 ## Content Structure
 
