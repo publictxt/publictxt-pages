@@ -29,13 +29,20 @@
   "year": "2026"
  },
  {
+  "bookmarks": [
+   {
+    "label": "↗ locusmag.com/feature/commentary-cory-doctorow-technopolitics",
+    "url": "https://locusmag.com/feature/commentary-cory-doctorow-technopolitics/"
+   }
+  ],
   "collections": [
-   "blog"
+   "blog",
+   "bookmarks"
   ],
   "created": "2026-09-22T00:00:00Z",
   "createdLabel": "22 Sep 2026",
   "section": "blog",
-  "summary": " bookmark: https://locusmag.com/feature/commentary-cory-doctorow-technopolitics/\nA post folder: a section holding this one page, its image beside it. Folder and file dates differ; …",
+  "summary": "A post folder: a section holding this one page, its image beside it. Folder and file dates differ; the file name&rsquo;s wins.\n",
   "tags": [],
   "title": "20260922 TechnoPolitics",
   "updated": "2026-09-22T00:00:00Z",
