@@ -12,10 +12,11 @@
   - An audio file (mp3, m4a, ogg, oga, opus, wav, flac, aac) becomes an <audio
     controls>, labelled by the alt text.
   - Anything else: a plain <img>.
-  A relative image/audio path is a file beside the source, as in Obsidian
-  (`../../media/x.mp3` from bookmarks/clippings/): found as a resource of the
-  nearest page at or above its folder and linked by that resource's URL (the page URL has
-  one more level, and slugs differ from folder names). Not found: left as is.
+  A relative image/audio path is a file in one of two places, found as a
+  Hugo resource and linked by its URL (folder names aren't URLs — slugs):
+  beside the note (its post folder, or its section's folder), or in a
+  top-level folder of files, e.g. `../../media/x.mp3` (a home resource —
+  such folders get no `_index.md`). Elsewhere: left as written, with a warning.
   hugo.toml turns off Goldmark's <p> around standalone images (a <div> can't
   sit in a <p>), so this adds it back for everything but embeds.
 */}}
@@ -37,20 +38,13 @@
 {{- else -}}
 {{- $dest := .Destination -}}
 {{- if and $u.Path (not $u.Host) (not $u.Scheme) (not (hasPrefix $u.Path "/")) -}}
-  {{- with .PageInner.File -}}
-    {{- $f := path.Join .Dir $u.Path -}}
-    {{- $dirs := split (strings.Trim (path.Dir $f) "/.") "/" -}}
-    {{- $owner := false -}}
-    {{- range seq (len $dirs) -1 0 -}}
-      {{- if not $owner -}}
-        {{- $d := delimit (first . $dirs) "/" -}}
-        {{- with site.GetPage (printf "/%s" $d) -}}
-          {{- $owner = true -}}
-          {{- with .Resources.Get (strings.TrimPrefix "/" (strings.TrimPrefix $d $f)) }}{{ $dest = .RelPermalink }}{{ end -}}
-        {{- end -}}
-      {{- end -}}
-    {{- end -}}
+  {{- $p := .PageInner -}}
+  {{- $r := or ($p.Resources.Get $u.Path) (and $p.CurrentSection ($p.CurrentSection.Resources.Get $u.Path)) -}}
+  {{- with $p.File -}}
+    {{- $f := path.Join (replace .Dir "\\" "/") $u.Path -}}
+    {{- if and (not $r) (eq (len (split $f "/")) 2) }}{{ $r = site.Home.Resources.Get $f }}{{ end -}}
   {{- end -}}
+  {{- with $r }}{{ $dest = .RelPermalink }}{{ else }}{{ warnf "%s: file not beside the note or in a top-level folder: %s" .Page.File.Path .Destination }}{{ end -}}
 {{- end -}}
 {{- $host := strings.TrimPrefix "www." (strings.TrimPrefix "m." $u.Host) -}}
 {{- $id := "" -}}
