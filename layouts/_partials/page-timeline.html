@@ -1,0 +1,18 @@
+{{/*
+  A page's archive, below "This page" (page.html's right column): its
+  section's pages on the timeline, titles and all, its own marked —
+  page-timeline.js fills it from the site index, so every page view fetches
+  index.json (cached; fingerprinted in production). Hidden until filled, and
+  for pages outside a section. Takes the page.
+*/}}
+{{ with .FirstSection }}{{ if not .IsHome }}
+<details class="timeline fold" data-page-timeline data-section="{{ .RelPermalink }}" data-url="{{ $.RelPermalink }}" open hidden>
+  <summary><span class="side-heading">{{ .Section | humanize }} timeline</span></summary>
+  <ol class="tl"></ol>
+</details>
+{{ with resources.Get "js/page-timeline.js" }}
+{{ $js := . | js.Build (dict "format" "esm" "minify" hugo.IsProduction "params" (partial "js-params.html" "page")) }}
+{{ if hugo.IsProduction }}{{ $js = $js | fingerprint }}{{ end }}
+<script type="module" src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
+{{ end }}
+{{ end }}{{ end }}

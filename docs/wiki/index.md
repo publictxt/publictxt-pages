@@ -39,7 +39,7 @@ tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
 layouts/baseof.html               shell: header + ☰, nav | main | "aside" block;
                                   data-base + data-index on <html>
 layouts/home.html                 hero, Recent list; aside: its filters
-layouts/page.html                 single page; data-pagefind-body; aside: page meta
+layouts/page.html                 single page; data-pagefind-body; aside: page meta, section timeline
 layouts/section.html              index body as prose + browse list; aside: its filters
 layouts/term.html                 /tags/<term>/; aside: its filters
 layouts/taxonomy.html             /tags/
@@ -50,6 +50,7 @@ layouts/_partials/
   head.html             title, description, favicon, Mastodon rel="me", stylesheet, nav.js
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
+  page-timeline.html    below it: the section's timeline, titles too; loads page-timeline.js
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal
@@ -97,11 +98,12 @@ assets/js/facets.js       chip facets from config; include, exclude, match any/a
                           chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
+assets/js/page-timeline.js  a page's archive: its section on the timeline, the page marked
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette + column widths in :root
 ```
 
-ES modules bundled per entry point (list.js, search.js; nav.js as a classic script) by
+ES modules bundled per entry point (list.js, search.js, page-timeline.js; nav.js as a classic script) by
 Hugo's built-in esbuild — no Node to build. One sort vocabulary, one card and one facet
 module serve lists and search; see traps.md.
 

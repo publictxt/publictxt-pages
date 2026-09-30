@@ -26,7 +26,7 @@ Items marked **(TBD)** are not built.
   - Sections, categories, tag cloud
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
-  - page meta (collections, dates, categories, tags) on pages
+  - page meta (collections, dates, categories, tags) on pages, then its section's timeline with titles: the page's year and month open, the page marked, year and month labels linking to the section list at that date (pages in a section with two or more pages)
   - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories

@@ -1,10 +1,11 @@
 {{/*
-  The `@params` for every js.Build (list-container.html, search.html): one
-  source, as shared modules are copied per bundle (traps.md).
+  The `@params` for every js.Build (list-container.html, search.html,
+  page-timeline.html): one source, as shared modules are copied per bundle
+  (traps.md).
     chipFacets  chip-facets.html
     months      month names, January first, in the site's language — for
                 timeline.js, so JS never formats a date
-  Expects the surface, "lists" or "search" — unused yet, for per-surface
+  Expects the surface, "lists", "search" or "page" — unused yet, for per-surface
   settings.
 */}}
 {{ $months := slice }}

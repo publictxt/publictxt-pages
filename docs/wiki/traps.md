@@ -39,13 +39,14 @@ API, so a bump means checking search too.
 Also: the breakpoints in `main.css` (1440px drawer, 900px one column) are repeated
 in `layout.js`, JS's only copy.
 
-## Two JS bundles, one `@params`
+## Three JS bundles, one `@params`
 
 `js.Build` bundles each entry point (`list.js` from `list-container.html`, `search.js`
-from `search.html`) with its imports, so shared modules are **copied into each**.
-(`nav.js`, from `head.html`, is a third bundle; it takes no `@params`.) Anything
-set per call — options, `params` — must match across both, or lists and search drift
-silently. Hence `js-params.html`, the one source of `@params`.
+from `search.html`, `page-timeline.js` from `page-timeline.html`) with its imports, so
+shared modules are **copied into each**. (`nav.js`, from `head.html`, is a fourth
+bundle; it takes no `@params`.) Anything set per call — options, `params` — must match
+across them, or lists, search and pages drift silently. Hence `js-params.html`, the one
+source of `@params`.
 
 ## The right column is filled from both sides
 
@@ -98,7 +99,7 @@ watches `build/content`, so content changes need sync re-run.
 
 ## Fingerprinting is production-only
 
-`head.html`, `list-container.html`, `search.html`: fingerprint + `integrity` only when
+`head.html`, `list-container.html`, `search.html`, `page-timeline.html`: fingerprint + `integrity` only when
 `hugo.IsProduction`.
 
 ## Section links use folder names
