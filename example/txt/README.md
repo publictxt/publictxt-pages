@@ -23,8 +23,8 @@ git diff tests/golden                                  # read it: every change s
 | Quoted date-only `created:` | `blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md` |
 | `_index.md` as folder index; links to it | `blog/_index.md`, `notes/_index.md`, `wiki/**/_index.md` |
 | Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Science/brain/` |
-| Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
-| Links to a post folder's note by name (`<…>` and `%20`) | `blog/_index.md` |
+| Post folder: a section with one page, its image beside the note | `blog/20260921-TechnoPolitics/` |
+| Link to a note with spaces in its name (`<…>` and `%20`) | `blog/_index.md` |
 | `publish: off` | `notes/unpublished.md` |
 | … a folder with only unpublished Markdown: its files stay off too | `notes/Draft post/` |
 | Spaces and dots in names; `.md` in a folder name | `wiki/Projects/PublicTxt/Other Software.md`, `Obsidian.md.md`, `bookmarks/sites/obsidian.md/` |
@@ -40,6 +40,6 @@ git diff tests/golden                                  # read it: every change s
 | `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `_index.md`, `Projects.md`, `online-things.md` |
 | Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
-| Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
+| Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png`; in a post folder, `blog/20260921-TechnoPolitics/*.jpg` |
 | Pasted image beside a flat post (no post folder), `%20` in the link | `blog/Pasted image 20260925101500.png`, `blog/20260925 Another Issue…` |
 | Site settings, not content | `settings/site.toml` |

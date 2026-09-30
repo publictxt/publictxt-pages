@@ -2,8 +2,8 @@
   The URL for a Markdown destination `path` written in `page`. Returns it.
   A relative path is a file in one of two places, found as a Hugo resource
   and linked by its URL (folder names aren't URLs — slugs): beside the note
-  (its post folder, or its section's folder), or in a top-level folder of
-  files, e.g. `../../media/x.mp3` (a home resource — such folders get no
+  (a resource of its folder's section, subfolders included), or in a
+  top-level folder of files, e.g. `../../media/x.mp3` (a home resource — such folders get no
   `_index.md`). Elsewhere: left as written, with a warning. Absolute paths
   and URLs: as written.
 */}}
@@ -11,7 +11,7 @@
 {{- $url := .path -}}
 {{- if and $u.Path (not $u.Host) (not $u.Scheme) (not (hasPrefix $u.Path "/")) -}}
   {{- $p := .page -}}
-  {{- $r := or ($p.Resources.Get $u.Path) (and $p.CurrentSection ($p.CurrentSection.Resources.Get $u.Path)) -}}
+  {{- $r := $p.CurrentSection.Resources.Get $u.Path -}}
   {{- with $p.File -}}
     {{- $f := path.Join (replace .Dir "\\" "/") $u.Path -}}
     {{- if and (not $r) (eq (len (split $f "/")) 2) }}{{ $r = site.Home.Resources.Get $f }}{{ end -}}
