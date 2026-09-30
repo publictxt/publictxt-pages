@@ -22,8 +22,8 @@ export function siteIndex() {
  *   section    every page below this section's path (.RegularPagesRecursive)
  *   tag        every page carrying this tag (term .Pages)
  *   collection every page of this collection, wherever filed (_partials/collection-pages.html)
- *   recent     the N most recently updated, site-wide (home): the index
- *              arrives in recent.html's order, so a slice
+ *   recent     the N most recently updated, site-wide; 0 = all (home): the
+ *              index arrives in recent.html's order, so a slice
  */
 export function scope(items, kind, value) {
   switch (kind) {

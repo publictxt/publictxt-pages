@@ -1,11 +1,12 @@
 // facets.js and sorts.js: the URL spelling shared links depend on, chip
-// presses, and lists (matches) agreeing with search (pagefindConditions).
+// presses, lists (matches) agreeing with search (pagefindConditions), rating counts.
 // Run: node --test "tests/js/*.test.mjs"   (Node 22+, which reads these .js files as ES
 // modules without a package.json; no packages)
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  addsPages, chipFacets, describe, matches, pagefindConditions, press, readFacet, toggleInclude, writeFacet,
+  addsPages, chipFacets, describe, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
+  writeFacet,
 } from "../../assets/js/facets.js";
 import { normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
 
@@ -140,4 +141,12 @@ test("sorts: canonical URL form omits the natural direction", () => {
   assert.deepEqual(parseSort("title"), { field: "title", dir: "asc" });
   assert.deepEqual(parseSort("updated"), { field: "updated", dir: "desc" });
   assert.equal(sortLabel("created asc"), "Oldest");
+});
+
+// ---- rating -------------------------------------------------------------
+
+test("rating chips count that rating or better; unrated stays exact", () => {
+  const c = ratingCounts({ 5: 2, 3: 1, unrated: 4 });
+  assert.deepEqual(c, { 1: 3, 2: 3, 3: 3, 4: 2, 5: 2, unrated: 4 });   // ★4+ counts the 5s
+  assert.equal(ratingCounts({}).unrated, 0);
 });

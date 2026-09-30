@@ -279,40 +279,9 @@ a:hover { text-decoration: underline; }
 .hero .lead { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; }
 .hero .lead p { margin: 0; }
 
-/* Home: Browse cards and Recent share a width — --cards (home.html) cards at
-   most --card-max each; auto-fit stretches the cards to fill it. */
-.home-browse {
-  --card-max: 200px;
-  --card-gap: 0.9rem;
-  max-width: calc(var(--cards) * var(--card-max) + (var(--cards) - 1) * var(--card-gap));
-}
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--card-gap, 0.9rem);
-}
-
-.card {
-  display: block;
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
-  color: var(--text);
-  transition: border-color 0.15s ease;
-}
-.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
-.card p { margin: 0; font-size: 0.85rem; }
-.card .card-desc { margin-bottom: 0.3rem; }
-.card:hover { border-color: var(--accent); text-decoration: none; }
-
-.card-accent { border-color: var(--accent-soft); background: var(--accent-soft); }
-
-.home-sections, .home-recent, .list-recent { margin-top: 2rem; }
-.home-sections h2, .home-recent h2, .list-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
+.home-recent, .list-recent { margin-top: 2rem; }
+.home-recent h2, .list-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
 .list-recent h2 .muted { font-size: 0.85rem; font-weight: 400; }
-/* Section cards carry the newest date of their contents — keep it quiet. */
-.card time { display: block; font-size: 0.8rem; margin-top: 0.2rem; }
 
 /* ---------- Breadcrumbs ---------- */
 
@@ -390,19 +359,13 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.7rem 0.9rem;
-  margin-bottom: 0.8rem;
 }
 .list-controls-body {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
-.list-controls-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
+.list-controls-head { display: flex; justify-content: flex-end; }
 .facet-label {
   font-size: 0.72rem;
   font-weight: 700;
@@ -412,9 +375,8 @@ a:hover { text-decoration: underline; }
   flex: none;
   min-width: 3rem;
 }
-.list-selects { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
 .list-sort { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
-.filter-group .list-sort, .filter-group .list-sort select { display: flex; width: 100%; }
+.list-facet .list-sort, .list-facet .list-sort select { display: flex; width: 100%; }
 .list-sort select {
   background: var(--bg-inset);
   border: 1px solid var(--border);
@@ -425,24 +387,217 @@ a:hover { text-decoration: underline; }
   padding: 0.3rem 0.5rem;
 }
 .list-sort select:focus { outline: none; border-color: var(--accent); }
-.list-facet {
+/* One filter section (list.js): a <details> whose label shuts it, as .fold
+   but smaller; picked values count in a badge, seen while shut. */
+/* A rule between shown sections; search hides empty ones. */
+.list-facet:not([hidden]) ~ .list-facet:not([hidden]) { padding-top: 0.6rem; border-top: 1px solid var(--border); }
+.list-facet > summary {
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--border);
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  list-style: none;
+  cursor: pointer;
 }
-.list-facet .chip-row { flex: 1 1 auto; min-width: 0; }
+.list-facet > summary::-webkit-details-marker { display: none; }
+.list-facet > summary::after {
+  content: "";
+  width: 0.32rem;
+  height: 0.32rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+  flex: none;
+}
+.list-facet[open] > summary { margin-bottom: 0.45rem; }
+.list-facet[open] > summary::after { transform: rotate(45deg); }
+@media (hover: hover) {
+  .list-facet > summary:hover .facet-label,
+  .list-facet > summary:hover::after { color: var(--accent); border-color: var(--accent); }
+}
+.list-facet > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.facet-badge {
+  display: inline-block;
+  min-width: 1.3em;
+  padding: 0 0.35em;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  text-align: center;
+}
+.list-facet[open] .facet-badge { display: none; }
 .list-reset { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
 .list-status { margin: 0; font-size: 1.15rem; font-weight: 700; }
 .filter-chip.more { border-style: dashed; color: var(--text-muted); }
-/* In the right column: stacked, each label above its control. */
-.aside .list-controls { margin: 0; }
-.aside .list-controls-head { flex-direction: column; align-items: stretch; }
-.aside .list-selects { flex-direction: column; align-items: stretch; gap: 0.6rem; }
-.aside .list-selects .list-sort { justify-content: space-between; }
-.aside .list-reset { align-self: flex-start; }
-.aside .list-facet { flex-direction: column; gap: 0.45rem; }
+/* Filters, then the timeline (list.js): one block, docked together. */
+.list-side { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 0.8rem; }
+.aside .list-side { gap: 1.25rem; margin: 0; }
+
+/* Timeline (timeline.js): years on a rail, each node opens its row, each
+   label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
+   counts beside them carry the numbers. */
+.timeline {
+  --row: 1.75rem;
+  --node: 18px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+}
+.tl, .tl-months, .tl-pages { list-style: none; margin: 0; padding: 0; }
+/* A shared page timeline's collection chips (page-timeline.js), above the rail. */
+.tl-chips { margin-bottom: 0.7rem; }
+.tl-chips[hidden] { display: none; }
+.tl { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.tl-year { position: relative; }
+/* The rail, node centre to node centre. */
+.tl-year::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--node) / 2 - 1px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.tl-year:first-child::before { top: calc(var(--row) / 2); }
+.tl-year:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
+.tl-year:only-child::before { display: none; }
+.tl-row {
+  display: grid;
+  grid-template-columns: var(--node) auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.55rem;
+  min-height: var(--row);
+}
+.tl-node {
+  position: relative;   /* over the rail */
+  width: var(--node);
+  height: var(--node);
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-raised);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+/* A chevron: right when shut, down when open, as .fold's. */
+.tl-node::before {
+  content: "";
+  width: 0.28rem;
+  height: 0.28rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: translateX(-1px) rotate(-45deg);
+  transition: transform 0.15s;
+}
+.open > .tl-row > .tl-node { border-color: var(--accent); }
+.open > .tl-row > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
+.current > .tl-row > .tl-node { background: var(--accent); border-color: var(--accent); }
+.current > .tl-row > .tl-node::before { border-color: var(--bg); }
+.tl-node:hover { border-color: var(--accent); }
+/* A month with nothing to open (filter mode): a dot on the branch. */
+.tl-dot { cursor: default; transform: scale(0.6); }
+.tl-dot::before { display: none; }
+.tl-dot:hover { border-color: var(--border); }
+.current > .tl-row > .tl-dot:hover { border-color: var(--accent); }
+.tl-node:hover::before { border-color: var(--accent); }
+.current > .tl-row > .tl-node:hover::before { border-color: var(--bg); }
+.tl-pick {
+  font: inherit;
+  color: var(--text);
+  background: none;
+  border: 0;
+  padding: 0.1rem 0;
+  cursor: pointer;
+  text-align: left;
+}
+.tl-year > .tl-row > .tl-pick { font-weight: 700; letter-spacing: 0.02em; }
+.tl-pick:hover, .tl-pick[aria-pressed="true"] { color: var(--accent); }
+.tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
+.tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.tl .count { color: var(--text-muted); font-size: 0.72rem; text-align: right; min-width: 1.5em; }
+
+/* A year's months, Jan..Dec. */
+.tl-spark { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
+.tl-spark i {
+  flex: none;
+  width: 5px;
+  height: calc(2px + var(--v) * 14px);
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.7;
+}
+.tl-spark i.none { background: var(--border); opacity: 1; }
+.tl-year:hover > .tl-row .tl-spark i:not(.none),
+.tl-year.current > .tl-row .tl-spark i:not(.none) { opacity: 1; }
+
+.tl-months { margin: 0.1rem 0 0.35rem calc(var(--node) + 0.55rem); }
+.tl-month { --node: 13px; --row: 1.6rem; }
+.tl-month .tl-pick { min-width: 5.6em; }
+.tl-bar { display: block; height: 6px; background: var(--bg-inset); border-radius: 3px; overflow: hidden; }
+.tl-bar i {
+  display: block;
+  height: 100%;
+  width: max(3px, calc(var(--v) * 100%));
+  background: var(--accent);
+  border-radius: 3px;
+  opacity: 0.55;
+}
+.tl-month:hover > .tl-row .tl-bar i, .tl-month.current > .tl-row .tl-bar i { opacity: 1; }
+
+/* An open month's pages, on a dashed branch of the rail. */
+.tl-pages {
+  margin: 0.1rem 0 0.4rem calc(var(--node) / 2 - 0.5px);
+  padding: 0.1rem 0 0.1rem 0.9rem;
+  border-left: 1px dashed var(--border);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.tl-pages li {
+  position: relative;
+  padding: 0.2rem 0;
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: baseline;
+}
+.tl-pages li.tl-newday { margin-top: 0.3rem; }
+/* Day of the month, once per day. */
+.tl-day { color: var(--text-muted); font-size: 0.72rem; text-align: right; }
+.tl-pages li::before {
+  content: "";
+  position: absolute;
+  left: calc(-0.9rem - 3px);
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.tl-pages a {
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tl-pages a:hover { color: var(--accent); text-decoration: none; }
+.tl-pages a[aria-current] { color: var(--accent); font-weight: 600; }
+.tl-pages li:has(a[aria-current])::before { background: var(--accent); }
+.tl-pages li:has(a:hover)::before { background: var(--accent); }
+.tl-empty { font-size: 0.8rem; }
+@media (prefers-reduced-motion: reduce) {
+  .tl-node::before, .list-facet > summary::after { transition: none; }
+}
 
 .pagination {
   display: flex;
@@ -612,12 +767,6 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   border-radius: var(--radius);
   padding: 0.8rem 0.9rem;
 }
-.search-filters-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.filter-group .side-heading { margin-bottom: 0.5rem; }
 
 /* A <details> box whose summary is its heading: whole row clickable, a
    chevron standing in for the native marker. Search filters, browse list
@@ -649,7 +798,6 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
 }
 .fold > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 .fold[open] > summary { margin-bottom: 0.8rem; }
-.filter-group .side-heading .muted { text-transform: none; letter-spacing: 0; font-weight: 400; }
 
 .filter-chip {
   font: inherit;

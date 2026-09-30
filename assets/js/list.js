@@ -1,35 +1,35 @@
 // Browse lists: each `[data-list]` swaps Hugo's fallback <ul> for sortable,
 // filterable, paged cards from the site index. State lives in the URL:
-// ?tag=&category=&collection=&year=&rating=&sort=&page= (`q` is search's); tag,
-// category and collection also take -not / -match (facets.js).
+// ?tag=&category=&collection=&year=&month=&rating=&sort=&page= (`q` is search's);
+// tag, category and collection also take -not / -match (facets.js); month
+// only with year (timeline.js).
 //
 //   data-scope-kind   section | collection | tag | recent
 //   data-scope-value  a path, a collection, a tag, or a limit
 //   data-order        default sort (sorts.js)
 //   data-per-page     cards per page
-//   data-compact      cards only: no controls, pager or URL (home Recent, dataview)
+//   data-compact      cards only: no controls, pager or URL (dataview)
 //   data-limit        compact: the first N only
 //
-// Filters go in the page's `[data-list-controls]` right column (section.html,
-// term.html), claimed by the first full list, or above the list when narrow
-// (layout.js). Sort sits with the count.
+// Filters, then the timeline, go in the page's `[data-list-controls]` right
+// column (section.html, term.html), claimed by the first full list, or above
+// the list when narrow (layout.js). Sort sits with the count.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
+import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
+  rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
+import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
 
-// Each facet's values per page and chip order. The chip facets per facets.js
-// (CHIPS); year single-select. Rating is a minimum, handled in render().
+// Each chip facet's values per page and chip order, per facets.js (CHIPS).
+// Rating is a minimum and the date the timeline's, both handled in render().
 // Disabled categories leave no data, so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
-const FACETS = {
-  ...Object.fromEntries(CHIPS.defs.map((d) => [d.key, { values: (it) => it[d.item] || [], order: byCount }])),
-  year: { values: (it) => [it.year], order: (a, b) => b[0].localeCompare(a[0]) },
-};
+const FACETS = Object.fromEntries(CHIPS.defs.map((d) => [d.key, { values: (it) => it[d.item] || [], order: byCount }]));
 
 // Rating ties: newest first either way.
 function sorted(items, sort) {
@@ -71,13 +71,14 @@ async function mount(root) {
 
   // ---- state <-> URL --------------------------------------------------
   // Chip facets by key (CHIPS.read); `more`: keys showing past their limit.
-  const state = { sort: defaultSort, ...CHIPS.read(), year: "", rating: "", page: 1, more: new Set() };
+  const state = { sort: defaultSort, ...CHIPS.read(), year: "", month: "", rating: "", page: 1, more: new Set() };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     Object.assign(state, CHIPS.read(p));
     state.year = p.get("year") || "";
+    state.month = monthFilter(p.get("month"), state.year);
     state.rating = ratingFilter(p.get("rating"));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
   }
@@ -87,6 +88,7 @@ async function mount(root) {
     if (s.sort !== defaultSort) p.set("sort", s.sort);
     CHIPS.write(p, s);
     if (s.year) p.set("year", s.year);
+    if (s.month) p.set("month", s.month);
     if (s.rating) p.set("rating", s.rating);
     if (s.page > 1) p.set("page", String(s.page));
     const qs = p.toString();
@@ -127,6 +129,16 @@ async function mount(root) {
   pager.setAttribute("aria-label", "Pagination");
   if (compact) root.append(list);
   else root.append(head, list, pager);
+  // Filters and timeline dock as one, so they keep their order when narrow.
+  const side = document.createElement("div");
+  side.className = "list-side";
+  const tl = document.createElement("details");
+  tl.className = "timeline fold";
+  tl.open = true;
+  tl.innerHTML = `<summary><span class="side-heading">Timeline</span></summary>`;
+  const tlBody = document.createElement("ol");
+  tlBody.className = "tl";
+  tl.append(tlBody);
 
   // A facet shows only when the list varies on it (a tag page hides its own
   // tag). A missing value counts as no value, so a lone category shows unless
@@ -139,85 +151,66 @@ async function mount(root) {
     const shown = d.shared ? (all.length > 1 ? all : []) : all.filter(([, n]) => n < items.length);
     return [d.key, shown.filter(([n]) => n !== own(d))];
   }));
-  const yearFacet = counts(items, "year");
-  const hasYears = yearFacet.length > 1;
   // Shows when ratings vary, unrated counting as a value ("★1+" = rated at all).
   const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
-  const hasFilters = hasYears || hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length);
+  const hasFilters = hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length);
+  // Nothing to pick in a single month. The newest year open to start,
+  // or the ones the URL picked (readURL, below).
+  const fullTree = timeline(items);
+  const hasTimeline = !compact && monthCount(fullTree) > 1;
+  const tlOpen = new Set();
 
   function chip(d, name, n) {
     return filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
   }
 
-  // `f`: a facets.js facet, for its match toggle.
-  function facetRow(label, chips, f) {
-    const row = document.createElement("div");
+  // A filter section, shut or open on its own (facets.js). `f`: a facets.js
+  // facet, for its match toggle; `picked`: values picked, shown while shut.
+  function facetRow(key, label, chips, f, picked) {
+    const row = document.createElement("details");
     row.className = "list-facet";
+    rememberFold(row, key);
+    const summary = document.createElement("summary");
     const lab = document.createElement("span");
     lab.className = "facet-label";
-    lab.textContent = label;
-    const toggle = f && matchToggle(f, () => { state.page = 1; render(true); });
-    if (toggle) lab.append(" ", toggle);
+    lab.append(label);
+    for (const x of foldHint(picked, f && matchToggle(f, () => { state.page = 1; render(true); }))) lab.append(" ", x);
+    summary.append(lab);
     const wrap = document.createElement("div");
     wrap.className = "chip-row";
     wrap.append(...chips);
-    row.append(lab, wrap);
+    row.append(summary, wrap);
     return row;
   }
 
-  // forYear / forRating / forFacet(key): `filtered` minus that filter, so
-  // options count what picking them gives.
-  function renderControls(filtered, forYear, forRating, forFacet) {
+  // forRating / forFacet(key): `filtered` minus that filter, so options
+  // count what picking them gives.
+  function renderControls(filtered, forRating, forFacet) {
     body.replaceChildren();
-    const row = document.createElement("div");
-    row.className = "list-controls-head";
-    const selects = document.createElement("div");
-    selects.className = "list-selects";
-
-    // A select: least used, and scales.
-    if (hasYears) {
-      const c = new Map(counts(forYear, "year"));
-      const yearWrap = document.createElement("label");
-      yearWrap.className = "list-sort";
-      yearWrap.innerHTML = `<span class="facet-label">Year</span> <select aria-label="Filter by year">`
-        + `<option value=""${state.year ? "" : " selected"}>All years</option>`
-        + yearFacet.map(([y]) => `<option value="${y}"${y === state.year ? " selected" : ""}>${y} (${c.get(y) || 0})</option>`).join("")
-        + `</select>`;
-      yearWrap.querySelector("select").addEventListener("change", (e) => {
-        state.year = e.target.value; state.page = 1; render(true);
-      });
-      selects.append(yearWrap);
-    }
-    if (hasRatings) {
-      const atLeast = (r) => forRating.filter((it) => (it.rating || 0) >= r).length;
-      const unrated = forRating.filter((it) => !it.rating).length;
-      const ratingWrap = document.createElement("label");
-      ratingWrap.className = "list-sort";
-      ratingWrap.innerHTML = `<span class="facet-label">Rating</span> <select aria-label="Filter by minimum rating">`
-        + `<option value=""${state.rating ? "" : " selected"}>Any rating</option>`
-        + ratings.map((r) => `<option value="${r}"${String(r) === state.rating ? " selected" : ""}>${ratingFilterLabel(r)} (${atLeast(r)})</option>`).join("")
-        + (hasUnrated ? `<option value="${UNRATED_FILTER}"${state.rating === UNRATED_FILTER ? " selected" : ""}>Unrated (${unrated})</option>` : "")
-        + `</select>`;
-      ratingWrap.querySelector("select").addEventListener("change", (e) => {
-        state.rating = e.target.value; state.page = 1; render(true);
-      });
-      selects.append(ratingWrap);
-    }
-    if (selects.childElementCount) row.append(selects);
     // Filters only; sort isn't in this box.
     if (filtering()) {
+      const row = document.createElement("div");
+      row.className = "list-controls-head";
       const clear = document.createElement("button");
       clear.type = "button";
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        CHIPS.clear(state); state.year = ""; state.rating = ""; state.page = 1; render(true);
+        CHIPS.clear(state); state.year = ""; state.month = ""; state.rating = ""; state.page = 1; render(true);
       });
       row.append(clear);
+      body.append(row);
     }
-    if (row.childElementCount) body.append(row);
+
+    if (hasRatings) {
+      const exact = {};
+      for (const it of forRating) { const k = it.rating ? String(it.rating) : UNRATED_FILTER; exact[k] = (exact[k] || 0) + 1; }
+      const values = [...ratings.map(String), ...(hasUnrated ? [UNRATED_FILTER] : [])];
+      const chips = ratingChips(values, ratingCounts(exact), state.rating, (v) => { state.rating = v; state.page = 1; render(true); });
+      body.append(facetRow("rating", "Rating", chips, null, state.rating ? 1 : 0));
+    }
 
     // Past a facet's `limit`, chips fold behind "more"; selected ones stay.
     for (const d of CHIPS.defs) {
@@ -242,7 +235,7 @@ async function mount(root) {
         });
         chips.push(more);
       }
-      body.append(facetRow(d.label, chips, f));
+      body.append(facetRow(d.key, d.label, chips, f, f.inc.size + f.exc.size));
     }
   }
 
@@ -285,11 +278,29 @@ async function mount(root) {
   }
 
   const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
+  const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
+
+  // The other filters narrow it; its own pick shows as pressed, not as a cut.
+  let lastForYear = [];
+  function drawTimeline(forYear) {
+    lastForYear = forYear;
+    const tree = timeline(forYear);
+    if (!tree.length) {
+      tlBody.innerHTML = `<li class="muted tl-empty">No dated pages match.</li>`;
+      return;
+    }
+    renderTimeline(tlBody, tree, {
+      year: state.year, month: state.month, open: tlOpen, names: params.months,
+      pick: (y, m) => { state.year = y; state.month = m; state.page = 1; render(true); },
+      rerender: () => drawTimeline(lastForYear),
+    });
+  }
 
   // Each filter as a test; `own` false drops a facet's includes (addsPages).
   const tests = {
     ...Object.fromEntries(CHIPS.keys.map((k) => [k, (it, own) => matches(state[k], FACETS[k].values(it), own)])),
-    year: (it) => !state.year || it.year === state.year,
+    // Month rides on year, so the timeline counts without both.
+    year: (it) => (!state.year || it.year === state.year) && (!state.month || monthOf(it) === state.month),
     rating: (it) => !state.rating
       || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating)),
   };
@@ -312,10 +323,11 @@ async function mount(root) {
     sortSelect.value = state.sort;
 
     const forFacet = (k) => addsPages(state[k]) ? items.filter((it) => passes(it, k)) : filtered;
-    renderControls(filtered, items.filter((it) => passes(it, "year")), items.filter((it) => passes(it, "rating")), forFacet);
+    renderControls(filtered, items.filter((it) => passes(it, "rating")), forFacet);
+    if (hasTimeline) drawTimeline(items.filter((it) => passes(it, "year")));
     renderPager(total);
     const n = filtered.length;
-    const what = [...CHIPS.describe(state), state.year,
+    const what = [...CHIPS.describe(state), dateLabel(),
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
     const extra = [what, total > 1 && `page ${state.page} of ${total}`].filter(Boolean).join(" · ");
     const detail = document.createElement("span");
@@ -328,8 +340,18 @@ async function mount(root) {
 
   window.addEventListener("popstate", () => { readURL(); render(false); });
   readURL();
-  // Folded when narrow, unless the URL set a filter. Nothing to filter, no box.
-  if (!compact && hasFilters) dock(controls, slot, root, (narrow) => { controls.open = !narrow || filtering(); });
+  if (hasTimeline) {
+    const y = state.year ? fullTree.find((t) => t.year === state.year) : fullTree[0];
+    if (y) tlOpen.add(y.year);
+  }
+  // Folded when narrow, unless the URL set a filter (for the timeline, a
+  // date). Nothing to filter and no timeline, no box.
+  if (!compact && hasFilters) side.append(controls);
+  if (hasTimeline) side.append(tl);
+  if (side.childElementCount) dock(side, slot, root, (narrow) => {
+    controls.open = !narrow || filtering();
+    tl.open = !narrow || Boolean(state.year);
+  });
   else if (slot) slot.hidden = true;
   render(false);
 }

@@ -12,12 +12,12 @@ Items marked **(TBD)** are not built.
 - Hugo renders `.md` extensions to `.html`
 - Sections
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-  - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
+  - The sidebar lists sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
   - Sections move to specialised Views over Collections (TBD)
-    - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
+    - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD; a page's shared timeline does this for `timelineCollections`)
     - Bookmarks should show Bookmark specialised view (TBD)
 - Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
   - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.
@@ -26,8 +26,8 @@ Items marked **(TBD)** are not built.
   - Sections, categories, tag cloud
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
-  - page meta (collections, dates, categories, tags) on pages
-  - filters on browse lists and search; sort stays by the results
+  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none.
+  - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
   - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable.
@@ -40,15 +40,18 @@ Items marked **(TBD)** are not built.
   - Tag and category facets: include or exclude values; match all or any of the included (default all). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
+  - Home *Recent*: every page, recently updated first, `recentLimit` a page, with filters and timeline; nothing filtered to start. (Not "this month": empty on quiet months.)
   - Sorting in all by Date, Recency, Alphabetical.
-  - Filter by Collection, and by Year (the `created` year).
+  - Filter by Collection, and by Year (the `created` year) or a month of it (`?year=&month=`) — picked in the timeline; no year select.
+  - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars and counts — no titles, the list shows those. A year or month label picks the date filter; the other filters narrow it. The newest year open to start.
   - Filter by Category and Tag, as the facets above (also in Search)
   - Sort by Source/Author (TBD)
-  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search)
+  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search): chips, one at a time, each counting that rating or better.
+  - Each filter section (Rating, Collection, Category, Tags; Search's Year too) shuts on its own, remembered per browser across lists and Search; a shut one shows how many values are picked.
 - Search
   - Full text search
   - Collection, Year and Tag filters as 'facets' are available without a query
-  - Finer date filters — month, ranges (TBD)
+  - Year and month from the timeline, as the browse lists' (Pagefind's `month` filter counts); ranges (TBD)
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks

@@ -23,6 +23,8 @@ search. Add one to both, or search cards go without it. What's still implemented
 | each list template's page collection (incl. the dataview hook) | its kind in `scope()` |
 | stars in `page-meta.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
+| `created`'s `2006-01-…` form in `list-json.html` | `monthOf()` in `timeline.js` reads its digits |
+| Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js` |
 
 A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
@@ -37,13 +39,14 @@ API, so a bump means checking search too.
 Also: the breakpoints in `main.css` (1440px drawer, 900px one column) are repeated
 in `layout.js`, JS's only copy.
 
-## Two JS bundles, one `@params`
+## Three JS bundles, one `@params`
 
 `js.Build` bundles each entry point (`list.js` from `list-container.html`, `search.js`
-from `search.html`) with its imports, so shared modules are **copied into each**.
-(`nav.js`, from `head.html`, is a third bundle; it takes no `@params`.) Anything
-set per call — options, `params` — must match across both, or lists and search drift
-silently. Hence `js-params.html`, the one source of `@params`.
+from `search.html`, `page-timeline.js` from `page-timeline.html`) with its imports, so
+shared modules are **copied into each**. (`nav.js`, from `head.html`, is a fourth
+bundle; it takes no `@params`.) Anything set per call — options, `params` — must match
+across them, or lists, search and pages drift silently. Hence `js-params.html`, the one
+source of `@params`.
 
 ## The right column is filled from both sides
 
@@ -57,6 +60,11 @@ aside by `:empty` — so these asides must hold no whitespace (`{{- -}}`) around
 
 Pagefind also indexes section index bodies (`section.html`); browse lists hold regular
 pages only. `category-counts.html` counts sections too, to match the search it links to.
+
+## `hugo.toml`: a key after a `[params.x]` table belongs to it
+
+TOML ignores indentation. `sectionOrder` and four others sat below `[params.footer]`
+and were silently `params.footer.*`. Plain `[params]` keys go above the first table.
 
 ## `partialCached` on site-scanning partials
 
@@ -96,7 +104,7 @@ watches `build/content`, so content changes need sync re-run.
 
 ## Fingerprinting is production-only
 
-`head.html`, `list-container.html`, `search.html`: fingerprint + `integrity` only when
+`head.html`, `list-container.html`, `search.html`, `page-timeline.html`: fingerprint + `integrity` only when
 `hugo.IsProduction`.
 
 ## Section links use folder names
