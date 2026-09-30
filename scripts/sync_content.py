@@ -8,29 +8,25 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
   * No `created:`/`updated:` -> dates.py ladders; `date:`/`lastmod:` renamed.
     Section indexes take their newest descendant's `updated`.
   * Folder with Markdown but no index -> generated `_index.md`.
-  * Post folder (one non-index .md + attachments, no subfolders) -> its .md
-    becomes `index.md`: a leaf bundle, one page. Links and embeds to the .md
-    by name (`Post/Note.md`) rewritten to `Post/index.md`, so Hugo finds it.
   * `#hashtags` linkified and merged into `tags:` (hashtags.py).
-  * `source_path:` records the pre-rename path, for the edit link.
+  * `source_path:` records the source path, for the edit link.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
 
 Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep) and `publish: off`
-pages, with an unpublished post folder's attachments. Other files are copied
+pages — and every file of a folder whose Markdown is all unpublished (a
+draft's attachments; beside published notes, they stay). Other files are copied
 verbatim — except SITE_CONFIG, the repo's site settings: not content, it goes
 beside dest as `site.toml`, which build.py overlays on hugo.toml.
 
 Usage: python3 scripts/sync_content.py <source_repo> <dest_content_dir>
 """
 
-import posixpath
 import re
 import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import unquote
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags
@@ -47,8 +43,6 @@ BOOKMARK_KEYS = ("bookmark", "bookmarks")
 FRONT_MATTER_RE = re.compile(r"^---[ \t]*\r?\n(.*?)^---[ \t]*\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
-# A link or image destination: `](<a b.md#x> "t")` or `](a%20b.md#x "t")`.
-LINK_DEST_RE = re.compile(r"(\]\()(<[^>\n]+>|[^)\s]+)")
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 
@@ -134,25 +128,7 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
     return Stamp(created, created_source, updated, authored)
 
 
-def relink_bundle_notes(body: str, rel: str, bundle_notes: set[str]) -> str:
-    """Links to a post folder's note by name -> its `index.md`. `bundle_notes`: source rels."""
-    def fix(m: re.Match) -> str:
-        dest = m.group(2)
-        bracketed = dest.startswith("<")
-        path, _, frag = dest.strip("<>").partition("#")
-        if "://" in path or not path.lower().endswith(".md"):
-            return m.group(0)
-        start = "" if path.startswith("/") else posixpath.dirname(rel)
-        target = posixpath.normpath(posixpath.join(start, unquote(path).lstrip("/")))
-        if target not in bundle_notes:
-            return m.group(0)
-        path = path[:path.rfind("/") + 1] + "index.md" + (f"#{frag}" if frag else "")
-        return m.group(1) + (f"<{path}>" if bracketed else path)
-    return LINK_DEST_RE.sub(fix, body)
-
-
-def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False,
-                 bundle_notes: set[str] = frozenset()) -> str:
+def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
     fm, body = split_front_matter(text)
     fm = rename_legacy_keys(fm)
     name = Path(rel).name
@@ -161,7 +137,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
 
     if not has_key(fm, "title"):
         fallback = stem.replace("-", " ").replace("_", " ").strip()
-        if name in INDEX_NAMES or is_leaf_bundle:
+        if name in INDEX_NAMES:
             parent = Path(rel).parent.name
             fallback = parent.replace("-", " ") if parent and parent != "." else fallback
         title, body = derive_title(body, fallback)
@@ -176,7 +152,6 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
     if not has_key(fm, "source_path"):
         added.append(f"source_path: {yaml_str(rel)}")
 
-    body = relink_bundle_notes(body, rel, bundle_notes)
     body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
@@ -184,22 +159,18 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 
 
-def find_leaf_bundle_dirs(src: Path) -> set[Path]:
-    """Post folders: one non-index .md + attachments, no subfolders. By structure, not name."""
-    bundles = set()
-    for d in src.rglob("*"):
-        if not d.is_dir() or any(part in SKIP_DIRS for part in d.relative_to(src).parts):
+def hidden_folders(src: Path) -> set[Path]:
+    """Folders with Markdown below them, none of it published: their other files stay off too."""
+    has_md, published = set(), set()
+    for md in src.rglob("*.md"):
+        rel = md.relative_to(src)
+        if not md.is_file() or md.name in SKIP_FILES or any(p in SKIP_DIRS for p in rel.parts):
             continue
-        children = [c for c in d.iterdir()
-                    if c.name not in SKIP_DIRS and c.name not in SKIP_FILES
-                    and not c.name.endswith(".gitkeep")]
-        if any(c.is_dir() for c in children):
-            continue
-        md = [c for c in children if c.suffix.lower() == ".md"]
-        other = [c for c in children if c.suffix.lower() != ".md"]
-        if len(md) == 1 and md[0].name not in INDEX_NAMES and other:
-            bundles.add(d)
-    return bundles
+        folders = list(md.parents)[:len(rel.parts) - 1]   # up to, not including, src
+        has_md.update(folders)
+        if not is_unpublished(md.read_text(encoding="utf-8")):
+            published.update(folders)
+    return has_md - published
 
 
 def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[int, int, int]:
@@ -219,12 +190,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
               "same commit time. Check out with fetch-depth: 0 for real dates.",
               file=sys.stderr)
 
-    leaf_bundles = find_leaf_bundle_dirs(src)
-    # A post folder is one page: unpublishing it takes its attachments too.
-    hidden_bundles = {d for d in leaf_bundles
-                      if any(is_unpublished(md.read_text(encoding="utf-8")) for md in d.glob("*.md"))}
-    leaf_bundles -= hidden_bundles
-    bundle_notes = {md.relative_to(src).as_posix() for d in leaf_bundles for md in d.glob("*.md")}
+    hidden = hidden_folders(src)
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -239,8 +205,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
             continue
         if path.relative_to(src).as_posix() == SITE_CONFIG:
             continue
-        if path.parent in hidden_bundles:
-            unpublished += path.suffix.lower() == ".md"
+        if path.suffix.lower() != ".md" and hidden.intersection(path.parents):
             continue
 
         rel = path.relative_to(src).as_posix()
@@ -248,9 +213,6 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
 
         if path.suffix.lower() == ".md":
             is_index = path.name in INDEX_NAMES
-            is_leaf_bundle = path.parent in leaf_bundles
-            if is_leaf_bundle:
-                target = target.with_name("index.md")
             text = path.read_text(encoding="utf-8")
             if is_unpublished(text):
                 unpublished += 1
@@ -261,7 +223,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                       "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, is_leaf_bundle, bundle_notes), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
@@ -270,8 +232,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
             other_count += 1
 
     newest = newest_updated_by_folder(dest, pages)
-    leaf_bundle_dests = {dest / b.relative_to(src) for b in leaf_bundles}
-    md_count += add_missing_indexes(dest, resolver.built_at, newest, leaf_bundle_dests)
+    md_count += add_missing_indexes(dest, resolver.built_at, newest)
     inherit_index_dates(indexes, newest)
     return md_count, other_count, unpublished
 
@@ -303,16 +264,14 @@ def inherit_index_dates(indexes: dict[Path, Stamp], newest: dict[Path, str]) -> 
             index.write_text(patched, encoding="utf-8")
 
 
-def add_missing_indexes(
-    dest: Path, built_at: str, newest: dict[Path, str], leaf_bundle_dests: set[Path]
-) -> int:
+def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> int:
     """
     An `_index.md` for every folder with Markdown below it and none of its own —
-    Hugo needs one for a section. Dated by its newest page. Leaf bundles excluded.
+    Hugo needs one for a section. Dated by its newest page.
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
-        if d in leaf_bundle_dests or (d / "_index.md").exists() or not any(p.is_file() for p in d.rglob("*.md")):
+        if (d / "_index.md").exists() or not any(p.is_file() for p in d.rglob("*.md")):
             continue
         title = d.name.replace("-", " ").replace("_", " ").strip()
         updated = newest.get(d, built_at)

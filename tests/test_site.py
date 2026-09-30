@@ -74,16 +74,18 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('<p><audio class="audio" controls preload="metadata" src="/media/silence.wav" aria-label="Half a second of silence"></audio></p>', html)
         self.assertIn('<img src="/notes/dot.png" alt="A dot">', html)
 
-    def test_bundle_image(self):
-        """A leaf bundle's image links by the slugged URL, not the folder name."""
-        html = (self.public / "blog" / "20260921-technopolitics" / "index.html").read_text(encoding="utf-8")
-        self.assertIn('<img src="/blog/20260921-technopolitics/18378321848729087020.jpg"', html)
+    def test_image_beside_post(self):
+        """A pasted image beside a post, Obsidian's `%20` name: its section's file."""
+        html = (self.public / "blog" / "2026" / "20260925-another-issue-with-the-fermi-paradox---the-barrow-scale"
+                / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<img src="/blog/2026/Pasted%20image%2020260925101500.png" alt="Barrow Scale sketch">', html)
+        self.assertTrue((self.public / "blog" / "2026" / "Pasted image 20260925101500.png").is_file())
 
-    def test_bundle_note_link(self):
-        """blog/_index.md: links to a post folder's note by name reach the bundle page."""
+    def test_spaced_note_link(self):
+        """blog/_index.md: a link to a note with spaces in its name, `<…>` or `%20`, reaches it."""
         html = (self.public / "blog" / "index.html").read_text(encoding="utf-8")
-        self.assertIn('<a href="/blog/20260921-technopolitics/">TechnoPolitics</a>, or '
-                      '<a href="/blog/20260921-technopolitics/">escaped</a>', html)
+        page = "/blog/2026/20260922-technopolitics/"
+        self.assertIn(f'<a href="{page}">TechnoPolitics</a>, or <a href="{page}">escaped</a>', html)
 
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #sci` + `LIMIT 2` of 5; a TABLE query stays code."""

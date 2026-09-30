@@ -20,12 +20,12 @@ git diff tests/golden                                  # read it: every change s
 | `created` from `YYYYMMDD` / `YYYY-MM-DD` in the name | `blog/2024/20241013-…`, `blog/20260509-…`, `notes/Info politics/The WhatsApp Mess . 20240816.md` |
 | `created` from a `YYYY/MM/DD/` path only | `blog/2023/12/17/another-post.md` |
 | `created`/`updated` authored, with offsets | `blog/20260915-a-post-with-full-front-matter.md` |
-| Quoted date-only `created:` | `blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md` |
+| Quoted date-only `created:` | `blog/2026/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md` |
 | `_index.md` as folder index; links to it | `blog/_index.md`, `notes/_index.md`, `wiki/**/_index.md` |
 | Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Science/brain/` |
-| Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
-| Links to a post folder's note by name (`<…>` and `%20`) | `blog/_index.md` |
+| Link to a note with spaces in its name (`<…>` and `%20`) | `blog/_index.md` -> `blog/2026/20260922 TechnoPolitics.md` |
 | `publish: off` | `notes/unpublished.md` |
+| … a folder with only unpublished Markdown: its files stay off too | `notes/Draft post/` |
 | Spaces and dots in names; `.md` in a folder name | `wiki/Projects/PublicTxt/Other Software.md`, `Obsidian.md.md`, `bookmarks/sites/obsidian.md/` |
 | Front matter fence with trailing space (`--- `) | `wiki/Computer-Science/CopyLeft.md`, `Free-Software.md`, `notes/Info politics/…` |
 | Block, flow, scalar and quoted-`#` `tags:`; merged with hashtags | `wiki/Science/Kurzgesagt.md`, `wiki/Projects/PublicTxt/CuratedCommons.md`, `bookmarks/sites/obsidian.md/Obsidian Web Clipper Plugin.md` |
@@ -39,5 +39,6 @@ git diff tests/golden                                  # read it: every change s
 | `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `_index.md`, `Projects.md`, `online-things.md` |
 | Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
-| Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
+| Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png` |
+| Images beside a post (no post folder); Obsidian's pasted name, `%20` in the link | `blog/2026/*.png`, `*.jpg`, beside `blog/2026/*.md` |
 | Site settings, not content | `settings/site.toml` |

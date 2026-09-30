@@ -17,7 +17,7 @@
   "createdLabel": "25 Sep 2026",
   "rating": 4,
   "section": "blog",
-  "summary": "No H1: title from the filename. Quoted date-only created:, block tags:.\nA Kurzgesagt video on the Barrow Scale, and a dangling link with an encoded space: Fermi Paradox.\nA thematic …",
+  "summary": "No H1: title from the filename. Quoted date-only created:, block tags:.\nA Kurzgesagt video on the Barrow Scale, and a dangling link with an encoded space: Fermi Paradox.\nA pasted …",
   "tags": [
    "cosmology",
    "sci",
@@ -25,21 +25,29 @@
   ],
   "title": "20260925 Another Issue with the Fermi Paradox   the Barrow Scale",
   "updated": "2026-09-25T00:00:00Z",
-  "url": "/blog/20260925-another-issue-with-the-fermi-paradox---the-barrow-scale/",
+  "url": "/blog/2026/20260925-another-issue-with-the-fermi-paradox---the-barrow-scale/",
   "year": "2026"
  },
  {
+  "bookmarks": [
+   {
+    "label": "↗ locusmag.com/feature/commentary-cory-doctorow-technopolitics",
+    "url": "https://locusmag.com/feature/commentary-cory-doctorow-technopolitics/"
+   }
+  ],
   "collections": [
-   "blog"
+   "blog",
+   "bookmarks"
   ],
   "created": "2026-09-22T00:00:00Z",
   "createdLabel": "22 Sep 2026",
+  "rating": 4,
   "section": "blog",
-  "summary": " bookmark: https://locusmag.com/feature/commentary-cory-doctorow-technopolitics/\nA post folder (one Markdown file + an image): becomes a leaf bundle. Folder and file dates differ; …",
+  "summary": "An image beside the post, in a year folder. The date is the file name&rsquo;s.\n",
   "tags": [],
-  "title": "20260921 TechnoPolitics",
+  "title": "20260922 TechnoPolitics",
   "updated": "2026-09-22T00:00:00Z",
-  "url": "/blog/20260921-technopolitics/",
+  "url": "/blog/2026/20260922-technopolitics/",
   "year": "2026"
  },
  {

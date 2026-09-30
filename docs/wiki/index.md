@@ -12,7 +12,7 @@ Add, move or remove a file: update this map. `python scripts/map_lint.py` checks
 Hugo never reads the source repo — only what sync writes: `build/content/`, `build/site.toml`.
 
 ```txt
-scripts/sync_content.py     source repo -> build/content: renames, titles, dates,
+scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, skips (incl. `publish: off`)
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`)
