@@ -27,7 +27,7 @@ Items marked **(TBD)** are not built.
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
   - page meta (collections, dates, categories, tags) on pages
-  - filters on browse lists and search; sort stays by the results
+  - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
   - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable.
@@ -41,7 +41,8 @@ Items marked **(TBD)** are not built.
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
   - Sorting in all by Date, Recency, Alphabetical.
-  - Filter by Collection, and by Year (the `created` year).
+  - Filter by Collection, and by Year (the `created` year), or a month of it (`?year=&month=`).
+  - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars, open to page titles (8, then "+N more"). A year or month label picks the date filter; the other filters narrow it. Newest year and month open to start. Lists only — not in Search.
   - Filter by Category and Tag, as the facets above (also in Search)
   - Sort by Source/Author (TBD)
   - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search)
