@@ -6,6 +6,10 @@
 <body>
   <header class="site-header">
     <div class="site-header-inner">
+      {{/* nav.js shows it and wires it; no JS, no button — the nav stays in the page. */}}
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="true" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       <a class="site-title{{ with site.Params.shortTitle }} has-short-title{{ end }}" href="{{ site.Home.RelPermalink }}">
         <img class="site-logo" src="{{ "logo.png" | relURL }}" alt="{{ site.Title }} logo">
         <span class="site-title-full">{{ site.Title }}</span>
@@ -19,14 +23,17 @@
     </div>
   </header>
 
+  {{/* Columns: site nav | main | the "aside" block — a template's context
+       column (page meta, filters), <aside class="aside">; none, no column. */}}
   <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="site-nav" aria-label="Site">
       {{ partial "sidebar.html" . }}
     </aside>
     <main class="content">
       {{ partial "breadcrumbs.html" . }}
       {{ block "main" . }}{{ end }}
     </main>
+    {{ block "aside" . }}{{ end }}
   </div>
 
   {{ partial "footer.html" . }}

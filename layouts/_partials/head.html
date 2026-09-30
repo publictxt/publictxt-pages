@@ -16,3 +16,9 @@
 {{ if hugo.IsProduction }}{{ $css = $css | minify | fingerprint }}{{ end }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
 {{ end }}
+{{/* Blocking, not a module: sets what main.css needs before first paint (nav.js). */}}
+{{ with resources.Get "js/nav.js" }}
+{{ $js := . | js.Build (dict "format" "iife" "minify" hugo.IsProduction) }}
+{{ if hugo.IsProduction }}{{ $js = $js | fingerprint }}{{ end }}
+<script src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
+{{ end }}

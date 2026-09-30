@@ -1,0 +1,49 @@
+{{/*
+  "This page": a page's collections, dates, rating, bookmarks, sources,
+  categories and tags — page.html's right column. Takes the page.
+*/}}
+<div class="side-block page-meta">
+  <h2 class="side-heading">This page</h2>
+  <dl class="meta-list">
+    <dt>Collection</dt>
+    {{/* page-collections.html; each links to its section when one exists */}}
+    <dd>{{ range $t := partial "page-collections.html" . }}{{ with site.GetPage $t }}<a class="chip chip-collection" href="{{ .RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
+    {{ $d := partial "date-labels.html" . }}
+    {{ with $d.created }}
+    <dt>Created</dt>
+    <dd><time datetime="{{ $.Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ . }}</time></dd>
+    {{ end }}
+    {{ with $d.updated }}
+    <dt>Updated</dt>
+    <dd><time datetime="{{ $.Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">{{ . }}</time></dd>
+    {{ end }}
+    {{/* Same stars as ratingHTML() in cards.js. */}}
+    {{ with partial "rating.html" . }}
+    <dt>Rating</dt>
+    <dd><span class="rating" role="img" aria-label="Rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
+    {{ end }}
+    {{ with partial "bookmark-urls.html" . }}
+    <dt>Bookmark{{ if gt (len .) 1 }}s{{ end }}</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
+    </dd>
+    {{ end }}
+    {{ with partial "source-links.html" . }}
+    <dt>Posted on</dt>
+    <dd class="chip-row">{{ . }}</dd>
+    {{ end }}
+    {{/* No category pages: each links to search, filtered. */}}
+    {{ with partial "categories.html" . }}
+    <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip" href="{{ "search/" | relURL }}?category={{ . | urlquery }}">{{ . }}</a>{{ end }}
+    </dd>
+    {{ end }}
+    {{ with .GetTerms "tags" }}
+    <dt>Tags</dt>
+    <dd class="chip-row">
+      {{ range . }}<a class="chip" href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a>{{ end }}
+    </dd>
+    {{ end }}
+  </dl>
+</div>

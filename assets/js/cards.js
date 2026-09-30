@@ -18,7 +18,7 @@ export function dateHTML(item) {
   return html;
 }
 
-// Same stars as sidebar.html. `rating` is 1–5, absent when unrated.
+// Same stars as page-meta.html. `rating` is 1–5, absent when unrated.
 export function ratingHTML(item) {
   const r = item.rating;
   return r ? ` <span class="rating" role="img" aria-label="Rated ${r} of 5">${"★".repeat(r)}${"☆".repeat(5 - r)}</span>` : "";

@@ -9,6 +9,7 @@ import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.j
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, matchToggle, pagefindConditions,
   toggleInclude } from "./facets.js";
+import { dock } from "./layout.js";
 import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -18,6 +19,7 @@ const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/")
 const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
+  layout: $("search-layout"),
   year: $("filter-year"), yearGroup: $("filter-year-group"),
   rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
@@ -199,9 +201,8 @@ window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run
 
 readURL();
 el.q.value = state.q;
-// Narrow screens (900px, as main.css): fold at load unless a filter is set.
-if (matchMedia("(max-width: 900px)").matches) {
-  el.filters.open = filtering();
-}
+// The right column; above the results when narrow, folded unless a filter is set.
+el.filters.hidden = false;
+dock(el.filters, el.filters.closest(".aside"), el.layout, (narrow) => { el.filters.open = !narrow || filtering(); });
 await run();
 if (!state.q) el.q.focus();
