@@ -18,7 +18,7 @@ import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
+import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
 
 const CHIPS = chipFacets(params.chipFacets);
 
@@ -317,11 +317,10 @@ async function mount(root) {
     const n = filtered.length;
     const what = [...CHIPS.describe(state), state.year,
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
-    const label = sortLabel(state.sort);
+    const extra = [what, total > 1 && `page ${state.page} of ${total}`].filter(Boolean).join(" · ");
     const detail = document.createElement("span");
     detail.className = "muted";
-    detail.textContent = ` (${[what, label, total > 1 && `page ${state.page} of ${total}`]
-      .filter(Boolean).join(" · ")})`;
+    detail.textContent = extra ? ` (${extra})` : "";
     status.replaceChildren(
       `${n} page${n === 1 ? "" : "s"}` + (n !== items.length ? ` of ${items.length}` : ""), detail);
     writeURL(pushHistory);

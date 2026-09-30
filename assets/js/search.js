@@ -10,7 +10,7 @@ import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, matchToggle, pagefindConditions,
   toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
-import { SORTS, normaliseSort, parseSort, sortLabel } from "./sorts.js";
+import { SORTS, normaliseSort, parseSort } from "./sorts.js";
 
 const CHIPS = chipFacets(params.chipFacets);
 const PAGE = 20;
@@ -156,8 +156,7 @@ async function run() {
   const n = current.length;
   const what = [hasQuery() ? `“${state.q}”` : "", ...CHIPS.describe(state), state.year,
     state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
-  el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "")
-    + ` · ${sort === RELEVANCE ? "Relevance" : sortLabel(sort)}`;
+  el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "");
   await showMore();
 }
 
