@@ -20,7 +20,7 @@
   --main-fit: 900px;        /* main's width before the aside grows past --aside-width */
   --gutter: 1.5rem;         /* page edge; x 4/3 between columns */
   --header-h: 4.5rem;
-  --layout-max: 1960px;     /* header + columns; wider, they centre */
+  --layout-max: 1660px;     /* header + columns; wider, they centre */
   --content-max: 86ch;      /* prose line length */
   /* The nav column + its gap, 0 when it's out of the grid (collapsed, drawer). */
   --nav-col: calc(var(--sidebar-width) + var(--gutter) * 4 / 3);
