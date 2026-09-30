@@ -437,7 +437,7 @@ a:hover { text-decoration: underline; }
 .aside .list-side { gap: 1.25rem; margin: 0; }
 
 /* Timeline (timeline.js): years on a rail, each node opens its row, each
-   label picks the date filter. Bars are one hue, baseline-anchored; the
+   label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
    counts beside them carry the numbers. */
 .timeline {
   --row: 1.75rem;
@@ -497,6 +497,11 @@ a:hover { text-decoration: underline; }
 .current > .tl-row > .tl-node { background: var(--accent); border-color: var(--accent); }
 .current > .tl-row > .tl-node::before { border-color: var(--bg); }
 .tl-node:hover { border-color: var(--accent); }
+/* A month with nothing to open (filter mode): a dot on the branch. */
+.tl-dot { cursor: default; transform: scale(0.6); }
+.tl-dot::before { display: none; }
+.tl-dot:hover { border-color: var(--border); }
+.current > .tl-row > .tl-dot:hover { border-color: var(--accent); }
 .tl-node:hover::before { border-color: var(--accent); }
 .current > .tl-row > .tl-node:hover::before { border-color: var(--bg); }
 .tl-pick {
@@ -511,7 +516,7 @@ a:hover { text-decoration: underline; }
 .tl-year > .tl-row > .tl-pick { font-weight: 700; letter-spacing: 0.02em; }
 .tl-pick:hover, .tl-pick[aria-pressed="true"] { color: var(--accent); }
 .tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
-.tl-node:focus-visible, .tl-pick:focus-visible, .tl-more:focus-visible, .tl-pages a:focus-visible {
+.tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 3px;
@@ -573,17 +578,9 @@ a:hover { text-decoration: underline; }
   overflow: hidden;
 }
 .tl-pages a:hover { color: var(--accent); text-decoration: none; }
+.tl-pages a[aria-current] { color: var(--accent); font-weight: 600; }
+.tl-pages li:has(a[aria-current])::before { background: var(--accent); }
 .tl-pages li:has(a:hover)::before { background: var(--accent); }
-.tl-more {
-  font: inherit;
-  font-size: 0.75rem;
-  color: var(--accent);
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-.tl-more:hover { text-decoration: underline; }
 .tl-empty { font-size: 0.8rem; }
 @media (prefers-reduced-motion: reduce) {
   .tl-node::before, .list-facet > summary::after { transition: none; }

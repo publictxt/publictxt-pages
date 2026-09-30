@@ -1,8 +1,9 @@
-// timeline.js: grouping by year and month, and the ?month= spelling.
+// timeline.js: grouping by year and month — from pages and from Pagefind's
+// month counts — and the ?month= spelling.
 // Run: node --test "tests/js/*.test.mjs"
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { monthCount, monthFilter, monthOf, timeline } from "../../assets/js/timeline.js";
+import { countsTree, monthCount, monthFilter, monthOf, timeline } from "../../assets/js/timeline.js";
 
 const page = (created, title = created) =>
   ({ title, created, year: created.slice(0, 4), createdLabel: "label" });
@@ -33,4 +34,11 @@ test("?month= needs a year and a real month", () => {
   assert.equal(monthFilter("10", ""), "");
   assert.equal(monthFilter("13", "2017"), "");
   assert.equal(monthFilter("7", "2017"), "");
+});
+
+test("Pagefind month counts make the same tree, less empty and undated months", () => {
+  const tree = countsTree({ "2017-02": 2, "2018-01": 1, "2017-10": 1, "2017-07": 0, "0001-01": 5, junk: 1 });
+  assert.deepEqual(tree.map((y) => [y.year, y.count]), [["2018", 1], ["2017", 3]]);
+  assert.deepEqual(tree[1].months.map((m) => [m.month, m.count]), [["10", 1], ["02", 2]]);
+  assert.deepEqual(countsTree(undefined), []);
 });

@@ -1,6 +1,10 @@
-// The timeline panel of a browse list (list.js): its pages by year and month
-// written, newest first — a blog archive, drawn on a rail. A year or month
-// picks the list's date filter (?year=, ?month=); its node opens it.
+// The timeline: pages by year and month written, newest first, drawn on a
+// rail. Two modes, one renderer:
+//   filter   counts only (list.js, search.js). A year or month label picks
+//            the date filter (?year=, ?month=); a year's node opens its months.
+//   archive  titles too (page-timeline.js). Labels link to the section's
+//            list at that date; a month's node opens its titles; the current
+//            page is marked.
 //
 // Month numbers are `created`'s own digits, never a Date: a reader's zone
 // would shift the month (date-labels.html). Month names are Hugo's
@@ -14,9 +18,13 @@ export function monthFilter(v, year) {
   return year && /^(0[1-9]|1[0-2])$/.test(v || "") ? v : "";
 }
 
+// The year of an undated page (Hugo's zero date), as index.json's `year` and
+// Pagefind's filters give it. It has no place on the rail.
+const UNDATED = "0001";
+
 // Items -> [{ year, count, months: [{ month, count, items }] }]: years and
 // months newest first, items within a month newest first. Undated pages
-// (no createdLabel) have no place on it and are left out.
+// (no createdLabel) are left out.
 export function timeline(items) {
   const years = new Map();
   for (const it of items) {
@@ -26,65 +34,110 @@ export function timeline(items) {
     (y.get(m) || y.set(m, []).get(m)).push(it);
   }
   const newest = (a, b) => (Date.parse(b.created) || 0) - (Date.parse(a.created) || 0);
-  const desc = (a, b) => b[0].localeCompare(a[0]);
-  return [...years].sort(desc).map(([year, months]) => {
-    const ms = [...months].sort(desc).map(([month, its]) => ({ month, count: its.length, items: its.sort(newest) }));
-    return { year, count: ms.reduce((n, m) => n + m.count, 0), months: ms };
-  });
+  return build([...years].map(([year, months]) =>
+    [year, [...months].map(([month, its]) => ({ month, count: its.length, items: its.sort(newest) }))]));
 }
 
-// Months in a tree; the panel shows only when there are two or more to pick.
-export const monthCount = (tree) => tree.reduce((n, y) => n + y.months.length, 0);
+// Pagefind's `month` filter counts ({ "2017-10": 3 }, pagefind-keys.html) ->
+// the same tree, without items. Empty and undated months left out.
+export function countsTree(counts) {
+  const years = new Map();
+  for (const [key, count] of Object.entries(counts || {})) {
+    const [year, month] = key.split("-");
+    if (!count || year === UNDATED || !monthFilter(month, year)) continue;
+    (years.get(year) || years.set(year, []).get(year)).push({ month, count, items: [] });
+  }
+  return build([...years]);
+}
 
-// Titles under an open month before "+N more", which picks the month instead.
-export const PAGES_SHOWN = 8;
+// [[year, months]] -> the tree, newest first.
+function build(years) {
+  const desc = (a, b) => b.localeCompare(a);
+  return years.sort((a, b) => desc(a[0], b[0])).map(([year, months]) => ({
+    year,
+    count: months.reduce((n, m) => n + m.count, 0),
+    months: months.sort((a, b) => desc(a.month, b.month)),
+  }));
+}
+
+// Months in a tree; the panel shows only when there are two or more.
+export const monthCount = (tree) => tree.reduce((n, y) => n + y.months.length, 0);
 
 /**
  * Fills `ol` with the tree's rows. Options:
- *   year, month  the list's date filter ("" when off)
+ *   year, month  the date filter, or in archive mode the current page's ("" = none)
  *   open         Set of open keys, "2017" and "2017-10"; toggles mutate it
  *   names        month names, January first (@params months)
- *   pick(y, m)   a year (m "") or month label pressed; the caller renders
  *   rerender()   after a node toggles
+ * Filter mode:
+ *   pick(y, m)   a year (m "") or month label pressed; the caller renders
+ * Archive mode:
+ *   href(y, m)   a year's (m "") or month's link
+ *   current      the current page's URL, marked among the titles
  */
 export function renderTimeline(ol, tree, opts) {
   const { year, month, open, names } = opts;
+  const archive = Boolean(opts.href);
   const name = (m) => names[Number(m) - 1] || m;
   // Bars scale to the year's busiest month: each year's shape, its months
   // against each other. Years compare by their counts.
   const peakOf = (y) => Math.max(1, ...y.months.map((m) => m.count));
   const plural = (n) => `${n} page${n === 1 ? "" : "s"}`;
 
-  // One row: node (toggle), label (filter), graphic, count.
-  // A label opens its row; a year's also shuts the other years, to focus it.
-  function row(key, label, fullLabel, count, active, onPick, graphic) {
+  // A node that opens `key`'s row; a plain dot when there's nothing to open.
+  function node(key, fullLabel, opens) {
+    if (!opens) {
+      const dot = document.createElement("span");
+      dot.className = "tl-node tl-dot";
+      dot.setAttribute("aria-hidden", "true");
+      return dot;
+    }
     const isOpen = open.has(key);
-    const div = document.createElement("div");
-    div.className = "tl-row";
-    const node = document.createElement("button");
-    node.type = "button";
-    node.className = "tl-node";
-    node.setAttribute("aria-expanded", String(isOpen));
-    node.setAttribute("aria-label", (isOpen ? "Hide " : "Show ") + fullLabel);
-    node.addEventListener("click", () => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tl-node";
+    b.setAttribute("aria-expanded", String(isOpen));
+    b.setAttribute("aria-label", (isOpen ? "Hide " : "Show ") + fullLabel);
+    b.addEventListener("click", () => {
       if (open.has(key)) open.delete(key); else open.add(key);
       opts.rerender();
     });
-    const pick = document.createElement("button");
-    pick.type = "button";
-    pick.className = "tl-pick";
-    pick.textContent = label;
-    pick.setAttribute("aria-pressed", String(active));
-    pick.title = active ? "Click to clear" : `Show ${fullLabel} only`;
-    pick.addEventListener("click", () => {
-      if (!key.includes("-")) for (const k of [...open]) if (k.split("-")[0] !== key) open.delete(k);
+    return b;
+  }
+
+  // Filter: a button that picks the date — and opens its row; a year's also
+  // shuts the other years, to focus it. Archive: a link to the list at it.
+  function label(key, text, fullLabel, y, m, active) {
+    if (archive) {
+      const a = document.createElement("a");
+      a.className = "tl-pick";
+      a.href = opts.href(y, m);
+      a.textContent = text;
+      a.title = `List ${fullLabel}`;
+      return a;
+    }
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tl-pick";
+    b.textContent = text;
+    b.setAttribute("aria-pressed", String(active));
+    b.title = active ? "Click to clear" : `Show ${fullLabel} only`;
+    b.addEventListener("click", () => {
+      if (!m) for (const k of [...open]) if (k.split("-")[0] !== key) open.delete(k);
       open.add(key);
-      onPick();
+      // Unpicking a month goes back up to its year.
+      if (m) opts.pick(y, active ? "" : m); else opts.pick(active ? "" : y, "");
     });
+    return b;
+  }
+
+  function row(nodeEl, labelEl, graphic, count) {
+    const div = document.createElement("div");
+    div.className = "tl-row";
     const n = document.createElement("span");
     n.className = "count";
     n.textContent = count;
-    div.append(node, pick, graphic, n);
+    div.append(nodeEl, labelEl, graphic, n);
     return div;
   }
 
@@ -96,9 +149,24 @@ export function renderTimeline(ol, tree, opts) {
     return b;
   };
 
+  function pageList(items) {
+    const ul = document.createElement("ul");
+    ul.className = "tl-pages";
+    for (const it of items) {
+      const a = document.createElement("a");
+      a.href = it.url;
+      a.textContent = it.title || it.url;
+      a.title = it.createdLabel;
+      if (it.url === opts.current) a.setAttribute("aria-current", "page");
+      const li = document.createElement("li");
+      li.append(a);
+      ul.append(li);
+    }
+    return ul;
+  }
+
   ol.replaceChildren(...tree.map((y) => {
     const key = y.year;
-    const active = year === y.year && !month;
     const li = document.createElement("li");
     li.className = "tl-year" + (open.has(key) ? " open" : "") + (year === y.year ? " current" : "");
     // Jan..Dec, one bar each: the year at a glance.
@@ -111,14 +179,15 @@ export function renderTimeline(ol, tree, opts) {
       const c = byMonth.get(m) || 0;
       spark.append(bar(c, peakOf(y), `${name(m)}: ${plural(c)}`));
     }
-    li.append(row(key, y.year, y.year, y.count, active,
-      () => opts.pick(active ? "" : y.year, ""), spark));
+    li.append(row(node(key, y.year, true), label(key, y.year, y.year, y.year, "", year === y.year && !month),
+      spark, y.count));
     if (!open.has(key)) return li;
 
     const months = document.createElement("ol");
     months.className = "tl-months";
     months.append(...y.months.map((m) => {
       const mkey = `${y.year}-${m.month}`;
+      const full = `${name(m.month)} ${y.year}`;
       const on = year === y.year && month === m.month;
       const mli = document.createElement("li");
       mli.className = "tl-month" + (open.has(mkey) ? " open" : "") + (on ? " current" : "");
@@ -126,37 +195,8 @@ export function renderTimeline(ol, tree, opts) {
       track.className = "tl-bar";
       track.setAttribute("aria-hidden", "true");
       track.append(bar(m.count, peakOf(y)));
-      // Unpicking a month goes back up to its year.
-      mli.append(row(mkey, name(m.month), `${name(m.month)} ${y.year}`, m.count, on,
-        () => opts.pick(y.year, on ? "" : m.month), track));
-      if (!open.has(mkey)) return mli;
-
-      const pages = document.createElement("ul");
-      pages.className = "tl-pages";
-      for (const it of m.items.slice(0, PAGES_SHOWN)) {
-        const a = document.createElement("a");
-        a.href = it.url;
-        a.textContent = it.title || it.url;
-        a.title = it.createdLabel;
-        const pli = document.createElement("li");
-        pli.append(a);
-        pages.append(pli);
-      }
-      // Picked, the list shows the rest; else "more" picks the month.
-      if (m.count > PAGES_SHOWN) {
-        const more = document.createElement(on ? "span" : "button");
-        more.className = on ? "muted" : "tl-more";
-        more.textContent = `+${m.count - PAGES_SHOWN} more` + (on ? " in the list" : "");
-        if (!on) {
-          more.type = "button";
-          more.title = `List ${name(m.month)} ${y.year}`;
-          more.addEventListener("click", () => opts.pick(y.year, m.month));
-        }
-        const pli = document.createElement("li");
-        pli.append(more);
-        pages.append(pli);
-      }
-      mli.append(pages);
+      mli.append(row(node(mkey, full, archive), label(mkey, name(m.month), full, y.year, m.month, on), track, m.count));
+      if (archive && open.has(mkey)) mli.append(pageList(m.items));
       return mli;
     }));
     li.append(months);

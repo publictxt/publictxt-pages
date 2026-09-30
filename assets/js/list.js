@@ -156,7 +156,7 @@ async function mount(root) {
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
   const hasFilters = hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length);
-  // Nothing to pick in a single month. Newest year and month open to start,
+  // Nothing to pick in a single month. The newest year open to start,
   // or the ones the URL picked (readURL, below).
   const fullTree = timeline(items);
   const hasTimeline = !compact && monthCount(fullTree) > 1;
@@ -342,9 +342,7 @@ async function mount(root) {
   readURL();
   if (hasTimeline) {
     const y = state.year ? fullTree.find((t) => t.year === state.year) : fullTree[0];
-    const m = y && (state.month || (state.year ? "" : y.months[0].month));
     if (y) tlOpen.add(y.year);
-    if (m) tlOpen.add(`${y.year}-${m}`);
   }
   // Folded when narrow, unless the URL set a filter (for the timeline, a
   // date). Nothing to filter and no timeline, no box.

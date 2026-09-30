@@ -96,7 +96,7 @@ assets/js/cards.js        the one card renderer; rating filter value
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating
                           chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging
-assets/js/timeline.js     browse list's timeline panel: pages by year/month, picks the date filter
+assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette + column widths in :root
 ```
