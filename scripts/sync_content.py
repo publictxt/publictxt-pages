@@ -17,7 +17,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     `bookmark:` URL — only that key makes a bookmark.
 
 Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep) and `publish: off`
-pages, with an unpublished post folder's attachments. Other files are copied
+pages — and every file of a folder whose Markdown is all unpublished (a
+draft's attachments; beside published notes, they stay). Other files are copied
 verbatim — except SITE_CONFIG, the repo's site settings: not content, it goes
 beside dest as `site.toml`, which build.py overlays on hugo.toml.
 
@@ -202,6 +203,20 @@ def find_leaf_bundle_dirs(src: Path) -> set[Path]:
     return bundles
 
 
+def hidden_folders(src: Path) -> set[Path]:
+    """Folders with Markdown below them, none of it published: their other files stay off too."""
+    has_md, published = set(), set()
+    for md in src.rglob("*.md"):
+        rel = md.relative_to(src)
+        if not md.is_file() or md.name in SKIP_FILES or any(p in SKIP_DIRS for p in rel.parts):
+            continue
+        folders = list(md.parents)[:len(rel.parts) - 1]   # up to, not including, src
+        has_md.update(folders)
+        if not is_unpublished(md.read_text(encoding="utf-8")):
+            published.update(folders)
+    return has_md - published
+
+
 def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[int, int, int]:
     """`resolver`: a test's fixed dates; default reads this repo's Git history."""
     if dest.exists():
@@ -219,11 +234,8 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
               "same commit time. Check out with fetch-depth: 0 for real dates.",
               file=sys.stderr)
 
-    leaf_bundles = find_leaf_bundle_dirs(src)
-    # A post folder is one page: unpublishing it takes its attachments too.
-    hidden_bundles = {d for d in leaf_bundles
-                      if any(is_unpublished(md.read_text(encoding="utf-8")) for md in d.glob("*.md"))}
-    leaf_bundles -= hidden_bundles
+    hidden = hidden_folders(src)
+    leaf_bundles = find_leaf_bundle_dirs(src) - hidden
     bundle_notes = {md.relative_to(src).as_posix() for d in leaf_bundles for md in d.glob("*.md")}
 
     md_count = other_count = unpublished = 0
@@ -239,8 +251,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
             continue
         if path.relative_to(src).as_posix() == SITE_CONFIG:
             continue
-        if path.parent in hidden_bundles:
-            unpublished += path.suffix.lower() == ".md"
+        if path.suffix.lower() != ".md" and hidden.intersection(path.parents):
             continue
 
         rel = path.relative_to(src).as_posix()

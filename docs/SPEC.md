@@ -53,7 +53,7 @@ Items marked **(TBD)** are not built.
   - Any page with post sources, should be put in Posts collection (TBD)
 - Pages
   - A post folder (one Markdown file + attachments, no subfolders) converts to a Hugo leaf bundle: the Markdown becomes the page, attachments become its page resources. Links and embeds to the note by its file name still reach the page.
-  - `publish: off` (or false / no / 0) keeps a page off the site — and a post folder's attachments with it. Hidden, not private: it stays in the source repo.
+  - `publish: off` (or false / no / 0) keeps a page off the site — and every file of a folder whose Markdown is all unpublished (a draft's attachments; beside published notes, they're published). Hidden, not private: it stays in the source repo.
   - `![alt](youtube-url)` embeds the video; `![alt](file.mp3)` (also m4a, ogg, oga, opus, wav, flac, aac) an audio player; other images stay images.
   - A relative image/audio path must be beside the note (its post or section folder) or in a top-level folder of files (`media/`); elsewhere it's left as written, with a build warning.
   - `![](page.md)` on its own line embeds that page's content, as Obsidian does; inline, a link. One level deep (nested embeds become links). `#heading` section embeds (TBD — a link for now).

@@ -26,6 +26,7 @@ git diff tests/golden                                  # read it: every change s
 | Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
 | Links to a post folder's note by name (`<…>` and `%20`) | `blog/_index.md` |
 | `publish: off` | `notes/unpublished.md` |
+| … a folder with only unpublished Markdown: its files stay off too | `notes/Draft post/` |
 | Spaces and dots in names; `.md` in a folder name | `wiki/Projects/PublicTxt/Other Software.md`, `Obsidian.md.md`, `bookmarks/sites/obsidian.md/` |
 | Front matter fence with trailing space (`--- `) | `wiki/Computer-Science/CopyLeft.md`, `Free-Software.md`, `notes/Info politics/…` |
 | Block, flow, scalar and quoted-`#` `tags:`; merged with hashtags | `wiki/Science/Kurzgesagt.md`, `wiki/Projects/PublicTxt/CuratedCommons.md`, `bookmarks/sites/obsidian.md/Obsidian Web Clipper Plugin.md` |
