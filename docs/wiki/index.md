@@ -38,7 +38,7 @@ tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
 ```txt
 layouts/baseof.html               shell: header + ☰, nav | main | "aside" block;
                                   data-base + data-index on <html>
-layouts/home.html                 hero, section cards, compact Recent list
+layouts/home.html                 hero, section cards, Recent list; aside: its filters
 layouts/page.html                 single page; data-pagefind-body; aside: page meta
 layouts/section.html              index body as prose + browse list; aside: its filters
 layouts/term.html                 /tags/<term>/; aside: its filters

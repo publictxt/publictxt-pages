@@ -40,6 +40,7 @@ Items marked **(TBD)** are not built.
   - Tag and category facets: include or exclude values; match all or any of the included (default all). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
 - Browse Lists
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
+  - Home *Recent*: every page, recently updated first, `recentLimit` a page, with filters and timeline; nothing filtered to start. (Not "this month": empty on quiet months.)
   - Sorting in all by Date, Recency, Alphabetical.
   - Filter by Collection, and by Year (the `created` year) or a month of it (`?year=&month=`) — picked in the timeline; no year select.
   - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars, open to page titles (8, then "+N more"). A year or month label picks the date filter; the other filters narrow it. Newest year and month open to start. Lists only — not in Search.

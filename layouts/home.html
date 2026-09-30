@@ -31,14 +31,21 @@
   </div>
 </section>
 
-{{/* The fallback list; list.js takes the same pages from the site index. */}}
+{{/* Every page, recently updated first, $limit a page, filters and timeline
+     beside. The no-JS fallback is the first page only: the whole site is too
+     long a home page. */}}
 {{ $limit := site.Params.recentLimit | default 8 }}
 {{ $recent := first $limit (partial "recent.html" site.RegularPages) }}
 {{ with $recent }}
 <section class="home-recent">
-  <h2>Recent <span class="muted">(recently updated first)</span></h2>
-  {{ partial "list-container.html" (dict "pages" . "compact" true "scope" (dict "kind" "recent" "value" $limit)) }}
+  <h2>Recent</h2>
+  {{ partial "list-container.html" (dict "pages" . "order" "updated" "perPage" $limit "scope" (dict "kind" "recent" "value" 0)) }}
 </section>
 {{ end }}
 </div>
+{{ end }}
+
+{{/* As section.html; only with a list to filter. */}}
+{{ define "aside" }}
+{{ if site.RegularPages }}<aside class="aside" aria-label="Filters" data-list-controls></aside>{{ end }}
 {{ end }}

@@ -45,7 +45,7 @@ capitalizeListTitles = false
   # Configured: Hugo's date order would reshuffle navigation on every edit.
   sectionOrder = ["bookmarks", "blog", "wiki", "posts", "notes"]
   tagCloudLimit = 30   # sidebar tag cloud
-  recentLimit = 8      # home Recent list
+  recentLimit = 8      # home Recent list: cards per page
   # Browse list defaults: sort "<field> [asc|desc]" over created (newest first),
   # title (A→Z), updated, rating (top first); cards per page. A section index
   # overrides for its subtree with `order:` / `perPage:`.
