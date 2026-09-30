@@ -46,8 +46,8 @@ Items marked **(TBD)** are not built.
   - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars, open to page titles (8, then "+N more"). A year or month label picks the date filter; the other filters narrow it. Newest year and month open to start. Lists only — not in Search.
   - Filter by Category and Tag, as the facets above (also in Search)
   - Sort by Source/Author (TBD)
-  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search). Lists: rating chips, one at a time; Search: a select.
-  - Each filter section (Rating, Collection, Category, Tags) shuts on its own, remembered per browser; a shut one shows how many values are picked.
+  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search): chips, one at a time, each counting that rating or better.
+  - Each filter section (Rating, Collection, Category, Tags; Search's Year too) shuts on its own, remembered per browser across lists and Search; a shut one shows how many values are picked.
 - Search
   - Full text search
   - Collection, Year and Tag filters as 'facets' are available without a query

@@ -3,12 +3,13 @@
 //
 // Sorting is Pagefind's, on pagefind-keys.html's keys, and replaces relevance
 // outright: "Relevance" is offered, and default, only with a query. Rating is
-// a minimum: `?rating=4` = any of "4", "5"; `unrated` is its own value.
+// a minimum: `?rating=4` = any of "4", "5"; `unrated` is its own value; chips
+// count as the lists' do, from a search without the rating filter.
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, filterChip, matchToggle, pagefindConditions,
-  toggleInclude } from "./facets.js";
+import { addsPages, chipFacets, filterChip, foldHint, matchToggle, pagefindConditions,
+  ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { SORTS, normaliseSort, parseSort } from "./sorts.js";
 
@@ -20,8 +21,9 @@ const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
   layout: $("search-layout"),
-  year: $("filter-year"), yearGroup: $("filter-year-group"),
-  rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), sort: $("search-sort"),
+  year: $("filter-year"), yearGroup: $("filter-year-group"), yearHint: $("filter-year-hint"),
+  rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), ratingHint: $("filter-rating-hint"),
+  sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
 // Per chip facet, search.html's filter-{key}-group / filter-{key} / filter-{key}-hint.
@@ -83,29 +85,30 @@ function chip(d, name, count) {
   return filterChip(state[d.key], name, d.prefix + name, count, run);
 }
 
-// counts: filter counts within the current result set (or totals when idle);
-// facetCounts: chip facet counts, per addsPages(). A chip facet the index
-// lacks hides — categories when disabled.
-function renderFilters(counts, facetCounts) {
+// facetCounts: chip facet counts, per addsPages(); ratingExact: exact rating
+// counts without the rating filter. A chip facet the index lacks hides —
+// categories when disabled.
+function renderFilters(facetCounts, ratingExact) {
   for (const d of CHIPS.defs) {
     const g = groups[d.key];
+    const f = state[d.key];
     const names = sortedKeys(allFilters[d.key]);
     g.group.hidden = names.length === 0;
     g.chips.replaceChildren(...names.map((n) => chip(d, n, (facetCounts[d.key] || {})[n] ?? 0)));
-    g.hint.replaceChildren(...[matchToggle(state[d.key], run)].filter(Boolean));
+    g.hint.replaceChildren(...foldHint(f.inc.size + f.exc.size, matchToggle(f, run)));
   }
   // No year counts: Pagefind's are per result set, so would read "0" beside real years.
   const years = yearKeys(allFilters.year);
   el.yearGroup.hidden = years.length < 2;
   el.year.replaceChildren(new Option("All years", "", false, !state.year),
     ...years.map((y) => new Option(y, y, false, y === state.year)));
-  // Likewise, and they'd be per exact value, not "or better".
+  el.yearHint.replaceChildren(...foldHint(state.year ? 1 : 0));
   const ratings = Object.keys(allFilters.rating || {}).filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);
   const hasUnrated = UNRATED_FILTER in (allFilters.rating || {});
   el.ratingGroup.hidden = ratings.length === 0;
-  el.rating.replaceChildren(new Option("Any rating", "", false, !state.rating),
-    ...ratings.map((r) => new Option(ratingFilterLabel(r), r, false, r === state.rating)),
-    ...(hasUnrated ? [new Option("Unrated", UNRATED_FILTER, false, state.rating === UNRATED_FILTER)] : []));
+  el.rating.replaceChildren(...ratingChips([...ratings, ...(hasUnrated ? [UNRATED_FILTER] : [])],
+    ratingCounts(ratingExact), state.rating, (v) => { state.rating = v; run(); }));
+  el.ratingHint.replaceChildren(...foldHint(state.rating ? 1 : 0));
 }
 
 function renderSort() {
@@ -116,12 +119,14 @@ function renderSort() {
 
 // ---- search ---------------------------------------------------------------
 // Pagefind filters for the state; `skip` names a facet whose includes are
-// left out (its addsPages counts).
+// left out (its addsPages counts), or "rating" to leave that out.
 function pagefindFilters(skip) {
   const filters = {};
   if (state.year) filters.year = state.year;
-  if (state.rating === UNRATED_FILTER) filters.rating = UNRATED_FILTER;
-  else if (state.rating) filters.rating = { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
+  if (skip !== "rating" && state.rating) {
+    filters.rating = state.rating === UNRATED_FILTER ? UNRATED_FILTER
+      : { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
+  }
   const all = CHIPS.keys.flatMap((k) => pagefindConditions(state[k], k !== skip));
   if (all.length) filters.all = all;
   return filters;
@@ -135,9 +140,9 @@ async function run() {
   const opts = { filters: pagefindFilters() };
   if (sort !== RELEVANCE) { const { field, dir } = parseSort(sort); opts.sort = { [field]: dir }; }
   const query = hasQuery() ? state.q : null;
-  // An addsPages facet counts from a search without its includes, or the
-  // totals when nothing else narrows.
-  const recount = CHIPS.keys.filter((k) => addsPages(state[k]));
+  // An addsPages facet counts from a search without its includes, and a set
+  // rating from one without it; or the totals when nothing else narrows.
+  const recount = [...CHIPS.keys.filter((k) => addsPages(state[k])), ...(state.rating ? ["rating"] : [])];
   const without = (k) => {
     const filters = pagefindFilters(k);
     return query || Object.keys(filters).length ? pagefind.search(query, { filters }) : null;
@@ -151,7 +156,8 @@ async function run() {
     const i = recount.indexOf(k);
     return [k, i < 0 ? counts[k] : (others[i]?.filters || allFilters)[k]];
   }));
-  renderFilters(counts, facetCounts);
+  const r = recount.indexOf("rating");
+  renderFilters(facetCounts, (r < 0 ? counts : (others[r]?.filters || allFilters)).rating || {});
   renderSort();
   const n = current.length;
   const what = [hasQuery() ? `“${state.q}”` : "", ...CHIPS.describe(state), state.year,
@@ -193,11 +199,11 @@ el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(t
 el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.year.addEventListener("change", () => { state.year = el.year.value; run(); });
-el.rating.addEventListener("change", () => { state.rating = el.rating.value; run(); });
 el.clear.addEventListener("click", () => { state.q = ""; CHIPS.clear(state); state.year = ""; state.rating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 
+for (const g of document.querySelectorAll("#search-filters [data-facet]")) rememberFold(g, g.dataset.facet);
 readURL();
 el.q.value = state.q;
 // The right column; above the results when narrow, folded unless a filter is set.

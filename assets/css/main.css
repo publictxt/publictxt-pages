@@ -407,7 +407,7 @@ a:hover { text-decoration: underline; }
   min-width: 3rem;
 }
 .list-sort { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
-.filter-group .list-sort, .filter-group .list-sort select { display: flex; width: 100%; }
+.list-facet .list-sort, .list-facet .list-sort select { display: flex; width: 100%; }
 .list-sort select {
   background: var(--bg-inset);
   border: 1px solid var(--border);
@@ -420,8 +420,8 @@ a:hover { text-decoration: underline; }
 .list-sort select:focus { outline: none; border-color: var(--accent); }
 /* One filter section (list.js): a <details> whose label shuts it, as .fold
    but smaller; picked values count in a badge, seen while shut. */
-.list-facet { padding-top: 0.6rem; border-top: 1px solid var(--border); }
-.list-facet:first-child { padding-top: 0; border-top: 0; }
+/* A rule between shown sections; search hides empty ones. */
+.list-facet:not([hidden]) ~ .list-facet:not([hidden]) { padding-top: 0.6rem; border-top: 1px solid var(--border); }
 .list-facet > summary {
   display: flex;
   align-items: center;
@@ -788,12 +788,6 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
   border-radius: var(--radius);
   padding: 0.8rem 0.9rem;
 }
-.search-filters-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.filter-group .side-heading { margin-bottom: 0.5rem; }
 
 /* A <details> box whose summary is its heading: whole row clickable, a
    chevron standing in for the native marker. Search filters, browse list
@@ -825,7 +819,6 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
 }
 .fold > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 .fold[open] > summary { margin-bottom: 0.8rem; }
-.filter-group .side-heading .muted { text-transform: none; letter-spacing: 0; font-weight: 400; }
 
 .filter-chip {
   font: inherit;

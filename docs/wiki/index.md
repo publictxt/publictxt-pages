@@ -93,7 +93,8 @@ assets/js/layout.js       breakpoints for JS; dock(): filters right column <-> p
 assets/js/nav.js          ☰: collapse the nav (wide), drawer (narrower); blocking, in <head>
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value
-assets/js/facets.js       chip facets from config; include, exclude, match any/all; shared
+assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating
+                          chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/timeline.js     browse list's timeline panel: pages by year/month, picks the date filter
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
