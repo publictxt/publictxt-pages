@@ -2,9 +2,10 @@
 // rail. Two modes, one renderer:
 //   filter   counts only (list.js, search.js). A year or month label picks
 //            the date filter (?year=, ?month=); a year's node opens its months.
-//   archive  titles too (page-timeline.js). Labels link to the section's
-//            list at that date; a month's node opens its titles; the current
-//            page is marked.
+//   archive  titles too (page-timeline.js), each after its day of the month,
+//            shown once per day so the column groups them. Labels link to the
+//            section's list at that date; a month's node opens its titles; the
+//            current page is marked.
 //
 // Month numbers are `created`'s own digits, never a Date: a reader's zone
 // would shift the month (date-labels.html). Month names are Hugo's
@@ -12,6 +13,8 @@
 
 // "01"–"12" from an item's created, as `year` is its first four digits.
 export const monthOf = (it) => (it.created || "").slice(5, 7);
+// "1"–"31", likewise, for archive titles.
+export const dayOf = (it) => String(Number((it.created || "").slice(8, 10)) || "");
 
 // ?month= : "01"–"12", only beside a year; else no filter.
 export function monthFilter(v, year) {
@@ -149,18 +152,27 @@ export function renderTimeline(ol, tree, opts) {
     return b;
   };
 
+  // The link's title carries the full date, so the day is visual only.
   function pageList(items) {
     const ul = document.createElement("ul");
     ul.className = "tl-pages";
+    let last = "";
     for (const it of items) {
+      const d = dayOf(it);
+      const day = document.createElement("span");
+      day.className = "tl-day";
+      day.setAttribute("aria-hidden", "true");
+      if (d !== last) day.textContent = d;
       const a = document.createElement("a");
       a.href = it.url;
       a.textContent = it.title || it.url;
       a.title = it.createdLabel;
       if (it.url === opts.current) a.setAttribute("aria-current", "page");
       const li = document.createElement("li");
-      li.append(a);
+      if (last && d !== last) li.className = "tl-newday";
+      li.append(day, a);
       ul.append(li);
+      last = d;
     }
     return ul;
   }

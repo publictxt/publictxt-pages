@@ -559,7 +559,17 @@ a:hover { text-decoration: underline; }
   font-size: 0.8rem;
   line-height: 1.4;
 }
-.tl-pages li { position: relative; padding: 0.2rem 0; }
+.tl-pages li {
+  position: relative;
+  padding: 0.2rem 0;
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: baseline;
+}
+.tl-pages li.tl-newday { margin-top: 0.3rem; }
+/* Day of the month, once per day. */
+.tl-day { color: var(--text-muted); font-size: 0.72rem; text-align: right; }
 .tl-pages li::before {
   content: "";
   position: absolute;

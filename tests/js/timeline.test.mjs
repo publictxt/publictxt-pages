@@ -3,7 +3,7 @@
 // Run: node --test "tests/js/*.test.mjs"
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { countsTree, monthCount, monthFilter, monthOf, timeline } from "../../assets/js/timeline.js";
+import { countsTree, dayOf, monthCount, monthFilter, monthOf, timeline } from "../../assets/js/timeline.js";
 
 const page = (created, title = created) =>
   ({ title, created, year: created.slice(0, 4), createdLabel: "label" });
@@ -22,6 +22,8 @@ test("years and months newest first, pages newest first within a month", () => {
 test("the month is created's own digits, not the reader's zone", () => {
   // 23:30 on the 31st, 10 hours ahead of UTC: still October wherever it's read.
   assert.equal(monthOf(page("2017-10-31T23:30:00+10:00")), "10");
+  assert.equal(dayOf(page("2017-10-31T23:30:00+10:00")), "31");
+  assert.equal(dayOf(page("2017-10-05T00:00:00Z")), "5");
 });
 
 test("undated pages are left out", () => {
