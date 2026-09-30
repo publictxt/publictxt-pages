@@ -7,13 +7,13 @@ content/blog/2023/12/_index.md
 content/blog/2023/_index.md
 content/blog/2024/20241013-multiverse-testability.md
 content/blog/2024/_index.md
+content/blog/2026/18378321848729087020.jpg
+content/blog/2026/20260922 TechnoPolitics.md
+content/blog/2026/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md
+content/blog/2026/Pasted image 20260925101500.png
+content/blog/2026/_index.md
 content/blog/20260509-CuratedCommons-Open-Aggregation-for-the-Open-Web.md
 content/blog/20260915-a-post-with-full-front-matter.md
-content/blog/20260921-TechnoPolitics/18378321848729087020.jpg
-content/blog/20260921-TechnoPolitics/20260922 TechnoPolitics.md
-content/blog/20260921-TechnoPolitics/_index.md
-content/blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md
-content/blog/Pasted image 20260925101500.png
 content/blog/_index.md
 content/bookmarks/_index.md
 content/bookmarks/sites/_index.md

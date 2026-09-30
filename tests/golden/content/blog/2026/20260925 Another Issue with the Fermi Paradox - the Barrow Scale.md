@@ -11,7 +11,7 @@ categories:
 title: "20260925 Another Issue with the Fermi Paradox   the Barrow Scale"
 created_source: front-matter
 updated: 2026-09-25
-source_path: "blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md"
+source_path: "blog/2026/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md"
 ---
 No H1: title from the filename. Quoted date-only `created:`, block `tags:`.
 
