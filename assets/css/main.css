@@ -440,6 +440,7 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
 }
 .embed-title { font-weight: 600; }
 .embed-body > :last-child { margin-bottom: 0; }
+.prose .audio { display: block; width: 100%; }
 .prose .video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius); }
 
 .prose blockquote {

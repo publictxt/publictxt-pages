@@ -77,7 +77,7 @@ layouts/_partials/
   folder-note.html      `Foo/Foo.md`, shown on Foo's section when it has no body
 
 layouts/_markup/
-  render-image.html     ![](page.md) -> note embed; YouTube URL -> iframe; else <img>
+  render-image.html     ![](page.md) -> note embed; YouTube URL -> iframe; audio file -> <audio>; else <img>
   render-codeblock-dataview.html  ```dataview LIST FROM #tag -> compact list, else code
 ```
 

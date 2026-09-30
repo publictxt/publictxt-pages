@@ -9,7 +9,13 @@
   - A YouTube URL (watch, youtu.be, shorts, embed, live) becomes a
     privacy-enhanced (youtube-nocookie) iframe titled by the alt text; `t=`
     becomes `start=` (seconds, trailing `s` ok).
+  - An audio file (mp3, m4a, ogg, oga, opus, wav, flac, aac) becomes an <audio
+    controls>, labelled by the alt text.
   - Anything else: a plain <img>.
+  A relative image/audio path is a file beside the source, as in Obsidian
+  (`../../media/x.mp3` from bookmarks/clippings/): found as a resource of the
+  nearest page at or above its folder and linked by that resource's URL (the page URL has
+  one more level, and slugs differ from folder names). Not found: left as is.
   hugo.toml turns off Goldmark's <p> around standalone images (a <div> can't
   sit in a <p>), so this adds it back for everything but embeds.
 */}}
@@ -29,6 +35,23 @@
     {{- if .IsBlock }}<p>{{ $link | safeHTML }}</p>{{ else }}{{ $link | safeHTML }}{{ end -}}
   {{- end -}}
 {{- else -}}
+{{- $dest := .Destination -}}
+{{- if and $u.Path (not $u.Host) (not $u.Scheme) (not (hasPrefix $u.Path "/")) -}}
+  {{- with .PageInner.File -}}
+    {{- $f := path.Join .Dir $u.Path -}}
+    {{- $dirs := split (strings.Trim (path.Dir $f) "/.") "/" -}}
+    {{- $owner := false -}}
+    {{- range seq (len $dirs) -1 0 -}}
+      {{- if not $owner -}}
+        {{- $d := delimit (first . $dirs) "/" -}}
+        {{- with site.GetPage (printf "/%s" $d) -}}
+          {{- $owner = true -}}
+          {{- with .Resources.Get (strings.TrimPrefix "/" (strings.TrimPrefix $d $f)) }}{{ $dest = .RelPermalink }}{{ end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
 {{- $host := strings.TrimPrefix "www." (strings.TrimPrefix "m." $u.Host) -}}
 {{- $id := "" -}}
 {{- if eq $host "youtu.be" -}}
@@ -49,8 +72,10 @@
     {{- $src = printf "%s?start=%s" $src (index . 0) -}}
   {{- end -}}
   <iframe class="video" src="{{ $src }}" title="{{ or .PlainText "YouTube video" }}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+{{- else if findRE `\.(?:mp3|m4a|ogg|oga|opus|wav|flac|aac)$` (lower $u.Path) -}}
+  <audio class="audio" controls preload="metadata" src="{{ $dest | safeURL }}"{{ with .PlainText }} aria-label="{{ . }}"{{ end }}></audio>
 {{- else -}}
-  <img src="{{ .Destination | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>
+  <img src="{{ $dest | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>
 {{- end -}}
 {{- if .IsBlock }}</p>{{ end -}}
 {{- end -}}
