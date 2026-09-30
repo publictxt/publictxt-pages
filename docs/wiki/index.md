@@ -30,6 +30,7 @@ tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
+tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
 ```
 
 ## Templates
@@ -94,6 +95,7 @@ assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; shared
 assets/js/list.js         browse list: state<->URL, facets, paging
+assets/js/timeline.js     browse list's timeline panel: pages by year/month, picks the date filter
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette + column widths in :root
 ```
