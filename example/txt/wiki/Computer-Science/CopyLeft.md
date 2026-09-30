@@ -5,7 +5,7 @@ categories:
 ---
 # CopyLeft
 
-[Computer Science](index.md) -> [Free Software](Free-Software.md) -> CopyLeft #free-software #licensing
+[Computer Science](_index.md) -> [Free Software](Free-Software.md) -> CopyLeft #free-software #licensing
 
 Copyleft is the practice of granting the right to freely distribute and modify a work, with the requirement that the same rights be preserved in derivative works.
 

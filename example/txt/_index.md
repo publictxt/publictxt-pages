@@ -10,10 +10,10 @@ See also:
 
 ## Content
 
-- [Wiki](wiki/index.md) - linked wiki pages
-- [Blog](blog/index.md) - weblogging
-- [Notes](notes/home.md) - loose notes
-- [Posts](posts/index.md) - toots, threads, micro-blogs
+- [Wiki](wiki/_index.md) - linked wiki pages
+- [Blog](blog/_index.md) - weblogging
+- [Notes](notes/_index.md) - loose notes
+- [Posts](posts/_index.md) - toots, threads, micro-blogs
 
 -----
 

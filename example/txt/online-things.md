@@ -9,4 +9,4 @@ A root-level page **with** front matter, including a custom `web:` key that must
 - [Mastodon](https://mastodon.social/@example)
 - [GitHub](https://github.com/example)
 
-Back to [home](index.md).
+Back to [home](_index.md).

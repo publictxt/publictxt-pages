@@ -1,6 +1,6 @@
 # Science home
 
-[Wiki home](../index.md)
+[Wiki home](../_index.md)
 
 science things ...
 

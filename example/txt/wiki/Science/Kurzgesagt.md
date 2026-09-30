@@ -9,7 +9,7 @@ tags:
   - sci
   - video
 ---
-[Science](index.md) Youtube Channel  
+[Science](_index.md) Youtube Channel  
 web: https://www.youtube.com/@kurzgesagt
 #channel #sci #video
 
