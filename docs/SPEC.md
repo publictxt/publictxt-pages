@@ -25,6 +25,7 @@ Items marked **(TBD)** are not built.
 - Left sidebar
   - Sections, categories, tag cloud
 - Right sidebar — context for what's shown
+  - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
   - page meta (collections, dates, categories, tags) on pages
   - filters on browse lists and search; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere

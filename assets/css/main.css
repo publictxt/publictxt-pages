@@ -15,11 +15,15 @@
   --chip-collection-bg: rgba(53, 117, 133, 0.12);
   --radius: 8px;
   --sidebar-width: 264px;   /* left: site nav */
-  --aside-width: 288px;     /* right: page meta, filters */
+  --aside-width: 288px;     /* right: page meta, filters; grows to --aside-max */
+  --aside-max: 360px;
+  --main-fit: 900px;        /* main's width before the aside grows past --aside-width */
   --gutter: 1.5rem;         /* page edge; x 4/3 between columns */
   --header-h: 4.5rem;
   --layout-max: 1960px;     /* header + columns; wider, they centre */
   --content-max: 86ch;      /* prose line length */
+  /* The nav column + its gap, 0 when it's out of the grid (collapsed, drawer). */
+  --nav-col: calc(var(--sidebar-width) + var(--gutter) * 4 / 3);
 }
 
 * { box-sizing: border-box; }
@@ -126,6 +130,7 @@ a:hover { text-decoration: underline; }
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
+  container-type: inline-size;   /* the aside's width measures it (cqi) */
 }
 
 .content { grid-column: 2; grid-row: 1; min-width: 0; }
@@ -158,9 +163,14 @@ a:hover { text-decoration: underline; }
   margin-right: calc(var(--gutter) * 4 / 3);
   padding-right: 0.25rem;
 }
+/* Spare width goes to the aside: what's left of the layout (100cqi, inside
+   its padding) after the nav column, the gap and --main-fit, within
+   --aside-width..--aside-max. */
 .aside {
   grid-column: 3;
-  width: var(--aside-width);
+  width: clamp(var(--aside-width),
+    100cqi - var(--nav-col) - var(--gutter) * 4 / 3 - var(--main-fit),
+    var(--aside-max));
   margin-left: calc(var(--gutter) * 4 / 3);
   padding-left: 0.25rem;
 }
@@ -711,11 +721,13 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 
 /* Wide: ☰ collapses the nav column (nav.js remembers it). */
 @media (min-width: 1441px) {
+  [data-nav-collapsed] { --nav-col: 0px; }
   [data-nav-collapsed] .sidebar { display: none; }
 }
 
 /* DRAWER: the nav slides over the page from the left, under the header. */
 @media (max-width: 1440px) {
+  .js { --nav-col: 0px; }
   .js .sidebar {
     position: fixed;
     top: calc(var(--header-h) + 1px);
