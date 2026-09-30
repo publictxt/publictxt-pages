@@ -19,7 +19,7 @@ Items marked **(TBD)** are not built.
   - Sections move to specialised Views over Collections (TBD)
     - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
     - Bookmarks should show Bookmark specialised view (TBD)
-- Layout: full width; left sidebar, content, right sidebar
+- Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
   - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.
   - One column on phones: filters fold above the results (open when one is set), page meta below the page.
 - Left sidebar

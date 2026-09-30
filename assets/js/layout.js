@@ -1,7 +1,7 @@
 // The layout's breakpoints, for JS: main.css's @media rules — change both.
 //   DRAWER  the left nav leaves the grid for a drawer (nav.js)
 //   NARROW  one column; the right column's filters dock into the page
-export const DRAWER = "(max-width: 1200px)";
+export const DRAWER = "(max-width: 1440px)";
 export const NARROW = "(max-width: 900px)";
 
 // Keeps `el` in the right column's `slot` — or at the top of `parent` when

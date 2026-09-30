@@ -18,7 +18,8 @@
   --aside-width: 288px;     /* right: page meta, filters */
   --gutter: 1.5rem;         /* page edge; x 4/3 between columns */
   --header-h: 4.5rem;
-  --content-max: 90ch;
+  --layout-max: 1960px;     /* header + columns; wider, they centre */
+  --content-max: 86ch;      /* prose line length */
 }
 
 * { box-sizing: border-box; }
@@ -51,7 +52,8 @@ a:hover { text-decoration: underline; }
 
 .site-header-inner {
   height: var(--header-h);
-
+  max-width: var(--layout-max);
+  margin: 0 auto;
   padding: 0 var(--gutter);
   display: flex;
   align-items: center;
@@ -113,11 +115,13 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Layout ---------- */
 
-/* Full width: nav | main | aside. The side columns are `auto`, sized by their
-   column's width + margin (the gap), so a hidden or absent one — collapsed
-   nav, a template without an aside — takes no space and leaves no gap. */
+/* nav | main | aside, up to --layout-max. The side columns are `auto`, sized
+   by their column's width + margin (the gap), so a hidden or absent one —
+   collapsed nav, a template without an aside — takes no space and leaves no
+   gap; main takes the rest. */
 .layout {
-  
+  max-width: var(--layout-max);
+  margin: 0 auto;
   padding: var(--gutter) var(--gutter) 3rem;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -703,15 +707,15 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 #search-more { margin-top: 1rem; }
 
 /* ---------- Responsive ---------- */
-/* Breakpoints repeated in assets/js/layout.js: DRAWER 1200px, NARROW 900px. */
+/* Breakpoints repeated in assets/js/layout.js: DRAWER 1440px, NARROW 900px. */
 
 /* Wide: ☰ collapses the nav column (nav.js remembers it). */
-@media (min-width: 1201px) {
+@media (min-width: 1441px) {
   [data-nav-collapsed] .sidebar { display: none; }
 }
 
 /* DRAWER: the nav slides over the page from the left, under the header. */
-@media (max-width: 1200px) {
+@media (max-width: 1440px) {
   .js .sidebar {
     position: fixed;
     top: calc(var(--header-h) + 1px);
