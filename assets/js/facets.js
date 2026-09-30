@@ -6,6 +6,8 @@
 // `-match` is written only off the facet's default, modes[0] — so a URL
 // without it means whatever the config's default is now.
 
+import { ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+
 export const STATES = ["include", "exclude"];
 export const MODES = ["all", "any"];
 
@@ -153,4 +155,79 @@ export function matchToggle(f, onChange) {
   b.title = `Pages with ${f.match} of the selected; click for ${other}`;
   b.addEventListener("click", () => { f.match = other; onChange(); });
   return b;
+}
+
+// ---- filter sections --------------------------------------------------
+// Each filter section (rating, tag, …) is a <details> the reader can shut,
+// remembered per browser for lists and search alike. Storage can throw or be
+// empty; then every section starts open. Read lazily: tests have no storage.
+const SHUT_KEY = "facets-shut";
+let shutKeys;
+function shut() {
+  if (!shutKeys) {
+    try { shutKeys = new Set(JSON.parse(localStorage.getItem(SHUT_KEY)) || []); } catch { shutKeys = new Set(); }
+  }
+  return shutKeys;
+}
+
+// Opens or shuts `details` as remembered for `key`, and remembers its toggles.
+export function rememberFold(details, key) {
+  details.open = !shut().has(key);
+  details.addEventListener("toggle", () => {
+    if (details.open) shut().delete(key); else shut().add(key);
+    try { localStorage.setItem(SHUT_KEY, JSON.stringify([...shut()])); } catch { /* this page only, then */ }
+  });
+}
+
+// What goes after a section's label: a badge of how many values are picked
+// (main.css shows it only while shut), then the match toggle. In a <summary>,
+// a button's click would also shut the section, so the toggle's doesn't.
+export function foldHint(picked, toggle) {
+  const out = [];
+  if (picked) {
+    const badge = document.createElement("span");
+    badge.className = "facet-badge";
+    badge.textContent = picked;
+    badge.title = `${picked} selected`;
+    out.push(badge);
+  }
+  if (toggle) {
+    toggle.addEventListener("click", (e) => e.preventDefault());
+    out.push(toggle);
+  }
+  return out;
+}
+
+// ---- rating -------------------------------------------------------------
+// {"5": n, "4": n, "unrated": n} exact counts -> the same keys counting that
+// rating or better, as a `?rating=` minimum filters. Unrated stays exact.
+export function ratingCounts(exact) {
+  const out = {};
+  for (const r of ["1", "2", "3", "4", "5"]) {
+    out[r] = Object.entries(exact).reduce((sum, [k, c]) => sum + (k !== UNRATED_FILTER && Number(k) >= Number(r) ? c : 0), 0);
+  }
+  out[UNRATED_FILTER] = exact[UNRATED_FILTER] || 0;
+  return out;
+}
+
+// Rating chips, one at a time: `values` the ratings to offer ("5"…"1",
+// "unrated"), `counts` per ratingCounts(), `current` the ?rating= value.
+// Pressing the set chip clears it. `onPick(value)` then.
+export function ratingChips(values, counts, current, onPick) {
+  return values.map((v) => {
+    const on = v === current;
+    const label = ratingFilterLabel(v);
+    const count = counts[v] || 0;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip filter-chip" + (on ? " active" : "") + (count === 0 && !on ? " empty" : "");
+    b.setAttribute("aria-pressed", String(on));
+    b.title = on ? "Click to clear" : "Click to show " + label;
+    const n = document.createElement("span");
+    n.className = "count";
+    n.textContent = count;
+    b.append(label, n);
+    b.addEventListener("click", () => onPick(on ? "" : v));
+    return b;
+  });
 }

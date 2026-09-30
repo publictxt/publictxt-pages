@@ -16,7 +16,8 @@
 // the list when narrow (layout.js). Sort sits with the count.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
+import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
+  rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
@@ -29,17 +30,6 @@ const CHIPS = chipFacets(params.chipFacets);
 // Disabled categories leave no data, so the facet hides itself.
 const byCount = (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]);
 const FACETS = Object.fromEntries(CHIPS.defs.map((d) => [d.key, { values: (it) => it[d.item] || [], order: byCount }]));
-
-// Filter sections the reader shut (rating, collection, …), for every list in
-// this browser. Storage can throw or be empty; then all start open.
-const SHUT_KEY = "list-facets-shut";
-const shut = (() => {
-  try { return new Set(JSON.parse(localStorage.getItem(SHUT_KEY)) || []); } catch { return new Set(); }
-})();
-function setShut(key, isShut) {
-  if (isShut) shut.add(key); else shut.delete(key);
-  try { localStorage.setItem(SHUT_KEY, JSON.stringify([...shut])); } catch { /* per page, then */ }
-}
 
 // Rating ties: newest first either way.
 function sorted(items, sort) {
@@ -176,51 +166,23 @@ async function mount(root) {
     return filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
   }
 
-  // A filter section, shut or open on its own (`shut`). `f`: a facets.js
-  // facet, for its match toggle; `set`: values picked, shown while shut.
-  function facetRow(key, label, chips, f, set) {
+  // A filter section, shut or open on its own (facets.js). `f`: a facets.js
+  // facet, for its match toggle; `picked`: values picked, shown while shut.
+  function facetRow(key, label, chips, f, picked) {
     const row = document.createElement("details");
     row.className = "list-facet";
-    row.open = !shut.has(key);
-    row.addEventListener("toggle", () => setShut(key, !row.open));
+    rememberFold(row, key);
     const summary = document.createElement("summary");
     const lab = document.createElement("span");
     lab.className = "facet-label";
-    lab.textContent = label;
-    if (set) {
-      const badge = document.createElement("span");
-      badge.className = "facet-badge";
-      badge.textContent = set;
-      badge.title = `${set} selected`;
-      lab.append(" ", badge);
-    }
-    const toggle = f && matchToggle(f, () => { state.page = 1; render(true); });
-    // In a <summary>, a button's click would also shut the section.
-    toggle?.addEventListener("click", (e) => e.preventDefault());
-    if (toggle) lab.append(" ", toggle);
+    lab.append(label);
+    for (const x of foldHint(picked, f && matchToggle(f, () => { state.page = 1; render(true); }))) lab.append(" ", x);
     summary.append(lab);
     const wrap = document.createElement("div");
     wrap.className = "chip-row";
     wrap.append(...chips);
     row.append(summary, wrap);
     return row;
-  }
-
-  // Rating: one at most, "★4+" = that or better. Pressing the set one clears it.
-  function ratingChip(value, label, count) {
-    const on = state.rating === value;
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "chip filter-chip" + (on ? " active" : "") + (count === 0 && !on ? " empty" : "");
-    b.setAttribute("aria-pressed", String(on));
-    b.title = on ? "Click to clear" : "Click to show " + label;
-    b.append(label);
-    const n = document.createElement("span");
-    n.className = "count";
-    n.textContent = count;
-    b.append(n);
-    b.addEventListener("click", () => { state.rating = on ? "" : value; state.page = 1; render(true); });
-    return b;
   }
 
   // forRating / forFacet(key): `filtered` minus that filter, so options
@@ -243,9 +205,10 @@ async function mount(root) {
     }
 
     if (hasRatings) {
-      const atLeast = (r) => forRating.filter((it) => (it.rating || 0) >= r).length;
-      const chips = ratings.map((r) => ratingChip(String(r), ratingFilterLabel(r), atLeast(r)));
-      if (hasUnrated) chips.push(ratingChip(UNRATED_FILTER, "Unrated", forRating.filter((it) => !it.rating).length));
+      const exact = {};
+      for (const it of forRating) { const k = it.rating ? String(it.rating) : UNRATED_FILTER; exact[k] = (exact[k] || 0) + 1; }
+      const values = [...ratings.map(String), ...(hasUnrated ? [UNRATED_FILTER] : [])];
+      const chips = ratingChips(values, ratingCounts(exact), state.rating, (v) => { state.rating = v; state.page = 1; render(true); });
       body.append(facetRow("rating", "Rating", chips, null, state.rating ? 1 : 0));
     }
 
