@@ -279,40 +279,9 @@ a:hover { text-decoration: underline; }
 .hero .lead { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; }
 .hero .lead p { margin: 0; }
 
-/* Home: Browse cards and Recent share a width — --cards (home.html) cards at
-   most --card-max each; auto-fit stretches the cards to fill it. */
-.home-browse {
-  --card-max: 200px;
-  --card-gap: 0.9rem;
-  max-width: calc(var(--cards) * var(--card-max) + (var(--cards) - 1) * var(--card-gap));
-}
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--card-gap, 0.9rem);
-}
-
-.card {
-  display: block;
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
-  color: var(--text);
-  transition: border-color 0.15s ease;
-}
-.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
-.card p { margin: 0; font-size: 0.85rem; }
-.card .card-desc { margin-bottom: 0.3rem; }
-.card:hover { border-color: var(--accent); text-decoration: none; }
-
-.card-accent { border-color: var(--accent-soft); background: var(--accent-soft); }
-
-.home-sections, .home-recent, .list-recent { margin-top: 2rem; }
-.home-sections h2, .home-recent h2, .list-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
+.home-recent, .list-recent { margin-top: 2rem; }
+.home-recent h2, .list-recent h2 { font-size: 1.15rem; margin-bottom: 0.8rem; }
 .list-recent h2 .muted { font-size: 0.85rem; font-weight: 400; }
-/* Section cards carry the newest date of their contents — keep it quiet. */
-.card time { display: block; font-size: 0.8rem; margin-top: 0.2rem; }
 
 /* ---------- Breadcrumbs ---------- */
 

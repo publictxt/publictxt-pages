@@ -12,7 +12,7 @@ Items marked **(TBD)** are not built.
 - Hugo renders `.md` extensions to `.html`
 - Sections
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-  - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
+  - The sidebar lists sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.

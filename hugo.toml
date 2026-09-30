@@ -41,7 +41,7 @@ capitalizeListTitles = false
     text = "[PublicTxt](https://github.com/publictxt/publictext), plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)"
     edit = "Improve this page"
 
-  # Section order in sidebar and home (folder names); unlisted follow A→Z.
+  # Section order in the sidebar (folder names); unlisted follow A→Z.
   # Configured: Hugo's date order would reshuffle navigation on every edit.
   sectionOrder = ["bookmarks", "blog", "wiki", "posts", "notes"]
   tagCloudLimit = 30   # sidebar tag cloud
