@@ -35,12 +35,6 @@ capitalizeListTitles = false
   # The deploy workflow sets it (HUGO_PARAMS_EDITURL).
   # editURL = "https://github.com/publictxt/publictxt-pages/edit/main/"
 
-  # Footer wording, optional; "" hides a line. `text` is inline markdown;
-  # `edit` labels the edit link (shown only with editURL).
-  [params.footer]
-    text = "[PublicTxt](https://github.com/publictxt/publictext), plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)"
-    edit = "Improve this page"
-
   # Section order in the sidebar (folder names); unlisted follow A→Z.
   # Configured: Hugo's date order would reshuffle navigation on every edit.
   sectionOrder = ["bookmarks", "blog", "wiki", "posts", "notes"]
@@ -51,6 +45,14 @@ capitalizeListTitles = false
   # overrides for its subtree with `order:` / `perPage:`.
   listOrder = "created"
   listPerPage = 20
+
+  # Tables ([params.x]) from here on: a plain key below one belongs to it.
+
+  # Footer wording, optional; "" hides a line. `text` is inline markdown;
+  # `edit` labels the edit link (shown only with editURL).
+  [params.footer]
+    text = "[PublicTxt](https://github.com/publictxt/publictext), plain-text knowledge, published with [publictxt-pages](https://github.com/publictxt/publictxt-pages)"
+    edit = "Improve this page"
 
   # Categories: a page's `categories:` / `category:` (a value or a list) from
   # this closed list (matched case-insensitively; unlisted values warned and
