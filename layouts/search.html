@@ -17,35 +17,10 @@
     <button type="button" id="search-clear" class="btn-ghost">Clear all</button>
   </form>
 
-  <div class="search-layout">
-    {{/* One fold for all filters; search.js closes it on phones when nothing is selected. */}}
-    <details class="search-filters fold" id="search-filters" open>
-      <summary><h3 class="side-heading">Filters</h3></summary>
-      <div class="search-filters-body">
-        {{/* A select, hidden when the site spans one year. */}}
-        <div class="filter-group" id="filter-year-group" hidden>
-          <h3 class="side-heading">Year</h3>
-          <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>
-        </div>
-        {{/* A minimum, as in the browse lists. search.js hides the group when
-             no indexed page has a rating. */}}
-        <div class="filter-group" id="filter-rating-group" hidden>
-          <h3 class="side-heading">Rating</h3>
-          <label class="list-sort"><select id="filter-rating" aria-label="Filter by minimum rating"></select></label>
-        </div>
-        {{/* The chip facets (chip-facets.html). search.js fills each and hides
-             a group no indexed page has — categories when disabled. */}}
-        {{ range partialCached "chip-facets.html" site }}
-        <div class="filter-group" id="filter-{{ .key }}-group" hidden>
-          <h3 class="side-heading">{{ .label }} <span class="muted" id="filter-{{ .key }}-hint"></span></h3>
-          <div id="filter-{{ .key }}" class="chip-row"></div>
-        </div>
-        {{ end }}
-      </div>
-    </details>
-
+  {{/* search.js docks #search-filters here on narrow screens. */}}
+  <div class="search-layout" id="search-layout">
     <section class="search-results" aria-live="polite">
-      <div class="search-results-head">
+      <div class="results-head">
         <p id="search-status" class="muted"></p>
         <label class="list-sort"><span class="facet-label">Sort</span> <select id="search-sort" aria-label="Sort order"></select></label>
       </div>
@@ -60,4 +35,35 @@
 {{ if hugo.IsProduction }}{{ $js = $js | fingerprint }}{{ end }}
 <script type="module" src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
 {{ end }}
+{{ end }}
+
+{{ define "aside" }}
+<aside class="aside" aria-label="Filters">
+  {{- /* One fold for all filters, shown with #search. search.js docks it in the
+     results on narrow screens, closed unless a filter is set. The aside has
+     no whitespace, so it is :empty then (main.css). */ -}}
+  <details class="search-filters fold" id="search-filters" open hidden>
+    <summary><h3 class="side-heading">Filters</h3></summary>
+    <div class="search-filters-body">
+      {{/* A select, hidden when the site spans one year. */}}
+      <div class="filter-group" id="filter-year-group" hidden>
+        <h3 class="side-heading">Year</h3>
+        <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>
+      </div>
+      {{/* A minimum, as in the browse lists. search.js hides the group when
+           no indexed page has a rating. */}}
+      <div class="filter-group" id="filter-rating-group" hidden>
+        <h3 class="side-heading">Rating</h3>
+        <label class="list-sort"><select id="filter-rating" aria-label="Filter by minimum rating"></select></label>
+      </div>
+      {{/* The chip facets (chip-facets.html). search.js fills each and hides
+           a group no indexed page has — categories when disabled. */}}
+      {{ range partialCached "chip-facets.html" site }}
+      <div class="filter-group" id="filter-{{ .key }}-group" hidden>
+        <h3 class="side-heading">{{ .label }} <span class="muted" id="filter-{{ .key }}-hint"></span></h3>
+        <div id="filter-{{ .key }}" class="chip-row"></div>
+      </div>
+      {{ end }}
+    </div>
+  </details></aside>
 {{ end }}

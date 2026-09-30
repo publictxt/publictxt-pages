@@ -21,7 +21,7 @@ search. Add one to both, or search cards go without it. What's still implemented
 | Server | Client |
 |---|---|
 | each list template's page collection (incl. the dataview hook) | its kind in `scope()` |
-| stars in `sidebar.html` | `ratingHTML()` in `cards.js` |
+| stars in `page-meta.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
 
 A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter
@@ -34,15 +34,24 @@ entry): change the default and shared links without it change meaning.
 The Pagefind version is pinned in `build.py`; `search.js` is written against its JS
 API, so a bump means checking search too.
 
-Also: the 900px breakpoint in `main.css` is repeated as `matchMedia` in `list.js` and
-`search.js`.
+Also: the breakpoints in `main.css` (1440px drawer, 900px one column) are repeated
+in `layout.js`, JS's only copy.
 
 ## Two JS bundles, one `@params`
 
 `js.Build` bundles each entry point (`list.js` from `list-container.html`, `search.js`
-from `search.html`) with its imports, so shared modules are **copied into each**. Anything
+from `search.html`) with its imports, so shared modules are **copied into each**.
+(`nav.js`, from `head.html`, is a third bundle; it takes no `@params`.) Anything
 set per call — options, `params` — must match across both, or lists and search drift
 silently. Hence `js-params.html`, the one source of `@params`.
+
+## The right column is filled from both sides
+
+A template's `{{ define "aside" }}` is its right column; none, no column. List filters
+are JS-only: `section.html`/`term.html` emit an empty `[data-list-controls]` aside that
+`list.js` claims and fills; search's filters are server-rendered in `search.html`'s aside.
+Below 900px, `dock()` (`layout.js`) moves them into the page, and `main.css` hides the
+aside by `:empty` — so these asides must hold no whitespace (`{{- -}}`) around their child.
 
 ## Search counts run higher than list counts
 

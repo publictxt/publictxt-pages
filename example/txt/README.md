@@ -23,7 +23,8 @@ git diff tests/golden                                  # read it: every change s
 | `created`/`updated` authored, with offsets | `blog/20260915-a-post-with-full-front-matter.md` |
 | Quoted date-only `created:` | `blog/2026/20260925 Attachments beside the note - no post folders.md` |
 | `_index.md` as folder index; links to it | `blog/_index.md`, `notes/_index.md`, `wiki/**/_index.md` |
-| Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Site/lists/` |
+| Folder with no index (generated) | `wiki/Projects/`, `wiki/Site/lists/` |
+| Section `description:` (home card); an index with front matter only | top-level `*/_index.md`; `bookmarks/_index.md` |
 | Link to a note with spaces in its name (`<…>` and `%20`) | `blog/_index.md` -> `blog/2026/20260925 Attachments…` |
 | `publish: off` | `notes/unpublished.md` |
 | … a folder with only unpublished Markdown: its files stay off too | `notes/Draft post/` |

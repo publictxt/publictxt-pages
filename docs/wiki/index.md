@@ -35,18 +35,20 @@ tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, li
 ## Templates
 
 ```txt
-layouts/baseof.html               shell; data-base + data-index on <html>
+layouts/baseof.html               shell: header + ☰, nav | main | "aside" block;
+                                  data-base + data-index on <html>
 layouts/home.html                 hero, section cards, compact Recent list
-layouts/page.html                 single page; data-pagefind-body
-layouts/section.html              index body as prose + browse list
-layouts/term.html                 /tags/<term>/
+layouts/page.html                 single page; data-pagefind-body; aside: page meta
+layouts/section.html              index body as prose + browse list; aside: its filters
+layouts/term.html                 /tags/<term>/; aside: its filters
 layouts/taxonomy.html             /tags/
-layouts/search.html               search UI shell; search.js fills it
+layouts/search.html               search UI shell, filters in its aside; search.js fills it
 layouts/404.html
 
 layouts/_partials/
-  head.html             title, description, favicon, Mastodon rel="me", stylesheet
-  sidebar.html          sections / page meta / tag cloud
+  head.html             title, description, favicon, Mastodon rel="me", stylesheet, nav.js
+  sidebar.html          left nav: sections / categories / tag cloud
+  page-meta.html        "This page": a page's meta, in its right column
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal
@@ -86,16 +88,19 @@ layouts/_markup/
 
 ```txt
 assets/js/site-index.js   fetch index.json (recent-first) once per document; scope() subsets
+assets/js/layout.js       breakpoints for JS; dock(): filters right column <-> page flow
+assets/js/nav.js          ☰: collapse the nav (wide), drawer (narrower); blocking, in <head>
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; shared
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
-assets/css/main.css       the whole theme; palette in :root
+assets/css/main.css       the whole theme; palette + column widths in :root
 ```
 
-ES modules bundled per entry point by Hugo's built-in esbuild — no Node to build. One
-sort vocabulary, one card and one facet module serve lists and search; see traps.md.
+ES modules bundled per entry point (list.js, search.js; nav.js as a classic script) by
+Hugo's built-in esbuild — no Node to build. One sort vocabulary, one card and one facet
+module serve lists and search; see traps.md.
 
 ## Config and delivery
 

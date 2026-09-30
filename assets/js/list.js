@@ -9,11 +9,16 @@
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL (home Recent, dataview)
 //   data-limit        compact: the first N only
+//
+// Filters go in the page's `[data-list-controls]` right column (section.html,
+// term.html), claimed by the first full list, or above the list when narrow
+// (layout.js). Sort sits with the count.
 import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, matches, matchToggle, toggleInclude } from "./facets.js";
+import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, normaliseSort, parseSort, sortLabel } from "./sorts.js";
+import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
 
 const CHIPS = chipFacets(params.chipFacets);
 
@@ -53,10 +58,14 @@ async function mount(root) {
   const perPage = Math.max(1, parseInt(root.dataset.perPage, 10) || 20);
   const limit = parseInt(root.dataset.limit, 10) || undefined;
   const defaultSort = normaliseSort(root.dataset.order);
+  // Claimed before the await, so mount order decides.
+  const slot = compact ? null : document.querySelector("[data-list-controls]");
+  slot?.removeAttribute("data-list-controls");
   let items;
   try {
     items = scope(await siteIndex(), root.dataset.scopeKind, root.dataset.scopeValue);
   } catch (e) {
+    if (slot) slot.hidden = true;
     return;   // keep Hugo's plain link list
   }
 
@@ -96,19 +105,28 @@ async function mount(root) {
   const controls = document.createElement("details");
   controls.className = "list-controls fold";
   controls.open = true;
-  controls.innerHTML = `<summary><span class="side-heading">Sort &amp; filter</span></summary>`;
+  controls.innerHTML = `<summary><span class="side-heading">Filters</span></summary>`;
   const body = document.createElement("div");
   body.className = "list-controls-body";
   controls.append(body);
   const status = document.createElement("p");
   status.className = "list-status";
+  const sortWrap = document.createElement("label");
+  sortWrap.className = "list-sort";
+  sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
+    `<option value="${v}">${l}</option>`).join("")}</select>`;
+  const sortSelect = sortWrap.querySelector("select");
+  sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; state.page = 1; render(true); });
+  const head = document.createElement("div");
+  head.className = "results-head";
+  head.append(status, sortWrap);
   const list = document.createElement("ul");
   list.className = "page-list";
   const pager = document.createElement("nav");
   pager.className = "pagination";
   pager.setAttribute("aria-label", "Pagination");
   if (compact) root.append(list);
-  else root.append(controls, status, list, pager);
+  else root.append(head, list, pager);
 
   // A facet shows only when the list varies on it (a tag page hides its own
   // tag). A missing value counts as no value, so a lone category shows unless
@@ -127,6 +145,7 @@ async function mount(root) {
   const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
+  const hasFilters = hasYears || hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length);
 
   function chip(d, name, n) {
     return filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
@@ -152,18 +171,10 @@ async function mount(root) {
   // options count what picking them gives.
   function renderControls(filtered, forYear, forRating, forFacet) {
     body.replaceChildren();
-    const head = document.createElement("div");
-    head.className = "list-controls-head";
+    const row = document.createElement("div");
+    row.className = "list-controls-head";
     const selects = document.createElement("div");
     selects.className = "list-selects";
-    const sortWrap = document.createElement("label");
-    sortWrap.className = "list-sort";
-    sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
-      `<option value="${v}"${v === state.sort ? " selected" : ""}>${l}</option>`).join("")}</select>`;
-    sortWrap.querySelector("select").addEventListener("change", (e) => {
-      state.sort = e.target.value; state.page = 1; render(true);
-    });
-    selects.append(sortWrap);
 
     // A select: least used, and scales.
     if (hasYears) {
@@ -194,18 +205,19 @@ async function mount(root) {
       });
       selects.append(ratingWrap);
     }
-    head.append(selects);
-    if (filtering() || state.sort !== defaultSort) {
+    if (selects.childElementCount) row.append(selects);
+    // Filters only; sort isn't in this box.
+    if (filtering()) {
       const clear = document.createElement("button");
       clear.type = "button";
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        CHIPS.clear(state); state.year = ""; state.rating = ""; state.sort = defaultSort; state.page = 1; render(true);
+        CHIPS.clear(state); state.year = ""; state.rating = ""; state.page = 1; render(true);
       });
-      head.append(clear);
+      row.append(clear);
     }
-    body.append(head);
+    if (row.childElementCount) body.append(row);
 
     // Past a facet's `limit`, chips fold behind "more"; selected ones stay.
     for (const d of CHIPS.defs) {
@@ -297,6 +309,7 @@ async function mount(root) {
     };
     list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag?.inc, onTag })));
     if (compact) return;
+    sortSelect.value = state.sort;
 
     const forFacet = (k) => addsPages(state[k]) ? items.filter((it) => passes(it, k)) : filtered;
     renderControls(filtered, items.filter((it) => passes(it, "year")), items.filter((it) => passes(it, "rating")), forFacet);
@@ -304,11 +317,10 @@ async function mount(root) {
     const n = filtered.length;
     const what = [...CHIPS.describe(state), state.year,
       state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
-    const label = sortLabel(state.sort);
+    const extra = [what, total > 1 && `page ${state.page} of ${total}`].filter(Boolean).join(" · ");
     const detail = document.createElement("span");
     detail.className = "muted";
-    detail.textContent = ` (${[what, label, total > 1 && `page ${state.page} of ${total}`]
-      .filter(Boolean).join(" · ")})`;
+    detail.textContent = extra ? ` (${extra})` : "";
     status.replaceChildren(
       `${n} page${n === 1 ? "" : "s"}` + (n !== items.length ? ` of ${items.length}` : ""), detail);
     writeURL(pushHistory);
@@ -316,10 +328,9 @@ async function mount(root) {
 
   window.addEventListener("popstate", () => { readURL(); render(false); });
   readURL();
-  // Narrow screens (900px, as main.css): fold unless the URL set a filter or sort.
-  if (matchMedia("(max-width: 900px)").matches) {
-    controls.open = filtering() || state.sort !== defaultSort;
-  }
+  // Folded when narrow, unless the URL set a filter. Nothing to filter, no box.
+  if (!compact && hasFilters) dock(controls, slot, root, (narrow) => { controls.open = !narrow || filtering(); });
+  else if (slot) slot.hidden = true;
   render(false);
 }
 

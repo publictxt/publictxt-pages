@@ -14,8 +14,16 @@
   --chip-bg: #1d2930;
   --chip-collection-bg: rgba(53, 117, 133, 0.12);
   --radius: 8px;
-  --sidebar-width: 264px;
-  --content-max: 76ch;
+  --sidebar-width: 264px;   /* left: site nav */
+  --aside-width: 288px;     /* right: page meta, filters; grows to --aside-max */
+  --aside-max: 348px;
+  --main-fit: 900px;        /* main's width before the aside grows past --aside-width */
+  --gutter: 1.5rem;         /* page edge; x 4/3 between columns */
+  --header-h: 4.5rem;
+  --layout-max: 1960px;     /* header + columns; wider, they centre */
+  --content-max: 86ch;      /* prose line length */
+  /* The nav column + its gap, 0 when it's out of the grid (collapsed, drawer). */
+  --nav-col: calc(var(--sidebar-width) + var(--gutter) * 4 / 3);
 }
 
 * { box-sizing: border-box; }
@@ -47,14 +55,34 @@ a:hover { text-decoration: underline; }
 }
 
 .site-header-inner {
-  max-width: 1200px;
+  height: var(--header-h);
+  max-width: var(--layout-max);
   margin: 0 auto;
-  padding: 0.65rem 1.25rem;
+  padding: 0 var(--gutter);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
 }
+
+/* ☰ — nav.js; hidden without it (the nav stays in the page). */
+.nav-toggle {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.js .nav-toggle { display: inline-flex; }
+.nav-toggle:hover { color: var(--accent); border-color: var(--border); }
+.nav-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nav-toggle[aria-expanded="true"] { color: var(--text); }
 
 .site-title {
   display: inline-flex;
@@ -76,6 +104,7 @@ a:hover { text-decoration: underline; }
   border-radius: 0.35rem;
 }
 
+.header-search { margin-left: auto; }
 .header-search input[type="search"] {
   background: var(--bg-inset);
   border: 1px solid var(--border);
@@ -90,17 +119,21 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Layout ---------- */
 
+/* nav | main | aside, up to --layout-max. The side columns are `auto`, sized
+   by their column's width + margin (the gap), so a hidden or absent one —
+   collapsed nav, a template without an aside — takes no space and leaves no
+   gap; main takes the rest. */
 .layout {
-  max-width: 1200px;
+  max-width: var(--layout-max);
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
+  padding: var(--gutter) var(--gutter) 3rem;
   display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  gap: 2rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
+  container-type: inline-size;   /* the aside's width measures it (cqi) */
 }
 
-.content { min-width: 0; }
+.content { grid-column: 2; grid-row: 1; min-width: 0; }
 
 .site-footer {
   border-top: 1px solid var(--border);
@@ -110,18 +143,38 @@ a:hover { text-decoration: underline; }
   padding: 1.25rem;
 }
 
-/* ---------- Sidebar ---------- */
+/* ---------- Sidebars ---------- */
 
-.sidebar {
+/* Left: site nav (sidebar.html). Right: a template's "aside" block. Each
+   sticks and scrolls on its own. */
+.sidebar, .aside {
   position: sticky;
-  top: 4.2rem;
+  top: calc(var(--header-h) + 1rem);
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  max-height: calc(100vh - 5.5rem);
+  max-height: calc(100vh - var(--header-h) - 2rem);
   overflow-y: auto;
+}
+.sidebar {
+  grid-column: 1;
+  width: var(--sidebar-width);
+  margin-right: calc(var(--gutter) * 4 / 3);
   padding-right: 0.25rem;
 }
+/* Spare width goes to the aside: what's left of the layout (100cqi, inside
+   its padding) after the nav column, the gap and --main-fit, within
+   --aside-width..--aside-max. */
+.aside {
+  grid-column: 3;
+  width: clamp(var(--aside-width),
+    100cqi - var(--nav-col) - var(--gutter) * 4 / 3 - var(--main-fit),
+    var(--aside-max));
+  margin-left: calc(var(--gutter) * 4 / 3);
+  padding-left: 0.25rem;
+}
+.aside[hidden] { display: none; }   /* list.js: nothing to filter */
 
 .side-block {
   background: var(--bg-raised);
@@ -226,10 +279,17 @@ a:hover { text-decoration: underline; }
 .hero .lead { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; }
 .hero .lead p { margin: 0; }
 
+/* Home: Browse cards and Recent share a width — --cards (home.html) cards at
+   most --card-max each; auto-fit stretches the cards to fill it. */
+.home-browse {
+  --card-max: 200px;
+  --card-gap: 0.9rem;
+  max-width: calc(var(--cards) * var(--card-max) + (var(--cards) - 1) * var(--card-gap));
+}
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--card-gap, 0.9rem);
 }
 
 .card {
@@ -243,6 +303,7 @@ a:hover { text-decoration: underline; }
 }
 .card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
 .card p { margin: 0; font-size: 0.85rem; }
+.card .card-desc { margin-bottom: 0.3rem; }
 .card:hover { border-color: var(--accent); text-decoration: none; }
 
 .card-accent { border-color: var(--accent-soft); background: var(--accent-soft); }
@@ -373,8 +434,15 @@ a:hover { text-decoration: underline; }
 }
 .list-facet .chip-row { flex: 1 1 auto; min-width: 0; }
 .list-reset { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
-.list-status { margin: 0 0 0.8rem; font-size: 1.15rem; font-weight: 700;}
+.list-status { margin: 0; font-size: 1.15rem; font-weight: 700; }
 .filter-chip.more { border-style: dashed; color: var(--text-muted); }
+/* In the right column: stacked, each label above its control. */
+.aside .list-controls { margin: 0; }
+.aside .list-controls-head { flex-direction: column; align-items: stretch; }
+.aside .list-selects { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+.aside .list-selects .list-sort { justify-content: space-between; }
+.aside .list-reset { align-self: flex-start; }
+.aside .list-facet { flex-direction: column; gap: 0.45rem; }
 
 .pagination {
   display: flex;
@@ -531,11 +599,11 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
 }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
+/* Results only; search.js docks the filters above them on narrow screens. */
 .search-layout {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 1.5rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .search-filters {
@@ -644,7 +712,8 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   border-radius: 3px;
   padding: 0 0.15em;
 }
-.search-results-head {
+/* Count + sort, above search results and browse lists. */
+.results-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -655,25 +724,81 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 #search-status { margin: 0; }
 #search-more { margin-top: 1rem; }
 
-@media (max-width: 900px) {
-  .search-layout { grid-template-columns: 1fr; }
+/* ---------- Responsive ---------- */
+/* Breakpoints repeated in assets/js/layout.js: DRAWER 1440px, NARROW 900px. */
+
+/* Wide: ☰ collapses the nav column (nav.js remembers it). */
+@media (min-width: 1441px) {
+  [data-nav-collapsed] { --nav-col: 0px; }
+  [data-nav-collapsed] .sidebar { display: none; }
 }
 
-/* ---------- Responsive ---------- */
+/* DRAWER: the nav slides over the page from the left, under the header. */
+@media (max-width: 1440px) {
+  .js { --nav-col: 0px; }
+  .js .sidebar {
+    position: fixed;
+    top: calc(var(--header-h) + 1px);
+    bottom: 0;
+    left: 0;
+    z-index: 9;
+    width: min(calc(var(--sidebar-width) + 2 * var(--gutter)), 85vw);
+    max-height: none;
+    margin: 0;
+    padding: 1rem var(--gutter) 2rem;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    transform: translateX(-100%);
+    /* Out of the tab order while closed — after the slide out, but at once
+       on open, so nav.js can focus into it. */
+    visibility: hidden;
+    transition: transform 0.2s ease, visibility 0s 0.2s;
+  }
+  .js[data-nav-open] .sidebar { transform: none; visibility: visible; transition: transform 0.2s ease; }
+  .js[data-nav-open] body::after {
+    content: "";
+    position: fixed;
+    inset: calc(var(--header-h) + 1px) 0 0;
+    z-index: 8;
+    background: rgba(0, 0, 0, 0.55);
+  }
+  .js[data-nav-open] { overflow: hidden; }
 
+  /* No JS: the nav goes under the page. */
+  html:not(.js) .sidebar {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 2rem 0 0;
+    padding: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none !important; }
+}
+
+/* NARROW: one column — content, then page meta; filters dock into the
+   content (layout.js), leaving their aside :empty. */
 @media (max-width: 900px) {
+  :root { --gutter: 1rem; }
+
   .layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 1.25rem;
   }
 
-  .sidebar {
+  .aside, html:not(.js) .sidebar {
     position: static;
+    width: auto;
     max-height: none;
-    order: 2; /* content first on small screens */
+    margin: 0;
+    padding: 0;
   }
-
-  .content { order: 1; }
+  .aside:empty { display: none; }
+  html:not(.js) .sidebar { order: 1; }   /* after the page meta */
 
   .header-search input[type="search"] { width: 42vw; }
 }

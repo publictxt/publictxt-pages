@@ -19,9 +19,15 @@ Items marked **(TBD)** are not built.
   - Sections move to specialised Views over Collections (TBD)
     - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
     - Bookmarks should show Bookmark specialised view (TBD)
-- Sidebar
-  - Tag cloud
-  - page meta (collections, dates, categories, tags) in sidebar.
+- Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
+  - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.
+  - One column on phones: filters fold above the results (open when one is set), page meta below the page.
+- Left sidebar
+  - Sections, categories, tag cloud
+- Right sidebar — context for what's shown
+  - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
+  - page meta (collections, dates, categories, tags) on pages
+  - filters on browse lists and search; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
   - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable.

@@ -26,3 +26,8 @@
   <p class="muted">No pages in this section yet.</p>
 {{ end }}
 {{ end }}
+
+{{/* As term.html; only with a list to filter. */}}
+{{ define "aside" }}
+{{ if (partial "section-pages.html" .).pages }}<aside class="aside" aria-label="Filters" data-list-controls></aside>{{ end }}
+{{ end }}

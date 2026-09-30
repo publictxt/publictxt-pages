@@ -9,3 +9,6 @@
   {{ partial "list-container.html" (dict "pages" (partial "recent.html" .Pages) "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .) "scope" (dict "kind" "tag" "value" .LinkTitle)) }}
 </section>
 {{ end }}
+
+{{/* list.js docks the list's filters here; empty (no JS) keeps the column. */}}
+{{ define "aside" }}<aside class="aside" aria-label="Filters" data-list-controls></aside>{{ end }}
