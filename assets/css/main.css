@@ -303,6 +303,7 @@ a:hover { text-decoration: underline; }
 }
 .card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
 .card p { margin: 0; font-size: 0.85rem; }
+.card .card-desc { margin-bottom: 0.3rem; }
 .card:hover { border-color: var(--accent); text-decoration: none; }
 
 .card-accent { border-color: var(--accent-soft); background: var(--accent-soft); }

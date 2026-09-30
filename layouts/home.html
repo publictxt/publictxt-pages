@@ -18,6 +18,8 @@
     {{ range $sections }}
     <a class="card" href="{{ .RelPermalink }}">
       <h3>{{ .Section | humanize }}</h3>
+      {{/* The section's _index.md `description:`. */}}
+      {{ with .Description }}<p class="muted card-desc">{{ . }}</p>{{ end }}
       {{ $n := len (partial "section-pages.html" .).pages }}
       <p class="muted">{{ $n }} page{{ if ne $n 1 }}s{{ end }}</p>
     </a>

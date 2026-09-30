@@ -1,5 +1,6 @@
 ---
 order: title
+description: Wiki knowledge base
 title: "How it works"
 created: 2025-01-01T12:00:00+00:00
 created_source: git

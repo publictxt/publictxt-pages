@@ -1,5 +1,6 @@
 ---
 order: title
+description: Wiki knowledge base
 ---
 # How it works
 
