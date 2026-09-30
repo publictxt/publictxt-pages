@@ -79,6 +79,13 @@ class SiteIndexTest(unittest.TestCase):
         html = (self.public / "blog" / "20260921-technopolitics" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<img src="/blog/20260921-technopolitics/18378321848729087020.jpg"', html)
 
+    def test_image_beside_post(self):
+        """A pasted image beside a flat post, Obsidian's `%20` name: its section's file."""
+        html = (self.public / "blog" / "20260925-another-issue-with-the-fermi-paradox---the-barrow-scale"
+                / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<img src="/blog/Pasted%20image%2020260925101500.png" alt="Barrow Scale sketch">', html)
+        self.assertTrue((self.public / "blog" / "Pasted image 20260925101500.png").is_file())
+
     def test_bundle_note_link(self):
         """blog/_index.md: links to a post folder's note by name reach the bundle page."""
         html = (self.public / "blog" / "index.html").read_text(encoding="utf-8")

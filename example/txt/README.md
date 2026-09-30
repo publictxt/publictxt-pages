@@ -40,4 +40,5 @@ git diff tests/golden                                  # read it: every change s
 | Root-level pages | `_index.md`, `Projects.md`, `online-things.md` |
 | Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
 | Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
+| Pasted image beside a flat post (no post folder), `%20` in the link | `blog/Pasted image 20260925101500.png`, `blog/20260925 Another Issue…` |
 | Site settings, not content | `settings/site.toml` |

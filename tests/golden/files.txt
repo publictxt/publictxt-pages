@@ -12,6 +12,7 @@ content/blog/20260915-a-post-with-full-front-matter.md
 content/blog/20260921-TechnoPolitics/18378321848729087020.jpg
 content/blog/20260921-TechnoPolitics/index.md
 content/blog/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md
+content/blog/Pasted image 20260925101500.png
 content/blog/_index.md
 content/bookmarks/_index.md
 content/bookmarks/sites/_index.md

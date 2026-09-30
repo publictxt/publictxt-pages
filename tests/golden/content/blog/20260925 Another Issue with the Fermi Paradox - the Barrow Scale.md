@@ -20,5 +20,9 @@ dangling link with an encoded space: [Fermi Paradox](../../wiki/Science/cosmolog
 
 ![Kurzgesagt - The Barrow Scale](https://www.youtube.com/watch?v=QW_jlUn4gA8)
 
+A pasted image beside the post, as Obsidian names and links it — no post folder needed:
+
+![Barrow Scale sketch](Pasted%20image%2020260925101500.png)
+
 ---
 A thematic break in the body must not be read as front matter.
