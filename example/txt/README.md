@@ -7,7 +7,7 @@ new (small) file, and a row in the table below.
 After changing anything here, refresh the snapshot, then read its diff before committing:
 
 ```bash
-GOLDEN_UPDATE=1 python -m unittest tests.test_golden   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden; Remove-Item Env:GOLDEN_UPDATE
+GOLDEN_UPDATE=1 python -m unittest tests.test_golden tests.test_site   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden tests.test_site; Remove-Item Env:GOLDEN_UPDATE
 git diff tests/golden                                  # read it: every change should be one you meant
 ```
 
@@ -34,10 +34,10 @@ git diff tests/golden                                  # read it: every change s
 | `bookmark:` / `bookmarks:`, in and outside `bookmarks/` | `bookmarks/sites/gitcms.dev/gitcms.dev.md`, `wiki/Projects/PublicTxt/Obsidian.md.md`, `wiki/Science/Kurzgesagt.md` |
 | Post sources (`mastodon:`, `substack:` list) | `blog/20260915-a-post-with-full-front-matter.md` |
 | Custom keys passed through | `online-things.md` (`web:`), `wiki/Science/Kurzgesagt.md` (`web-links:`) |
-| YouTube embed in image syntax; note embed `![](page.md)`, and inline as a link | `notes/embeds.md` |
+| YouTube and audio embeds in image syntax; note embed `![](page.md)`, and inline as a link | `notes/embeds.md` |
 | ` ```dataview ` tag list, with `LIMIT`; unsupported query left as code | `notes/tag-lists.md` |
 | `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `index.md`, `Projects.md`, `online-things.md` |
 | Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
-| Non-Markdown copied verbatim | `media/favicon-180.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
+| Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
 | Site settings, not content | `settings/site.toml` |

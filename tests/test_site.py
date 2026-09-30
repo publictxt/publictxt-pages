@@ -5,10 +5,10 @@ tests/golden/index.json — and rendered HTML where a template, not the
 index, is the case (dataview lists). Skipped without `hugo` on PATH.
 
 Builds in build/test/ (gitignored), mounting it in place of build/content, in
-the development environment so index.json isn't fingerprinted. Refresh as
-test_golden.py:
+the development environment so index.json isn't fingerprinted. Refresh with
+test_golden.py, after it (its refresh drops index.json):
 
-  GOLDEN_UPDATE=1 python -m unittest tests.test_site
+  GOLDEN_UPDATE=1 python -m unittest tests.test_golden tests.test_site
 """
 
 import json
@@ -71,13 +71,20 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('"/wiki/projects/publictxt/publictxt/"', self.index)
 
     def test_note_embed(self):
-        """notes/embeds.md: a standalone `![](…/Cosmology.md)` embeds; inline, a link; videos keep their <p>."""
+        """notes/embeds.md: a standalone `![](…/Cosmology.md)` embeds; inline, a link; videos and audio keep their <p>."""
         html = (self.public / "notes" / "embeds" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<div class="embed" data-pagefind-ignore="all">', html)
         self.assertIn('<a class="embed-title" href="/wiki/science/cosmology/">Cosmology</a>', html)
         self.assertIn("issue #42", html)
         self.assertIn('Inline, <a href="/notes/sample/">sample</a> is just a link.', html)
         self.assertIn('<p><iframe class="video"', html)
+        self.assertIn('<p><audio class="audio" controls preload="metadata" src="/media/silence.wav" aria-label="Half a second of silence"></audio></p>', html)
+        self.assertIn('<img src="/notes/dot.png" alt="A dot">', html)
+
+    def test_bundle_image(self):
+        """A leaf bundle's image links by the slugged URL, not the folder name."""
+        html = (self.public / "blog" / "20260921-technopolitics" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<img src="/blog/20260921-technopolitics/18378321848729087020.jpg"', html)
 
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #sci` + `LIMIT 2` of 5; a TABLE query stays code."""

@@ -52,7 +52,7 @@ node --test "tests/js/*.test.mjs"     # browser modules' logic; Node 22+, no pac
 intended change to either, refresh it and review the diff:
 
 ```bash
-GOLDEN_UPDATE=1 python -m unittest tests.test_golden   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden; Remove-Item Env:GOLDEN_UPDATE
+GOLDEN_UPDATE=1 python -m unittest tests.test_golden tests.test_site   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden tests.test_site; Remove-Item Env:GOLDEN_UPDATE
 git diff tests/golden                                  # read it: every change should be one you meant
 ```
 
