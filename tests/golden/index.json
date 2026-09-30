@@ -2,12 +2,12 @@
  {
   "bookmarks": [
    {
-    "label": "↗ youtube.com/watch?v=QW_jlUn4gA8",
-    "url": "https://www.youtube.com/watch?v=QW_jlUn4gA8"
+    "label": "↗ gohugo.io/content-management/page-resources",
+    "url": "https://gohugo.io/content-management/page-resources/"
    }
   ],
   "categories": [
-   "Science"
+   "Tech"
   ],
   "collections": [
    "blog",
@@ -17,37 +17,15 @@
   "createdLabel": "25 Sep 2026",
   "rating": 4,
   "section": "blog",
-  "summary": "No H1: title from the filename. Quoted date-only created:, block tags:.\nA Kurzgesagt video on the Barrow Scale, and a dangling link with an encoded space: Fermi Paradox.\nA pasted …",
+  "summary": "No H1: title from the filename. Quoted date-only created:, block tags:.\nAn image sits beside its note, as Obsidian saves it, and links as a file of the note&rsquo;s section — no …",
   "tags": [
-   "cosmology",
-   "sci",
-   "freeculture"
+   "attachments",
+   "obsidian",
+   "site"
   ],
-  "title": "20260925 Another Issue with the Fermi Paradox   the Barrow Scale",
+  "title": "20260925 Attachments beside the note   no post folders",
   "updated": "2026-09-25T00:00:00Z",
-  "url": "/blog/2026/20260925-another-issue-with-the-fermi-paradox---the-barrow-scale/",
-  "year": "2026"
- },
- {
-  "bookmarks": [
-   {
-    "label": "↗ locusmag.com/feature/commentary-cory-doctorow-technopolitics",
-    "url": "https://locusmag.com/feature/commentary-cory-doctorow-technopolitics/"
-   }
-  ],
-  "collections": [
-   "blog",
-   "bookmarks"
-  ],
-  "created": "2026-09-22T00:00:00Z",
-  "createdLabel": "22 Sep 2026",
-  "rating": 4,
-  "section": "blog",
-  "summary": "An image beside the post, in a year folder. The date is the file name&rsquo;s.\n",
-  "tags": [],
-  "title": "20260922 TechnoPolitics",
-  "updated": "2026-09-22T00:00:00Z",
-  "url": "/blog/2026/20260922-technopolitics/",
+  "url": "/blog/2026/20260925-attachments-beside-the-note---no-post-folders/",
   "year": "2026"
  },
  {
@@ -77,7 +55,7 @@
  {
   "categories": [
    "Tech",
-   "Politics"
+   "Project"
   ],
   "collections": [
    "blog",
@@ -87,15 +65,15 @@
   "createdLabel": "9 May 2026",
   "rating": 3,
   "section": "blog",
-  "summary": "A PublicTxt Project Post\nThere&rsquo;s a quiet irony at the heart of the modern web. We have Creative Commons licensing for content, but the conversation around that content — the …",
+  "summary": "A publictxt-pages dev post\nA folder of Markdown needs two things to be a site: pages and search. Hugo renders the pages, as one binary; Pagefind indexes the built site, with no …",
   "tags": [
-   "commons",
+   "hugo",
    "publictxt",
    "writing"
   ],
-  "title": "20260509 CuratedCommons Open Aggregation for the Open Web",
+  "title": "20260509 Choosing Hugo and Pagefind",
   "updated": "2026-05-09T00:00:00Z",
-  "url": "/blog/20260509-curatedcommons-open-aggregation-for-the-open-web/",
+  "url": "/blog/20260509-choosing-hugo-and-pagefind/",
   "year": "2026"
  },
  {
@@ -105,17 +83,35 @@
   "created": "2026-04-26T00:00:00Z",
   "createdLabel": "26 Apr 2026",
   "section": "posts",
-  "summary": "2026-04-26 &ldquo;come on.. let&rsquo;s be alive for a little bit.. If we hate it we can always die later\nFacebook\n",
+  "summary": "2026-04-26 One repo of Markdown in, a browsable, searchable site out.\nMastodon\n",
   "tags": [],
-  "title": "\"come on.. let's be alive for a little bit.. If we hate it we can always die later",
+  "title": "\"Plain text, published\": the first site builds",
   "updated": "2026-04-26T00:00:00Z",
-  "url": "/posts/20260426-come-on-lets-be-alive/",
+  "url": "/posts/20260426-first-toot/",
   "year": "2026"
+ },
+ {
+  "collections": [
+   "wiki"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "wiki",
+  "summary": "Wiki home -&gt; Site features\n#site #lists\nEvery list — home&rsquo;s Recent, sections, tag pages — renders in the browser from one index.json, over a plain list for no-JS. This …",
+  "tags": [
+   "site",
+   "lists"
+  ],
+  "title": "Browse lists",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/wiki/site/lists/browse-lists/",
+  "year": "2025"
  },
  {
   "categories": [
    "Tech",
-   "Politics"
+   "CompSci"
   ],
   "collections": [
    "wiki"
@@ -123,57 +119,15 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Computer Science -&gt; Free Software -&gt; CopyLeft #free-software #licensing\nCopyleft is the practice of granting the right to freely distribute and modify a work, with the …",
+  "summary": "Pipeline -&gt; Hashtags -&gt; Dates #pipeline #dates\nEvery page gets a created and an updated, each from the first source that has one:\nSource created updated Front matter created: …",
   "tags": [
-   "free-software",
-   "licensing"
+   "pipeline",
+   "dates"
   ],
-  "title": "CopyLeft",
+  "title": "Dates",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/wiki/computer-science/copyleft/",
-  "year": "2025"
- },
- {
-  "collections": [
-   "wiki"
-  ],
-  "created": "2025-01-01T12:00:00Z",
-  "createdLabel": "1 Jan 2025",
-  "section": "wiki",
-  "summary": "Wiki home -&gt; Science home\n#cosmology #sci\nPosts: multiverse testability\nInline math-ish text with a hash that is not a tag: issue #42 and C# are fine because tags must start …",
-  "tags": [
-   "cosmology",
-   "sci"
-  ],
-  "title": "Cosmology",
-  "updated": "2025-03-01T12:00:00Z",
-  "updatedLabel": "1 Mar 2025",
-  "url": "/wiki/science/cosmology/",
-  "year": "2025"
- },
- {
-  "categories": [
-   "Project",
-   "Tech"
-  ],
-  "collections": [
-   "wiki"
-  ],
-  "created": "2025-01-01T12:00:00Z",
-  "createdLabel": "1 Jan 2025",
-  "rating": 5,
-  "section": "wiki",
-  "summary": "Creative Commons for the curation layer: commentary and curation living in forkable plain-text repositories rather than inside a platform. #curation\nPart of [[PublicTxt]]. Blog …",
-  "tags": [
-   "publictxt",
-   "commons",
-   "curation"
-  ],
-  "title": "Curated Commons",
-  "updated": "2025-03-01T12:00:00Z",
-  "updatedLabel": "1 Mar 2025",
-  "url": "/wiki/projects/publictxt/curatedcommons/",
+  "url": "/wiki/pipeline/dates/",
   "year": "2025"
  },
  {
@@ -192,32 +146,10 @@
   "year": "2025"
  },
  {
-  "categories": [
-   "Tech",
-   "Politics"
-  ],
-  "collections": [
-   "wiki"
-  ],
-  "created": "2025-01-01T12:00:00Z",
-  "createdLabel": "1 Jan 2025",
-  "section": "wiki",
-  "summary": "Computer Science -&gt; Free Software #free-software #info-politics\nSoftware that respects the four freedoms: run, study, share, modify. Not to be confused with &ldquo;open …",
-  "tags": [
-   "free-software",
-   "info-politics"
-  ],
-  "title": "Free Software",
-  "updated": "2025-03-01T12:00:00Z",
-  "updatedLabel": "1 Mar 2025",
-  "url": "/wiki/computer-science/free-software/",
-  "year": "2025"
- },
- {
   "bookmarks": [
    {
-    "label": "↗ GitCMS.dev",
-    "url": "https://GitCMS.dev"
+    "label": "↗ gohugo.io",
+    "url": "https://gohugo.io"
    }
   ],
   "collections": [
@@ -226,63 +158,39 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "bookmarks",
-  "summary": " [[PublicTxt]] like offering - without the collaboration. Also very AI and Agent happy MCP: https://mcp.gitcms.dev ",
+  "summary": " [[publictxt-pages]] builds on it: templates, taxonomies, render hooks. One binary, no Node Docs: https://gohugo.io/documentation/ ",
   "tags": [
-   "km",
-   "PKM",
-   "git",
-   "sw",
-   "paid"
+   "hugo",
+   "SSG",
+   "go",
+   "site"
   ],
-  "title": "gitcms.dev",
+  "title": "gohugo.io",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/bookmarks/sites/gitcms.dev/gitcms.dev/",
+  "url": "/bookmarks/sites/gohugo.io/gohugo.io/",
   "year": "2025"
  },
  {
-  "bookmarks": [
-   {
-    "label": "↗ kurzgesagt.org",
-    "url": "https://kurzgesagt.org/"
-   }
+  "categories": [
+   "Tech",
+   "CompSci"
   ],
-  "collections": [
-   "wiki",
-   "bookmarks"
-  ],
-  "created": "2025-01-01T12:00:00Z",
-  "createdLabel": "1 Jan 2025",
-  "rating": 5,
-  "section": "wiki",
-  "summary": "Science Youtube Channel\nweb: https://www.youtube.com/@kurzgesagt #channel #sci #video\nBlock-style YAML tags list plus inline hashtags that duplicate them — the merge must …",
-  "tags": [
-   "channel",
-   "sci",
-   "video"
-  ],
-  "title": "Kurzgesagt",
-  "updated": "2025-03-01T12:00:00Z",
-  "updatedLabel": "1 Mar 2025",
-  "url": "/wiki/science/kurzgesagt/",
-  "year": "2025"
- },
- {
   "collections": [
    "wiki"
   ],
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Wiki home -&gt; Science home\n#brain #sci\n",
+  "summary": "Pipeline -&gt; Hashtags #pipeline #hashtags\nAn inline #tag becomes a link to its tag page and joins the page&rsquo;s tags: front matter — hashtags and front matter tags are one …",
   "tags": [
-   "brain",
-   "sci"
+   "pipeline",
+   "hashtags"
   ],
-  "title": "Neuroscience",
+  "title": "Hashtags",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/wiki/science/brain/neuroscience/",
+  "url": "/wiki/pipeline/hashtags/",
   "year": "2025"
  },
  {
@@ -315,7 +223,7 @@
  },
  {
   "categories": [
-   "Personal"
+   "Project"
   ],
   "collections": [
    "page"
@@ -323,7 +231,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "",
-  "summary": "A root-level page with front matter, including a custom web: key that must be preserved.\nMastodon GitHub Back to home.\n",
+  "summary": "A root-level page with front matter, including a custom web: key that must be preserved.\npublictxt-pages — this site&rsquo;s engine PublicTxt — the idea Mastodon Back to home.\n",
   "tags": [],
   "title": "Online things",
   "updated": "2025-03-01T12:00:00Z",
@@ -338,7 +246,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Filename contains a space. #publictxt\nTools in the same space:\n[[Obsidian]] (wikilink) Obsidian (markdown link) Logseq, Foam, Dendron ",
+  "summary": "Filename contains a space. #publictxt\nTools in the same space:\n[[Obsidian]] (wikilink) Obsidian (markdown link) Obsidian Publish, Quartz, Logseq, Foam ",
   "tags": [
    "publictxt"
   ],
@@ -346,6 +254,33 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/wiki/projects/publictxt/other-software/",
+  "year": "2025"
+ },
+ {
+  "bookmarks": [
+   {
+    "label": "↗ pagefind.app",
+    "url": "https://pagefind.app/"
+   }
+  ],
+  "collections": [
+   "wiki",
+   "bookmarks"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "rating": 5,
+  "section": "wiki",
+  "summary": "Site features search library\nweb: https://pagefind.app/docs/ #search #site #static\nBlock-style YAML tags list plus inline hashtags that duplicate them — the merge must de-duplicate …",
+  "tags": [
+   "search",
+   "site",
+   "static"
+  ],
+  "title": "Pagefind",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/wiki/site/pagefind/",
   "year": "2025"
  },
  {
@@ -367,18 +302,42 @@
   "year": "2025"
  },
  {
+  "categories": [
+   "Project",
+   "Tech"
+  ],
+  "collections": [
+   "wiki"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "rating": 5,
+  "section": "wiki",
+  "summary": "The static site part of PublicTxt: one Git repository of Markdown in, a browsable, searchable site out — Hugo for pages, Pagefind for search, no Node. #site\nPart of [[PublicTxt]]. …",
+  "tags": [
+   "publictxt",
+   "hugo",
+   "site"
+  ],
+  "title": "publictxt-pages",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/wiki/projects/publictxt/publictxt-pages/",
+  "year": "2025"
+ },
+ {
   "collections": [
    "page"
   ],
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "",
-  "summary": "Public software and contract work — a root-level page outside any section.\nUnder development PublicTxt WikiTool CuratedCommons Ideas SnapCipher — a dangling link; that page does …",
+  "summary": "What publictxt-pages doesn&rsquo;t do yet — a root-level page outside any section. SPEC.md has the full list.\nNext [[wikilink]] conversion at sync — Other Software writes them …",
   "tags": [],
-  "title": "Projects",
+  "title": "Roadmap",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/projects/",
+  "url": "/roadmap/",
   "year": "2025"
  },
  {
@@ -398,12 +357,30 @@
  },
  {
   "collections": [
+   "wiki"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "wiki",
+  "summary": "Wiki home -&gt; Site features\n#site #search\nFull-text search is Pagefind: an index built after Hugo, with tag, collection, category and year filters that work without a query. …",
+  "tags": [
+   "site",
+   "search"
+  ],
+  "title": "Search",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/wiki/site/search/",
+  "year": "2025"
+ },
+ {
+  "collections": [
    "notes"
   ],
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "notes",
-  "summary": "A Dataview block lists the pages with a tag:\n20260925 Another Issue with the Fermi Paradox the Barrow Scale blog bookmarks 25 Sep 2026 Cosmology wiki 1 Jan 2025 · updated 1 Mar …",
+  "summary": "A Dataview block lists the pages with a tag:\n20260925 Attachments beside the note no post folders blog bookmarks 25 Sep 2026 Browse lists wiki 1 Jan 2025 · updated 1 Mar 2025 All 6 …",
   "tags": [],
   "title": "Tag lists",
   "updated": "2025-03-01T12:00:00Z",
@@ -418,22 +395,22 @@
   "created": "2024-10-13T00:00:00Z",
   "createdLabel": "13 Oct 2024",
   "section": "blog",
-  "summary": "#cosmology #sci #writing\nClaims that an inflationary multiverse is &ldquo;testable&rdquo; usually reduce to: our observed constants fall inside the range the model allows. But a …",
+  "summary": "#plaintext #writing #publictxt\nNotes stay Markdown files in their repo, readable and editable anywhere. What the site needs — titles, dates, tags — is derived at build time, into a …",
   "tags": [
-   "cosmology",
-   "sci",
-   "writing"
+   "plaintext",
+   "writing",
+   "publictxt"
   ],
-  "title": "The \"Near-Optimal\" Trap: Why Multiverse Testability Still Feels Off",
+  "title": "The \"plain text first\" rule: why the source is never touched",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/blog/2024/20241013-multiverse-testability/",
+  "url": "/blog/2024/2024-10-13-why-plain-text/",
   "year": "2024"
  },
  {
   "categories": [
    "Tech",
-   "Politics"
+   "Project"
   ],
   "collections": [
    "notes"
@@ -441,15 +418,15 @@
   "created": "2024-08-16T00:00:00Z",
   "createdLabel": "16 Aug 2024",
   "section": "notes",
-  "summary": "The idea that we collectively choose a platform owned by a data-mining ad company, when publicly-owned alternatives exist.\nFilename has spaces and a dot; folder has a space. No H1. …",
+  "summary": "Why a Git repository and not a database: plain files anyone can read, history for free, free hosting, and forks as the way to reuse and aggregate.\nFilename has spaces and a dot; …",
   "tags": [
-   "info-politics",
-   "social-software"
+   "design",
+   "git"
   ],
-  "title": "The WhatsApp Mess . 20240816",
+  "title": "Why Git . 20240816",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/notes/info-politics/the-whatsapp-mess-.-20240816/",
+  "url": "/notes/design-notes/why-git-.-20240816/",
   "year": "2024"
  },
  {
@@ -460,7 +437,7 @@
   "createdLabel": "17 Dec 2023",
   "rating": 1,
   "section": "blog",
-  "summary": "Sunday, 17th December, 2023 #personal #journal #blog\nthinking and working on PublicText — dangling relative link posts &hellip;. github template repo ",
+  "summary": "Sunday, 17th December, 2023 #personal #journal #blog\nsketching PublicText — dangling relative link one repo of Markdown per person a GitHub template repo to start from ",
   "tags": [
    "personal",
    "journal",
@@ -479,7 +456,7 @@
   "created": "2023-12-17T00:00:00Z",
   "createdLabel": "17 Dec 2023",
   "section": "blog",
-  "summary": "No date in the filename — the date must come from the blog/2023/12/17/ path. #journal\n",
+  "summary": "No date in the filename — the date must come from the blog/2023/12/17/ path. First idea for the site: plain Hugo, no theme. #journal\n",
   "tags": [
    "journal"
   ],

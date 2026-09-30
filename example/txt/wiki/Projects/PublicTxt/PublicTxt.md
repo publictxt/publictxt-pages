@@ -7,6 +7,6 @@ PublicTxt is an experiment in using Git repositories as an interoperability laye
 Note the line *before* the H1 above — the sync step still has to find the title.
 
 ## Related
-- [Curated Commons](CuratedCommons.md)
+- [publictxt-pages](publictxt-pages.md) — the static site part
 - [Other Software](Other%20Software.md) — a link with an encoded space
 - [Obsidian](../../../bookmarks/wiki/Obsidian.md.md) — cross-section link into bookmarks

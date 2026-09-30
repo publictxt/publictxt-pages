@@ -64,40 +64,40 @@ class SiteIndexTest(unittest.TestCase):
         self.assertEqual(INDEX.read_text(encoding="utf-8").replace("\r\n", "\n"), self.index)
 
     def test_note_embed(self):
-        """notes/embeds.md: a standalone `![](…/Cosmology.md)` embeds; inline, a link; videos and audio keep their <p>."""
+        """notes/embeds.md: a standalone `![](…/Search.md)` embeds; inline, a link; videos and audio keep their <p>."""
         html = (self.public / "notes" / "embeds" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<div class="embed" data-pagefind-ignore="all">', html)
-        self.assertIn('<a class="embed-title" href="/wiki/science/cosmology/">Cosmology</a>', html)
+        self.assertIn('<a class="embed-title" href="/wiki/site/search/">Search</a>', html)
         self.assertIn("issue #42", html)
         self.assertIn('Inline, <a href="/notes/sample/">sample</a> is just a link.', html)
         self.assertIn('<p><iframe class="video"', html)
-        self.assertIn('<p><audio class="audio" controls preload="metadata" src="/media/silence.wav" aria-label="Half a second of silence"></audio></p>', html)
-        self.assertIn('<img src="/notes/dot.png" alt="A dot">', html)
+        self.assertIn('<p><audio class="audio" controls preload="metadata" src="/media/silence.wav" aria-label="A moment of silence"></audio></p>', html)
+        self.assertIn('<img src="/notes/pipeline.png" alt="The build: sync, Hugo, Pagefind">', html)
 
     def test_image_beside_post(self):
         """A pasted image beside a post, Obsidian's `%20` name: its section's file."""
-        html = (self.public / "blog" / "2026" / "20260925-another-issue-with-the-fermi-paradox---the-barrow-scale"
+        html = (self.public / "blog" / "2026" / "20260925-attachments-beside-the-note---no-post-folders"
                 / "index.html").read_text(encoding="utf-8")
-        self.assertIn('<img src="/blog/2026/Pasted%20image%2020260925101500.png" alt="Barrow Scale sketch">', html)
+        self.assertIn('<img src="/blog/2026/Pasted%20image%2020260925101500.png" alt="A pasted image">', html)
         self.assertTrue((self.public / "blog" / "2026" / "Pasted image 20260925101500.png").is_file())
 
     def test_spaced_note_link(self):
         """blog/_index.md: a link to a note with spaces in its name, `<…>` or `%20`, reaches it."""
         html = (self.public / "blog" / "index.html").read_text(encoding="utf-8")
-        page = "/blog/2026/20260922-technopolitics/"
-        self.assertIn(f'<a href="{page}">TechnoPolitics</a>, or <a href="{page}">escaped</a>', html)
+        page = "/blog/2026/20260925-attachments-beside-the-note---no-post-folders/"
+        self.assertIn(f'<a href="{page}">attachments</a>, or <a href="{page}">escaped</a>', html)
 
     def test_dataview_tag_list(self):
-        """notes/tag-lists.md: `LIST FROM #sci` + `LIMIT 2` of 5; a TABLE query stays code."""
+        """notes/tag-lists.md: `LIST FROM #site` + `LIMIT 2` of 6; a TABLE query stays code."""
         html = (self.public / "notes" / "tag-lists" / "index.html").read_text(encoding="utf-8")
         # From the list to the second block.
         block = re.search(r'<div class="dataview" data-pagefind-ignore="all">(.*?)TABLE rating', html, re.S)
         self.assertIsNotNone(block, "no dataview list")
-        self.assertIn('data-scope-kind="tag" data-scope-value="sci"', block[1])
+        self.assertIn('data-scope-kind="tag" data-scope-value="site"', block[1])
         self.assertIn('data-limit="2"', block[1])
         self.assertEqual(block[1].count("<li>"), 2)
-        self.assertIn("All 5 pages tagged #sci", block[1])
-        self.assertRegex(html, r"<pre[^>]*>.*TABLE rating FROM #sci", "unsupported query not left as code")
+        self.assertIn("All 6 pages tagged #site", block[1])
+        self.assertRegex(html, r"<pre[^>]*>.*TABLE rating FROM #site", "unsupported query not left as code")
 
 
 if __name__ == "__main__":
