@@ -1,0 +1,22 @@
+{{/*
+  `![](page.md)`, Obsidian's note embed. Takes the image hook's context.
+  Standalone: that page's content, boxed, titled with a link to it. Kept out
+  of Pagefind (search finds it at its own URL). Inline, with a `#heading`, or
+  unresolved: a plain link (a warning if unresolved). One level: the embedded
+  page is re-rendered from source with its own `.md` embeds made links —
+  through .Content, a cycle (A embeds B embeds A) hangs the build.
+*/}}
+{{- $u := urls.Parse .Destination -}}
+{{- $p := .PageInner.GetPage $u.Path -}}
+{{- if and $p .IsBlock (not $u.Fragment) (ne $p .PageInner) -}}
+<div class="embed" data-pagefind-ignore="all">
+  <a class="embed-title" href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+  {{- $src := replaceRE `!\[\]\(([^)\s]*?\.md(?:#[^)]*)?)\)` "[$1]($1)" $p.RawContent -}}
+  {{- $src = replaceRE `!(\[[^\]\n]*\]\([^)\s]*?\.md(?:#[^)]*)?\))` "$1" $src }}
+  <div class="embed-body">{{ $p.RenderString (dict "display" "block") $src }}</div>
+</div>
+{{- else -}}
+  {{- if not $p }}{{ warnf "%s: embed target not found: %s" .Page.File.Path .Destination }}{{ end -}}
+  {{- $link := printf `<a href="%s">%s</a>` (cond (ne $p nil) (printf "%s%s" $p.RelPermalink (cond (ne $u.Fragment "") (printf "#%s" (anchorize $u.Fragment)) "")) .Destination) (or .PlainText (cond (ne $p nil) $p.Title .Destination) | htmlEscape) -}}
+  {{- if .IsBlock }}<p>{{ $link | safeHTML }}</p>{{ else }}{{ $link | safeHTML }}{{ end -}}
+{{- end -}}

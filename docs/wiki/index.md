@@ -75,9 +75,11 @@ layouts/_partials/
   category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating:
   folder-note.html      `Foo/Foo.md`, shown on Foo's section when it has no body
+  note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
+  attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
 
 layouts/_markup/
-  render-image.html     ![](page.md) -> note embed; YouTube URL -> iframe; audio file -> <audio>; else <img>
+  render-image.html     every ![](…): .md -> note-embed; YouTube -> iframe; audio -> <audio>; else <img>
   render-codeblock-dataview.html  ```dataview LIST FROM #tag -> compact list, else code
 ```
 

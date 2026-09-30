@@ -1,51 +1,20 @@
 {{/*
-  Markdown image hook.
-  - `![](page.md)`, standalone: Obsidian's note embed — that page's content,
-    boxed, titled with a link to it. Kept out of Pagefind (search finds it at
-    its own URL). Inline, with a `#heading`, or unresolved: a plain link (a
-    warning if unresolved). One level: the embedded page is re-rendered from
-    source with its own `.md` embeds made links — through .Content, a cycle
-    (A embeds B embeds A) hangs the build.
+  Markdown image hook (Hugo's name for it — it handles every `![](…)`):
+  - a `.md` destination: note-embed.html.
   - A YouTube URL (watch, youtu.be, shorts, embed, live) becomes a
     privacy-enhanced (youtube-nocookie) iframe titled by the alt text; `t=`
     becomes `start=` (seconds, trailing `s` ok).
   - An audio file (mp3, m4a, ogg, oga, opus, wav, flac, aac) becomes an <audio
     controls>, labelled by the alt text.
   - Anything else: a plain <img>.
-  A relative image/audio path is a file in one of two places, found as a
-  Hugo resource and linked by its URL (folder names aren't URLs — slugs):
-  beside the note (its post folder, or its section's folder), or in a
-  top-level folder of files, e.g. `../../media/x.mp3` (a home resource —
-  such folders get no `_index.md`). Elsewhere: left as written, with a warning.
-  hugo.toml turns off Goldmark's <p> around standalone images (a <div> can't
-  sit in a <p>), so this adds it back for everything but embeds.
+  File URLs come from attachment-url.html. hugo.toml turns off Goldmark's <p>
+  around standalone images (a <div> can't sit in a <p>), so this adds it
+  back for everything but note embeds.
 */}}
 {{- $u := urls.Parse .Destination -}}
 {{- if and (not $u.Host) (strings.HasSuffix (lower $u.Path) ".md") -}}
-  {{- $p := .PageInner.GetPage $u.Path -}}
-  {{- if and $p .IsBlock (not $u.Fragment) (ne $p .PageInner) -}}
-<div class="embed" data-pagefind-ignore="all">
-  <a class="embed-title" href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
-  {{- $src := replaceRE `!\[\]\(([^)\s]*?\.md(?:#[^)]*)?)\)` "[$1]($1)" $p.RawContent -}}
-  {{- $src = replaceRE `!(\[[^\]\n]*\]\([^)\s]*?\.md(?:#[^)]*)?\))` "$1" $src }}
-  <div class="embed-body">{{ $p.RenderString (dict "display" "block") $src }}</div>
-</div>
-  {{- else -}}
-    {{- if not $p }}{{ warnf "%s: embed target not found: %s" .Page.File.Path .Destination }}{{ end -}}
-    {{- $link := printf `<a href="%s">%s</a>` (cond (ne $p nil) (printf "%s%s" $p.RelPermalink (cond (ne $u.Fragment "") (printf "#%s" (anchorize $u.Fragment)) "")) .Destination) (or .PlainText (cond (ne $p nil) $p.Title .Destination) | htmlEscape) -}}
-    {{- if .IsBlock }}<p>{{ $link | safeHTML }}</p>{{ else }}{{ $link | safeHTML }}{{ end -}}
-  {{- end -}}
+  {{- partial "note-embed.html" . -}}
 {{- else -}}
-{{- $dest := .Destination -}}
-{{- if and $u.Path (not $u.Host) (not $u.Scheme) (not (hasPrefix $u.Path "/")) -}}
-  {{- $p := .PageInner -}}
-  {{- $r := or ($p.Resources.Get $u.Path) (and $p.CurrentSection ($p.CurrentSection.Resources.Get $u.Path)) -}}
-  {{- with $p.File -}}
-    {{- $f := path.Join (replace .Dir "\\" "/") $u.Path -}}
-    {{- if and (not $r) (eq (len (split $f "/")) 2) }}{{ $r = site.Home.Resources.Get $f }}{{ end -}}
-  {{- end -}}
-  {{- with $r }}{{ $dest = .RelPermalink }}{{ else }}{{ warnf "%s: file not beside the note or in a top-level folder: %s" .Page.File.Path .Destination }}{{ end -}}
-{{- end -}}
 {{- $host := strings.TrimPrefix "www." (strings.TrimPrefix "m." $u.Host) -}}
 {{- $id := "" -}}
 {{- if eq $host "youtu.be" -}}
@@ -66,10 +35,13 @@
     {{- $src = printf "%s?start=%s" $src (index . 0) -}}
   {{- end -}}
   <iframe class="video" src="{{ $src }}" title="{{ or .PlainText "YouTube video" }}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-{{- else if findRE `\.(?:mp3|m4a|ogg|oga|opus|wav|flac|aac)$` (lower $u.Path) -}}
-  <audio class="audio" controls preload="metadata" src="{{ $dest | safeURL }}"{{ with .PlainText }} aria-label="{{ . }}"{{ end }}></audio>
 {{- else -}}
-  <img src="{{ $dest | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>
+  {{- $src := partial "attachment-url.html" (dict "page" .PageInner "path" .Destination) -}}
+  {{- if findRE `\.(?:mp3|m4a|ogg|oga|opus|wav|flac|aac)$` (lower $u.Path) -}}
+  <audio class="audio" controls preload="metadata" src="{{ $src | safeURL }}"{{ with .PlainText }} aria-label="{{ . }}"{{ end }}></audio>
+  {{- else -}}
+  <img src="{{ $src | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}>
+  {{- end -}}
 {{- end -}}
 {{- if .IsBlock }}</p>{{ end -}}
 {{- end -}}
