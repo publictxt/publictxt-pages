@@ -39,20 +39,17 @@
 
 {{ define "aside" }}
 <aside class="aside" aria-label="Filters">
-  {{- /* One fold for all filters, shown with #search. search.js docks it in the
-     results on narrow screens, closed unless a filter is set. The aside has
-     no whitespace, so it is :empty then (main.css). */ -}}
-  <details class="search-filters fold" id="search-filters" open hidden>
+  {{- /* Filters, then the timeline, as the browse lists'; shown with #search.
+     search.js docks the pair in the results on narrow screens, each closed
+     unless it has a filter set. The aside has no whitespace, so it is :empty
+     then (main.css). */ -}}
+  <div class="list-side" id="search-side" hidden>
+  <details class="search-filters fold" id="search-filters" open>
     <summary><h3 class="side-heading">Filters</h3></summary>
     {{/* Each section a fold, shut or open on its own and remembered
          (facets.js rememberFold); search.js hides one with nothing to offer.
          -hint takes a badge of picked values and the match toggle. */}}
     <div class="list-controls-body">
-      {{/* A select, hidden when the site spans one year: no timeline here. */}}
-      <details class="list-facet" id="filter-year-group" data-facet="year" open hidden>
-        <summary><span class="facet-label">Year <span id="filter-year-hint"></span></span></summary>
-        <label class="list-sort"><select id="filter-year" aria-label="Filter by year"></select></label>
-      </details>
       {{/* A minimum, as in the browse lists: chips, one at a time. */}}
       <details class="list-facet" id="filter-rating-group" data-facet="rating" open hidden>
         <summary><span class="facet-label">Rating <span id="filter-rating-hint"></span></span></summary>
@@ -67,5 +64,12 @@
       </details>
       {{ end }}
     </div>
-  </details></aside>
+  </details>
+  {{- /* timeline.js's filter mode, from Pagefind's month counts; hidden when
+       the index spans one month. */}}
+  <details class="timeline fold" id="search-timeline" open hidden>
+    <summary><span class="side-heading">Timeline</span></summary>
+    <ol class="tl" id="search-tl"></ol>
+  </details>
+  </div></aside>
 {{ end }}

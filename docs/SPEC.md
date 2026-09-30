@@ -51,7 +51,7 @@ Items marked **(TBD)** are not built.
 - Search
   - Full text search
   - Collection, Year and Tag filters as 'facets' are available without a query
-  - Finer date filters — month, ranges (TBD)
+  - Year and month from the timeline, as the browse lists' (Pagefind's `month` filter counts); ranges (TBD)
   - Also Sortable
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
