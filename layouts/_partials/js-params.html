@@ -1,7 +1,12 @@
 {{/*
   The `@params` for every js.Build (list-container.html, search.html): one
   source, as shared modules are copied per bundle (traps.md).
+    chipFacets  chip-facets.html
+    months      month names, January first, in the site's language — for
+                timeline.js, so JS never formats a date
   Expects the surface, "lists" or "search" — unused yet, for per-surface
   settings.
 */}}
-{{ return dict "chipFacets" (partialCached "chip-facets.html" site) }}
+{{ $months := slice }}
+{{ range seq 12 }}{{ $months = $months | append ((time (printf "2000-%02d-15" .)).Format "January") }}{{ end }}
+{{ return dict "chipFacets" (partialCached "chip-facets.html" site) "months" $months }}

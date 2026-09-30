@@ -50,11 +50,13 @@ export const PAGES_SHOWN = 8;
 export function renderTimeline(ol, tree, opts) {
   const { year, month, open, names } = opts;
   const name = (m) => names[Number(m) - 1] || m;
-  // Bars scale to the busiest month on the whole panel, so years compare.
-  const peak = Math.max(1, ...tree.flatMap((y) => y.months.map((m) => m.count)));
+  // Bars scale to the year's busiest month: each year's shape, its months
+  // against each other. Years compare by their counts.
+  const peakOf = (y) => Math.max(1, ...y.months.map((m) => m.count));
   const plural = (n) => `${n} page${n === 1 ? "" : "s"}`;
 
   // One row: node (toggle), label (filter), graphic, count.
+  // A label opens its row; a year's also shuts the other years, to focus it.
   function row(key, label, fullLabel, count, active, onPick, graphic) {
     const isOpen = open.has(key);
     const div = document.createElement("div");
@@ -74,7 +76,11 @@ export function renderTimeline(ol, tree, opts) {
     pick.textContent = label;
     pick.setAttribute("aria-pressed", String(active));
     pick.title = active ? "Click to clear" : `Show ${fullLabel} only`;
-    pick.addEventListener("click", () => { open.add(key); onPick(); });
+    pick.addEventListener("click", () => {
+      if (!key.includes("-")) for (const k of [...open]) if (k.split("-")[0] !== key) open.delete(k);
+      open.add(key);
+      onPick();
+    });
     const n = document.createElement("span");
     n.className = "count";
     n.textContent = count;
@@ -82,9 +88,10 @@ export function renderTimeline(ol, tree, opts) {
     return div;
   }
 
-  const bar = (count, title) => {
+  const bar = (count, peak, title) => {
     const b = document.createElement("i");
     b.style.setProperty("--v", String(count / peak));
+    if (!count) b.className = "none";
     if (title) b.title = title;
     return b;
   };
@@ -102,7 +109,7 @@ export function renderTimeline(ol, tree, opts) {
     for (let i = 1; i <= 12; i++) {
       const m = String(i).padStart(2, "0");
       const c = byMonth.get(m) || 0;
-      spark.append(bar(c, `${name(m)}: ${plural(c)}`));
+      spark.append(bar(c, peakOf(y), `${name(m)}: ${plural(c)}`));
     }
     li.append(row(key, y.year, y.year, y.count, active,
       () => opts.pick(active ? "" : y.year, ""), spark));
@@ -118,7 +125,7 @@ export function renderTimeline(ol, tree, opts) {
       const track = document.createElement("span");
       track.className = "tl-bar";
       track.setAttribute("aria-hidden", "true");
-      track.append(bar(m.count));
+      track.append(bar(m.count, peakOf(y)));
       // Unpicking a month goes back up to its year.
       mli.append(row(mkey, name(m.month), `${name(m.month)} ${y.year}`, m.count, on,
         () => opts.pick(y.year, on ? "" : m.month), track));
@@ -135,13 +142,16 @@ export function renderTimeline(ol, tree, opts) {
         pli.append(a);
         pages.append(pli);
       }
-      if (m.count > PAGES_SHOWN && !on) {
-        const more = document.createElement("button");
-        more.type = "button";
-        more.className = "tl-more";
-        more.textContent = `+${m.count - PAGES_SHOWN} more`;
-        more.title = `List ${name(m.month)} ${y.year}`;
-        more.addEventListener("click", () => opts.pick(y.year, m.month));
+      // Picked, the list shows the rest; else "more" picks the month.
+      if (m.count > PAGES_SHOWN) {
+        const more = document.createElement(on ? "span" : "button");
+        more.className = on ? "muted" : "tl-more";
+        more.textContent = `+${m.count - PAGES_SHOWN} more` + (on ? " in the list" : "");
+        if (!on) {
+          more.type = "button";
+          more.title = `List ${name(m.month)} ${y.year}`;
+          more.addEventListener("click", () => opts.pick(y.year, m.month));
+        }
         const pli = document.createElement("li");
         pli.append(more);
         pages.append(pli);
