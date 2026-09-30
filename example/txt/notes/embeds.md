@@ -12,6 +12,10 @@ An audio file embeds a player:
 
 ![Half a second of silence](../media/silence.wav)
 
+From a top-level folder, as above, or beside the note:
+
+![A dot](dot.png)
+
 A Markdown link to a note in image syntax embeds the note, as in Obsidian:
 
 ![](../wiki/Science/Cosmology.md)

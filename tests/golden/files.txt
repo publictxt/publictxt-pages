@@ -24,6 +24,7 @@ content/media/silence.wav
 content/notes/Info politics/The WhatsApp Mess . 20240816.md
 content/notes/Info politics/_index.md
 content/notes/_index.md
+content/notes/dot.png
 content/notes/embeds.md
 content/notes/sample.md
 content/notes/tag-lists.md

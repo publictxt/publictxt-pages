@@ -79,6 +79,7 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('Inline, <a href="/notes/sample/">sample</a> is just a link.', html)
         self.assertIn('<p><iframe class="video"', html)
         self.assertIn('<p><audio class="audio" controls preload="metadata" src="/media/silence.wav" aria-label="Half a second of silence"></audio></p>', html)
+        self.assertIn('<img src="/notes/dot.png" alt="A dot">', html)
 
     def test_bundle_image(self):
         """A leaf bundle's image links by the slugged URL, not the folder name."""

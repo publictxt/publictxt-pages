@@ -39,5 +39,5 @@ git diff tests/golden                                  # read it: every change s
 | `[[wikilinks]]`, dangling and cross-section links | `Projects.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `index.md`, `Projects.md`, `online-things.md` |
 | Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
-| Non-Markdown copied verbatim | `media/favicon-180.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
+| Non-Markdown copied verbatim | `media/favicon-180.png`; beside a note in a section, `notes/dot.png`; as a bundle attachment, `blog/20260921-TechnoPolitics/*.jpg` |
 | Site settings, not content | `settings/site.toml` |
