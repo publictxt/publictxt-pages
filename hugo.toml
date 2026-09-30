@@ -30,10 +30,10 @@ capitalizeListTitles = false
   favicon = "favicon.png"
   # Mastodon profile URL (optional), emitted as a hidden <link rel="me"> for
   # profile verification.
-  mastodon = "https://hachyderm.io/@jaysen"
+  # mastodon = "https://mastodon.social/@user"
   # "Edit this page" prefix; the page's source path is appended. Empty = no link.
   # The deploy workflow sets it (HUGO_PARAMS_EDITURL).
-  editURL = "https://github.com/jaysen/txt/edit/master/"
+  # editURL = "https://github.com/publictxt/publictxt-pages/edit/main/"
 
   # Footer wording, optional; "" hides a line. `text` is inline markdown;
   # `edit` labels the edit link (shown only with editURL).

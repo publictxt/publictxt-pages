@@ -1,51 +1,49 @@
-content/Projects.md
+content/Roadmap.md
 content/_index.md
 content/blog/2023/12/17/20231217.md
 content/blog/2023/12/17/_index.md
 content/blog/2023/12/17/another-post.md
 content/blog/2023/12/_index.md
 content/blog/2023/_index.md
-content/blog/2024/20241013-multiverse-testability.md
+content/blog/2024/2024-10-13-why-plain-text.md
 content/blog/2024/_index.md
-content/blog/2026/18378321848729087020.jpg
-content/blog/2026/20260922 TechnoPolitics.md
-content/blog/2026/20260925 Another Issue with the Fermi Paradox - the Barrow Scale.md
+content/blog/2026/20260925 Attachments beside the note - no post folders.md
 content/blog/2026/Pasted image 20260925101500.png
 content/blog/2026/_index.md
-content/blog/20260509-CuratedCommons-Open-Aggregation-for-the-Open-Web.md
+content/blog/20260509-Choosing-Hugo-and-Pagefind.md
 content/blog/20260915-a-post-with-full-front-matter.md
 content/blog/_index.md
 content/bookmarks/_index.md
 content/bookmarks/sites/_index.md
-content/bookmarks/sites/gitcms.dev/_index.md
-content/bookmarks/sites/gitcms.dev/gitcms.dev.md
-content/bookmarks/sites/obsidian.md/Obsidian Web Clipper Plugin.md
+content/bookmarks/sites/gohugo.io/_index.md
+content/bookmarks/sites/gohugo.io/gohugo.io.md
+content/bookmarks/sites/obsidian.md/Obsidian Publish.md
 content/bookmarks/sites/obsidian.md/_index.md
-content/media/favicon-180.png
+content/media/icon.png
 content/media/silence.wav
-content/notes/Info politics/The WhatsApp Mess . 20240816.md
-content/notes/Info politics/_index.md
+content/notes/Design notes/Why Git . 20240816.md
+content/notes/Design notes/_index.md
 content/notes/_index.md
-content/notes/dot.png
 content/notes/embeds.md
+content/notes/pipeline.png
 content/notes/sample.md
 content/notes/tag-lists.md
 content/online-things.md
-content/posts/20260426-come-on-lets-be-alive.md
+content/posts/20260426-first-toot.md
 content/posts/_index.md
-content/wiki/Computer-Science/CopyLeft.md
-content/wiki/Computer-Science/Free-Software.md
-content/wiki/Computer-Science/_index.md
-content/wiki/Projects/PublicTxt/CuratedCommons.md
+content/wiki/Pipeline/Dates.md
+content/wiki/Pipeline/Hashtags.md
+content/wiki/Pipeline/_index.md
 content/wiki/Projects/PublicTxt/Obsidian.md.md
 content/wiki/Projects/PublicTxt/Other Software.md
 content/wiki/Projects/PublicTxt/PublicTxt.md
 content/wiki/Projects/PublicTxt/_index.md
+content/wiki/Projects/PublicTxt/publictxt-pages.md
 content/wiki/Projects/_index.md
-content/wiki/Science/Cosmology.md
-content/wiki/Science/Kurzgesagt.md
-content/wiki/Science/_index.md
-content/wiki/Science/brain/Neuroscience.md
-content/wiki/Science/brain/_index.md
+content/wiki/Site/Pagefind.md
+content/wiki/Site/Search.md
+content/wiki/Site/_index.md
+content/wiki/Site/lists/Browse-lists.md
+content/wiki/Site/lists/_index.md
 content/wiki/_index.md
 site.toml

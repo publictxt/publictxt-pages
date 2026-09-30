@@ -1,18 +1,20 @@
-# Example public txt instance
+# publictxt-pages example
+
+A small PublicTxt repository about **publictxt-pages** itself: each page explains the feature it exercises, so this site is a tour of the project — and the fixture its tests build.
 
 See also:
 
 - Recent things
-  - [Curated Commons post](blog/20260509-CuratedCommons-Open-Aggregation-for-the-Open-Web.md)
+  - [Choosing Hugo and Pagefind](blog/20260509-Choosing-Hugo-and-Pagefind.md)
   - [PublicTxt](wiki/Projects/PublicTxt/PublicTxt.md)
 - [Online things](online-things.md)
-- [Projects](Projects.md)
+- [Roadmap](Roadmap.md)
 
 ## Content
 
-- [Wiki](wiki/_index.md) - linked wiki pages
-- [Blog](blog/_index.md) - weblogging
-- [Notes](notes/_index.md) - loose notes
+- [Wiki](wiki/_index.md) - how it works
+- [Blog](blog/_index.md) - the dev log
+- [Notes](notes/_index.md) - feature notes and demos
 - [Posts](posts/_index.md) - toots, threads, micro-blogs
 
 -----

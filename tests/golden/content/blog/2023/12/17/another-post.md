@@ -6,4 +6,4 @@ updated: 2025-03-01T12:00:00+00:00
 source_path: "blog/2023/12/17/another-post.md"
 tags: ["journal"]
 ---
-No date in the filename — the date must come from the `blog/2023/12/17/` path. [#journal](/tags/journal/)
+No date in the filename — the date must come from the `blog/2023/12/17/` path. First idea for the site: plain Hugo, no theme. [#journal](/tags/journal/)

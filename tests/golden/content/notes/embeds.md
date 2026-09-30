@@ -7,22 +7,22 @@ source_path: "notes/embeds.md"
 ---
 A YouTube link in image syntax embeds the video:
 
-![Kurzgesagt - The Barrow Scale](https://www.youtube.com/watch?v=QW_jlUn4gA8)
+![Hugo tutorial: archetypes (Giraffe Academy)](https://www.youtube.com/watch?v=bcme8AzVh6o)
 
 Short links and start times work too:
 
-![The Barrow Scale, from 1:30](https://youtu.be/QW_jlUn4gA8?t=90)
+![The same video, from 1:30](https://youtu.be/bcme8AzVh6o?t=90)
 
 An audio file embeds a player:
 
-![Half a second of silence](../media/silence.wav)
+![A moment of silence](../media/silence.wav)
 
 From a top-level folder, as above, or beside the note:
 
-![A dot](dot.png)
+![The build: sync, Hugo, Pagefind](pipeline.png)
 
 A Markdown link to a note in image syntax embeds the note, as in Obsidian:
 
-![](../wiki/Science/Cosmology.md)
+![](../wiki/Site/Search.md)
 
 Inline, ![](sample.md) is just a link.

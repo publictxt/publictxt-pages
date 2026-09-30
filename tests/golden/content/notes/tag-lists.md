@@ -8,12 +8,12 @@ source_path: "notes/tag-lists.md"
 A Dataview block lists the pages with a tag:
 
 ```dataview
-LIST FROM #sci
+LIST FROM #site
 LIMIT 2
 ```
 
 A query outside the supported subset stays a code block:
 
 ```dataview
-TABLE rating FROM #sci
+TABLE rating FROM #site
 ```
