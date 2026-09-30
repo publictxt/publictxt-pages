@@ -79,6 +79,12 @@ class SiteIndexTest(unittest.TestCase):
         html = (self.public / "blog" / "20260921-technopolitics" / "index.html").read_text(encoding="utf-8")
         self.assertIn('<img src="/blog/20260921-technopolitics/18378321848729087020.jpg"', html)
 
+    def test_bundle_note_link(self):
+        """blog/_index.md: links to a post folder's note by name reach the bundle page."""
+        html = (self.public / "blog" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<a href="/blog/20260921-technopolitics/">TechnoPolitics</a>, or '
+                      '<a href="/blog/20260921-technopolitics/">escaped</a>', html)
+
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #sci` + `LIMIT 2` of 5; a TABLE query stays code."""
         html = (self.public / "notes" / "tag-lists" / "index.html").read_text(encoding="utf-8")

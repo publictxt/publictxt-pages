@@ -9,7 +9,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     Section indexes take their newest descendant's `updated`.
   * Folder with Markdown but no index -> generated `_index.md`.
   * Post folder (one non-index .md + attachments, no subfolders) -> its .md
-    becomes `index.md`: a leaf bundle, one page.
+    becomes `index.md`: a leaf bundle, one page. Links and embeds to the .md
+    by name (`Post/Note.md`) rewritten to `Post/index.md`, so Hugo finds it.
   * `#hashtags` linkified and merged into `tags:` (hashtags.py).
   * `source_path:` records the pre-rename path, for the edit link.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
@@ -23,11 +24,13 @@ beside dest as `site.toml`, which build.py overlays on hugo.toml.
 Usage: python3 scripts/sync_content.py <source_repo> <dest_content_dir>
 """
 
+import posixpath
 import re
 import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import unquote
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags
@@ -44,6 +47,8 @@ BOOKMARK_KEYS = ("bookmark", "bookmarks")
 FRONT_MATTER_RE = re.compile(r"^---[ \t]*\r?\n(.*?)^---[ \t]*\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
+# A link or image destination: `](<a b.md#x> "t")` or `](a%20b.md#x "t")`.
+LINK_DEST_RE = re.compile(r"(\]\()(<[^>\n]+>|[^)\s]+)")
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 
@@ -129,7 +134,25 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
     return Stamp(created, created_source, updated, authored)
 
 
-def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False) -> str:
+def relink_bundle_notes(body: str, rel: str, bundle_notes: set[str]) -> str:
+    """Links to a post folder's note by name -> its `index.md`. `bundle_notes`: source rels."""
+    def fix(m: re.Match) -> str:
+        dest = m.group(2)
+        bracketed = dest.startswith("<")
+        path, _, frag = dest.strip("<>").partition("#")
+        if "://" in path or not path.lower().endswith(".md"):
+            return m.group(0)
+        start = "" if path.startswith("/") else posixpath.dirname(rel)
+        target = posixpath.normpath(posixpath.join(start, unquote(path).lstrip("/")))
+        if target not in bundle_notes:
+            return m.group(0)
+        path = path[:path.rfind("/") + 1] + "index.md" + (f"#{frag}" if frag else "")
+        return m.group(1) + (f"<{path}>" if bracketed else path)
+    return LINK_DEST_RE.sub(fix, body)
+
+
+def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False,
+                 bundle_notes: set[str] = frozenset()) -> str:
     fm, body = split_front_matter(text)
     fm = rename_legacy_keys(fm)
     name = Path(rel).name
@@ -153,6 +176,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
     if not has_key(fm, "source_path"):
         added.append(f"source_path: {yaml_str(rel)}")
 
+    body = relink_bundle_notes(body, rel, bundle_notes)
     body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
@@ -200,6 +224,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     hidden_bundles = {d for d in leaf_bundles
                       if any(is_unpublished(md.read_text(encoding="utf-8")) for md in d.glob("*.md"))}
     leaf_bundles -= hidden_bundles
+    bundle_notes = {md.relative_to(src).as_posix() for d in leaf_bundles for md in d.glob("*.md")}
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -236,7 +261,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                       "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, is_leaf_bundle), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, is_leaf_bundle, bundle_notes), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:

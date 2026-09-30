@@ -24,6 +24,7 @@ git diff tests/golden                                  # read it: every change s
 | `_index.md` as folder index; links to it | `blog/_index.md`, `notes/_index.md`, `wiki/**/_index.md` |
 | Folder with no index (generated) | `bookmarks/`, `wiki/Projects/`, `wiki/Science/brain/` |
 | Post folder -> leaf bundle | `blog/20260921-TechnoPolitics/` |
+| Links to a post folder's note by name (`<…>` and `%20`) | `blog/_index.md` |
 | `publish: off` | `notes/unpublished.md` |
 | Spaces and dots in names; `.md` in a folder name | `wiki/Projects/PublicTxt/Other Software.md`, `Obsidian.md.md`, `bookmarks/sites/obsidian.md/` |
 | Front matter fence with trailing space (`--- `) | `wiki/Computer-Science/CopyLeft.md`, `Free-Software.md`, `notes/Info politics/…` |

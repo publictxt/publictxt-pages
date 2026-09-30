@@ -79,6 +79,9 @@ tags. Reordering changes every page's tags.
 - `normalise_md` drops blank lines from existing front matter.
 - `*.md` globs match folders too — bookmark domain folders (`sites/obsidian.md/`).
   Check `is_file()`.
+- A post folder's note is renamed `index.md`; sync rewrites links to it by name, and
+  Hugo's embedded link hook (`hugo.toml`) and `note-embed.html` resolve the result by
+  `GetPage`. A custom `render-link.html` must keep doing so.
 
 ## Search is unavailable under `hugo server`
 
