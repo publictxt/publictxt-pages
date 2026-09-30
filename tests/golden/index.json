@@ -97,7 +97,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Wiki home -&gt; Site features\n#site #lists\nEvery list — home&rsquo;s Recent, sections, tag pages — renders in the browser from one index.json, over a plain list for no-JS. This …",
+  "summary": "#site #lists\nEvery list — home&rsquo;s Recent, sections, tag pages — renders in the browser from one index.json, over a plain list for no-JS.\nThis folder has no _index.md: sync …",
   "tags": [
    "site",
    "lists"
@@ -362,7 +362,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Wiki home -&gt; Site features\n#site #search\nFull-text search is Pagefind: an index built after Hugo, with tag, collection, category and year filters that work without a query. …",
+  "summary": "#site #search\nFull-text search is Pagefind: an index built after Hugo, with tag, collection, category and year filters that work without a query. Posts: the plain text rule\nInline …",
   "tags": [
    "site",
    "search"

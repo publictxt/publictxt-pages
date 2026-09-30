@@ -1,5 +1,3 @@
-[Wiki home](../_index.md) -> [Site features](_index.md)
-
 # Search
 
 #site #search
