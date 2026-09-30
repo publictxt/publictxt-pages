@@ -5,10 +5,10 @@ tests/golden/index.json — and rendered HTML where a template, not the
 index, is the case (dataview lists). Skipped without `hugo` on PATH.
 
 Builds in build/test/ (gitignored), mounting it in place of build/content, in
-the development environment so index.json isn't fingerprinted. Refresh as
-test_golden.py:
+the development environment so index.json isn't fingerprinted. Refresh with
+test_golden.py, after it (its refresh drops index.json):
 
-  GOLDEN_UPDATE=1 python -m unittest tests.test_site
+  GOLDEN_UPDATE=1 python -m unittest tests.test_golden tests.test_site
 """
 
 import json

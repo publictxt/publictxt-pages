@@ -9,7 +9,10 @@ itself is test_dates.py's.
 An intended change: refresh, then read the diff before committing —
 reviewing it is the test.
 
-  GOLDEN_UPDATE=1 python -m unittest tests.test_golden     (PowerShell: $env:GOLDEN_UPDATE=1)
+  GOLDEN_UPDATE=1 python -m unittest tests.test_golden tests.test_site     (PowerShell: $env:GOLDEN_UPDATE=1)
+
+With test_site, after it: the refresh rewrites tests/golden/ whole, dropping
+index.json, which test_site writes.
 """
 
 import contextlib

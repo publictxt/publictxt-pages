@@ -7,7 +7,7 @@ new (small) file, and a row in the table below.
 After changing anything here, refresh the snapshot, then read its diff before committing:
 
 ```bash
-GOLDEN_UPDATE=1 python -m unittest tests.test_golden   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden; Remove-Item Env:GOLDEN_UPDATE
+GOLDEN_UPDATE=1 python -m unittest tests.test_golden tests.test_site   # PowerShell: $env:GOLDEN_UPDATE=1; python -m unittest tests.test_golden tests.test_site; Remove-Item Env:GOLDEN_UPDATE
 git diff tests/golden                                  # read it: every change should be one you meant
 ```
 
