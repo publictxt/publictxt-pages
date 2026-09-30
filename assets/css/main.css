@@ -16,7 +16,7 @@
   --radius: 8px;
   --sidebar-width: 264px;   /* left: site nav */
   --aside-width: 288px;     /* right: page meta, filters; grows to --aside-max */
-  --aside-max: 360px;
+  --aside-max: 348px;
   --main-fit: 900px;        /* main's width before the aside grows past --aside-width */
   --gutter: 1.5rem;         /* page edge; x 4/3 between columns */
   --header-h: 4.5rem;
@@ -279,10 +279,17 @@ a:hover { text-decoration: underline; }
 .hero .lead { color: var(--text-muted); font-size: 1.05rem; max-width: 60ch; }
 .hero .lead p { margin: 0; }
 
+/* Home: Browse cards and Recent share a width — --cards (home.html) cards at
+   most --card-max each; auto-fit stretches the cards to fill it. */
+.home-browse {
+  --card-max: 200px;
+  --card-gap: 0.9rem;
+  max-width: calc(var(--cards) * var(--card-max) + (var(--cards) - 1) * var(--card-gap));
+}
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--card-gap, 0.9rem);
 }
 
 .card {
