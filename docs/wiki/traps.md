@@ -61,6 +61,11 @@ aside by `:empty` — so these asides must hold no whitespace (`{{- -}}`) around
 Pagefind also indexes section index bodies (`section.html`); browse lists hold regular
 pages only. `category-counts.html` counts sections too, to match the search it links to.
 
+## `hugo.toml`: a key after a `[params.x]` table belongs to it
+
+TOML ignores indentation. `sectionOrder` and four others sat below `[params.footer]`
+and were silently `params.footer.*`. Plain `[params]` keys go above the first table.
+
 ## `partialCached` on site-scanning partials
 
 `site-index.html`, `sections.html`, `collection-pages.html`, `category-counts.html`

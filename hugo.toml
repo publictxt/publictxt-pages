@@ -40,6 +40,10 @@ capitalizeListTitles = false
   sectionOrder = ["bookmarks", "blog", "wiki", "posts", "notes"]
   tagCloudLimit = 30   # sidebar tag cloud
   recentLimit = 8      # home Recent list: cards per page
+  # Collections sharing one timeline on their pages, with a chip per
+  # collection to narrow it; its labels link to the home list. Pages outside
+  # them get their section's timeline. Empty = every page its section's.
+  timelineCollections = ["blog", "posts"]
   # Browse list defaults: sort "<field> [asc|desc]" over created (newest first),
   # title (A→Z), updated, rating (top first); cards per page. A section index
   # overrides for its subtree with `order:` / `perPage:`.

@@ -17,7 +17,7 @@ Items marked **(TBD)** are not built.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
   - Sections move to specialised Views over Collections (TBD)
-    - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
+    - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD; a page's shared timeline does this for `timelineCollections`)
     - Bookmarks should show Bookmark specialised view (TBD)
 - Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
   - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.
@@ -26,7 +26,7 @@ Items marked **(TBD)** are not built.
   - Sections, categories, tag cloud
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
-  - page meta (collections, dates, categories, tags) on pages, then its section's timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to the section list at that date (pages in a section with two or more pages)
+  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none.
   - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories

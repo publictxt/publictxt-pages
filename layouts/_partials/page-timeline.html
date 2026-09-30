@@ -1,13 +1,23 @@
 {{/*
-  A page's archive, below "This page" (page.html's right column): its
-  section's pages on the timeline, titles and all, its own marked —
-  page-timeline.js fills it from the site index, so every page view fetches
-  index.json (cached; fingerprinted in production). Hidden until filled, and
-  for pages outside a section. Takes the page.
+  A page's archive, below "This page" (page.html's right column), filled by
+  page-timeline.js from the site index — so every page view fetches
+  index.json (cached; fingerprinted in production). Hidden until filled.
+  Its scope:
+    a page in any of params.timelineCollections — all of those, one shared
+      timeline with a chip per collection; labels link to the home list
+    else a page in a section — that section; labels link to its list
+    else (root-level pages) none
+  Takes the page.
 */}}
-{{ with .FirstSection }}{{ if not .IsHome }}
-<details class="timeline fold" data-page-timeline data-section="{{ .RelPermalink }}" data-url="{{ $.RelPermalink }}" open hidden>
-  <summary><span class="side-heading">{{ .Section | humanize }} timeline</span></summary>
+{{ $group := slice }}{{ range site.Params.timelineCollections }}{{ $group = $group | append (lower .) }}{{ end }}
+{{ $shared := intersect (partial "page-collections.html" .) $group }}
+{{ $section := cond (and .FirstSection (not .FirstSection.IsHome)) .FirstSection false }}
+{{ if or $shared $section }}
+<details class="timeline fold" data-page-timeline data-url="{{ .RelPermalink }}"
+  {{- if $shared }} data-collections="{{ delimit $group " " }}" data-list="{{ site.Home.RelPermalink }}"
+  {{- else }} data-section="{{ $section.RelPermalink }}" data-list="{{ $section.RelPermalink }}"{{ end }} open hidden>
+  <summary><span class="side-heading">{{ if $shared }}Timeline{{ else }}{{ $section.Section | humanize }} timeline{{ end }}</span></summary>
+  <div class="chip-row tl-chips" hidden></div>
   <ol class="tl"></ol>
 </details>
 {{ with resources.Get "js/page-timeline.js" }}
@@ -15,4 +25,4 @@
 {{ if hugo.IsProduction }}{{ $js = $js | fingerprint }}{{ end }}
 <script type="module" src="{{ $js.RelPermalink }}"{{ with $js.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
 {{ end }}
-{{ end }}{{ end }}
+{{ end }}
