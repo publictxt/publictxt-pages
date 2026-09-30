@@ -74,7 +74,6 @@ layouts/_partials/
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating:
-  folder-note.html      `Foo/Foo.md`, shown on Foo's section when it has no body
   note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
   attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
 

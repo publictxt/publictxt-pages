@@ -14,7 +14,6 @@ Items marked **(TBD)** are not built.
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
-  - Folder note: with no index body, a section shows its `Foo/Foo.md` (any case). The note stays a page — listed, linked, searched at its own URL.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - Sections move to specialised Views over Collections (TBD)
     - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
