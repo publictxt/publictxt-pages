@@ -396,12 +396,7 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   gap: 0.6rem;
 }
-.list-controls-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
+.list-controls-head { display: flex; justify-content: flex-end; }
 .facet-label {
   font-size: 0.72rem;
   font-weight: 700;
@@ -411,7 +406,6 @@ a:hover { text-decoration: underline; }
   flex: none;
   min-width: 3rem;
 }
-.list-selects { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
 .list-sort { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
 .filter-group .list-sort, .filter-group .list-sort select { display: flex; width: 100%; }
 .list-sort select {
@@ -424,23 +418,51 @@ a:hover { text-decoration: underline; }
   padding: 0.3rem 0.5rem;
 }
 .list-sort select:focus { outline: none; border-color: var(--accent); }
-.list-facet {
+/* One filter section (list.js): a <details> whose label shuts it, as .fold
+   but smaller; picked values count in a badge, seen while shut. */
+.list-facet { padding-top: 0.6rem; border-top: 1px solid var(--border); }
+.list-facet:first-child { padding-top: 0; border-top: 0; }
+.list-facet > summary {
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--border);
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  list-style: none;
+  cursor: pointer;
 }
-.list-facet .chip-row { flex: 1 1 auto; min-width: 0; }
+.list-facet > summary::-webkit-details-marker { display: none; }
+.list-facet > summary::after {
+  content: "";
+  width: 0.32rem;
+  height: 0.32rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+  flex: none;
+}
+.list-facet[open] > summary { margin-bottom: 0.45rem; }
+.list-facet[open] > summary::after { transform: rotate(45deg); }
+@media (hover: hover) {
+  .list-facet > summary:hover .facet-label,
+  .list-facet > summary:hover::after { color: var(--accent); border-color: var(--accent); }
+}
+.list-facet > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.facet-badge {
+  display: inline-block;
+  min-width: 1.3em;
+  padding: 0 0.35em;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  text-align: center;
+}
+.list-facet[open] .facet-badge { display: none; }
 .list-reset { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
 .list-status { margin: 0; font-size: 1.15rem; font-weight: 700; }
 .filter-chip.more { border-style: dashed; color: var(--text-muted); }
-/* In the right column: stacked, each label above its control. */
-.aside .list-controls-head { flex-direction: column; align-items: stretch; }
-.aside .list-selects { flex-direction: column; align-items: stretch; gap: 0.6rem; }
-.aside .list-selects .list-sort { justify-content: space-between; }
-.aside .list-reset { align-self: flex-start; }
-.aside .list-facet { flex-direction: column; gap: 0.45rem; }
 /* Filters, then the timeline (list.js): one block, docked together. */
 .list-side { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 0.8rem; }
 .aside .list-side { gap: 1.25rem; margin: 0; }
@@ -595,7 +617,7 @@ a:hover { text-decoration: underline; }
 .tl-more:hover { text-decoration: underline; }
 .tl-empty { font-size: 0.8rem; }
 @media (prefers-reduced-motion: reduce) {
-  .tl-node::before { transition: none; }
+  .tl-node::before, .list-facet > summary::after { transition: none; }
 }
 
 .pagination {
