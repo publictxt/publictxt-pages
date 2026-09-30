@@ -5,7 +5,7 @@ categories:
 ---
 # Free Software
 
-[Computer Science](index.md) -> Free Software #free-software #info-politics
+[Computer Science](_index.md) -> Free Software #free-software #info-politics
 
 Software that respects the four freedoms: run, study, share, modify. Not to be confused with "open source", which describes a development method rather than an ethic.
 

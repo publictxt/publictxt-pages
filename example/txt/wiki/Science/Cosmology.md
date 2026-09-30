@@ -1,4 +1,4 @@
-[Wiki home](../index.md) -> [Science home](index.md)
+[Wiki home](../_index.md) -> [Science home](_index.md)
 
 # Cosmology
 

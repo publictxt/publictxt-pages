@@ -15,6 +15,7 @@ Items marked **(TBD)** are not built.
   - home list sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
+  - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
   - Sections move to specialised Views over Collections (TBD)
     - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD)
     - Bookmarks should show Bookmark specialised view (TBD)
@@ -68,9 +69,9 @@ Items marked **(TBD)** are not built.
 
 ```txt
 
-index.md, Projects.md                   (home + root pages)
+_index.md, Projects.md                  (home + root pages)
 
-wiki/index.md, wiki/A/index.md          (folder index = section page (any depth))
+wiki/_index.md, wiki/A/_index.md        (folder index = section page (any depth))
 
 blog/2023/12/17/x.md                    (dates derived from path)
 blog/20260509-title.md                  (YYYYMMDD prefix date)

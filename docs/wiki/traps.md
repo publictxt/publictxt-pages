@@ -74,11 +74,8 @@ keys are invisible. Swap in a real parser rather than extend the regexes.
 `HASHTAG_RE`: linkified tags, then protected regions (code, links, URLs), then bare
 tags. Reordering changes every page's tags.
 
-## Sync collisions and rewrites
+## Sync quirks
 
-- `index.md` and `home.md` in one folder both become `_index.md`; the later wins,
-  silently.
-- `linkify` runs **after** the index-link rewrite, which expects untouched links.
 - `normalise_md` drops blank lines from existing front matter.
 - `*.md` globs match folders too — bookmark domain folders (`sites/obsidian.md/`).
   Check `is_file()`.

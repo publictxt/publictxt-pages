@@ -3,8 +3,7 @@
 sync_content.py — copy a PublicTxt/Obsidian repo into Hugo's content dir,
 fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
-  * `index.md`/`home.md` -> `_index.md` (else Hugo reads the folder as a leaf
-    bundle and hides its siblings); links to them rewritten to match.
+  * A folder's index is `_index.md`, Hugo's name, passed through as written.
   * No `title:` -> the leading `# H1` (removed from the body), else filename.
   * No `created:`/`updated:` -> dates.py ladders; `date:`/`lastmod:` renamed.
     Section indexes take their newest descendant's `updated`.
@@ -35,7 +34,7 @@ from hashtags import linkify, merge_tags
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
-INDEX_NAMES = {"index.md", "home.md"}
+INDEX_NAMES = {"_index.md"}
 SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.toml
 # `publish:` values that keep a page off the site (YAML reads off/no as false).
 UNPUBLISHED = {"off", "false", "no", "0"}
@@ -44,7 +43,6 @@ BOOKMARK_KEYS = ("bookmark", "bookmarks")
 # Fences may carry trailing spaces (`--- `), as editors leave them.
 FRONT_MATTER_RE = re.compile(r"^---[ \t]*\r?\n(.*?)^---[ \t]*\r?\n?", re.DOTALL | re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
-INDEX_LINK_RE = re.compile(r"(\]\([^)\s]*?)(?:index|home)\.md(#[^)]*)?\)")
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
@@ -155,7 +153,6 @@ def normalise_md(text: str, rel: str, stamp: Stamp, is_leaf_bundle: bool = False
     if not has_key(fm, "source_path"):
         added.append(f"source_path: {yaml_str(rel)}")
 
-    body = INDEX_LINK_RE.sub(r"\1_index.md\2)", body)
     body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
@@ -227,9 +224,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
         if path.suffix.lower() == ".md":
             is_index = path.name in INDEX_NAMES
             is_leaf_bundle = path.parent in leaf_bundles
-            if is_index:
-                target = target.with_name("_index.md")
-            elif is_leaf_bundle:
+            if is_leaf_bundle:
                 target = target.with_name("index.md")
             text = path.read_text(encoding="utf-8")
             if is_unpublished(text):

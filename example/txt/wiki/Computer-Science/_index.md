@@ -1,4 +1,4 @@
-[Wiki home](../index.md)
+[Wiki home](../_index.md)
 
 # Computer Science things
 
