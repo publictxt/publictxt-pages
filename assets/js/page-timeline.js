@@ -5,14 +5,20 @@
 //   data-collections  pages of any of these collections, one timeline, with
 //                     collection chips (facets.js, as configured) to narrow
 //                     it; remembered per browser, and carried into the links
+//   data-tags         params.timelineTags, as JSON: a chip each where the tag
+//                     splits the timeline (splittingTags), the tag facet's
+//                     states; remembered and carried alike. Panel-only, so
+//                     it works without the tag chip facet, unlinked then.
 // Needs a second page; else it stays hidden.
 import * as params from "@params";   // js-params.html
-import { chipFacets, filterChip, matches, readFacet, writeFacet } from "./facets.js";
+import { chipFacets, filterChip, isSet, matches, readFacet, writeFacet } from "./facets.js";
 import { siteIndex, scope } from "./site-index.js";
-import { monthOf, renderTimeline, timeline } from "./timeline.js";
+import { monthOf, renderTimeline, splittingTags, timeline } from "./timeline.js";
 
-const COLLECTION = chipFacets(params.chipFacets).defs.find((d) => d.key === "collection");
-const KEY = "timeline-collections";   // the chips' state, as a query string
+const FACETS = chipFacets(params.chipFacets).defs;
+const COLLECTION = FACETS.find((d) => d.key === "collection");
+const TAG = FACETS.find((d) => d.key === "tag");
+const KEY = "timeline-collections";   // the chips' state (tags too), as a query string
 
 async function mount(el) {
   const { section, url, list } = el.dataset;
@@ -34,24 +40,30 @@ async function mount(el) {
   const ol = el.querySelector(".tl");
 
   // Chips: the group's collections with pages, when two or more — and the
-  // collection chip facet is configured.
+  // collection chip facet is configured; then the tags that split it.
   const present = group.filter((c) => items.some((it) => it.collections.includes(c)));
+  let wanted = [];
+  try { wanted = JSON.parse(el.dataset.tags || "[]"); } catch { /* none */ }
+  const tags = splittingTags(items, wanted);
   const chipRow = el.querySelector(".tl-chips");
-  let f = null;
-  if (COLLECTION && present.length > 1) {
-    let saved = "";
-    try { saved = localStorage.getItem(KEY) || ""; } catch { /* none */ }
-    f = readFacet(new URLSearchParams(saved), "collection", COLLECTION.states, COLLECTION.modes);
-    for (const s of [f.inc, f.exc]) for (const v of [...s]) if (!present.includes(v)) s.delete(v);
-  }
+  let saved;
+  try { saved = new URLSearchParams(localStorage.getItem(KEY) || ""); } catch { saved = new URLSearchParams(); }
+  const restore = (key, def, values) => {
+    const out = readFacet(saved, key, def?.states, def?.modes);
+    for (const s of [out.inc, out.exc]) for (const v of [...s]) if (!values.includes(v)) s.delete(v);
+    return out;
+  };
+  const f = COLLECTION && present.length > 1 ? restore("collection", COLLECTION, present) : null;
+  const tf = tags.length ? restore("tag", TAG, tags) : null;
   const save = () => {
     const p = new URLSearchParams();
-    writeFacet(p, f);
+    for (const x of [f, tf]) if (x) writeFacet(p, x);
     try { localStorage.setItem(KEY, p.toString()); } catch { /* this page only, then */ }
   };
 
   // The list at a date: the chips' collections, as includes, when the facet
-  // can match any of them; else the date alone.
+  // can match any of them; else the date alone. Tag chips as set, when the
+  // list has the tag facet.
   function href(y, m) {
     const p = new URLSearchParams({ year: y });
     if (m) p.set("month", m);
@@ -62,14 +74,19 @@ async function mount(el) {
         if (shown.length > 1 && COLLECTION.modes[0] !== "any") p.set("collection-match", "any");
       }
     }
+    if (tf && TAG && isSet(tf)) writeFacet(p, tf);
     return `${list}?${p}`;
   }
 
   function draw() {
-    const shown = f ? items.filter((it) => matches(f, it.collections)) : items;
-    if (f) {
-      chipRow.replaceChildren(...present.map((c) => filterChip(f, c, c,
-        items.filter((it) => it.collections.includes(c)).length, () => { save(); draw(); })));
+    const shown = items.filter((it) => (!f || matches(f, it.collections)) && (!tf || matches(tf, it.tags || [])));
+    const onPress = () => { save(); draw(); };
+    if (f || tf) {
+      chipRow.replaceChildren(
+        ...(f ? present.map((c) => filterChip(f, c, c,
+          items.filter((it) => it.collections.includes(c)).length, onPress)) : []),
+        ...(tf ? tags.map((t) => filterChip(tf, t, "#" + t,
+          items.filter((it) => (it.tags || []).includes(t)).length, onPress)) : []));
       chipRow.hidden = false;
     }
     const tree = timeline(shown);

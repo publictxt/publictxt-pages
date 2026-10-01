@@ -50,7 +50,7 @@ layouts/_partials/
   head.html             title, description, favicon, Mastodon rel="me", stylesheet, nav.js
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
-  page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's
+  page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal
@@ -98,7 +98,7 @@ assets/js/facets.js       chip facets from config; include, exclude, match any/a
                           chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
-assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared
+assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared, timelineTags chips
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette + column widths in :root
 ```
