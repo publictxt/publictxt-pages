@@ -5,7 +5,8 @@
 //   data-collections  pages of any of these collections, one timeline, with
 //                     collection chips (facets.js, as configured) to narrow
 //                     it; remembered per browser, and carried into the links
-//   data-tags         params.timelineTags, as JSON: a chip each where the tag
+//   data-tags         with data-collections only (page-timeline.html):
+//                     params.timelineTags, as JSON: a chip each where the tag
 //                     splits the timeline (splittingTags), the tag facet's
 //                     states; remembered and carried alike. Panel-only, so
 //                     it works without the tag chip facet, unlinked then.

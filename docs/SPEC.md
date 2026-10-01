@@ -26,7 +26,7 @@ Items marked **(TBD)** are not built.
   - Sections, categories, tag cloud
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
-  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none. Either timeline also gets a chip per `timelineTags` tag (default `journal`) that some of its pages have and some don't — a filter on that panel only, not a collection; remembered and carried alike.
+  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none. The shared timeline also gets a chip per `timelineTags` tag (default `journal`: blog entries of a special kind) that some of its pages have and some don't — a filter on that panel only, not a collection; remembered and carried alike.
   - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories

@@ -44,9 +44,10 @@ capitalizeListTitles = false
   # collection to narrow it; its labels link to the home list. Pages outside
   # them get their section's timeline. Empty = every page its section's.
   timelineCollections = ["blog", "posts"]
-  # Tags with a chip on a page's timeline, to narrow it (include or exclude),
-  # wherever some of its pages have the tag and some don't. Not collections:
-  # nothing else changes. Empty = no tag chips.
+  # Tags with a chip on that shared timeline, to narrow it (include or
+  # exclude), where some of its pages have the tag and some don't — entries
+  # of a special kind. Not collections: nothing else changes. Section
+  # timelines get none. Empty = no tag chips.
   timelineTags = ["journal"]
   # Browse list defaults: sort "<field> [asc|desc]" over created (newest first),
   # title (A→Z), updated, rating (top first); cards per page. A section index
