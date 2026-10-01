@@ -30,7 +30,7 @@ tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
-tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
+tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling, tag chips
 ```
 
 ## Templates
