@@ -971,6 +971,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   .layout {
     display: flex;
     flex-direction: column;
+    align-items: stretch;   /* not the grid's start: side panels fill the width */
     gap: 1.25rem;
   }
 
