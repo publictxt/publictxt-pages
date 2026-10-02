@@ -48,10 +48,10 @@ Home, section and tag lists share one interface.
 **Sort**: Newest, Oldest, Title, Recently updated, Top/Lowest rated (unrated counts as
 2.5). Starts at the [configured order](configuration.md#browse-lists).
 
-**Newest, Oldest and Recently updated group by month**, on a rail, each page's day of the
-month beside it. A month's heading stays pinned while you scroll its pages and shows how
-many it holds — "4 of 9 pages" when the month runs onto another page. Click its node to
-fold it; under Newest and Oldest, click its name to filter to it.
+**Newest, Oldest and Recently updated group by month.** A month's heading stays pinned
+while you scroll its pages and shows how many it holds — "4 of 9 pages" when the month
+runs onto another page. Click its circle to fold it; under Newest and Oldest, click its
+name to filter to it.
 
 **Compact**, beside sort: one line per page — title, date, stars — for skimming. Remembered
 in your browser for lists and search; not part of the URL.
