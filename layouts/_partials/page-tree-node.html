@@ -1,22 +1,18 @@
 {{/*
-  One folder's rows in page-tree.html: its sub-folders (each a <details>,
-  recursing) then its pages, as <li>s. On the page's path: `on-path`, open;
-  the page itself: `current`, aria-current.
-  Takes dict section (a section page), page (the page shown).
+  One folder's rows in page-tree.html, all shut, nothing marked: its
+  sub-folders (each a <details>, recursing), then its pages, as <li>s.
+  Opened rows come from tree-row.html. Page-independent, so page-tree.html
+  caches it per tree.
+  Takes a section page.
 */}}
-{{- $page := .page -}}
-{{- range sort .section.Sections "Path" -}}
-{{- $on := .IsAncestor $page -}}
-<li class="tree-dir{{ if $on }} on-path{{ end }}">
-  <details{{ if $on }} open{{ end }}>
-    <summary><a href="{{ .RelPermalink }}">{{ partial "crumb-label.html" . }}</a><span class="count">{{ len .RegularPagesRecursive }}</span></summary>
+{{- range sort .Sections "Path" -}}
+{{- partial "tree-row.html" (dict "url" .RelPermalink "dir" true) }}{{ partial "crumb-label.html" . }}</a><span class="count">{{ len .RegularPagesRecursive }}</span></summary>
     <ul class="tree-list">
-      {{- partial "page-tree-node.html" (dict "section" . "page" $page) -}}
+      {{- partial "page-tree-node.html" . -}}
     </ul>
   </details>
 </li>
 {{- end -}}
-{{- range sort .section.RegularPages "LinkTitle" -}}
-{{- $cur := eq . $page -}}
-<li class="tree-page{{ if $cur }} current{{ end }}"><a href="{{ .RelPermalink }}"{{ if $cur }} aria-current="page"{{ end }}>{{ .LinkTitle }}</a></li>
+{{- range sort .RegularPages "LinkTitle" -}}
+{{- partial "tree-row.html" (dict "url" .RelPermalink) }}{{ .LinkTitle }}</a></li>
 {{- end -}}

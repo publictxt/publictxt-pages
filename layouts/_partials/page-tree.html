@@ -1,19 +1,32 @@
 {{/*
   A page's folder tree, below "This page" (page.html's right column), in
   place of its timeline when tree-root.html gives its section.
-  Server-rendered, no JS: nested <details>, open along the page's path — the path lit, the page marked, every other folder shut
-  with its page count (focus + context). Folders first, by folder name;
-  then pages, by title. Built from Hugo's sections — sync gives every folder
-  an _index.md, so the folders are the source repo's.
+  Server-rendered, no JS: nested <details>, open along the page's path —
+  the path lit, the page marked, every other folder shut with its page
+  count (focus + context). Folders first, by folder name; then pages, by
+  title. Built from Hugo's sections — sync gives every folder an
+  _index.md, so the folders are the source repo's.
+  Rendered once per tree (partialCached), then each page's path patched
+  in, row by row (tree-row.html): rendering it per page made the build
+  O(pages²) — 5x slower on a 1,000-page wiki.
   Takes dict page, root (tree-root.html's section).
 */}}
 {{ $root := .root }}
+{{ $html := partialCached "page-tree-node.html" $root $root.RelPermalink }}
+{{ range .page.Ancestors }}
+  {{ if and (ne . $root) (.IsDescendant $root) }}
+    {{ $html = replace $html (partial "tree-row.html" (dict "url" .RelPermalink "dir" true))
+      (partial "tree-row.html" (dict "url" .RelPermalink "dir" true "on" true)) 1 }}
+  {{ end }}
+{{ end }}
+{{ $html = replace $html (partial "tree-row.html" (dict "url" .page.RelPermalink))
+  (partial "tree-row.html" (dict "url" .page.RelPermalink "on" true)) 1 }}
 <nav class="side-block tree" aria-label="{{ $root.Section | humanize }} pages">
   <h2 class="side-heading tree-head">
     <a href="{{ $root.RelPermalink }}">{{ $root.Section | humanize }}</a>
     <span class="count">{{ len $root.RegularPagesRecursive }}</span>
   </h2>
   <ul class="tree-list">
-    {{- partial "page-tree-node.html" (dict "section" $root "page" .page) -}}
+    {{- $html | safeHTML -}}
   </ul>
 </nav>

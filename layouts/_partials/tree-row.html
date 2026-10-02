@@ -1,0 +1,11 @@
+{{- /*
+  A folder tree row's opening tags, its link's href the last thing in it:
+  page-tree-node.html renders the tree with them shut and unmarked, and
+  page-tree.html finds one ("on" false) to swap in its on-path form ("on"
+  true). One source, so the two match byte for byte — html/template
+  escapes the href (café -> caf%C3%A9), which a hand-built string misses.
+  Takes dict url, dir (folder, else page), on.
+*/ -}}
+{{- if .dir -}}<li class="tree-dir{{ if .on }} on-path{{ end }}"><details{{ if .on }} open{{ end }}><summary><a href="{{ .url }}">
+{{- else -}}<li class="tree-page{{ if .on }} current{{ end }}"><a href="{{ .url }}"{{ if .on }} aria-current="page"{{ end }}>
+{{- end -}}
