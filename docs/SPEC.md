@@ -68,6 +68,7 @@ Items marked **(TBD)** are not built.
 - Pages
   - Folders are sections and notes are pages, whatever a folder holds — a post folder (a note + its attachments) is a section with one page. Attach files beside the note instead; no folder needed.
   - `publish: off` (or false / no / 0) keeps a page off the site — and every file of a folder whose Markdown is all unpublished (a draft's attachments; beside published notes, they're published). Hidden, not private: it stays in the source repo.
+  - `params.excludeFolders` in `settings/site.toml` leaves whole folders out, notes and attachments (e.g. `["settings/Templates"]`, with Obsidian's Templates plugin pointed at that folder; `settings/` itself isn't skipped, only `site.toml` is special there): paths from the repo root, case-insensitive. Like `publish: off`, hidden not private. Links into them dangle.
   - `![alt](youtube-url)` embeds the video; `![alt](file.mp3)` (also m4a, ogg, oga, opus, wav, flac, aac) an audio player; other images stay images.
   - A relative image/audio path must be beside the note (its folder, or a subfolder of it like `attachments/`) or in a top-level folder of files (`media/`); elsewhere it's left as written, with a build warning.
   - `![](page.md)` on its own line embeds that page's content, as Obsidian does; inline, a link. One level deep (nested embeds become links). `#heading` section embeds (TBD — a link for now).

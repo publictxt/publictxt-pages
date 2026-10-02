@@ -6,7 +6,10 @@
 
 # title = "My notes"
 
-# [params]
+[params]
+  # Folders (from the repo root) left out whole: notes and attachments.
+  # The example's settings/Templates (Obsidian templates) stays off the site.
+  excludeFolders = ["settings/Templates"]
 #   description = "Plain-text notes, published."
 #   sectionOrder = ["blog", "wiki", "notes"]
 
