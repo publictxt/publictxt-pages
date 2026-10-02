@@ -63,6 +63,12 @@ class SiteIndexTest(unittest.TestCase):
         self.assertTrue(INDEX.is_file(), "no snapshot yet — run with GOLDEN_UPDATE=1")
         self.assertEqual(INDEX.read_text(encoding="utf-8").replace("\r\n", "\n"), self.index)
 
+    def test_index_text_is_plain(self):
+        """index.json carries plain text (cards.js escapes it): no HTML entities left in summaries."""
+        items = json.loads(self.index)
+        self.assertEqual([it["url"] for it in items if re.search(r"&[a-z]+;|&#\d+;", it.get("summary", ""))], [])
+        self.assertTrue(any("->" in it.get("summary", "") for it in items), "fixture lost its ->")
+
     def test_note_embed(self):
         """notes/embeds.md: a standalone `![](…/Search.md)` embeds; inline, a link; videos and audio keep their <p>."""
         html = (self.public / "notes" / "embeds" / "index.html").read_text(encoding="utf-8")
@@ -149,6 +155,13 @@ class SiteIndexTest(unittest.TestCase):
         top = re.search(r'<section class="tree tree-content">.*?</section>', self.html("wiki"), re.S)[0]
         self.assertEqual(self.rows(top, "open"), ["/wiki/pipeline/", "/wiki/projects/", "/wiki/site/"])
         self.assertIn('href="/wiki/projects/publictxt/"', top)
+
+    def test_folder_labels_keep_their_case(self):
+        """A folder's label is its name as cased (wiki/Projects/PublicTxt/), in breadcrumbs and the tree."""
+        html = self.html("wiki", "projects", "publictxt")
+        self.assertIn('<li aria-current="page">PublicTxt</li>', html)
+        self.assertIn('href="/wiki/projects/publictxt/">PublicTxt</a>', self.html("wiki"))
+        self.assertIn('<a href="/blog/2023/">2023</a>', self.html("blog", "2023", "12"), "date folder humanized")
 
     def test_section_tree_only_with_subfolders(self):
         """A flat tree-section folder, and a section outside treeSections: no tree."""

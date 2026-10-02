@@ -77,7 +77,9 @@ async function mount(root) {
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     Object.assign(state, CHIPS.read(p));
-    state.year = p.get("year") || "";
+    // No timeline (one month, or compact), no date filter: nothing would
+    // show it or clear it.
+    state.year = hasTimeline ? p.get("year") || "" : "";
     state.month = monthFilter(p.get("month"), state.year);
     state.rating = ratingFilter(p.get("rating"));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
