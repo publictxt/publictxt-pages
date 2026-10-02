@@ -11,6 +11,8 @@ find the right file/s, then read those files.
 
 - `docs/wiki/index.md` — entry point + the map: every source file, one line each
 - `docs/wiki/traps.md` — cross-file invariants. **Read before editing templates or the pipeline.**
+- `docs/user/` — user guide (setup, config, writing, site features). Update it when a
+  user-visible behaviour, setting or default changes
 - `docs/SPEC.md` — what the site *should* do, including unbuilt **(TBD)** items; best understanding, not contract
 
 **Keep docs in step, in the same change:** the map when a file is added, moved or removed
