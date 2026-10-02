@@ -1,0 +1,9 @@
+{{/*
+  The only reader of params.treeSections: a page's top-level section when it
+  is one of them (folder names, any case) — the root of its folder tree
+  (page-tree.html) — else false. Takes the page.
+*/}}
+{{ $root := .FirstSection }}
+{{ $names := apply (site.Params.treeSections | default slice) "lower" "." }}
+{{ if and $root (not $root.IsHome) (in $names (lower $root.Section)) }}{{ return $root }}{{ end }}
+{{ return false }}
