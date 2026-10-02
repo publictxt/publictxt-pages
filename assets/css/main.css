@@ -441,9 +441,11 @@ a:hover { text-decoration: underline; }
    counts beside them carry the numbers. The folder tree (page-tree.html)
    shares its rules — nodes, rails, page branches — by selector list: one
    look, so change both together. */
-.timeline {
+.timeline, .tree {
   --row: 1.75rem;
   --node: 18px;
+}
+.timeline {
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -604,6 +606,12 @@ a:hover { text-decoration: underline; }
 .tl-pages li:has(a[aria-current])::before, .tree-pages li:has(a[aria-current])::before,
 .tl-pages li:has(a:hover)::before, .tree-pages li:has(a:hover)::before { background: var(--accent); }
 .tl-empty { font-size: 0.8rem; }
+/* A section's tree, in its content (section-tree.html): no box, body-sized. */
+.tree.tree-content { font-size: 0.95rem; }
+.tree-content { margin: 1.6rem 0 2rem; }
+.tree-content > .side-heading { margin-bottom: 0.5rem; }
+.tree-content > nav { max-width: 34rem; }   /* counts beside their names */
+.tree-content .tree-pages { font-size: 0.9rem; }
 /* Tree only: a folder's row is its <summary> — the node opens it, the name
    links to the folder; its pages are block rows, no day column. */
 .tree-row { grid-template-columns: var(--node) minmax(0, 1fr) auto; list-style: none; cursor: pointer; }

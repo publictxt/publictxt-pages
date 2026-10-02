@@ -121,6 +121,32 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn("data-page-timeline", html)
         self.assertNotIn('class="timeline fold tree"', html)
 
+    def section(self, *path):
+        return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")
+
+    def test_section_tree(self):
+        """A tree section's folder: its subtree after the index body — outside Pagefind's — first level open."""
+        html = self.section("wiki", "site")
+        tree = re.search(r'<section class="tree tree-content">.*?</section>', html, re.S)
+        self.assertIsNotNone(tree, "no section tree")
+        body = re.search(r'<div class="prose" data-pagefind-body>.*?</div>', html, re.S)
+        self.assertLess(body.end(), tree.start(), "tree inside the indexed body")
+        tree = tree[0]
+        self.assertIn('<li class="tree-dir"><details open><summary class="tree-row">'
+                      '<span class="tree-node" aria-hidden="true"></span><a class="tree-pick" href="/wiki/site/lists/">', tree)
+        self.assertIn('<a href="/wiki/site/search/">Search</a>', tree)
+        self.assertNotIn("/wiki/pipeline/", tree, "another folder's pages")
+        # /wiki/: the whole tree, deeper folders shut.
+        top = self.section("wiki")
+        self.assertIn('<a class="tree-pick" href="/wiki/projects/publictxt/">', top)
+        self.assertNotRegex(top, r'<details open><summary class="tree-row"><span class="tree-node" aria-hidden="true"></span>'
+                                 r'<a class="tree-pick" href="/wiki/projects/publictxt/">')
+
+    def test_section_tree_only_with_subfolders(self):
+        """A flat tree-section folder, and a section outside treeSections: no tree."""
+        self.assertNotIn('class="tree tree-content"', self.section("wiki", "site", "lists"))
+        self.assertNotIn('class="tree tree-content"', self.section("notes"))
+
 
 if __name__ == "__main__":
     unittest.main()
