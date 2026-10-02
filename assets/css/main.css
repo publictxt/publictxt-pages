@@ -438,7 +438,7 @@ a:hover { text-decoration: underline; }
 
 /* Timeline (timeline.js): years on a rail, each node opens its row, each
    label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
-   counts beside them carry the numbers. The folder tree (page-tree.html)
+   counts beside them carry the numbers. The folder tree (tree/aside.html)
    shares its rules — nodes, rails, page branches — by selector list: one
    look, so change both together. */
 .timeline, .tree {
@@ -525,8 +525,9 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   text-align: left;
 }
-.tl-year > .tl-row > .tl-pick,
-.tree > nav > .tree-dirs > .tree-dir > details > .tree-row > .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+/* Top-level folders bold, as years; sub-folders plain, as months. */
+.tl-year > .tl-row > .tl-pick, .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+.tree-sub .tree-pick { font-weight: 400; letter-spacing: normal; }
 .tl-pick:hover, .tl-pick[aria-pressed="true"], .tree-pick:hover { color: var(--accent); text-decoration: none; }
 .tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
 .tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible,
@@ -606,7 +607,7 @@ a:hover { text-decoration: underline; }
 .tl-pages li:has(a[aria-current])::before, .tree-pages li:has(a[aria-current])::before,
 .tl-pages li:has(a:hover)::before, .tree-pages li:has(a:hover)::before { background: var(--accent); }
 .tl-empty { font-size: 0.8rem; }
-/* A section's tree, in its content (section-tree.html): no box, body-sized. */
+/* A section's tree, in its content (tree/content.html): no box, body-sized. */
 .tree.tree-content { font-size: 0.95rem; }
 .tree-content { margin: 1.6rem 0 2rem; }
 .tree-content > .side-heading { margin-bottom: 0.5rem; }
