@@ -21,8 +21,7 @@ HASHTAG_RE = re.compile(
     # 2. regions that never contain tags (order matters: checked before 3)
     r"|(?P<protected>"
     r"!?\[[^\]\n]*\]\([^)\n]*\)"   # inline link or image
-    r"|```.*?```"                    # fenced code
-    r"|~~~.*?~~~"
+    r"|(?P<fence>`{3,}|~{3,}).*?(?P=fence)"   # fenced code, closed at its own length
     r"|`[^`\n]*`"                    # inline code
     r"|<[^>\n]+>"                    # HTML tag or autolink
     r"|https?://\S+"                 # bare URL

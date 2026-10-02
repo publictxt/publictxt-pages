@@ -28,6 +28,7 @@ scripts/map_lint.py         this map vs the tree; docstring: how it reads the ma
 tests/test_golden.py        example/txt through sync vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
+tests/test_hashtags.py      HASHTAG_RE's fences: a long fence holds a short one
 tests/test_exclude.py       params.excludeFolders: whole subtrees left out of sync
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
