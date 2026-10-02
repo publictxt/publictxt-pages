@@ -8,6 +8,8 @@
 
 # [params]
 #   description = "Plain-text notes, published."
+#   # Folders (from the repo root) left out whole: notes and attachments.
+#   excludeFolders = ["Obsidian/Templates"]
 #   sectionOrder = ["blog", "wiki", "notes"]
 
 # [[params.chipFacets]]
