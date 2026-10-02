@@ -5,7 +5,7 @@
   outside data-pagefind-body, above the browse list. Server-rendered, no
   JS: the archive timeline's markup (renderTimeline() in timeline.js, which
   main.css styles alike — traps.md), with <details> in place of its
-  buttons, and no month bars: the year's sparkline is enough, and the
+  buttons, and no sparklines or month bars: a table of contents, so the
   counts carry the numbers. The newest year and its newest month open; a year's or month's
   label links to the browse list below at that date (?year=&month=).
   Only across two or more months, as list.js's timeline panel: within one,
@@ -26,20 +26,10 @@
   <ol class="tl">
   {{- range $yi, $y := $years }}
     {{- $months := .Pages.GroupByDate "01" }}
-    {{- $peak := 1 }}
-    {{- range $months }}{{ $peak = math.Max $peak (len .Pages) }}{{ end }}
     <li class="tl-year"><details{{ if eq $yi 0 }} open{{ end }}>
       <summary class="tl-row">
         <span class="tl-node" aria-hidden="true"></span>
         <a class="tl-pick" href="{{ $section.RelPermalink }}?year={{ .Key }}" title="List {{ .Key }}">{{ .Key }}</a>
-        {{- /* Jan..Dec, one bar each: the year at a glance. */}}
-        <span class="tl-spark" aria-hidden="true">
-          {{- range $i, $name := $names }}
-            {{- $n := 0 }}
-            {{- with where $months "Key" (printf "%02d" (add $i 1)) }}{{ $n = len (index . 0).Pages }}{{ end }}
-            <i{{ if not $n }} class="none"{{ end }} style="--v: {{ div (float $n) $peak }}" title="{{ $name }}: {{ $n }} page{{ if ne $n 1 }}s{{ end }}"></i>
-          {{- end }}
-        </span>
         <span class="count">{{ len .Pages }}</span>
       </summary>
       <ol class="tl-months">

@@ -453,7 +453,7 @@ a:hover { text-decoration: underline; }
    label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
    counts beside them carry the numbers. A timeline section's contents
    (timeline/content.html) is its markup server-rendered, <details> for
-   .open, without month bars. The folder tree (tree/aside.html)
+   .open, without sparklines or month bars. The folder tree (tree/aside.html)
    shares its rules — nodes, rails, page branches — by selector list: one
    look, so change both together. */
 .timeline, .tree, .contents {
@@ -552,7 +552,7 @@ a:hover { text-decoration: underline; }
   border-radius: 3px;
 }
 .tl .count, .tree .count { color: var(--text-muted); font-size: 0.72rem; text-align: right; min-width: 1.5em; }
-/* Last column, bar or none (contents' months have none). */
+/* Last column, bar or none (contents' rows have none). */
 .tl-row > .count { grid-column: -2; }
 
 /* A year's months, Jan..Dec. */
@@ -636,7 +636,6 @@ a:hover { text-decoration: underline; }
 summary.tl-row { list-style: none; cursor: pointer; }
 summary.tl-row::-webkit-details-marker { display: none; }
 summary.tl-row:hover > .tl-node { border-color: var(--accent); }
-summary.tl-row:hover .tl-spark i:not(.none) { opacity: 1; }
 summary.tl-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 /* Tree only: a folder's row is its <summary> — the node opens it, the name
    links to the folder; its pages are block rows, no day column. */
