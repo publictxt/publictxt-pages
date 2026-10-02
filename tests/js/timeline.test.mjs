@@ -1,9 +1,9 @@
 // timeline.js: grouping by year and month — from pages and from Pagefind's
-// month counts — and the ?month= spelling.
+// month counts — the ?month= spelling, and an archive's tag chips.
 // Run: node --test "tests/js/*.test.mjs"
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { countsTree, dayOf, monthCount, monthFilter, monthOf, timeline } from "../../assets/js/timeline.js";
+import { countsTree, dayOf, monthCount, monthFilter, monthOf, splittingTags, timeline } from "../../assets/js/timeline.js";
 
 const page = (created, title = created) =>
   ({ title, created, year: created.slice(0, 4), createdLabel: "label" });
@@ -43,4 +43,16 @@ test("Pagefind month counts make the same tree, less empty and undated months", 
   assert.deepEqual(tree.map((y) => [y.year, y.count]), [["2018", 1], ["2017", 3]]);
   assert.deepEqual(tree[1].months.map((m) => [m.month, m.count]), [["10", 1], ["02", 2]]);
   assert.deepEqual(countsTree(undefined), []);
+});
+
+test("tag chips: only tags that split the dated pages, in config order, the pages' spelling", () => {
+  const tagged = (created, tags) => ({ ...page(created), tags });
+  const items = [
+    tagged("2020-01-01T00:00:00Z", ["Journal", "all"]),
+    tagged("2020-02-01T00:00:00Z", ["all"]),
+    { ...tagged("0001-01-01T00:00:00Z", ["undated"]), createdLabel: "" },
+  ];
+  assert.deepEqual(splittingTags(items, ["all", "none", "journal"]), ["Journal"]);
+  assert.deepEqual(splittingTags(items, ["undated"]), []);
+  assert.deepEqual(splittingTags([page("2020-01-01T00:00:00Z")], ["journal"]), []);
 });

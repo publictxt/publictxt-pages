@@ -30,7 +30,7 @@ tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
-tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
+tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling, tag chips
 ```
 
 ## Templates
@@ -39,8 +39,10 @@ tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
 layouts/baseof.html               shell: header + ☰, nav | main | "aside" block;
                                   data-base + data-index on <html>
 layouts/home.html                 hero, Recent list; aside: its filters
-layouts/page.html                 single page; data-pagefind-body; aside: page meta, section timeline
-layouts/section.html              index body as prose + browse list; aside: its filters
+layouts/page.html                 single page; data-pagefind-body; aside: page meta, then
+                                  folder tree (treeSections) or timeline
+layouts/section.html              index body as prose, folder tree (treeSections),
+                                  browse list; aside: its filters
 layouts/term.html                 /tags/<term>/; aside: its filters
 layouts/taxonomy.html             /tags/
 layouts/search.html               search UI shell, filters in its aside; search.js fills it
@@ -50,7 +52,12 @@ layouts/_partials/
   head.html             title, description, favicon, Mastodon rel="me", stylesheet, nav.js
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
-  page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's
+  page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
+  panels.html           only reader of params.treeSections: "tree" or "timeline", page or section
+  page-tree.html        or the folder tree: cached per tree, the page's path patched in
+  page-tree-node.html   one folder's rows, recursing             (partialCached, per tree)
+  tree-row.html         a row's opening tags: renders the tree and makes the patch's needles
+  section-tree.html     a tree section's folder, in its content: its subtree, one level open
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal
@@ -98,7 +105,7 @@ assets/js/facets.js       chip facets from config; include, exclude, match any/a
                           chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
-assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared
+assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared, timelineTags chips
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette + column widths in :root
 ```

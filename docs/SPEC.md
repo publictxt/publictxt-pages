@@ -14,11 +14,15 @@ Items marked **(TBD)** are not built.
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - The sidebar lists sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
+  - A `treeSections` folder with sub-folders shows its subtree below the index body (not search-indexed), sub-folders open one level, then the browse list.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
   - Sections move to specialised Views over Collections (TBD)
     - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD; a page's shared timeline does this for `timelineCollections`)
     - Bookmarks should show Bookmark specialised view (TBD)
+    - Wiki view: a right-column panel of categories (TBD) and the folder tree (built: `treeSections`, below)
+    - Panels per section, not one view each (TBD): a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md` like `order:` — so wiki/notes can keep a timeline beside the tree. Then `timelineCollections`/`timelineTags` fold into a `[params.timeline]` table, each panel its own partial. `treeSections` folds into `panels:` too; `panels.html`, its only reader, is the seam.
+    - A non-log timeline (wiki, notes) may want `updated`, not `created`, as its date (TBD; timeline.js takes one date field throughout)
 - Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
   - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.
   - One column on phones: filters fold above the results (open when one is set), page meta below the page.
@@ -26,7 +30,8 @@ Items marked **(TBD)** are not built.
   - Sections, categories, tag cloud
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
-  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none.
+  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none. The shared timeline also gets a chip per `timelineTags` tag (default `journal`: blog entries of a special kind) that some of its pages have and some don't — a filter on that panel only, not a collection; remembered and carried alike.
+  - pages of `treeSections` (default wiki) get a folder tree of their section instead of the timeline: server-rendered, no JS; folders then pages, A→Z; in the timeline's look (folders as its years, pages as its pages); open along the page's path, those folders' nodes filled, the page marked; other folders shut, with page counts. Folders only — a page filed elsewhere with `collections: wiki` isn't in it.
   - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories
