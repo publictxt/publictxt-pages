@@ -568,13 +568,14 @@ a:hover { text-decoration: underline; }
   transform: translateX(-1px) rotate(-45deg);
   transition: transform 0.15s;
 }
-/* Tree and contents: open is <details open>; current is on the page's path. */
+/* Tree and contents: open is <details open>; current is on the page's path
+   (tree), or the list's date (contents, list.js). */
 .open > .tl-row > .tl-node, [open] > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--accent); }
 .open > .tl-row > .tl-node::before, [open] > .tl-row > .tl-node::before,
 [open] > .tree-row > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
-.current > .tl-row > .tl-node,
+.current > .tl-row > .tl-node, .current > details > .tl-row > .tl-node,
 .on-path > details > .tree-row > .tree-node { background: var(--accent); border-color: var(--accent); }
-.current > .tl-row > .tl-node::before,
+.current > .tl-row > .tl-node::before, .current > details > .tl-row > .tl-node::before,
 .on-path > details > .tree-row > .tree-node::before { border-color: var(--bg); }
 .tl-node:hover, .tree-row:hover > .tree-node { border-color: var(--accent); }
 /* A month with nothing to open (filter mode): a dot on the branch. */
@@ -583,7 +584,7 @@ a:hover { text-decoration: underline; }
 .tl-dot:hover { border-color: var(--border); }
 .current > .tl-row > .tl-dot:hover { border-color: var(--accent); }
 .tl-node:hover::before, .tree-row:hover > .tree-node::before { border-color: var(--accent); }
-.current > .tl-row > .tl-node:hover::before,
+.current > .tl-row > .tl-node:hover::before, .current > details > .tl-row > .tl-node:hover::before,
 .on-path > details > .tree-row:hover > .tree-node::before { border-color: var(--bg); }
 .tl-pick, .tree-pick {
   font: inherit;
@@ -597,8 +598,9 @@ a:hover { text-decoration: underline; }
 /* Top-level folders bold, as years; sub-folders plain, as months. */
 .tl-year > .tl-row > .tl-pick, .tl-year > details > .tl-row > .tl-pick, .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
 .tree-sub .tree-pick { font-weight: 400; letter-spacing: normal; }
-.tl-pick:hover, .tl-pick[aria-pressed="true"], .tree-pick:hover { color: var(--accent); text-decoration: none; }
-.tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
+/* The picked date: pressed (filter), or current (contents). */
+.tl-pick:hover, .tl-pick[aria-pressed="true"], .tl-pick[aria-current], .tree-pick:hover { color: var(--accent); text-decoration: none; }
+.tl-pick[aria-pressed="true"], .tl-pick[aria-current] { text-decoration: underline; text-underline-offset: 3px; }
 .tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible,
 .tree-row:focus-visible, .tree-pick:focus-visible, .tree-pages a:focus-visible {
   outline: 2px solid var(--accent);

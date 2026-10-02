@@ -23,7 +23,7 @@ import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, rati
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
-import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
+import { markContents, monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
 
@@ -168,6 +168,10 @@ async function mount(root) {
   const fullTree = timeline(items);
   const hasTimeline = !compact && monthCount(fullTree) > 1;
   const tlOpen = new Set();
+  // A timeline section's contents, above this list (timeline/content.html):
+  // its labels link here at a date, so it marks the one picked.
+  const contents = hasTimeline && slot ? document.querySelector(".tl-contents") : null;
+  let contentsDate = "";
 
   function chip(d, name, n) {
     return filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
@@ -354,6 +358,11 @@ async function mount(root) {
     const forFacet = (k) => addsPages(state[k]) ? items.filter((it) => passes(it, k)) : filtered;
     renderControls(filtered, items.filter((it) => passes(it, "rating")), forFacet);
     if (hasTimeline) drawTimeline(items.filter((it) => passes(it, "year")));
+    if (contents) {
+      const date = state.year && `${state.year}-${state.month}`;
+      markContents(contents, state.year, state.month, date !== contentsDate);
+      contentsDate = date;
+    }
     renderPager(total);
     const n = filtered.length;
     const what = [...CHIPS.describe(state), dateLabel(),

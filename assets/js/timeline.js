@@ -6,6 +6,8 @@
 //            shown once per day so the column groups them. Labels link to the
 //            section's list at that date; a month's node opens its titles; the
 //            current page is marked.
+// A timeline section's contents is the archive markup server-rendered;
+// markContents() marks the list's date on it.
 //
 // Month numbers are `created`'s own digits, never a Date: a reader's zone
 // would shift the month (date-labels.html). Month names are Hugo's
@@ -229,4 +231,24 @@ export function renderTimeline(ol, tree, opts) {
     li.append(months);
     return li;
   }));
+}
+
+/**
+ * A timeline section's contents (timeline/content.html), server-rendered:
+ * marks the date the list is on as renderTimeline() does — the year's row
+ * current, the picked label's too — matching each label's own ?year=&month=
+ * link. `refocus` (the date changed): its year and month open and the other
+ * years shut, as a year pick does.
+ */
+export function markContents(el, year, month, refocus) {
+  for (const a of el.querySelectorAll(".tl-pick")) {
+    const p = new URL(a.href).searchParams;
+    const y = p.get("year"), m = p.get("month") || "";
+    const li = a.closest("li");
+    const details = li.querySelector(":scope > details");
+    li.classList.toggle("current", y === year && (!m || m === month));
+    if (y === year && m === month) a.setAttribute("aria-current", "true");
+    else a.removeAttribute("aria-current");
+    if (refocus && year) details.open = m ? details.open || (y === year && m === month) : y === year;
+  }
 }
