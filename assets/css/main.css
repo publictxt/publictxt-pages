@@ -11,6 +11,7 @@
   --text-muted: #8a93a5;
   --accent: #53a4c7;
   --accent-soft: rgba(57, 117, 145, 0.18);
+  --node-open-border: var(--accent-soft);   /* tl-node / tree-node ring, expanded */
   --chip-bg: #1d2930;
   --chip-collection-bg: rgba(53, 117, 133, 0.12);
   --radius: 8px;
@@ -531,7 +532,7 @@ a:hover { text-decoration: underline; }
   transition: transform 0.15s;
 }
 /* Tree and contents: open is <details open>; current is on the page's path. */
-.open > .tl-row > .tl-node, [open] > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--accent); }
+.open > .tl-row > .tl-node, [open] > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--node-open-border); }
 .open > .tl-row > .tl-node::before, [open] > .tl-row > .tl-node::before,
 [open] > .tree-row > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
 .current > .tl-row > .tl-node,
@@ -649,7 +650,7 @@ a:hover { text-decoration: underline; }
 .contents.fold > summary::after { display: none; }
 .contents.fold[open] > summary { margin-bottom: var(--gap); }
 .contents > summary > .tl-node, .contents > summary > .tree-node { flex: none; }
-.contents[open] > summary > .tl-node, .contents[open] > summary > .tree-node,
+.contents[open] > summary > .tl-node, .contents[open] > summary > .tree-node { border-color: var(--node-open-border); }
 .contents > summary:hover > .tl-node, .contents > summary:hover > .tree-node { border-color: var(--accent); }
 .contents[open] > summary > .tl-node::before,
 .contents[open] > summary > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
