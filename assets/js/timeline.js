@@ -41,6 +41,21 @@ export function timeline(items) {
     [year, [...months].map(([month, its]) => ({ month, count: its.length, items: its.sort(newest) }))]));
 }
 
+// An archive's tag chips (params.timelineTags): of `wanted`, matched
+// case-insensitively, the tags some dated items carry and some don't — a tag
+// on all or none filters nothing. In the items' spelling, in `wanted`'s order.
+export function splittingTags(items, wanted) {
+  const dated = items.filter((it) => it.createdLabel);
+  const out = [];
+  for (const w of wanted) {
+    const lw = w.toLowerCase();
+    const spelt = (it) => (it.tags || []).find((t) => t.toLowerCase() === lw);
+    const hits = dated.filter(spelt);
+    if (hits.length && hits.length < dated.length) out.push(spelt(hits[0]));
+  }
+  return out;
+}
+
 // Pagefind's `month` filter counts ({ "2017-10": 3 }, pagefind-keys.html) ->
 // the same tree, without items. Empty and undated months left out.
 export function countsTree(counts) {

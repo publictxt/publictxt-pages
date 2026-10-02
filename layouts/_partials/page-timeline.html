@@ -4,7 +4,9 @@
   index.json (cached; fingerprinted in production). Hidden until filled.
   Its scope:
     a page in any of params.timelineCollections — all of those, one shared
-      timeline with a chip per collection; labels link to the home list
+      timeline with a chip per collection, and per params.timelineTags tag
+      that splits it (a filter on this panel only, not a collection); labels
+      link to the home list
     else a page in a section — that section; labels link to its list
     else (root-level pages) none
   Takes the page.
@@ -15,8 +17,9 @@
 {{ if or $shared $section }}
 <details class="timeline fold" data-page-timeline data-url="{{ .RelPermalink }}"
   {{- if $shared }} data-collections="{{ delimit $group " " }}" data-list="{{ site.Home.RelPermalink }}"
+  {{- with site.Params.timelineTags }} data-tags="{{ jsonify . }}"{{ end }}
   {{- else }} data-section="{{ $section.RelPermalink }}" data-list="{{ $section.RelPermalink }}"{{ end }} open hidden>
-  <summary><span class="side-heading">{{ if $shared }}Timeline{{ else }}{{ $section.Section | humanize }} timeline{{ end }}</span></summary>
+  <summary><span class="side-heading">{{ if $shared }}Timeline{{ else }}{{ partial "crumb-label.html" $section }} timeline{{ end }}</span></summary>
   <div class="chip-row tl-chips" hidden></div>
   <ol class="tl"></ol>
 </details>

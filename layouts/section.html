@@ -16,6 +16,8 @@
 <div class="prose" data-pagefind-body>{{ . }}</div>
 {{ end }}
 
+{{ if partial "tree/enabled.html" . }}{{ partial "tree/content.html" . }}{{ end }}
+
 {{ $list := partial "section-pages.html" . }}
 {{ $pages := $list.pages }}
 {{ if $pages }}

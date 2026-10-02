@@ -17,7 +17,7 @@
   "createdLabel": "25 Sep 2026",
   "rating": 4,
   "section": "blog",
-  "summary": "No H1: title from the filename. Quoted date-only created:, block tags:.\nAn image sits beside its note, as Obsidian saves it, and links as a file of the note&rsquo;s section — no …",
+  "summary": "No H1: title from the filename. Quoted date-only created:, block tags:.\nAn image sits beside its note, as Obsidian saves it, and links as a file of the note’s section — no …",
   "tags": [
    "attachments",
    "obsidian",
@@ -97,7 +97,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "#site #lists\nEvery list — home&rsquo;s Recent, sections, tag pages — renders in the browser from one index.json, over a plain list for no-JS.\nThis folder has no _index.md: sync …",
+  "summary": "#site #lists\nEvery list — home’s Recent, sections, tag pages — renders in the browser from one index.json, over a plain list for no-JS.\nThis folder has no _index.md: sync …",
   "tags": [
    "site",
    "lists"
@@ -119,7 +119,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Pipeline -&gt; Hashtags -&gt; Dates #pipeline #dates\nEvery page gets a created and an updated, each from the first source that has one:\nSource created updated Front matter created: …",
+  "summary": "Pipeline -> Hashtags -> Dates #pipeline #dates\nEvery page gets a created and an updated, each from the first source that has one:\nSource created updated Front matter created: …",
   "tags": [
    "pipeline",
    "dates"
@@ -182,7 +182,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "Pipeline -&gt; Hashtags #pipeline #hashtags\nAn inline #tag becomes a link to its tag page and joins the page&rsquo;s tags: front matter — hashtags and front matter tags are one …",
+  "summary": "Pipeline -> Hashtags #pipeline #hashtags\nAn inline #tag becomes a link to its tag page and joins the page’s tags: front matter — hashtags and front matter tags are one …",
   "tags": [
    "pipeline",
    "hashtags"
@@ -231,7 +231,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "",
-  "summary": "A root-level page with front matter, including a custom web: key that must be preserved.\npublictxt-pages — this site&rsquo;s engine PublicTxt — the idea Mastodon Back to home.\n",
+  "summary": "A root-level page with front matter, including a custom web: key that must be preserved.\npublictxt-pages — this site’s engine PublicTxt — the idea Mastodon Back to home.\n",
   "tags": [],
   "title": "Online things",
   "updated": "2025-03-01T12:00:00Z",
@@ -332,7 +332,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "",
-  "summary": "What publictxt-pages doesn&rsquo;t do yet — a root-level page outside any section. SPEC.md has the full list.\nNext [[wikilink]] conversion at sync — Other Software writes them …",
+  "summary": "What publictxt-pages doesn’t do yet — a root-level page outside any section. SPEC.md has the full list.\nNext [[wikilink]] conversion at sync — Other Software writes them …",
   "tags": [],
   "title": "Roadmap",
   "updated": "2025-03-01T12:00:00Z",

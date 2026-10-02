@@ -453,23 +453,27 @@ a:hover { text-decoration: underline; }
 
 /* Timeline (timeline.js): years on a rail, each node opens its row, each
    label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
-   counts beside them carry the numbers. */
-.timeline {
+   counts beside them carry the numbers. The folder tree (tree/aside.html)
+   shares its rules — nodes, rails, page branches — by selector list: one
+   look, so change both together. */
+.timeline, .tree {
   --row: 1.75rem;
   --node: 18px;
+}
+.timeline {
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.7rem 0.9rem;
 }
-.tl, .tl-months, .tl-pages { list-style: none; margin: 0; padding: 0; }
+.tl, .tl-months, .tl-pages, .tree-dirs, .tree-pages { list-style: none; margin: 0; padding: 0; }
 /* A shared page timeline's collection chips (page-timeline.js), above the rail. */
 .tl-chips { margin-bottom: 0.7rem; }
 .tl-chips[hidden] { display: none; }
-.tl { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-.tl-year { position: relative; }
+.tl, .tree { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.tl-year, .tree-dir { position: relative; }
 /* The rail, node centre to node centre. */
-.tl-year::before {
+.tl-year::before, .tree-dir::before {
   content: "";
   position: absolute;
   left: calc(var(--node) / 2 - 1px);
@@ -478,17 +482,17 @@ a:hover { text-decoration: underline; }
   width: 2px;
   background: var(--border);
 }
-.tl-year:first-child::before { top: calc(var(--row) / 2); }
-.tl-year:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
-.tl-year:only-child::before { display: none; }
-.tl-row {
+.tl-year:first-child::before, .tree-dir:first-child::before { top: calc(var(--row) / 2); }
+.tl-year:last-child::before, .tree-dir:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
+.tl-year:only-child::before, .tree-dir:only-child::before { display: none; }
+.tl-row, .tree-row {
   display: grid;
   grid-template-columns: var(--node) auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 0.55rem;
   min-height: var(--row);
 }
-.tl-node {
+.tl-node, .tree-node {
   position: relative;   /* over the rail */
   width: var(--node);
   height: var(--node);
@@ -501,7 +505,7 @@ a:hover { text-decoration: underline; }
   place-items: center;
 }
 /* A chevron: right when shut, down when open, as .fold's. */
-.tl-node::before {
+.tl-node::before, .tree-node::before {
   content: "";
   width: 0.28rem;
   height: 0.28rem;
@@ -510,19 +514,24 @@ a:hover { text-decoration: underline; }
   transform: translateX(-1px) rotate(-45deg);
   transition: transform 0.15s;
 }
-.open > .tl-row > .tl-node { border-color: var(--accent); }
-.open > .tl-row > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
-.current > .tl-row > .tl-node { background: var(--accent); border-color: var(--accent); }
-.current > .tl-row > .tl-node::before { border-color: var(--bg); }
-.tl-node:hover { border-color: var(--accent); }
+/* Tree: open is <details open>; current is on the page's path. */
+.open > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--accent); }
+.open > .tl-row > .tl-node::before,
+[open] > .tree-row > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
+.current > .tl-row > .tl-node,
+.on-path > details > .tree-row > .tree-node { background: var(--accent); border-color: var(--accent); }
+.current > .tl-row > .tl-node::before,
+.on-path > details > .tree-row > .tree-node::before { border-color: var(--bg); }
+.tl-node:hover, .tree-row:hover > .tree-node { border-color: var(--accent); }
 /* A month with nothing to open (filter mode): a dot on the branch. */
 .tl-dot { cursor: default; transform: scale(0.6); }
 .tl-dot::before { display: none; }
 .tl-dot:hover { border-color: var(--border); }
 .current > .tl-row > .tl-dot:hover { border-color: var(--accent); }
-.tl-node:hover::before { border-color: var(--accent); }
-.current > .tl-row > .tl-node:hover::before { border-color: var(--bg); }
-.tl-pick {
+.tl-node:hover::before, .tree-row:hover > .tree-node::before { border-color: var(--accent); }
+.current > .tl-row > .tl-node:hover::before,
+.on-path > details > .tree-row:hover > .tree-node::before { border-color: var(--bg); }
+.tl-pick, .tree-pick {
   font: inherit;
   color: var(--text);
   background: none;
@@ -531,15 +540,18 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   text-align: left;
 }
-.tl-year > .tl-row > .tl-pick { font-weight: 700; letter-spacing: 0.02em; }
-.tl-pick:hover, .tl-pick[aria-pressed="true"] { color: var(--accent); }
+/* Top-level folders bold, as years; sub-folders plain, as months. */
+.tl-year > .tl-row > .tl-pick, .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+.tree-sub .tree-pick { font-weight: 400; letter-spacing: normal; }
+.tl-pick:hover, .tl-pick[aria-pressed="true"], .tree-pick:hover { color: var(--accent); text-decoration: none; }
 .tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
-.tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible {
+.tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible,
+.tree-row:focus-visible, .tree-pick:focus-visible, .tree-pages a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 3px;
 }
-.tl .count { color: var(--text-muted); font-size: 0.72rem; text-align: right; min-width: 1.5em; }
+.tl .count, .tree .count { color: var(--text-muted); font-size: 0.72rem; text-align: right; min-width: 1.5em; }
 
 /* A year's months, Jan..Dec. */
 .tl-spark { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
@@ -555,8 +567,8 @@ a:hover { text-decoration: underline; }
 .tl-year:hover > .tl-row .tl-spark i:not(.none),
 .tl-year.current > .tl-row .tl-spark i:not(.none) { opacity: 1; }
 
-.tl-months { margin: 0.1rem 0 0.35rem calc(var(--node) + 0.55rem); }
-.tl-month { --node: 13px; --row: 1.6rem; }
+.tl-months, .tree-sub { margin: 0.1rem 0 0.35rem calc(var(--node) + 0.55rem); }
+.tl-month, .tree-sub { --node: 13px; --row: 1.6rem; }
 .tl-month .tl-pick { min-width: 5.6em; }
 .tl-bar { display: block; height: 6px; background: var(--bg-inset); border-radius: 3px; overflow: hidden; }
 .tl-bar i {
@@ -570,7 +582,7 @@ a:hover { text-decoration: underline; }
 .tl-month:hover > .tl-row .tl-bar i, .tl-month.current > .tl-row .tl-bar i { opacity: 1; }
 
 /* An open month's pages, on a dashed branch of the rail. */
-.tl-pages {
+.tl-pages, .tree-pages {
   margin: 0.1rem 0 0.4rem calc(var(--node) / 2 - 0.5px);
   padding: 0.1rem 0 0.1rem 0.9rem;
   border-left: 1px dashed var(--border);
@@ -588,7 +600,7 @@ a:hover { text-decoration: underline; }
 .tl-pages li.tl-newday { margin-top: 0.3rem; }
 /* Day of the month, once per day. */
 .tl-day { color: var(--text-muted); font-size: 0.72rem; text-align: right; }
-.tl-pages li::before {
+.tl-pages li::before, .tree-pages li::before {
   content: "";
   position: absolute;
   left: calc(-0.9rem - 3px);
@@ -598,20 +610,31 @@ a:hover { text-decoration: underline; }
   border-radius: 50%;
   background: var(--text-muted);
 }
-.tl-pages a {
+.tl-pages a, .tree-pages a {
   color: var(--text);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.tl-pages a:hover { color: var(--accent); text-decoration: none; }
-.tl-pages a[aria-current] { color: var(--accent); font-weight: 600; }
-.tl-pages li:has(a[aria-current])::before { background: var(--accent); }
-.tl-pages li:has(a:hover)::before { background: var(--accent); }
+.tl-pages a:hover, .tree-pages a:hover { color: var(--accent); text-decoration: none; }
+.tl-pages a[aria-current], .tree-pages a[aria-current] { color: var(--accent); font-weight: 600; }
+.tl-pages li:has(a[aria-current])::before, .tree-pages li:has(a[aria-current])::before,
+.tl-pages li:has(a:hover)::before, .tree-pages li:has(a:hover)::before { background: var(--accent); }
 .tl-empty { font-size: 0.8rem; }
+/* A section's tree, in its content (tree/content.html): no box, body-sized. */
+.tree.tree-content { font-size: 0.95rem; }
+.tree-content { margin: 1.6rem 0 2rem; }
+.tree-content > .side-heading { margin-bottom: 0.5rem; }
+.tree-content > nav { max-width: 34rem; }   /* counts beside their names */
+.tree-content .tree-pages { font-size: 0.9rem; }
+/* Tree only: a folder's row is its <summary> — the node opens it, the name
+   links to the folder; its pages are block rows, no day column. */
+.tree-row { grid-template-columns: var(--node) minmax(0, 1fr) auto; list-style: none; cursor: pointer; }
+.tree-row::-webkit-details-marker { display: none; }
+.tree-pages li { position: relative; padding: 0.2rem 0; }
 @media (prefers-reduced-motion: reduce) {
-  .tl-node::before, .list-facet > summary::after { transition: none; }
+  .tl-node::before, .tree-node::before, .list-facet > summary::after { transition: none; }
 }
 
 .pagination {

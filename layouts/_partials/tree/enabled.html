@@ -1,0 +1,11 @@
+{{/*
+  The only reader of params.treeSections: whether a page or section is in
+  one of those top-level sections (folder names, any case). If so, a page
+  shows its section's folder tree in place of its timeline (page.html),
+  and a section shows its folder's tree in its content (section.html).
+  Where SPEC's per-section `panels:` (TBD) would be read instead.
+  Takes a page or section; returns true or false.
+*/}}
+{{ $s := .FirstSection }}
+{{ $names := apply (site.Params.treeSections | default slice) "lower" "." }}
+{{ return and $s (not $s.IsHome) (in $names (lower $s.Section)) }}

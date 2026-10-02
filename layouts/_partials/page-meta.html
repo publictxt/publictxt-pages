@@ -6,8 +6,9 @@
   <h2 class="side-heading">This page</h2>
   <dl class="meta-list">
     <dt>Collection</dt>
-    {{/* page-collections.html; each links to its section when one exists */}}
-    <dd>{{ range $t := partial "page-collections.html" . }}{{ with site.GetPage $t }}<a class="chip chip-collection" href="{{ .RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
+    {{/* page-collections.html; each links to its top-level section when one
+      exists — by path: a bare name would find a tag page of that name */}}
+    <dd>{{ range $t := partial "page-collections.html" . }}{{ $s := site.GetPage (printf "/%s" $t) }}{{ if and $s $s.IsSection }}<a class="chip chip-collection" href="{{ $s.RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
     {{ $d := partial "date-labels.html" . }}
     {{ with $d.created }}
     <dt>Created</dt>

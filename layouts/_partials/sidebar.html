@@ -4,9 +4,9 @@
     {{ $current := . }}
     {{ range partialCached "sections.html" . }}
     {{ $active := eq $current.FirstSection . }}
-    {{/* folder name, not the _index.md H1 — authors title those freely ("wiki home") */}}
+    {{/* folder name, as crumb-label.html makes it */}}
     <a class="chip chip-section{{ if $active }} active{{ end }}" href="{{ .RelPermalink }}"{{ if $active }} aria-current="true"{{ end }}>
-      {{- .Section | humanize -}}
+      {{- partial "crumb-label.html" . -}}
       <span class="count">{{ len (partial "section-pages.html" .).pages }}</span></a>
     {{ end }}
     {{/* Last, a full line: Search every page. */}}

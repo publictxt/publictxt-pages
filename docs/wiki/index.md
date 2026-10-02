@@ -5,7 +5,8 @@ has a docstring, every partial a `{{/* */}}` contract. Code wins any disagreemen
 [traps.md](traps.md) holds what spans files; **read it before editing templates or the
 pipeline.** [SPEC.md](../SPEC.md) is what the site *should* do.
 
-Add, move or remove a file: update this map. `python scripts/map_lint.py` checks both ways.
+Add, move or remove a file: update this map. `python scripts/map_lint.py` checks both ways —
+a bare name counts only under its folder's heading.
 
 ## Python — pipeline (no dependencies; 3.10+)
 
@@ -18,7 +19,7 @@ scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`)
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
 scripts/build.sh            shim -> build.py, for deploy workflows copied before it
-scripts/map_lint.py         this map vs the tree
+scripts/map_lint.py         this map vs the tree; docstring: how it reads the map
 ```
 
 ## Tests — `python -m unittest` (stdlib), `node --test "tests/js/*.test.mjs"`
@@ -29,8 +30,9 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
+tests/test_map_lint.py      map_lint.py's reading of the map: folder headings, namesakes
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
-tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
+tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling, tag chips
 ```
 
 ## Templates
@@ -39,8 +41,10 @@ tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
 layouts/baseof.html               shell: header + ☰, nav | main | "aside" block;
                                   data-base + data-index on <html>
 layouts/home.html                 hero, Recent list; aside: its filters
-layouts/page.html                 single page; data-pagefind-body; aside: page meta, section timeline
-layouts/section.html              index body as prose + browse list; aside: its filters
+layouts/page.html                 single page; data-pagefind-body; aside: page meta, then
+                                  folder tree (treeSections) or timeline
+layouts/section.html              index body as prose, folder tree (treeSections),
+                                  browse list; aside: its filters
 layouts/term.html                 /tags/<term>/; aside: its filters
 layouts/taxonomy.html             /tags/
 layouts/search.html               search UI shell, filters in its aside; search.js fills it
@@ -50,10 +54,10 @@ layouts/_partials/
   head.html             title, description, favicon, Mastodon rel="me", stylesheet, nav.js
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
-  page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's
+  page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
-  crumb-label.html      one crumb's label; date folders literal
+  crumb-label.html      a page's short label; every folder label: its name, as cased
   sections.html         top-level sections in sectionOrder   (partialCached)
   recent.html           the one "recently updated first"
   page-date.html        created, + updated when shown
@@ -81,6 +85,14 @@ layouts/_partials/
   note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
   attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
 
+layouts/_partials/tree/   a folder tree of a tree section (params.treeSections)
+  enabled.html          only reader of treeSections: is a page or section in one?
+  aside.html            a page's, in place of its timeline: cached, the page's path marked in
+  content.html          a folder's, in its content: its subtree, one level open
+  node.html             one folder's rows, recursing, all shut (partialCached, per folder)
+  row.html              a row's opening tags, every form: shut, "on" (path), "open"
+  mark.html             one row of a cached tree opened or marked, by row.html's forms
+
 layouts/_markup/
   render-image.html     every ![](…): .md -> note-embed; YouTube -> iframe; audio -> <audio>; else <img>
   render-codeblock-dataview.html  ```dataview LIST FROM #tag -> compact list, else code
@@ -98,7 +110,7 @@ assets/js/facets.js       chip facets from config; include, exclude, match any/a
                           chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging
 assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
-assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared
+assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared, timelineTags chips
 assets/js/search.js       Pagefind UI: filters, sort, incremental results
 assets/css/main.css       the whole theme; palette + column widths in :root
 ```

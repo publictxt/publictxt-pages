@@ -2,6 +2,8 @@
   A page collection as index.json items (shape: cards.js), in the given
   order. Returns a JSON string; dates RFC 3339 for sorting and <time>, plus
   Hugo-made display values (labels, year) so JS never derives them.
+  Text values are plain text, not HTML: cards.js escapes them. Hence the
+  summary's htmlUnescape, last — truncate re-escapes (-> to -&gt;).
 */}}
 {{ $items := slice }}
 {{ range . }}
@@ -15,7 +17,7 @@
       "created" (.Date.Format "2006-01-02T15:04:05Z07:00")
       "updated" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
       "year" (.Date.Format "2006")
-      "summary" (.Summary | plainify | truncate 180)
+      "summary" (.Summary | plainify | truncate 180 | htmlUnescape)
   }}
   {{ with partial "categories.html" . }}{{ $item = merge $item (dict "categories" .) }}{{ end }}
   {{ with partial "rating.html" . }}{{ $item = merge $item (dict "rating" .) }}{{ end }}

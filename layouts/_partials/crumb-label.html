@@ -1,10 +1,15 @@
-{{- /* Short label for a page in a breadcrumb trail. Sections use their folder
-       name (authors title _index pages freely — "wiki home"), matching the sidebar. */ -}}
+{{- /* A page's short label: breadcrumbs, the sidebar's sections, tree and
+       timeline headings and rows. A section is its folder's name, never
+       its _index.md title (authors title those freely: "wiki home"), as
+       the author cased it (.File.Dir; Hugo's .Path is lower-cased) —
+       humanized only when all lower-case ("my-notes" -> "My notes"):
+       humanize splits camelCase ("PublicTxt" -> "Public txt") and
+       ordinalises numbers ("2023" -> "2023rd"). */ -}}
 {{- if .IsHome -}}Home
 {{- else if eq .Kind "section" -}}
   {{- $b := path.Base .Path -}}
-  {{- /* humanize ordinalises numbers ("2023rd") — keep date folders literal */ -}}
-  {{- if findRE `^\d+$` $b }}{{ $b }}{{ else }}{{ $b | humanize }}{{ end -}}
+  {{- with .File }}{{ $b = path.Base .Dir }}{{ end -}}
+  {{- if or (findRE `^\d+$` $b) (ne $b (lower $b)) }}{{ $b }}{{ else }}{{ $b | humanize }}{{ end -}}
 {{- else if eq .Kind "taxonomy" -}}{{ .Title | humanize }}
 {{- else if eq .Kind "term" -}}#{{ .Data.Term }}
 {{- else -}}{{ .Title }}
