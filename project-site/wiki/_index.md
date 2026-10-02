@@ -25,6 +25,7 @@ Your repo stays plain Markdown: no theme, no build files, nothing to maintain.
 3. [Writing](writing.md) — folders, front matter, tags, links, embeds, dates, drafts
 4. [The published site](site.md) — what readers get: lists, filters, timeline, search
 5. [Other editors](other-editors.md) — VS Code, the GitHub web editor, anything that writes Markdown
+6. [Obsidian](Obsidian/_index.md) — properties, plugins, and what doesn't carry over to the site
 
 ## Obsidian is the default, not a requirement
 

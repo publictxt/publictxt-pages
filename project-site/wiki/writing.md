@@ -71,7 +71,9 @@ Practical upshot: **you rarely need to type dates.** Git history supplies them. 
 posts with a date prefix when the date is part of what they are (a log, a journal);
 leave reference notes undated and let Git track them.
 
-Obsidian tip: Daily Notes and the Templates plugin can write `created: {{date}}` for you.
+Obsidian tip: [Templates](Obsidian/Plugins/templates.md) can write
+`created: {{date:YYYY-MM-DD}}` for you, and [Daily notes](Obsidian/Plugins/daily-notes.md)
+names each note by its date.
 
 ## Tags
 
@@ -195,7 +197,7 @@ LIMIT 10
 
 Lists pages with that tag, recently updated first. `LIMIT` is optional. Any other
 query (`TABLE`, `WHERE`, `SORT`, several tags) shows as a code block on the site — it
-still works in Obsidian.
+still works in Obsidian. More: [Dataview](Obsidian/Plugins/dataview.md).
 
 ## Bookmarks
 
@@ -249,7 +251,8 @@ folder.
 
 ## Front matter reference
 
-All optional.
+All optional. Which Obsidian property type to give each:
+[Properties](Obsidian/properties.md).
 
 | Key | Value | Effect |
 |---|---|---|

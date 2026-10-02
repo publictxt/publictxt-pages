@@ -58,7 +58,8 @@ These keep links working in Obsidian, on GitHub, and on the site.
 
 **Settings → Core plugins → Templates** (optional): set *Template folder location* to
 `settings/Templates`, then exclude it from the site — see
-[Configuration → Leave folders out](configuration.md#leave-folders-out).
+[Configuration → Leave folders out](configuration.md#leave-folders-out), and
+[Templates](Obsidian/Plugins/templates.md) for templates that suit the site.
 
 Already have notes with `[[wikilinks]]`? Turning the setting off doesn't convert them.
 Find them with search (`[[`) and fix the ones that matter; Obsidian writes Markdown
@@ -135,7 +136,8 @@ Pick one:
 
 - **[Obsidian Git](https://github.com/Vinzent03/obsidian-git)** (community plugin) —
   commit and push from inside Obsidian: command palette → *Commit all changes* then
-  *Push*, or turn on auto backup at an interval. Simplest day to day.
+  *Push*, or turn on auto backup at an interval. Simplest day to day — settings in
+  [Obsidian Git](Obsidian/Plugins/obsidian-git.md).
 - **GitHub Desktop** — see changes, write a message, *Push origin*.
 - **Terminal** — `git add -A && git commit -m "notes" && git push`.
 
