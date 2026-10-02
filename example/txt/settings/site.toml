@@ -6,10 +6,11 @@
 
 # title = "My notes"
 
-# [params]
+[params]
+  # Folders (from the repo root) left out whole: notes and attachments.
+  # The example's Obsidian/Templates stays off the site.
+  excludeFolders = ["Obsidian/Templates"]
 #   description = "Plain-text notes, published."
-#   # Folders (from the repo root) left out whole: notes and attachments.
-#   excludeFolders = ["Obsidian/Templates"]
 #   sectionOrder = ["blog", "wiki", "notes"]
 
 # [[params.chipFacets]]
