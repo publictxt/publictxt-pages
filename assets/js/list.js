@@ -21,7 +21,7 @@ import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, rati
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, grouper, groups, normaliseSort, parseSort } from "./sorts.js";
+import { SORTS, UNRATED, groupDay, grouper, groups, normaliseSort, parseSort } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -283,21 +283,28 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  // A group's heading: its month, linking to that date filter when the sort
-  // is by created (the filter's date) and the list isn't already on it; and
-  // how many it holds — "4 of 9" when the rest are on other pages.
-  function groupHead(g) {
+  // A month's group, a fold, open: its heading pins while its cards scroll
+  // by — the month, linking to that date filter when the sort is by created
+  // (the filter's date) and the list isn't already on it; a rule; how many it
+  // holds, "4 of 9 pages" when the rest are on other pages. Each card's day
+  // of the month on the rail, once per day.
+  function groupItem(g, dayOf, cardFor) {
     const li = document.createElement("li");
     li.className = "card-group";
+    const fold = document.createElement("details");
+    fold.open = true;
+    const head = document.createElement("summary");
+    head.className = "card-group-head";
+    head.innerHTML = `<span class="tl-node" aria-hidden="true"></span>`;
     const h = document.createElement("h2");
-    h.className = "card-group-head";
+    h.className = "card-group-title";
     const [y, m] = g.key.split("-");
-    const label = g.key ? `${params.months[Number(m) - 1]} ${y}` : "Undated";
+    const month = g.key && params.months[Number(m) - 1];
+    let label = h;
     if (g.key && parseSort(state.sort).field === "created" && state.month !== m) {
       const a = document.createElement("a");
       a.href = url({ year: y, month: m, page: 1 });
-      a.title = `List ${label}`;
-      a.textContent = label;
+      a.title = `List ${month} ${y}`;
       a.addEventListener("click", (e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
         e.preventDefault();
@@ -307,11 +314,33 @@ async function mount(root) {
         root.scrollIntoView({ block: "start" });
       });
       h.append(a);
-    } else h.append(label);
-    const n = document.createElement("span");
-    n.className = "count";
-    n.textContent = g.items.length < g.total ? `${g.items.length} of ${g.total}` : String(g.total);
-    li.append(h, n);
+      label = a;
+    }
+    if (g.key) {
+      const year = document.createElement("span");
+      year.className = "card-group-year";
+      year.textContent = y;
+      label.append(month + " ", year);
+    } else label.append("Undated");
+    const rule = document.createElement("span");
+    rule.className = "card-group-rule";
+    const count = document.createElement("span");
+    count.className = "count";
+    const pages = (n) => `${n} page${n === 1 ? "" : "s"}`;
+    count.textContent = g.items.length < g.total ? `${g.items.length} of ${pages(g.total)}` : pages(g.total);
+    head.append(h, rule, count);
+    const ul = document.createElement("ul");
+    ul.className = "card-group-items";
+    let last = "";
+    for (const it of g.items) {
+      const c = cardFor(it);
+      const day = dayOf(it);
+      if (day && day !== last) c.dataset.day = day;
+      last = day;
+      ul.append(c);
+    }
+    fold.append(head, ul);
+    li.append(fold);
     return li;
   }
 
@@ -359,8 +388,9 @@ async function mount(root) {
     const cardFor = (it) => card(it, { activeTags: state.tag?.inc, onTag });
     const keyOf = compact ? null : grouper(state.sort);
     list.classList.toggle("grouped", Boolean(keyOf));
+    const dayOf = groupDay(state.sort);
     list.replaceChildren(...(keyOf
-      ? groups(slice, keyOf, filtered).flatMap((g) => [groupHead(g), ...g.items.map(cardFor)])
+      ? groups(slice, keyOf, filtered).map((g) => groupItem(g, dayOf, cardFor))
       : slice.map(cardFor)));
     if (compact) return;
     sortSelect.value = state.sort;

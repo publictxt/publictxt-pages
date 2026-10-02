@@ -364,52 +364,74 @@ a:hover { text-decoration: underline; }
 
 .page-card .chip-row { margin-top: 0.5rem; }
 
-/* Grouped cards (list.js, a date sort): a rail down the left, a node per
-   month heading, as the timeline's; each heading pins under the header while
-   its cards scroll by. */
+/* Grouped cards (list.js, a date sort): each month a fold on a rail, as the
+   timeline's — its node (.tl-node) opens and shuts it; its heading, a rule
+   out to the count, pins under the header while its cards scroll by; each
+   card's day of the month sits on the rail. */
 .page-list.grouped {
   --node: 18px;
-  --rail-gap: 0.8rem;
+  --gutter: 2.6rem;
   position: relative;
-  padding-left: calc(var(--node) + var(--rail-gap));
+  gap: 0.4rem;
 }
 .page-list.grouped::before {
   content: "";
   position: absolute;
   left: calc(var(--node) / 2 - 1px);
-  top: 1rem;
+  top: calc(0.5rem + var(--node) / 2);
   bottom: 0;
   width: 2px;
   background: var(--border);
 }
-.card-group {
+.card-group-head {
   position: sticky;
   top: var(--header-h);
   z-index: 2;
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.45rem 0 0.15rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0;
+  /* Opaque to cover cards when pinned, but not over the rail. */
+  background: linear-gradient(to right, transparent var(--node), var(--bg) var(--node));
+  list-style: none;
+  cursor: pointer;
+}
+.card-group-head::-webkit-details-marker { display: none; }
+.card-group-head > .tl-node { flex: none; }
+.card-group > [open] > .card-group-head > .tl-node, .card-group-head:hover > .tl-node { border-color: var(--accent); }
+.card-group > [open] > .card-group-head > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
+.card-group-head:hover > .tl-node::before { border-color: var(--accent); }
+.card-group-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.card-group-title { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+.card-group-title a { color: var(--text); }
+.card-group-title a:hover { color: var(--accent); text-decoration: none; }
+.card-group-year { color: var(--text-muted); }
+.card-group-rule { flex: 1; min-width: 1rem; height: 1px; background: var(--border); }
+.card-group .count { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.card-group-items {
+  list-style: none;
+  margin: 0.2rem 0 0.6rem;
+  padding: 0 0 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.card-group-items > li { position: relative; }
+.card-group-items > li[data-day]::before {
+  content: attr(data-day);
+  position: absolute;
+  left: calc(-1 * var(--gutter));
+  top: 1rem;
+  width: var(--node);
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--text-muted);
   background: var(--bg);
   font-variant-numeric: tabular-nums;
 }
-.card-group:not(:first-child) { margin-top: 0.6rem; }
-.card-group::before {
-  content: "";
-  position: absolute;
-  left: calc(-1 * (var(--node) + var(--rail-gap)));
-  top: calc(0.45rem + 0.6em - var(--node) / 2);
-  width: var(--node);
-  height: var(--node);
-  box-sizing: border-box;
-  border: 2px solid var(--accent);
-  border-radius: 50%;
-  background: var(--bg-raised);
-}
-.card-group-head { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; }
-.card-group-head a { color: var(--text); }
-.card-group-head a:hover { color: var(--accent); text-decoration: none; }
-.card-group .count { color: var(--text-muted); font-size: 0.75rem; }
+.dense .card-group-items { gap: 0.35rem; }
+.dense .card-group-items > li[data-day]::before { top: 0.55rem; }
 
 /* Compact cards (densityToggle in cards.js): one line each, title then
    collections, date and stars; no summary, links or tags. The head's parts
@@ -1094,7 +1116,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 
 @media (max-width: 600px) {
-  .page-list.grouped { --node: 13px; --rail-gap: 0.55rem; }
+  .page-list.grouped { --node: 13px; --gutter: 1.9rem; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
     padding: 0.8rem 0.9rem;

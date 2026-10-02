@@ -48,7 +48,7 @@ Items marked **(TBD)** are not built.
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
   - Home *Recent*: every page, recently updated first, `recentLimit` a page, with filters and timeline; nothing filtered to start. (Not "this month": empty on quiet months.)
   - Sorting in all by Date, Recency, Alphabetical.
-  - A date sort groups the cards by that date's month, on a rail: a heading per month, pinned while its cards scroll, with its count ("4 of 9" when split across pages); under a `created` sort it links to that month's date filter. Title and rating groups, and Search, TBD.
+  - A date sort groups the cards by that date's month, on a rail: a heading per month — its node folds it (open to start, not remembered), pinned while its cards scroll, a rule out to its count ("4 of 9 pages" when split across pages) — and each card's day of the month on the rail, once per day; under a `created` sort it links to that month's date filter. Title and rating groups, and Search, TBD.
   - A Compact toggle beside sort (lists and Search): one line per card, remembered per browser, not in the URL.
   - Filter by Collection, and by Year (the `created` year) or a month of it (`?year=&month=`) — picked in the timeline; no year select.
   - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars and counts — no titles, the list shows those. A year or month label picks the date filter; the other filters narrow it. The newest year open to start.

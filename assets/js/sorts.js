@@ -30,17 +30,28 @@ export function parseSort(s) {
   return { field, dir: dir || (field === "title" ? "asc" : "desc") };
 }
 
+// A date sort's field's ISO string for an item, "" when undated (Hugo's zero
+// date). grouper() and groupDay() read its digits, as timeline.js's monthOf:
+// the page's own date, no zone shift.
+function dateOf(it, field) {
+  const d = it[field] || "";
+  return /^\d{4}-\d{2}-\d{2}/.test(d) && !d.startsWith("0001") ? d : "";
+}
+const dateField = (sort) => { const { field } = parseSort(sort); return field === "created" || field === "updated" ? field : null; };
+
 // How `sort` groups cards: a function from an item to its group key, or null
 // when it doesn't group. A date sort groups by that date's month, "2026-09"
-// ("" undated), read from the ISO string's digits as timeline.js's monthOf:
-// the page's own date, no zone shift. Title and rating don't group (yet).
+// ("" undated). Title and rating don't group (yet).
 export function grouper(sort) {
-  const { field } = parseSort(sort);
-  if (field !== "created" && field !== "updated") return null;
-  return (it) => {
-    const d = it[field] || "";
-    return /^\d{4}-\d{2}/.test(d) && !d.startsWith("0001") ? d.slice(0, 7) : "";
-  };
+  const f = dateField(sort);
+  return f && ((it) => dateOf(it, f).slice(0, 7));
+}
+
+// A card's day of the month in its date group, "1"–"31" ("" undated); null
+// when `sort` isn't by date.
+export function groupDay(sort) {
+  const f = dateField(sort);
+  return f && ((it) => String(Number(dateOf(it, f).slice(8, 10)) || ""));
 }
 
 // `shown` (a page of sorted items) in runs by key: [{ key, items, total }],
