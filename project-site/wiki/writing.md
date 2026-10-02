@@ -58,7 +58,8 @@ appears in Obsidian.
 
 Every page gets **created** and **updated**. Created, first match wins:
 
-1. `created:` (or `date:`) in front matter — `2026-10-02` or `2026-10-02T09:30:00+01:00`
+1. `created:` (or `date:`) in front matter — `2026-10-02`, `2026-10-02T09:30:00+01:00`,
+   or `2026-10-02T09:30` as Obsidian's *Date & time* property writes it
 2. A date in the file name — `20261002-title.md`, `2026-10-02-title.md`,
    `Title . 20261002.md` — or the path `blog/2026/10/02/title.md`
 3. The commit that first added the file

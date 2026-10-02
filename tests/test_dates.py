@@ -11,6 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from dates import UNDATED, DateResolver, date_from_path, sort_key  # noqa: E402
+from sync_content import normalise_md, stamp_for                   # noqa: E402
 
 
 class DateFromPath(unittest.TestCase):
@@ -70,6 +71,35 @@ class SortKey(unittest.TestCase):
     def test_orders_mixed_forms(self):
         self.assertLess(sort_key("2024-01-01"), sort_key("2024-01-02T00:00:00+00:00"))
         self.assertEqual(sort_key("not a date"), UNDATED)
+
+
+class AuthoredDates(unittest.TestCase):
+    """The front-matter rung, in sync: what Obsidian's properties write, Hugo must parse."""
+
+    def stamp_and_page(self, fm: str):
+        resolver = DateResolver(Path(tempfile.gettempdir()))
+        resolver.git_times = {}
+        stamp = stamp_for(fm, Path("missing.md"), "notes/a.md", resolver)
+        return stamp, normalise_md(f"---\n{fm}\n---\nx\n", "notes/a.md", stamp)
+
+    def test_minute_times_get_seconds(self):
+        # Obsidian's Date & time property: minutes only, which Hugo rejects.
+        stamp, page = self.stamp_and_page('created: 2026-10-02T09:30\nupdated: "2026-10-03T18:05"')
+        self.assertEqual((stamp.created, stamp.updated), ("2026-10-02T09:30:00", "2026-10-03T18:05:00"))
+        self.assertIn("\ncreated: 2026-10-02T09:30:00\n", page)
+        self.assertIn('\nupdated: "2026-10-03T18:05:00"\n', page)
+
+    def test_other_forms_untouched(self):
+        for value in ("2026-10-02", "2026-10-02T09:30:00", "2026-10-02T09:30:00+01:00"):
+            with self.subTest(value):
+                stamp, page = self.stamp_and_page(f"created: {value}")
+                self.assertEqual(stamp.created, value)
+                self.assertIn(f"\ncreated: {value}\n", page)
+
+    def test_legacy_key_too(self):
+        stamp, page = self.stamp_and_page("date: 2026-10-02T09:30")
+        self.assertEqual(stamp.created, "2026-10-02T09:30:00")
+        self.assertIn("\ncreated: 2026-10-02T09:30:00\n", page)
 
 
 if __name__ == "__main__":

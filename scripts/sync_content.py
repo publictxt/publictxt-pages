@@ -48,6 +48,10 @@ H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
+# A time to the minute, as Obsidian's Date & time property writes it: Hugo
+# rejects it (failing the build), so the copy gets `:00` seconds.
+MINUTE_TIME_RE = re.compile(
+    r"""^((?:created|updated)\s*:\s*["']?\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(["']?\s*)$""", re.MULTILINE)
 
 
 @dataclass
@@ -87,13 +91,14 @@ def lacks_bookmark_url(rel: str, fm: str | None, is_index: bool) -> bool:
     return not any(front_matter_value(fm, k) for k in BOOKMARK_KEYS)
 
 
-def rename_legacy_keys(fm: str | None) -> str | None:
+def normalise_dates(fm: str | None) -> str | None:
+    """`created` / `updated` as Hugo reads them: legacy keys renamed, minute times given seconds."""
     if not fm:
         return fm
     for old, new in LEGACY_KEYS.items():
         if not has_key(fm, new):
             fm = re.sub(rf"^{old}(\s*:)", rf"{new}\1", fm, count=1, flags=re.MULTILINE)
-    return fm
+    return MINUTE_TIME_RE.sub(r"\1:00\2", fm)
 
 
 def derive_title(body: str, fallback: str) -> tuple[str, str]:
@@ -115,7 +120,7 @@ def yaml_str(s: str) -> str:
 
 def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> Stamp:
     """Resolve a source file's `created` / `updated`, honouring what its front matter says."""
-    fm = rename_legacy_keys(fm)
+    fm = normalise_dates(fm)
     if created := front_matter_value(fm, "created"):
         created_source = "front-matter"
     else:
@@ -133,7 +138,7 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
 
 def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
     fm, body = split_front_matter(text)
-    fm = rename_legacy_keys(fm)
+    fm = normalise_dates(fm)
     name = Path(rel).name
     stem = Path(rel).stem
     added = []
