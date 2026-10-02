@@ -19,7 +19,7 @@
   {{ end }}
 {{ end }}
 {{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "as" "on") }}
-{{ $name := $root.Section | humanize }}
+{{ $name := partial "crumb-label.html" $root }}
 <details class="timeline fold tree" open>
   <summary><span class="side-heading">{{ $name }} tree</span></summary>
   <nav aria-label="{{ $name }} pages">

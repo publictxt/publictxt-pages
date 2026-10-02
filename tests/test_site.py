@@ -156,6 +156,13 @@ class SiteIndexTest(unittest.TestCase):
         self.assertEqual(self.rows(top, "open"), ["/wiki/pipeline/", "/wiki/projects/", "/wiki/site/"])
         self.assertIn('href="/wiki/projects/publictxt/"', top)
 
+    def test_folder_labels_keep_their_case(self):
+        """A folder's label is its name as cased (wiki/Projects/PublicTxt/), in breadcrumbs and the tree."""
+        html = self.html("wiki", "projects", "publictxt")
+        self.assertIn('<li aria-current="page">PublicTxt</li>', html)
+        self.assertIn('href="/wiki/projects/publictxt/">PublicTxt</a>', self.html("wiki"))
+        self.assertIn('<a href="/blog/2023/">2023</a>', self.html("blog", "2023", "12"), "date folder humanized")
+
     def test_section_tree_only_with_subfolders(self):
         """A flat tree-section folder, and a section outside treeSections: no tree."""
         self.assertNotIn('class="tree tree-content"', self.html("wiki", "site", "lists"))

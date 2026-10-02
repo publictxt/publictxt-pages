@@ -57,7 +57,7 @@ layouts/_partials/
   page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
-  crumb-label.html      one crumb's label; date folders literal
+  crumb-label.html      a page's short label; every folder label: its name, as cased
   sections.html         top-level sections in sectionOrder   (partialCached)
   recent.html           the one "recently updated first"
   page-date.html        created, + updated when shown

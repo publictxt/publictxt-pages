@@ -107,9 +107,3 @@ watches `build/content`, so content changes need sync re-run.
 
 `head.html`, `list-container.html`, `search.html`, `page-timeline.html`: fingerprint + `integrity` only when
 `hugo.IsProduction`.
-
-## Section links use folder names
-
-Never the `_index.md` title (authors title freely) — `sidebar.html`, `sections.html`,
-`crumb-label.html`. `humanize` would make `2023` "2023rd", so `crumb-label.html`
-skips it for date folders.

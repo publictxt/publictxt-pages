@@ -19,7 +19,7 @@
   {{- if $shared }} data-collections="{{ delimit $group " " }}" data-list="{{ site.Home.RelPermalink }}"
   {{- with site.Params.timelineTags }} data-tags="{{ jsonify . }}"{{ end }}
   {{- else }} data-section="{{ $section.RelPermalink }}" data-list="{{ $section.RelPermalink }}"{{ end }} open hidden>
-  <summary><span class="side-heading">{{ if $shared }}Timeline{{ else }}{{ $section.Section | humanize }} timeline{{ end }}</span></summary>
+  <summary><span class="side-heading">{{ if $shared }}Timeline{{ else }}{{ partial "crumb-label.html" $section }} timeline{{ end }}</span></summary>
   <div class="chip-row tl-chips" hidden></div>
   <ol class="tl"></ol>
 </details>
