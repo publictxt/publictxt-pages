@@ -1,0 +1,12 @@
+{{/*
+  The only reader of params.timelineSections: whether a section is in one
+  of those top-level sections (folder names, any case). If so, it shows its
+  pages by date in its content (timeline/content.html), as a tree section
+  shows its folders (tree/enabled.html, which this mirrors). Its pages keep
+  their right-column timeline either way (page-timeline.html). Where SPEC's
+  per-section `panels:` (TBD) would be read instead.
+  Takes a section; returns true or false.
+*/}}
+{{ $s := .FirstSection }}
+{{ $names := apply (site.Params.timelineSections | default slice) "lower" "." }}
+{{ return and $s (not $s.IsHome) (in $names (lower $s.Section)) }}

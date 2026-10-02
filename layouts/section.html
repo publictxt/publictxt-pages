@@ -17,6 +17,7 @@
 {{ end }}
 
 {{ if partial "tree/enabled.html" . }}{{ partial "tree/content.html" . }}{{ end }}
+{{ if partial "timeline/enabled.html" . }}{{ partial "timeline/content.html" . }}{{ end }}
 
 {{ $list := partial "section-pages.html" . }}
 {{ $pages := $list.pages }}

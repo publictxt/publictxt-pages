@@ -1,0 +1,61 @@
+{{/*
+  A timeline section's folder, in its content: what its browse list lists
+  (section-pages.html), by year and month written, with titles — a table of
+  contents by date, as tree/content.html is by place. Below the index body,
+  outside data-pagefind-body, above the browse list. Server-rendered, no
+  JS: the archive timeline's markup (renderTimeline() in timeline.js, which
+  main.css styles alike — traps.md), with <details> in place of its
+  buttons, and no sparklines or month bars: a table of contents, so the
+  counts carry the numbers (main.css puts them after their names). The newest year and its newest month open; a year's or month's
+  label links to the browse list below at that date (?year=&month=).
+  Only across two or more months, as list.js's timeline panel: within one,
+  it would repeat the browse list. Undated pages left out, as timeline.js.
+  A fold, open, its node the rail's root, as tree/content.html.
+  Takes a section in a timeline section (timeline/enabled.html).
+*/}}
+{{ $section := . }}
+{{- $pages := (partial "section-pages.html" .).pages }}
+{{- $years := where ($pages.GroupByDate "2006") "Key" "ne" "0001" }}{{/* Hugo's zero date */}}
+{{- $monthCount := 0 }}
+{{- range $years }}{{ $monthCount = add $monthCount (len (.Pages.GroupByDate "01")) }}{{ end }}
+{{ if ge $monthCount 2 }}
+{{- $names := partialCached "month-names.html" site }}
+<details class="contents tl-contents fold" open>
+  <summary><span class="tl-node" aria-hidden="true"></span><h2 class="side-heading">Contents</h2></summary>
+  <nav aria-label="{{ partial "crumb-label.html" $section }} by date">
+  <ol class="tl">
+  {{- range $yi, $y := $years }}
+    {{- $months := .Pages.GroupByDate "01" }}
+    <li class="tl-year"><details{{ if eq $yi 0 }} open{{ end }}>
+      <summary class="tl-row">
+        <span class="tl-node" aria-hidden="true"></span>
+        <a class="tl-pick" href="{{ $section.RelPermalink }}?year={{ .Key }}" title="List {{ .Key }}">{{ .Key }}</a>
+        <span class="count">{{ len .Pages }}</span>
+      </summary>
+      <ol class="tl-months">
+      {{- range $mi, $m := $months }}
+        {{- $name := index $names (sub (int (strings.TrimLeft "0" .Key)) 1) }}{{/* int rejects "09" (octal) */}}
+        <li class="tl-month"><details{{ if and (eq $yi 0) (eq $mi 0) }} open{{ end }}>
+          <summary class="tl-row">
+            <span class="tl-node" aria-hidden="true"></span>
+            <a class="tl-pick" href="{{ $section.RelPermalink }}?year={{ $y.Key }}&month={{ .Key }}" title="List {{ $name }} {{ $y.Key }}">{{ $name }}</a>
+            <span class="count">{{ len .Pages }}</span>
+          </summary>
+          {{- /* Each title after its day of the month, shown once per day. */}}
+          <ul class="tl-pages">
+          {{- $last := "" }}
+          {{- range .Pages }}
+            {{- $day := .Date.Format "2" }}
+            <li{{ if and $last (ne $day $last) }} class="tl-newday"{{ end }}><span class="tl-day" aria-hidden="true">{{ if ne $day $last }}{{ $day }}{{ end }}</span><a href="{{ .RelPermalink }}" title="{{ (partial "date-labels.html" .).created }}">{{ .LinkTitle }}</a></li>
+            {{- $last = $day }}
+          {{- end }}
+          </ul>
+        </details></li>
+      {{- end }}
+      </ol>
+    </details></li>
+  {{- end }}
+  </ol>
+  </nav>
+</details>
+{{- end }}

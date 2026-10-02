@@ -53,6 +53,11 @@ capitalizeListTitles = false
   # section in place of the timeline: reference material, read by place, not
   # date. Empty = every page a timeline.
   treeSections = ["wiki"]
+  # Top-level sections (folder names) whose folder pages (the section's and
+  # each sub-folder's) show their pages by year and month, with titles, above
+  # the browse list: a log, read by date. Shown across two months or more.
+  # Empty = none.
+  timelineSections = ["blog", "posts"]
   # Browse list defaults: sort "<field> [asc|desc]" over created (newest first),
   # title (A→Z), updated, rating (top first); cards per page. A section index
   # overrides for its subtree with `order:` / `perPage:`.

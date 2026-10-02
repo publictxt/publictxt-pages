@@ -1,0 +1,8 @@
+{{/*
+  Month names, January first, in the site's language — Hugo's, so JS never
+  formats a date (js-params.html passes them on) and server-rendered
+  timelines (timeline/content.html) name months alike. Returns the slice.
+*/}}
+{{ $months := slice }}
+{{ range seq 12 }}{{ $months = $months | append ((time (printf "2000-%02d-15" .)).Format "January") }}{{ end }}
+{{ return $months }}
