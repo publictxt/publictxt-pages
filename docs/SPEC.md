@@ -14,6 +14,7 @@ Items marked **(TBD)** are not built.
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
   - The sidebar lists sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
+  - A `treeSections` folder with sub-folders shows its subtree below the index body (not search-indexed), sub-folders open one level, then the browse list.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
   - Sections move to specialised Views over Collections (TBD)
@@ -47,7 +48,7 @@ Items marked **(TBD)** are not built.
   - Home *Recent*: every page, recently updated first, `recentLimit` a page, with filters and timeline; nothing filtered to start. (Not "this month": empty on quiet months.)
   - Sorting in all by Date, Recency, Alphabetical.
   - Filter by Collection, and by Year (the `created` year) or a month of it (`?year=&month=`) — picked in the timeline; no year select.
-  - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars and counts — no titles, the list shows those. A year or month label picks the date filter; the other filters narrow it. The newest year open to start.
+  - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars and counts — no titles, the list shows those. A year or month label picks the date filter; the other filters narrow it. The newest year open to start. None in `treeSections` (read by place, the tree is there instead); without a timeline, `?year=`/`?month=` are ignored.
   - Filter by Category and Tag, as the facets above (also in Search)
   - Sort by Source/Author (TBD)
   - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search): chips, one at a time, each counting that rating or better.
