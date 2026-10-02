@@ -5,7 +5,8 @@ has a docstring, every partial a `{{/* */}}` contract. Code wins any disagreemen
 [traps.md](traps.md) holds what spans files; **read it before editing templates or the
 pipeline.** [SPEC.md](../SPEC.md) is what the site *should* do.
 
-Add, move or remove a file: update this map. `python scripts/map_lint.py` checks both ways.
+Add, move or remove a file: update this map. `python scripts/map_lint.py` checks both ways —
+a bare name counts only under its folder's heading.
 
 ## Python — pipeline (no dependencies; 3.10+)
 
@@ -18,7 +19,7 @@ scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`)
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
 scripts/build.sh            shim -> build.py, for deploy workflows copied before it
-scripts/map_lint.py         this map vs the tree
+scripts/map_lint.py         this map vs the tree; docstring: how it reads the map
 ```
 
 ## Tests — `python -m unittest` (stdlib), `node --test "tests/js/*.test.mjs"`
@@ -29,6 +30,7 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
+tests/test_map_lint.py      map_lint.py's reading of the map: folder headings, namesakes
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
 tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling, tag chips
 ```

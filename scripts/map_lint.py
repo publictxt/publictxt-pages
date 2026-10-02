@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
 map_lint.py — checks docs/wiki/index.md's map against the tree, both ways:
+  UNMAPPED  a source file the map doesn't list
+  GONE      a file the map lists that no longer exists
 
-  UNMAPPED  a source file the map doesn't mention (by path, or bare name
-            under a heading such as layouts/_partials/)
-  GONE      a file the map names that no longer exists
+The map is its ```txt blocks. A line starting at column 0 lists a file by
+path (`scripts/build.py  …`), or opens a folder (`layouts/_partials/  …`);
+an indented line starting with a file name lists that file in the open
+folder (`  head.html  …` = layouts/_partials/head.html). Only a line's
+first word counts — descriptions name other files freely. Outside the
+blocks, a file's full path in the prose maps it too.
 
 Usage: python scripts/map_lint.py. Exits 1 on any report.
 """
@@ -15,6 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MAP = ROOT / "docs" / "wiki" / "index.md"
+
 SOURCE_GLOBS = (
     "scripts/*.py", "scripts/*.sh", "scripts/*.ps1",
     "layouts/**/*.html",
@@ -24,21 +30,39 @@ SOURCE_GLOBS = (
     "hugo.toml",
 )
 SOURCE_EXCLUDE = {"tests/__init__.py"}
-# A file named in the map's code blocks: a path or a bare name with a source extension.
-NAMED_RE = re.compile(r"(?<![\w./-])([\w./-]+\.(?:py|sh|ps1|html|js|css|yml|toml))\b")
+
+FILE_RE = re.compile(r"[\w./-]+\.(?:py|sh|ps1|html|js|mjs|css|yml|toml)")
+
+
+def mapped(text: str) -> set[str]:
+    """The paths the map's blocks list, folder headings resolved."""
+    paths = set()
+    for block in re.findall(r"```txt\n(.*?)```", text, re.DOTALL):
+        folder = ""
+        for line in block.splitlines():
+            if not line.strip():
+                continue
+            first = line.split()[0]
+            if not line[0].isspace():
+                folder = first if first.endswith("/") else ""
+                if FILE_RE.fullmatch(first):
+                    paths.add(first)
+            elif folder and FILE_RE.fullmatch(first):
+                paths.add(folder + first)
+    return paths
+
+
+def check(text: str, sources: set[str], exists) -> list[str]:
+    listed = mapped(text)
+    problems = [f"UNMAPPED {rel}" for rel in sorted(sources - SOURCE_EXCLUDE)
+                if rel not in listed and rel not in text]
+    problems += [f"GONE     {rel}" for rel in sorted(listed) if not exists(rel)]
+    return problems
 
 
 def main() -> int:
-    text = MAP.read_text(encoding="utf-8")
-    sources = {f.relative_to(ROOT).as_posix(): f.name
-               for g in SOURCE_GLOBS for f in ROOT.glob(g)}
-    names = set(sources.values())
-    problems = [f"UNMAPPED {rel}" for rel, name in sorted(sources.items())
-                if rel not in SOURCE_EXCLUDE and rel not in text and name not in text]
-    blocks = "\n".join(re.findall(r"```txt\n(.*?)```", text, re.DOTALL))
-    for named in sorted(set(NAMED_RE.findall(blocks))):
-        if not (ROOT / named).exists() and named not in names:
-            problems.append(f"GONE     {named}")
+    sources = {f.relative_to(ROOT).as_posix() for g in SOURCE_GLOBS for f in ROOT.glob(g)}
+    problems = check(MAP.read_text(encoding="utf-8"), sources, lambda rel: (ROOT / rel).exists())
     for p in problems:
         print(p)
     print(f"map: {len(sources)} source file(s), {len(problems)} problem(s)")
