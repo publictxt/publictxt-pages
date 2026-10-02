@@ -1,0 +1,22 @@
+{{/*
+  One folder's rows in page-tree.html: its sub-folders (each a <details>,
+  recursing) then its pages, as <li>s. On the page's path: `on-path`, open;
+  the page itself: `current`, aria-current.
+  Takes dict section (a section page), page (the page shown).
+*/}}
+{{- $page := .page -}}
+{{- range sort .section.Sections "Path" -}}
+{{- $on := .IsAncestor $page -}}
+<li class="tree-dir{{ if $on }} on-path{{ end }}">
+  <details{{ if $on }} open{{ end }}>
+    <summary><a href="{{ .RelPermalink }}">{{ partial "crumb-label.html" . }}</a><span class="count">{{ len .RegularPagesRecursive }}</span></summary>
+    <ul class="tree-list">
+      {{- partial "page-tree-node.html" (dict "section" . "page" $page) -}}
+    </ul>
+  </details>
+</li>
+{{- end -}}
+{{- range sort .section.RegularPages "LinkTitle" -}}
+{{- $cur := eq . $page -}}
+<li class="tree-page{{ if $cur }} current{{ end }}"><a href="{{ .RelPermalink }}"{{ if $cur }} aria-current="page"{{ end }}>{{ .LinkTitle }}</a></li>
+{{- end -}}

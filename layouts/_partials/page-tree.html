@@ -1,0 +1,23 @@
+{{/*
+  A page's folder tree, below "This page" (page.html's right column), in
+  place of its timeline when its top-level section is one of
+  params.treeSections. Server-rendered, no JS: nested <details>, open along
+  the page's path — the path lit, the page marked, every other folder shut
+  with its page count (focus + context). Folders first, by folder name;
+  then pages, by title. Built from Hugo's sections — sync gives every folder
+  an _index.md, so the folders are the source repo's.
+  Takes the page; renders nothing outside a tree section.
+*/}}
+{{ $root := .FirstSection }}
+{{ $names := apply (site.Params.treeSections | default slice) "lower" "." }}
+{{ if and $root (not $root.IsHome) (in $names (lower $root.Section)) }}
+<nav class="side-block tree" aria-label="{{ $root.Section | humanize }} pages">
+  <h2 class="side-heading tree-head">
+    <a href="{{ $root.RelPermalink }}">{{ $root.Section | humanize }}</a>
+    <span class="count">{{ len $root.RegularPagesRecursive }}</span>
+  </h2>
+  <ul class="tree-list">
+    {{- partial "page-tree-node.html" (dict "section" $root "page" .) -}}
+  </ul>
+</nav>
+{{ end }}
