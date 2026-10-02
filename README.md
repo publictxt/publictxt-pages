@@ -13,6 +13,7 @@ minimal reliance on PublicTxt-specific syntax transforms.
 
 ## docs
 
+- [docs/user/](docs/user/README.md) — **user guide**: setup with Obsidian, configuration, writing, the published site
 - [docs/SPEC.md](docs/SPEC.md) — what it does and should do
 - [docs/wiki/](docs/wiki/index.md) — the file map, and traps that span files
 
