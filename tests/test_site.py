@@ -181,6 +181,7 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIsNotNone(tl, "no section timeline")
         body = re.search(r'<div class="prose" data-pagefind-body>.*?</div>', html, re.S)
         self.assertLess(body.end(), html.index(tl), "timeline inside the indexed body")
+        self.assertIn('<summary><span class="tl-node" aria-hidden="true"></span><h2', tl, "heading node: the rail's root")
         # Years newest first, with counts; each label links to the list below at that date.
         self.assertEqual(re.findall(r'href="/blog/\?year=(\d{4})"[^\n]*\n.*?<span class="count">(\d+)</span>', tl, re.S),
                          [("2026", "3"), ("2024", "1"), ("2023", "2")])
