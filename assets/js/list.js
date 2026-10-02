@@ -14,14 +14,15 @@
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
 // the list when narrow (layout.js). Sort and the density toggle sit with the count.
-// A date or rating sort groups the cards, by month or stars (grouper() in sorts.js).
-import { card, densityToggle, ratingFilter, ratingFilterLabel, ratingHTML, UNRATED_FILTER } from "./cards.js";
+// A date or rating sort groups the cards, by month or stars (card-groups.js).
+import { cardGroups, countBy, grouper, groupTitle } from "./card-groups.js";
+import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, grouper, groups, normaliseSort, parseSort } from "./sorts.js";
+import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -283,73 +284,19 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  // A group's title, from its key (grouper()): stars, as the cards' — no
-  // link, as the rating filter is a minimum (★4 would list the 5s too); or a
-  // month, its year muted, linking to that date filter when the sort is by
-  // created (the filter's date) and the list isn't already on it.
-  function groupTitle(key) {
-    const h = document.createElement("h2");
-    h.className = "card-group-title";
-    const { field } = parseSort(state.sort);
-    if (field === "rating") {
-      if (key) h.innerHTML = ratingHTML({ rating: Number(key) }).trim();
-      else h.append("Unrated");
-      return h;
-    }
-    if (!key) {
-      h.append("Undated");
-      return h;
-    }
-    const [y, m] = key.split("-");
-    const month = params.months[Number(m) - 1];
-    let label = h;
-    if (field === "created" && state.month !== m) {
-      const a = document.createElement("a");
-      a.href = url({ year: y, month: m, page: 1 });
-      a.title = `List ${month} ${y}`;
-      a.addEventListener("click", (e) => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
-        e.preventDefault();
-        state.year = y; state.month = m; state.page = 1;
-        tlOpen.add(y);
-        render(true);
-        root.scrollIntoView({ block: "start" });
-      });
-      h.append(a);
-      label = a;
-    }
-    const year = document.createElement("span");
-    year.className = "card-group-year";
-    year.textContent = y;
-    label.append(month + " ", year);
-    return h;
-  }
-
-  // A group, a fold, open: its heading pins while its cards scroll by — its
-  // title, a rule, how many it holds ("4 of 9 pages" when the rest are on
-  // other pages).
-  function groupItem(g, cardFor) {
-    const li = document.createElement("li");
-    li.className = "card-group";
-    const fold = document.createElement("details");
-    fold.open = true;
-    const head = document.createElement("summary");
-    head.className = "card-group-head";
-    head.innerHTML = `<span class="tl-node" aria-hidden="true"></span>`;
-    const rule = document.createElement("span");
-    rule.className = "card-group-rule";
-    const count = document.createElement("span");
-    count.className = "count";
-    const pages = (n) => `${n} page${n === 1 ? "" : "s"}`;
-    count.textContent = g.items.length < g.total ? `${g.items.length} of ${pages(g.total)}` : pages(g.total);
-    head.append(groupTitle(g.key), rule, count);
-    const ul = document.createElement("ul");
-    ul.className = "card-group-items";
-    ul.append(...g.items.map(cardFor));
-    fold.append(head, ul);
-    li.append(fold);
-    return li;
-  }
+  // A group's title (card-groups.js): a created month links to that date
+  // filter, unless the list is on it.
+  const titleFor = (key) => groupTitle(key, {
+    field: parseSort(state.sort).field,
+    months: params.months,
+    href: (y, m) => state.year === y && state.month === m ? null : url({ year: y, month: m, page: 1 }),
+    pick: (y, m) => {
+      state.year = y; state.month = m; state.page = 1;
+      tlOpen.add(y);
+      render(true);
+      root.scrollIntoView({ block: "start" });
+    },
+  });
 
   const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
   const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
@@ -395,9 +342,12 @@ async function mount(root) {
     const cardFor = (it) => card(it, { activeTags: state.tag?.inc, onTag });
     const keyOf = compact ? null : grouper(state.sort);
     list.classList.toggle("grouped", Boolean(keyOf));
-    list.replaceChildren(...(keyOf
-      ? groups(slice, keyOf, filtered).map((g) => groupItem(g, cardFor))
-      : slice.map(cardFor)));
+    list.replaceChildren();
+    if (keyOf) {
+      const totals = countBy(filtered, keyOf);
+      const add = cardGroups(list, keyOf, { title: titleFor, total: (k) => totals.get(k) });
+      for (const it of slice) add(it, cardFor(it));
+    } else list.append(...slice.map(cardFor));
     if (compact) return;
     sortSelect.value = state.sort;
 
