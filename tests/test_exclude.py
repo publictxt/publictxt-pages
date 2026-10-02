@@ -43,11 +43,11 @@ def synced(files: dict[str, str], exclude) -> list[str]:
 
 
 REPO = {
-    "Obsidian/Templates/Daily.md": "# Daily\n",
-    "Obsidian/Templates/img.png": "x",
-    "Obsidian/Templates/Deep/Nested.md": "# Nested\n",
-    "Obsidian/Keep.md": "# Keep\n",
-    "Obsidian Notes/Other.md": "# Other\n",
+    "settings/Templates/Daily.md": "# Daily\n",
+    "settings/Templates/img.png": "x",
+    "settings/Templates/Deep/Nested.md": "# Nested\n",
+    "settings/Keep.md": "# Keep\n",
+    "settings Notes/Other.md": "# Other\n",
     "notes/Templates/Real.md": "# Real\n",
     "Top.md": "# Top\n",
 }
@@ -55,28 +55,33 @@ REPO = {
 
 class ExcludeFoldersTest(unittest.TestCase):
     def test_subtree_goes_siblings_stay(self):
-        out = synced(REPO, '["Obsidian/Templates"]')
-        self.assertFalse([p for p in out if "Templates/" in p and p.startswith("Obsidian/")], out)
-        self.assertIn("Obsidian/Keep.md", out)
+        out = synced(REPO, '["settings/Templates"]')
+        self.assertFalse([p for p in out if "Templates/" in p and p.startswith("settings/")], out)
+        self.assertIn("settings/Keep.md", out)
         self.assertIn("notes/Templates/Real.md", out)    # same name, other place
-        self.assertIn("Obsidian Notes/Other.md", out)    # prefix of a name isn't a folder prefix
+        self.assertIn("settings Notes/Other.md", out)    # prefix of a name isn't a folder prefix
         self.assertIn("Top.md", out)
 
     def test_no_setting_excludes_nothing(self):
-        self.assertIn("Obsidian/Templates/Daily.md", synced(REPO, None))
+        self.assertIn("settings/Templates/Daily.md", synced(REPO, None))
+
+    def test_site_toml_is_not_content(self):
+        # settings/ holds the config too: it's copied beside content, not synced as a page.
+        out = synced(REPO, '["settings/Templates"]')
+        self.assertNotIn("settings/site.toml", out)
 
     def test_slashes_and_case_are_forgiving(self):
         bs = chr(92)   # TOML literal string, so no escapes
-        out = synced(REPO, "['/obsidian" + bs + "templates/']")
-        self.assertNotIn("Obsidian/Templates/Daily.md", out)
+        out = synced(REPO, "['/Settings" + bs + "templates/']")
+        self.assertNotIn("settings/Templates/Daily.md", out)
 
     def test_excluded_folder_leaves_no_index(self):
-        out = synced({"Obsidian/Templates/Daily.md": "# D\n", "Top.md": "# T\n"}, '["Obsidian/Templates"]')
-        self.assertFalse([p for p in out if p.startswith("Obsidian/")], out)
+        out = synced({"settings/Templates/Daily.md": "# D\n", "Top.md": "# T\n"}, '["settings/Templates"]')
+        self.assertFalse([p for p in out if p.startswith("settings/")], out)
 
     def test_bad_value_stops_the_build(self):
         with self.assertRaises(SystemExit):
-            synced(REPO, '"Obsidian/Templates"')
+            synced(REPO, '"settings/Templates"')
 
 
 if __name__ == "__main__":

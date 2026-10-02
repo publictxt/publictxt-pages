@@ -15,7 +15,7 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
 Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep), the folders listed in
 the repo's settings/site.toml `params.excludeFolders` (whole subtrees, notes and
-attachments alike — e.g. Obsidian/Templates), and `publish: off`
+attachments alike — e.g. settings/Templates), and `publish: off`
 pages — and every file of a folder whose Markdown is all unpublished (a
 draft's attachments; beside published notes, they stay). Other files are copied
 verbatim — except SITE_CONFIG, the repo's site settings: not content, it goes
