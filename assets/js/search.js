@@ -8,7 +8,7 @@
 // timeline (timeline.js, filter mode) picks ?year= / ?month= from Pagefind's
 // month counts, recounted without the date filter while one is set.
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
-import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matchToggle, pagefindConditions,
   ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
@@ -215,6 +215,7 @@ el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
 el.clear.addEventListener("click", () => { state.q = ""; CHIPS.clear(state); state.year = ""; state.month = ""; state.rating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
+el.sort.closest(".results-tools").append(densityToggle(el.list));
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 
 for (const g of document.querySelectorAll("#search-filters [data-facet]")) rememberFold(g, g.dataset.facet);

@@ -48,6 +48,9 @@ Home, section and tag lists share one interface.
 **Sort**: Newest, Oldest, Title, Recently updated, Top/Lowest rated (unrated counts as
 2.5). Starts at the [configured order](configuration.md#browse-lists).
 
+**Compact**, beside sort: one line per page — title, date, stars — for skimming. Remembered
+in your browser for lists and search; not part of the URL.
+
 **Filter chips** — Collection, Category, Tags (as [configured](configuration.md#filter-chips)):
 
 - Click a chip to **include** it; click again to clear.

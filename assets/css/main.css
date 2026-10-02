@@ -328,7 +328,7 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   padding: 0.9rem 1.1rem;
 }
-.page-card time { font-size: 0.8rem; }
+.page-card time, .page-card-dates > .muted { font-size: 0.8rem; }
 
 .page-card-head {
   display: flex;
@@ -361,6 +361,21 @@ a:hover { text-decoration: underline; }
 }
 
 .page-card .chip-row { margin-top: 0.5rem; }
+
+/* Compact cards (densityToggle in cards.js): one line each, title then
+   collections, date and stars; no summary, links or tags. The head's parts
+   join the card's row, so a phone wraps them under the title, not stacked. */
+.page-list.dense, .result-list.dense { gap: 0.35rem; }
+.dense .page-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.6rem;
+  padding: 0.45rem 0.9rem;
+}
+.dense .page-card-head { display: contents; }
+.dense .page-card-title { flex: 1 1 16rem; font-size: 0.95rem; }
+.dense .page-card .chip-row, .dense .page-card-summary { display: none; }
 
 /* Browse lists (assets/js/list.js) */
 .link-list { margin: 0; padding-left: 1.2rem; }
@@ -938,6 +953,10 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   margin-bottom: 0.8rem;
 }
 #search-status { margin: 0; }
+/* Sort and the density toggle: together, at the right, wrapped or not. */
+.results-tools { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; }
+.density-toggle { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.density-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 #search-more { margin-top: 1rem; }
 
 /* ---------- Responsive ---------- */
