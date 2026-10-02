@@ -1,0 +1,26 @@
+# The project site's settings, merged over publictxt-pages' hugo.toml at build
+# time (wiki/configuration.md has the rules). baseURL and the edit link come
+# from .github/workflows/deploy.yml, which builds this folder.
+
+title = "publictxt-pages"
+
+[params]
+  description = "Publish a folder of Markdown notes as a browsable, searchable website — free, no server."
+  shortTitle = "publictxt-pages"
+  sectionOrder = ["wiki", "blog", "posts", "bookmarks"]
+
+  [params.footer]
+    text = "[publictxt-pages](https://github.com/publictxt/publictxt-pages) · free software, [GPL-3.0](https://github.com/publictxt/publictxt-pages/blob/main/LICENSE) · part of [PublicTxt](https://github.com/publictxt/publictext)"
+
+  # No categories yet: tags and collections do the sorting.
+  [params.categories]
+    enabled = false
+
+[[params.chipFacets]]
+  key = "collection"
+  label = "Collection"
+  states = ["include", "exclude"]
+  match = ["any"]
+[[params.chipFacets]]
+  key = "tag"
+  label = "Tags"

@@ -44,4 +44,4 @@ the site reads — but any editor works. See [Other editors](other-editors.md).
 | Set the site title | `HUGO_TITLE` in the workflow, or `title` in `settings/site.toml` |
 | Date a post | Name it `20260509-title.md`, or set `created:` |
 
-Spec and internals (for contributors): [`docs/SPEC.md`](https://github.com/publictxt/publictxt-pages/blob/main/docs/SPEC.md), [`docs/wiki/`](https://github.com/publictxt/publictxt-pages/blob/main/docs/wiki/index.md).
+Background — how the build works, PublicTxt, FAQ, contributing — is in [About](About/_index.md).
