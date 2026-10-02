@@ -1,24 +1,24 @@
 {{/*
   A page's folder tree, below "This page" (page.html's right column), in
-  place of its timeline in a tree section (tree-section.html). Server-
+  place of its timeline in a tree section (tree/enabled.html). Server-
   rendered, no JS, in the timeline's look (a fold; folders as its years,
   pages as its pages): open along the page's path — those nodes filled,
   the page marked — every other folder shut with its page count. Folders
   first, by folder name; then pages, by title. Built from Hugo's sections:
   sync gives every folder an _index.md, so they are the source repo's.
   Rendered once per tree (partialCached), then each page's path marked in
-  (tree-mark.html): rendering it per page made the build O(pages²) — 5x
+  (tree/mark.html): rendering it per page made the build O(pages²) — 5x
   slower on a 1,000-page wiki.
   Takes the page.
 */}}
 {{ $root := .FirstSection }}
-{{ $html := partialCached "tree-node.html" $root $root.RelPermalink }}
+{{ $html := partialCached "tree/node.html" $root $root.RelPermalink }}
 {{ range .Ancestors }}
   {{ if and (ne . $root) (.IsDescendant $root) }}
-    {{ $html = partial "tree-mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "on") }}
+    {{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "on") }}
   {{ end }}
 {{ end }}
-{{ $html = partial "tree-mark.html" (dict "html" $html "url" .RelPermalink "as" "on") }}
+{{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "as" "on") }}
 {{ $name := $root.Section | humanize }}
 <details class="timeline fold tree" open>
   <summary><span class="side-heading">{{ $name }} tree</span></summary>

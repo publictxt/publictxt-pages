@@ -99,7 +99,7 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn("All 6 pages tagged #site", block[1])
         self.assertRegex(html, r"<pre[^>]*>.*TABLE rating FROM #site", "unsupported query not left as code")
 
-    # The folder tree's markup is read here, and only here (tree-row.html).
+    # The folder tree's markup is read here, and only here (tree/row.html).
     def html(self, *path):
         return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")
 

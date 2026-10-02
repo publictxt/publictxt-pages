@@ -21,7 +21,7 @@ Items marked **(TBD)** are not built.
     - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD; a page's shared timeline does this for `timelineCollections`)
     - Bookmarks should show Bookmark specialised view (TBD)
     - Wiki view: a right-column panel of categories (TBD) and the folder tree (built: `treeSections`, below)
-    - Panels per section, not one view each (TBD): a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md` like `order:` — so wiki/notes can keep a timeline beside the tree. Then `timelineCollections`/`timelineTags` fold into a `[params.timeline]` table, each panel its own partial. `treeSections` folds into `panels:` too; `tree-section.html`, its only reader, is the seam.
+    - Panels per section, not one view each (TBD): a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md` like `order:` — so wiki/notes can keep a timeline beside the tree. Then `timelineCollections`/`timelineTags` fold into a `[params.timeline]` table, each panel its own partial. `treeSections` folds into `panels:` too; `tree/enabled.html`, its only reader, is the seam.
     - A non-log timeline (wiki, notes) may want `updated`, not `created`, as its date (TBD; timeline.js takes one date field throughout)
 - Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
   - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.

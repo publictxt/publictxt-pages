@@ -24,6 +24,6 @@
 {{ define "aside" }}
 <aside class="aside" aria-label="This page">
   {{ partial "page-meta.html" . }}
-  {{ if partial "tree-section.html" . }}{{ partial "page-tree.html" . }}{{ else }}{{ partial "page-timeline.html" . }}{{ end }}
+  {{ if partial "tree/enabled.html" . }}{{ partial "tree/aside.html" . }}{{ else }}{{ partial "page-timeline.html" . }}{{ end }}
 </aside>
 {{ end }}

@@ -3,14 +3,14 @@
   data-pagefind-body (or every index page would match every title below
   it), above the browse list. The folder's own subtree, its sub-folders
   open one level; cached per folder, so /wiki/ shares the right column's
-  (page-tree.html). Only with sub-folders: a flat folder's tree would
+  (tree/aside.html). Only with sub-folders: a flat folder's tree would
   repeat the browse list.
-  Takes a section in a tree section (tree-section.html).
+  Takes a section in a tree section (tree/enabled.html).
 */}}
 {{ with .Sections }}
-{{ $html := partialCached "tree-node.html" $ $.RelPermalink }}
+{{ $html := partialCached "tree/node.html" $ $.RelPermalink }}
 {{ range . }}
-  {{ $html = partial "tree-mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "open") }}
+  {{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "open") }}
 {{ end }}
 <section class="tree tree-content">
   <h2 class="side-heading">Contents</h2>

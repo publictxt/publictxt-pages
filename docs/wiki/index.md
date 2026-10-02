@@ -53,12 +53,6 @@ layouts/_partials/
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
   page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
-  tree-section.html     only reader of params.treeSections: is a page or section in one?
-  page-tree.html        or a tree section's folder tree: cached, the page's path marked in
-  section-tree.html     a tree section's folder, in its content: its subtree, one level open
-  tree-node.html        one folder's rows, recursing, all shut (partialCached, per folder)
-  tree-row.html         a row's opening tags, every form: shut, "on" (path), "open"
-  tree-mark.html        one row of a cached tree opened or marked, by tree-row.html's forms
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal
@@ -88,6 +82,14 @@ layouts/_partials/
   rating.html           only reader of rating:
   note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
   attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
+
+layouts/_partials/tree/   a folder tree of a tree section (params.treeSections)
+  enabled.html          only reader of treeSections: is a page or section in one?
+  aside.html            a page's, in place of its timeline: cached, the page's path marked in
+  content.html          a folder's, in its content: its subtree, one level open
+  node.html             one folder's rows, recursing, all shut (partialCached, per folder)
+  row.html              a row's opening tags, every form: shut, "on" (path), "open"
+  mark.html             one row of a cached tree opened or marked, by row.html's forms
 
 layouts/_markup/
   render-image.html     every ![](…): .md -> note-embed; YouTube -> iframe; audio -> <audio>; else <img>
