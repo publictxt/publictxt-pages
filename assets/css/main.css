@@ -525,8 +525,9 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   text-align: left;
 }
-.tl-year > .tl-row > .tl-pick,
-.tree > nav > .tree-dirs > .tree-dir > details > .tree-row > .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+/* Top-level folders bold, as years; sub-folders plain, as months. */
+.tl-year > .tl-row > .tl-pick, .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+.tree-sub .tree-pick { font-weight: 400; letter-spacing: normal; }
 .tl-pick:hover, .tl-pick[aria-pressed="true"], .tree-pick:hover { color: var(--accent); text-decoration: none; }
 .tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
 .tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible,

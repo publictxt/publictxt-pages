@@ -99,54 +99,61 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn("All 6 pages tagged #site", block[1])
         self.assertRegex(html, r"<pre[^>]*>.*TABLE rating FROM #site", "unsupported query not left as code")
 
+    # The folder tree's markup is read here, and only here (tree-row.html).
+    def html(self, *path):
+        return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")
+
+    @staticmethod
+    def rows(tree, state):
+        """hrefs of a tree's folder rows that are `on` (the page's path) or `open` (any opened), in order."""
+        li = r'<li class="tree-dir on-path">' if state == "on" else r'<li class="tree-dir[^"]*">'
+        return re.findall(li + r'<details open><summary class="tree-row">[^\n]*?href="([^"]+)"', tree)
+
+    @staticmethod
+    def current(tree):
+        return re.findall(r'<li class="tree-page current"><a href="([^"]+)" aria-current="page">', tree)
+
     def test_wiki_tree(self):
         """A wiki page: the folder tree, not the timeline — open along its path, the page marked."""
-        html = (self.public / "wiki" / "site" / "lists" / "browse-lists" / "index.html").read_text(encoding="utf-8")
+        html = self.html("wiki", "site", "lists", "browse-lists")
         tree = re.search(r'<details class="timeline fold tree".*?</nav>', html, re.S)
         self.assertIsNotNone(tree, "no folder tree")
         self.assertNotIn("data-page-timeline", html)
         tree = tree[0]
-        self.assertEqual(re.findall(r'<li class="tree-dir on-path"><details open><summary class="tree-row">'
-                                    r'<span class="tree-node" aria-hidden="true"></span><a class="tree-pick" href="([^"]+)"', tree),
-                         ["/wiki/site/", "/wiki/site/lists/"])
-        self.assertEqual(tree.count("<details open>"), 2, "only the path open")
-        self.assertIn('<li class="tree-page current"><a href="/wiki/site/lists/browse-lists/" aria-current="page">', tree)
+        self.assertEqual(self.rows(tree, "on"), ["/wiki/site/", "/wiki/site/lists/"])
+        self.assertEqual(self.rows(tree, "open"), ["/wiki/site/", "/wiki/site/lists/"], "only the path open")
+        self.assertEqual(self.current(tree), ["/wiki/site/lists/browse-lists/"])
         # Shut folders keep their pages, and counts.
         self.assertIn('<a href="/wiki/pipeline/dates/">Dates</a>', tree)
-        self.assertIn('<a class="tree-pick" href="/wiki/projects/">Projects</a><span class="count">4</span>', tree)
+        self.assertIn('href="/wiki/projects/">Projects</a><span class="count">4</span>', tree)
 
     def test_timeline_outside_tree_sections(self):
         """A page outside params.treeSections keeps its timeline."""
-        html = (self.public / "notes" / "sample" / "index.html").read_text(encoding="utf-8")
+        html = self.html("notes", "sample")
         self.assertIn("data-page-timeline", html)
         self.assertNotIn('class="timeline fold tree"', html)
 
-    def section(self, *path):
-        return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")
-
     def test_section_tree(self):
         """A tree section's folder: its subtree after the index body — outside Pagefind's — first level open."""
-        html = self.section("wiki", "site")
+        html = self.html("wiki", "site")
         tree = re.search(r'<section class="tree tree-content">.*?</section>', html, re.S)
         self.assertIsNotNone(tree, "no section tree")
         body = re.search(r'<div class="prose" data-pagefind-body>.*?</div>', html, re.S)
         self.assertLess(body.end(), tree.start(), "tree inside the indexed body")
         tree = tree[0]
-        self.assertIn('<li class="tree-dir"><details open><summary class="tree-row">'
-                      '<span class="tree-node" aria-hidden="true"></span><a class="tree-pick" href="/wiki/site/lists/">', tree)
+        self.assertEqual(self.rows(tree, "open"), ["/wiki/site/lists/"])
+        self.assertEqual(self.rows(tree, "on") + self.current(tree), [], "nothing marked")
         self.assertIn('<a href="/wiki/site/search/">Search</a>', tree)
         self.assertNotIn("/wiki/pipeline/", tree, "another folder's pages")
-        # /wiki/: the whole tree, deeper folders shut.
-        top = self.section("wiki")
-        self.assertIn('<a class="tree-pick" href="/wiki/projects/publictxt/">', top)
-        self.assertNotRegex(top, r'<details open><summary class="tree-row"><span class="tree-node" aria-hidden="true"></span>'
-                                 r'<a class="tree-pick" href="/wiki/projects/publictxt/">')
+        # /wiki/: the whole tree, one level open.
+        top = re.search(r'<section class="tree tree-content">.*?</section>', self.html("wiki"), re.S)[0]
+        self.assertEqual(self.rows(top, "open"), ["/wiki/pipeline/", "/wiki/projects/", "/wiki/site/"])
+        self.assertIn('href="/wiki/projects/publictxt/"', top)
 
     def test_section_tree_only_with_subfolders(self):
         """A flat tree-section folder, and a section outside treeSections: no tree."""
-        self.assertNotIn('class="tree tree-content"', self.section("wiki", "site", "lists"))
-        self.assertNotIn('class="tree tree-content"', self.section("notes"))
-
+        self.assertNotIn('class="tree tree-content"', self.html("wiki", "site", "lists"))
+        self.assertNotIn('class="tree tree-content"', self.html("notes"))
 
 if __name__ == "__main__":
     unittest.main()
