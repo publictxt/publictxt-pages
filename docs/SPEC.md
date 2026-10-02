@@ -27,6 +27,7 @@ Items marked **(TBD)** are not built.
 - Right sidebar — context for what's shown
   - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
   - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none.
+  - pages of `treeSections` (default wiki) get a folder tree of their section instead of the timeline: server-rendered, no JS; folders then pages, A→Z; open along the page's path, the path lit, the page marked; other folders shut, with page counts. Folders only — a page filed elsewhere with `collections: wiki` isn't in it.
   - filters on browse lists and search, then a browse list's timeline; sort stays by the results
   - Author **(TBD)** — carried in front matter, rendered nowhere
 - Categories

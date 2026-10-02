@@ -39,7 +39,8 @@ tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling
 layouts/baseof.html               shell: header + ☰, nav | main | "aside" block;
                                   data-base + data-index on <html>
 layouts/home.html                 hero, Recent list; aside: its filters
-layouts/page.html                 single page; data-pagefind-body; aside: page meta, section timeline
+layouts/page.html                 single page; data-pagefind-body; aside: page meta, then
+                                  folder tree (treeSections) or timeline
 layouts/section.html              index body as prose + browse list; aside: its filters
 layouts/term.html                 /tags/<term>/; aside: its filters
 layouts/taxonomy.html             /tags/
@@ -51,6 +52,10 @@ layouts/_partials/
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
   page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's
+  tree-root.html        only reader of params.treeSections: a page's tree root, or false
+  page-tree.html        or the folder tree: cached per tree, the page's path patched in
+  page-tree-node.html   one folder's rows, recursing             (partialCached, per tree)
+  tree-row.html         a row's opening tags: renders the tree and makes the patch's needles
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal

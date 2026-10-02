@@ -69,7 +69,8 @@ and were silently `params.footer.*`. Plain `[params]` keys go above the first ta
 ## `partialCached` on site-scanning partials
 
 `site-index.html`, `sections.html`, `collection-pages.html`, `category-counts.html`
-walk every page; uncached, the build goes O(pages²).
+walk every page; uncached, the build goes O(pages²). So does `page-tree-node.html`
+(cached per tree root, in `page-tree.html`) across a tree section's pages.
 
 ## Build order and `public/`
 
