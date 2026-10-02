@@ -243,8 +243,13 @@ a:hover { text-decoration: underline; }
 .rating { color: var(--accent); letter-spacing: 0.05em; white-space: nowrap; }
 
 /* A long URL ellipsed to its card, not pushing a phone wider. */
-.chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
-  max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+.chip-link {
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
 .bookmark-links, .source-links { margin-top: 0.4rem; }
 .source-links { align-items: center; }
 
@@ -315,7 +320,8 @@ a:hover { text-decoration: underline; }
 .list-header h1 { margin: 0 0 0.4rem; font-size: 1.7rem; overflow-wrap: anywhere; }
 .list-header p, .list-header .list-intro { color: var(--text-muted); margin: 0; }
 
-.page-list {
+/* A column of cards: a browse list, search results, a group's cards. */
+.page-list, .result-list, .card-group-items {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -366,8 +372,8 @@ a:hover { text-decoration: underline; }
 
 /* Grouped cards (card-groups.js; lists and search, a date or rating sort):
    each month or star count a fold — the timeline's node (.tl-node) opens and
-   shuts it; its heading, a rule out to the count, pins under the header
-   while its cards scroll by. */
+   shuts it, open and hovered as the contents heading's (below); its heading,
+   a rule out to the count, pins under the header while its cards scroll by. */
 .grouped {
   --node: 18px;
   gap: 0.4rem;
@@ -385,10 +391,6 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
 }
 .card-group-head::-webkit-details-marker { display: none; }
-.card-group-head > .tl-node { flex: none; }
-.card-group > [open] > .card-group-head > .tl-node, .card-group-head:hover > .tl-node { border-color: var(--accent); }
-.card-group > [open] > .card-group-head > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
-.card-group-head:hover > .tl-node::before { border-color: var(--accent); }
 .card-group-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 .card-group-title { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
 .card-group-title a { color: var(--text); }
@@ -396,20 +398,12 @@ a:hover { text-decoration: underline; }
 .card-group-year { color: var(--text-muted); }
 .card-group-rule { flex: 1; min-width: 1rem; height: 1px; background: var(--border); }
 .card-group .count { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.card-group-items {
-  list-style: none;
-  margin: 0.2rem 0 0.6rem;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-.dense .card-group-items { gap: 0.35rem; }
+.card-group-items { margin: 0.2rem 0 0.6rem; }
 
 /* Compact cards (densityToggle in cards.js): one line each, title then
    collections, date and stars; no summary, links or tags. The head's parts
    join the card's row, so a phone wraps them under the title, not stacked. */
-.page-list.dense, .result-list.dense { gap: 0.35rem; }
+.dense, .dense .card-group-items { gap: 0.35rem; }
 .dense .page-card {
   display: flex;
   flex-wrap: wrap;
@@ -692,12 +686,15 @@ a:hover { text-decoration: underline; }
 .contents.fold > summary { justify-content: flex-start; gap: 0.55rem; width: fit-content; }
 .contents.fold > summary::after { display: none; }
 .contents.fold[open] > summary { margin-bottom: var(--gap); }
-.contents > summary > .tl-node, .contents > summary > .tree-node { flex: none; }
-.contents[open] > summary > .tl-node, .contents[open] > summary > .tree-node,
-.contents > summary:hover > .tl-node, .contents > summary:hover > .tree-node { border-color: var(--accent); }
-.contents[open] > summary > .tl-node::before,
-.contents[open] > summary > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
-.contents > summary:hover > .tl-node::before, .contents > summary:hover > .tree-node::before { border-color: var(--accent); }
+/* Its heading's node; a card group's too (card-groups.js). */
+.contents > summary > .tl-node, .contents > summary > .tree-node, .card-group-head > .tl-node { flex: none; }
+.contents[open] > summary > .tl-node, .contents[open] > summary > .tree-node, [open] > .card-group-head > .tl-node,
+.contents > summary:hover > .tl-node, .contents > summary:hover > .tree-node,
+.card-group-head:hover > .tl-node { border-color: var(--accent); }
+.contents[open] > summary > .tl-node::before, .contents[open] > summary > .tree-node::before,
+[open] > .card-group-head > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
+.contents > summary:hover > .tl-node::before, .contents > summary:hover > .tree-node::before,
+.card-group-head:hover > .tl-node::before { border-color: var(--accent); }
 /* The rail up to the root, across the heading's margin. */
 .contents > nav > .tl > .tl-year:first-child::before,
 .contents > nav > .tree-dirs > .tree-dir:first-child::before { display: block; top: calc(-1 * var(--gap)); }
@@ -973,14 +970,6 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 .match-toggle:hover { border-color: var(--accent); }
 
-.result-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
 .result-list mark {
   background: var(--accent-soft);
   color: var(--accent);

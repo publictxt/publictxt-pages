@@ -61,11 +61,12 @@ export function groupTitle(key, { field, months, href, pick }) {
     return h;
   }
   const [y, m] = key.split("-");
+  const month = months[Number(m) - 1];
   const year = Object.assign(document.createElement("span"), { className: "card-group-year", textContent: y });
   const url = field === "created" && href(y, m);
   let label = h;
   if (url) {
-    label = Object.assign(document.createElement("a"), { href: url, title: `List ${months[Number(m) - 1]} ${y}` });
+    label = Object.assign(document.createElement("a"), { href: url, title: `List ${month} ${y}` });
     label.addEventListener("click", (e) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;   // let new-tab clicks through
       e.preventDefault();
@@ -73,7 +74,7 @@ export function groupTitle(key, { field, months, href, pick }) {
     });
     h.append(label);
   }
-  label.append(months[Number(m) - 1] + " ", year);
+  label.append(month + " ", year);
   return h;
 }
 

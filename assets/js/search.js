@@ -193,7 +193,7 @@ async function run() {
   current = res.results; shown = 0;
   el.list.replaceChildren();
   const counts = res.filters || allFilters;
-  const keyOf = sort === RELEVANCE ? null : grouper(sort);
+  const keyOf = sort === RELEVANCE ? null : grouper(sort);   // parseSort would read it as created
   el.list.classList.toggle("grouped", Boolean(keyOf));
   addCard = keyOf
     ? cardGroups(el.list, keyOf, { title: titleFor, total: groupTotal(parseSort(sort).field, counts) })

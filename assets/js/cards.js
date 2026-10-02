@@ -46,7 +46,7 @@ export function tagURL(name) {
 // and left out of the URL. Storage can throw or be empty; then cards start full.
 const DENSE_KEY = "cards-dense";
 export function readDense(storage) {
-  try { return storage.getItem(DENSE_KEY) === "1"; } catch { return false; }
+  try { return (storage ?? localStorage).getItem(DENSE_KEY) === "1"; } catch { return false; }
 }
 
 // The toggle for `list` (a .page-list or .result-list), set as remembered.
@@ -56,7 +56,7 @@ export function densityToggle(list) {
   b.className = "btn-ghost density-toggle";
   b.textContent = "Compact";
   const set = (on) => { list.classList.toggle("dense", on); b.setAttribute("aria-pressed", String(on)); };
-  set(readDense(globalThis.localStorage));
+  set(readDense());
   b.addEventListener("click", () => {
     const on = !list.classList.contains("dense");
     set(on);
