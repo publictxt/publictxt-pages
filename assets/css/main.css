@@ -334,9 +334,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 0.75rem;
-  min-width: 0;
 }
 
 .page-card-title {
@@ -351,8 +349,8 @@ a:hover { text-decoration: underline; }
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.35rem;
-  flex-shrink: 0;
-  margin-left: auto;
+  flex: 0 1 auto;
+  max-width: 50%;   /* many chips wrap, not push the card wider */
 }
 
 .page-card-summary {
@@ -986,6 +984,15 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   .aside:empty { display: none; }
   html:not(.js) .sidebar { order: 1; }   /* after the page meta */
 
+  .header-search input[type="search"] { width: 42vw; }
+}
+
+@media (max-width: 700px) {
+  .site-title.has-short-title .site-title-full { display: none; }
+  .site-title.has-short-title .site-title-short { display: inline; }
+}
+
+@media (max-width: 600px) {
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
     padding: 0.8rem 0.9rem;
@@ -996,22 +1003,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
     gap: 0.5rem;
   }
   .page-card-collections {
-    margin-left: 0;
+    max-width: 100%;
     justify-content: flex-start;
-  }
-  .header-search input[type="search"] { width: 42vw; }
-}
-
-@media (max-width: 700px) {
-  .site-title.has-short-title .site-title-full { display: none; }
-  .site-title.has-short-title .site-title-short { display: inline; }
-}
-
-@media (max-width: 520px) {
-  .page-card-head {
-    align-items: stretch;
-  }
-  .single-meta {
-    gap: 0.3rem;
   }
 }
