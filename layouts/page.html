@@ -24,7 +24,9 @@
 {{ define "aside" }}
 <aside class="aside" aria-label="This page">
   {{ partial "page-meta.html" . }}
-  {{/* A tree section's pages get its folder tree; the rest, a timeline. */}}
-  {{ with partial "tree-root.html" . }}{{ partial "page-tree.html" (dict "page" $ "root" .) }}{{ else }}{{ partial "page-timeline.html" $ }}{{ end }}
+  {{ range partial "panels.html" . }}
+    {{ if eq . "tree" }}{{ partial "page-tree.html" (dict "page" $ "root" $.FirstSection) }}
+    {{ else if eq . "timeline" }}{{ partial "page-timeline.html" $ }}{{ end }}
+  {{ end }}
 </aside>
 {{ end }}

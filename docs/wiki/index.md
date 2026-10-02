@@ -52,7 +52,7 @@ layouts/_partials/
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
   page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
-  tree-root.html        only reader of params.treeSections: a page's tree root, or false
+  panels.html           only reader of params.treeSections: "tree" or "timeline", page or section
   page-tree.html        or the folder tree: cached per tree, the page's path patched in
   page-tree-node.html   one folder's rows, recursing             (partialCached, per tree)
   tree-row.html         a row's opening tags: renders the tree and makes the patch's needles

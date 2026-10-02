@@ -1,6 +1,6 @@
 {{/*
   A page's folder tree, below "This page" (page.html's right column), in
-  place of its timeline when tree-root.html gives its section.
+  place of its timeline when panels.html says "tree".
   Server-rendered, no JS, in the timeline's look (a fold; folders as its
   years, pages as its pages): nested <details>, open along the page's
   path — those nodes filled, the page marked — every other folder shut
@@ -10,7 +10,7 @@
   Rendered once per tree (partialCached), then each page's path patched
   in, row by row (tree-row.html): rendering it per page made the build
   O(pages²) — 5x slower on a 1,000-page wiki.
-  Takes dict page, root (tree-root.html's section).
+  Takes dict page, root (its top-level section).
 */}}
 {{ $root := .root }}
 {{ $html := partialCached "page-tree-node.html" $root $root.RelPermalink }}
