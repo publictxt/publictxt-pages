@@ -14,13 +14,14 @@
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
 // the list when narrow (layout.js). Sort and the density toggle sit with the count.
+// A date sort groups the cards by month, on a rail (grouper() in sorts.js).
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
+import { SORTS, UNRATED, grouper, groups, normaliseSort, parseSort } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -282,6 +283,38 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
+  // A group's heading: its month, linking to that date filter when the sort
+  // is by created (the filter's date) and the list isn't already on it; and
+  // how many it holds — "4 of 9" when the rest are on other pages.
+  function groupHead(g) {
+    const li = document.createElement("li");
+    li.className = "card-group";
+    const h = document.createElement("h2");
+    h.className = "card-group-head";
+    const [y, m] = g.key.split("-");
+    const label = g.key ? `${params.months[Number(m) - 1]} ${y}` : "Undated";
+    if (g.key && parseSort(state.sort).field === "created" && state.month !== m) {
+      const a = document.createElement("a");
+      a.href = url({ year: y, month: m, page: 1 });
+      a.title = `List ${label}`;
+      a.textContent = label;
+      a.addEventListener("click", (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        state.year = y; state.month = m; state.page = 1;
+        tlOpen.add(y);
+        render(true);
+        root.scrollIntoView({ block: "start" });
+      });
+      h.append(a);
+    } else h.append(label);
+    const n = document.createElement("span");
+    n.className = "count";
+    n.textContent = g.items.length < g.total ? `${g.items.length} of ${g.total}` : String(g.total);
+    li.append(h, n);
+    return li;
+  }
+
   const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
   const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
 
@@ -323,7 +356,12 @@ async function mount(root) {
       toggleInclude(state.tag, t);
       state.page = 1; render(true);
     };
-    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag?.inc, onTag })));
+    const cardFor = (it) => card(it, { activeTags: state.tag?.inc, onTag });
+    const keyOf = compact ? null : grouper(state.sort);
+    list.classList.toggle("grouped", Boolean(keyOf));
+    list.replaceChildren(...(keyOf
+      ? groups(slice, keyOf, filtered).flatMap((g) => [groupHead(g), ...g.items.map(cardFor)])
+      : slice.map(cardFor)));
     if (compact) return;
     sortSelect.value = state.sort;
 

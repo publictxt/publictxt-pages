@@ -242,7 +242,9 @@ a:hover { text-decoration: underline; }
 /* Stars from rating.html's value: sidebar and cards. */
 .rating { color: var(--accent); letter-spacing: 0.05em; white-space: nowrap; }
 
-.chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace; }
+/* A long URL ellipsed to its card, not pushing a phone wider. */
+.chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
 .bookmark-links, .source-links { margin-top: 0.4rem; }
 .source-links { align-items: center; }
 
@@ -361,6 +363,53 @@ a:hover { text-decoration: underline; }
 }
 
 .page-card .chip-row { margin-top: 0.5rem; }
+
+/* Grouped cards (list.js, a date sort): a rail down the left, a node per
+   month heading, as the timeline's; each heading pins under the header while
+   its cards scroll by. */
+.page-list.grouped {
+  --node: 18px;
+  --rail-gap: 0.8rem;
+  position: relative;
+  padding-left: calc(var(--node) + var(--rail-gap));
+}
+.page-list.grouped::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--node) / 2 - 1px);
+  top: 1rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.card-group {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0 0.15rem;
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
+}
+.card-group:not(:first-child) { margin-top: 0.6rem; }
+.card-group::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * (var(--node) + var(--rail-gap)));
+  top: calc(0.45rem + 0.6em - var(--node) / 2);
+  width: var(--node);
+  height: var(--node);
+  box-sizing: border-box;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg-raised);
+}
+.card-group-head { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; }
+.card-group-head a { color: var(--text); }
+.card-group-head a:hover { color: var(--accent); text-decoration: none; }
+.card-group .count { color: var(--text-muted); font-size: 0.75rem; }
 
 /* Compact cards (densityToggle in cards.js): one line each, title then
    collections, date and stars; no summary, links or tags. The head's parts
@@ -1045,6 +1094,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 
 @media (max-width: 600px) {
+  .page-list.grouped { --node: 13px; --rail-gap: 0.55rem; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
     padding: 0.8rem 0.9rem;

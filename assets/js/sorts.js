@@ -30,6 +30,33 @@ export function parseSort(s) {
   return { field, dir: dir || (field === "title" ? "asc" : "desc") };
 }
 
+// How `sort` groups cards: a function from an item to its group key, or null
+// when it doesn't group. A date sort groups by that date's month, "2026-09"
+// ("" undated), read from the ISO string's digits as timeline.js's monthOf:
+// the page's own date, no zone shift. Title and rating don't group (yet).
+export function grouper(sort) {
+  const { field } = parseSort(sort);
+  if (field !== "created" && field !== "updated") return null;
+  return (it) => {
+    const d = it[field] || "";
+    return /^\d{4}-\d{2}/.test(d) && !d.startsWith("0001") ? d.slice(0, 7) : "";
+  };
+}
+
+// `shown` (a page of sorted items) in runs by key: [{ key, items, total }],
+// `total` that key's count in `all`, so a run split across pages says so.
+export function groups(shown, keyOf, all) {
+  const totals = new Map();
+  for (const it of all) { const k = keyOf(it); totals.set(k, (totals.get(k) || 0) + 1); }
+  const out = [];
+  for (const it of shown) {
+    const k = keyOf(it);
+    if (out.at(-1)?.key !== k) out.push({ key: k, items: [], total: totals.get(k) || 0 });
+    out.at(-1).items.push(it);
+  }
+  return out;
+}
+
 export function sortLabel(s) {
   return (SORTS.find(([v]) => v === s) || [, s])[1];
 }

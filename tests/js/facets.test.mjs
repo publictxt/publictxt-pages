@@ -8,7 +8,7 @@ import {
   addsPages, chipFacets, describe, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
-import { normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
+import { grouper, groups, normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
 
 const qs = (s) => new URLSearchParams(s);
 const url = (f) => { const p = new URLSearchParams(); writeFacet(p, f); return p.toString(); };
@@ -141,6 +141,26 @@ test("sorts: canonical URL form omits the natural direction", () => {
   assert.deepEqual(parseSort("title"), { field: "title", dir: "asc" });
   assert.deepEqual(parseSort("updated"), { field: "updated", dir: "desc" });
   assert.equal(sortLabel("created asc"), "Oldest");
+});
+
+test("sorts: a date sort groups by that date's month, as written; others don't", () => {
+  const it = { created: "2026-09-30T23:30:00-05:00", updated: "2026-10-01T09:00:00Z" };
+  assert.equal(grouper("created")(it), "2026-09", "the page's own month, not UTC's");
+  assert.equal(grouper("updated asc")(it), "2026-10");
+  assert.equal(grouper("created")({ created: "0001-01-01T00:00:00Z" }), "", "Hugo's zero date: undated");
+  assert.equal(grouper("created")({}), "");
+  assert.equal(grouper("title"), null);
+  assert.equal(grouper("rating"), null);
+});
+
+test("sorts: groups are runs of a page, each with its total across pages", () => {
+  const items = ["a1", "a2", "b1", "b2", "b3", "c1"];
+  const keyOf = (s) => s[0];
+  assert.deepEqual(groups(items.slice(1, 4), keyOf, items), [
+    { key: "a", items: ["a2"], total: 2 },
+    { key: "b", items: ["b1", "b2"], total: 3 },
+  ]);
+  assert.deepEqual(groups([], keyOf, items), []);
 });
 
 // ---- rating -------------------------------------------------------------
