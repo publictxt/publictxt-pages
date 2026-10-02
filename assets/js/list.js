@@ -10,6 +10,7 @@
 //   data-per-page     cards per page
 //   data-compact      cards only: no controls, pager or URL (dataview)
 //   data-limit        compact: the first N only
+//   data-no-timeline  no timeline (a tree section, panels.html)
 //
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
@@ -77,7 +78,8 @@ async function mount(root) {
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
     Object.assign(state, CHIPS.read(p));
-    state.year = p.get("year") || "";
+    // No timeline, no date filter: nothing would show it or clear it.
+    state.year = hasTimeline ? p.get("year") || "" : "";
     state.month = monthFilter(p.get("month"), state.year);
     state.rating = ratingFilter(p.get("rating"));
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
@@ -159,7 +161,7 @@ async function mount(root) {
   // Nothing to pick in a single month. The newest year open to start,
   // or the ones the URL picked (readURL, below).
   const fullTree = timeline(items);
-  const hasTimeline = !compact && monthCount(fullTree) > 1;
+  const hasTimeline = !compact && !("noTimeline" in root.dataset) && monthCount(fullTree) > 1;
   const tlOpen = new Set();
 
   function chip(d, name, n) {

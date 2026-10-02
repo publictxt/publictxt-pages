@@ -147,6 +147,13 @@ class SiteIndexTest(unittest.TestCase):
         self.assertNotIn('class="tree tree-content"', self.section("wiki", "site", "lists"))
         self.assertNotIn('class="tree tree-content"', self.section("notes"))
 
+    def test_tree_section_list_has_no_timeline(self):
+        """A tree section's browse list is flagged for list.js to draw no timeline (and take no date); others not."""
+        flag = re.compile(r'<div class="list" data-list [^>]*data-no-timeline')
+        self.assertRegex(self.section("wiki"), flag)
+        self.assertRegex(self.section("wiki", "site", "lists"), flag)
+        self.assertNotRegex(self.section("notes"), flag)
+
 
 if __name__ == "__main__":
     unittest.main()

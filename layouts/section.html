@@ -23,7 +23,7 @@
 {{ $pages := $list.pages }}
 {{ if $pages }}
 <section class="list-section">
-  {{ partial "list-container.html" (dict "pages" $pages "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .) "scope" $list.scope) }}
+  {{ partial "list-container.html" (dict "pages" $pages "order" (partial "list-order.html" .) "perPage" (partial "list-per-page.html" .) "scope" $list.scope "timeline" (in $panels "timeline")) }}
 </section>
 {{ else }}
   <p class="muted">No pages in this section yet.</p>
