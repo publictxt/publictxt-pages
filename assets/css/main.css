@@ -599,6 +599,116 @@ a:hover { text-decoration: underline; }
   .tl-node::before, .list-facet > summary::after { transition: none; }
 }
 
+/* Folder tree (page-tree.html): the timeline's rail-and-node language, for
+   place instead of time — folders are square nodes, pages dots, each joined
+   to its parent's rail by an elbow. The rail from the section down to this
+   page is lit (:has(); without it, unlit). */
+.tree {
+  --row: 1.6rem;
+  --node: 14px;
+  --indent: 0.85rem;
+  --rail: 1.5px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.tree-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.tree .count { color: var(--text-muted); font-size: 0.72rem; font-weight: 400; letter-spacing: 0; }
+.tree-list { list-style: none; margin: 0; padding: 0; }
+.tree-list .tree-list { margin-left: calc(var(--node) / 2 - var(--rail) / 2); }
+.tree-list .tree-list > li { position: relative; padding-left: var(--indent); }
+/* This row's stretch of the parent's rail; the last one stops at its elbow. */
+.tree-list .tree-list > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--rail);
+  background: var(--border);
+}
+.tree-list .tree-list > li:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
+.tree-list .tree-list > li::after {
+  content: "";
+  position: absolute;
+  left: var(--rail);   /* off the rail: a grey elbow mustn't notch a lit one */
+  top: calc(var(--row) / 2 - var(--rail) / 2);
+  width: calc(var(--indent) - var(--rail) - 3px);
+  height: var(--rail);
+  background: var(--border);
+}
+/* The lit path: every stretch above the path's row, then its top half. */
+.tree-list .tree-list > li:has(~ .on-path, ~ .current)::before { background: var(--accent); }
+.tree-list .tree-list > :is(.on-path, .current)::before {
+  background: linear-gradient(var(--accent) 0 calc(var(--row) / 2), var(--border) 0);
+}
+.tree-list .tree-list > :is(.on-path, .current)::after { background: var(--accent); }
+
+/* Rows: node | label | count. Labels wrap; node and elbow stay on line one. */
+.tree summary, .tree-page > a {
+  display: grid;
+  grid-template-columns: var(--node) minmax(0, 1fr) auto;
+  column-gap: 0.5rem;
+  align-items: start;
+}
+.tree summary { position: relative; list-style: none; cursor: pointer; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary > a, .tree-page > a { padding: 0.2rem 0; }
+.tree summary > .count { padding-top: 0.3rem; }
+/* A folder: a square node, its chevron right when shut, down when open. */
+.tree summary::before {
+  content: "";
+  width: var(--node);
+  height: var(--node);
+  margin-top: calc((var(--row) - var(--node)) / 2);
+  border: var(--rail) solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-raised);
+  box-sizing: border-box;
+}
+.tree summary::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--node) / 2 - 0.15rem);
+  top: calc(var(--row) / 2 - 0.15rem);
+  width: 0.3rem;
+  height: 0.3rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: translateX(-1px) rotate(-45deg);
+  transition: transform 0.15s;
+}
+.tree details[open] > summary::after { transform: translateY(-1px) rotate(45deg); }
+.tree summary > a { color: var(--text); font-weight: 600; }
+.tree-dir.on-path > details > summary::before { border-color: var(--accent); }
+.tree-dir.on-path > details > summary > a { color: var(--accent); }
+/* A page: a dot; this page's filled, ringed. */
+.tree-page > a { color: var(--text); grid-template-columns: var(--node) minmax(0, 1fr); }
+.tree-page > a::before {
+  content: "";
+  justify-self: center;
+  width: 6px;
+  height: 6px;
+  margin-top: calc(var(--row) / 2 - 3px - 0.2rem);   /* less the link's padding */
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.tree-page.current > a { color: var(--accent); font-weight: 600; }
+.tree-page.current > a::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tree a:hover { color: var(--accent); text-decoration: none; }
+.tree-page > a:hover::before { background: var(--accent); }
+@media (hover: hover) {
+  .tree summary:hover::before { border-color: var(--accent); }
+  .tree summary:hover::after { border-color: var(--accent); }
+}
+.tree summary:focus-visible, .tree a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tree summary::after { transition: none; }
+}
+
 .pagination {
   display: flex;
   align-items: center;
