@@ -373,8 +373,8 @@ a:hover { text-decoration: underline; }
    out to the count, pins under the header while its cards scroll by; each
    card's day of the month sits on the rail. */
 .page-list.grouped {
-  --node: 14px;
-  --gutter: 2rem;
+  --node: 18px;
+  --gutter: 2.6rem;
   position: relative;
   gap: 0.4rem;
 }
@@ -435,9 +435,9 @@ a:hover { text-decoration: underline; }
 .card-group-items > li[data-day]::before {
   content: attr(data-day);
   position: absolute;
-  left: calc(var(--node) / 2 - 1.3ch - var(--gutter));   /* centred on the rail */
+  left: calc(-1 * var(--gutter));
   top: calc(var(--pad-y) + 1px);   /* the card's padding and border */
-  width: 2.6ch;
+  width: var(--node);
   text-align: center;
   font-size: 0.72rem;
   line-height: calc(var(--title-size) * 1.65);   /* .page-card-title's line */
@@ -1132,7 +1132,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 
 @media (max-width: 600px) {
-  .page-list.grouped { --node: 12px; --gutter: 1.6rem; }
+  .page-list.grouped { --node: 13px; --gutter: 1.9rem; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
     --pad-y: 0.8rem;
