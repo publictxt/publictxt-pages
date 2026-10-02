@@ -34,7 +34,9 @@ page, most recently updated first, with the full filters and timeline beside it.
 
 1. The folder's `_index.md` text
 2. For a [tree section](configuration.md#timeline-and-folder-tree) (default `wiki`): its
-   sub-folders, one level open
+   sub-folders, one level open. For a timeline section (default `blog`, `posts`): its
+   pages by year and month, with titles — click a year or month to filter the list to
+   it, and it's marked while the list is on it
 3. The browse list — for a top-level section, every page in its
    [collection](writing.md#collections), wherever filed; for a sub-folder, only what's
    filed under it
