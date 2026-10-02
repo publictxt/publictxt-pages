@@ -137,6 +137,8 @@ deploy/publish-to-github-pages.yml   template for the CONTENT repo; header has s
 site-content/                        site-owned pages (search)
 example/txt/                         default source repo + golden-test fixture;
                                      its README maps case -> file
+project-site/                        this project's own site, a source repo in a folder:
+                                     the user guide (wiki/) and more; its README has the rules
 static/                              favicons, logo
 ```
 

@@ -19,7 +19,7 @@ Three layers; later wins:
 
 | Layer | Where | Use for |
 |---|---|---|
-| 1. Defaults | `hugo.toml` in publictxt-pages | Read it for every option and its default — don't edit it |
+| 1. Defaults | [`hugo.toml`](https://github.com/publictxt/publictxt-pages/blob/main/hugo.toml) in publictxt-pages | Read it for every option and its default — don't edit it |
 | 2. Your settings | `settings/site.toml` in your **content repo** | Most settings: lists, tables, anything you'd keep with your notes |
 | 3. Workflow env vars | `HUGO_*` in `.github/workflows/publish.yml` | Per-deployment values: `HUGO_BASEURL`, `HUGO_TITLE`, edit URL |
 
@@ -34,7 +34,7 @@ Rules for `settings/site.toml`:
   for plain values only; lists and tables go in `site.toml`.
 
 `settings/` is published like any folder, except `site.toml`. Starter:
-[`example/txt/settings/site.toml`](../../example/txt/settings/site.toml).
+[`example/txt/settings/site.toml`](https://github.com/publictxt/publictxt-pages/blob/main/example/txt/settings/site.toml).
 
 ## Site identity
 

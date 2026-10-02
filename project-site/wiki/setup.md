@@ -89,8 +89,8 @@ config orders and styles. Details: [Writing](writing.md).
 
 ## 5. Add the publish workflow
 
-Copy [`deploy/publish-to-github-pages.yml`](../../deploy/publish-to-github-pages.yml)
-from this repo into your content repo as:
+Copy [`deploy/publish-to-github-pages.yml`](https://github.com/publictxt/publictxt-pages/blob/main/deploy/publish-to-github-pages.yml)
+from the publictxt-pages repo into your content repo as:
 
 ```txt
 my-notes/.github/workflows/publish.yml
