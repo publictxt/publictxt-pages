@@ -53,11 +53,12 @@ layouts/_partials/
   sidebar.html          left nav: sections / categories / tag cloud
   page-meta.html        "This page": a page's meta, in its right column
   page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
-  panels.html           only reader of params.treeSections: "tree" or "timeline", page or section
-  page-tree.html        or the folder tree: cached per tree, the page's path patched in
-  page-tree-node.html   one folder's rows, recursing             (partialCached, per tree)
-  tree-row.html         a row's opening tags: renders the tree and makes the patch's needles
+  tree-section.html     only reader of params.treeSections: is a page or section in one?
+  page-tree.html        or a tree section's folder tree: cached, the page's path marked in
   section-tree.html     a tree section's folder, in its content: its subtree, one level open
+  tree-node.html        one folder's rows, recursing, all shut (partialCached, per folder)
+  tree-row.html         a row's opening tags, every form: shut, "on" (path), "open"
+  tree-mark.html        one row of a cached tree opened or marked, by tree-row.html's forms
   breadcrumbs.html      .Ancestors trail
   footer.html           [params.footer] wording; edit-in-repo link
   crumb-label.html      one crumb's label; date folders literal

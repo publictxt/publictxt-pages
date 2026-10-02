@@ -1,17 +1,16 @@
 {{/*
   A tree section's folder, in its content: below the index body, outside
   data-pagefind-body (or every index page would match every title below
-  it), above the browse list. The folder's own subtree — its sub-folders
-  open one level, the rest shut — from the tree page-tree.html caches,
-  so /wiki/ shares the right column's. Only with sub-folders: a flat
-  folder's tree would repeat the browse list.
-  Takes a section in a tree section (panels.html "tree").
+  it), above the browse list. The folder's own subtree, its sub-folders
+  open one level; cached per folder, so /wiki/ shares the right column's
+  (page-tree.html). Only with sub-folders: a flat folder's tree would
+  repeat the browse list.
+  Takes a section in a tree section (tree-section.html).
 */}}
 {{ with .Sections }}
-{{ $html := partialCached "page-tree-node.html" $ $.RelPermalink }}
+{{ $html := partialCached "tree-node.html" $ $.RelPermalink }}
 {{ range . }}
-  {{ $html = replace $html (partial "tree-row.html" (dict "url" .RelPermalink "dir" true))
-    (partial "tree-row.html" (dict "url" .RelPermalink "dir" true "open" true)) 1 }}
+  {{ $html = partial "tree-mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "open") }}
 {{ end }}
 <section class="tree tree-content">
   <h2 class="side-heading">Contents</h2>

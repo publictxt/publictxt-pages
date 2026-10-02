@@ -1,0 +1,11 @@
+{{/*
+  One row of a cached tree (tree-node.html), opened or marked: finds the
+  row's shut, unmarked opening tags and swaps in its "on" (on the page's
+  path; a folder opened and filled, a page marked current) or "open"
+  (a folder opened) form. Both from tree-row.html, so they match the tree
+  byte for byte.
+  Takes dict html (the tree), url, dir (folder, else page), as ("on" or
+  "open"); returns the tree.
+*/}}
+{{ $row := dict "url" .url "dir" .dir }}
+{{ return replace .html (partial "tree-row.html" $row) (partial "tree-row.html" (merge $row (dict .as true))) 1 }}

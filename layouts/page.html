@@ -24,9 +24,6 @@
 {{ define "aside" }}
 <aside class="aside" aria-label="This page">
   {{ partial "page-meta.html" . }}
-  {{ range partial "panels.html" . }}
-    {{ if eq . "tree" }}{{ partial "page-tree.html" (dict "page" $ "root" $.FirstSection) }}
-    {{ else if eq . "timeline" }}{{ partial "page-timeline.html" $ }}{{ end }}
-  {{ end }}
+  {{ if partial "tree-section.html" . }}{{ partial "page-tree.html" . }}{{ else }}{{ partial "page-timeline.html" . }}{{ end }}
 </aside>
 {{ end }}

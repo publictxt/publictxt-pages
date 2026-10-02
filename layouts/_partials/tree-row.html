@@ -1,9 +1,9 @@
 {{- /*
-  A folder tree row's opening tags, its link's href the last thing in it:
-  page-tree-node.html renders the tree with them shut and unmarked, and
-  page-tree.html and section-tree.html find one (neither "on" nor "open")
-  to swap in its on-path form ("on") or just opened ("open", folders). One source, so the two match byte for byte — html/template
-  escapes the href (café -> caf%C3%A9), which a hand-built string misses.
+  A tree row's opening tags, its link's href last: tree-node.html renders
+  every row shut and unmarked; tree-mark.html finds one and swaps in its
+  "on" or "open" form. One source, so they match byte for byte —
+  html/template escapes the href (café -> caf%C3%A9), which a hand-built
+  string would miss. The closing tags are tree-node.html's.
   Takes dict url, dir (folder, else page), on, open.
 */ -}}
 {{- if .dir -}}<li class="tree-dir{{ if .on }} on-path{{ end }}"><details{{ if or .on .open }} open{{ end }}><summary class="tree-row"><span class="tree-node" aria-hidden="true"></span><a class="tree-pick" href="{{ .url }}">

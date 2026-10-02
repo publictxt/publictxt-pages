@@ -16,8 +16,7 @@
 <div class="prose" data-pagefind-body>{{ . }}</div>
 {{ end }}
 
-{{ $panels := partial "panels.html" . }}
-{{ if in $panels "tree" }}{{ partial "section-tree.html" . }}{{ end }}
+{{ if partial "tree-section.html" . }}{{ partial "section-tree.html" . }}{{ end }}
 
 {{ $list := partial "section-pages.html" . }}
 {{ $pages := $list.pages }}
