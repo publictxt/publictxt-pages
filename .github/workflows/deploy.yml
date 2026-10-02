@@ -1,0 +1,69 @@
+# Publish this repo's own site: project-site/, built with this checkout of
+# publictxt-pages — so the site always shows the generator as it is on main —
+# and deployed to GitHub Pages.
+#
+# One-time setup: Settings -> Pages -> Source: "GitHub Actions". The base URL
+# comes from the Pages settings (configure-pages), so a custom domain needs no
+# edit here. Content repos use deploy/publish-to-github-pages.yml instead: it
+# fetches publictxt-pages, where this one is publictxt-pages.
+
+name: Deploy project site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Page dates come from Git history; a shallow clone gives every page one date.
+          fetch-depth: 0
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      # Same version as test.yml and the deploy template.
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.166.0"
+
+      # For Pagefind, which build.py fetches with npx.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        env:
+          # configure-pages' base_url has no trailing slash.
+          HUGO_BASEURL: ${{ steps.pages.outputs.base_url }}/
+          # A page's source_path is relative to project-site/, so the prefix ends there.
+          HUGO_PARAMS_EDITURL: ${{ github.server_url }}/${{ github.repository }}/edit/${{ github.ref_name }}/project-site/
+        # The runner's python3 (3.10+) is enough; build.py needs no packages.
+        run: python3 scripts/build.py --source project-site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

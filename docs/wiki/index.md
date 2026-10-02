@@ -135,6 +135,7 @@ module serve lists and search; see traps.md.
 hugo.toml                            mounts, front matter mapping, params
 deploy/publish-to-github-pages.yml   template for the CONTENT repo; header has setup
 .github/workflows/test.yml           tests + map_lint on push and PR
+.github/workflows/deploy.yml         project-site/ -> this repo's GitHub Pages, on push to main
 site-content/                        site-owned pages (search)
 example/txt/                         default source repo + golden-test fixture;
                                      its README maps case -> file

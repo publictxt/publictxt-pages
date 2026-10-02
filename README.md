@@ -67,3 +67,6 @@ to `.github/workflows/publish.yml` there, set `HUGO_BASEURL`, and switch that re
 Per-site settings: `HUGO_*` env vars on its Build step, or the content repo's
 `settings/site.toml` (commented example: `example/txt/settings/site.toml`). Keep
 `fetch-depth: 0` — page dates come from Git history.
+
+This project's own site is built the same way from [`project-site/`](project-site/README.md),
+by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`.

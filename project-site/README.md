@@ -25,6 +25,15 @@ site always shows the generator as it is on `main`.
   `project-site/`: a relative `../../deploy/…` works on GitHub but dangles on the site.
 - Otherwise, plain PublicTxt conventions — the [writing guide](wiki/writing.md).
 
+## Publishing
+
+[`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) builds this folder
+and deploys it to GitHub Pages on every push to `main` — content and generator changes
+alike — or from **Actions → Deploy project site → Run workflow**. It sets the base URL
+from the repo's Pages settings, and the *Improve this page* links.
+
+One-time: **Settings → Pages → Source: GitHub Actions**.
+
 ## Preview
 
 From the repo root:
