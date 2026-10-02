@@ -8,7 +8,7 @@ import {
   addsPages, chipFacets, describe, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
-import { groupDay, grouper, groups, normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
+import { grouper, groups, normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
 
 const qs = (s) => new URLSearchParams(s);
 const url = (f) => { const p = new URLSearchParams(); writeFacet(p, f); return p.toString(); };
@@ -151,10 +151,6 @@ test("sorts: a date sort groups by that date's month, as written; others don't",
   assert.equal(grouper("created")({}), "");
   assert.equal(grouper("title"), null);
   assert.equal(grouper("rating"), null);
-  assert.equal(groupDay("created")(it), "30", "its day on the rail, the page's own");
-  assert.equal(groupDay("updated")(it), "1");
-  assert.equal(groupDay("created")({}), "");
-  assert.equal(groupDay("title"), null);
 });
 
 test("sorts: groups are runs of a page, each with its total across pages", () => {

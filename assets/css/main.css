@@ -325,12 +325,10 @@ a:hover { text-decoration: underline; }
 }
 
 .page-card {
-  --pad-y: 0.9rem;
-  --title-size: 1.02rem;
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--pad-y) 1.1rem;
+  padding: 0.9rem 1.1rem;
 }
 .page-card time, .page-card-dates > .muted { font-size: 0.8rem; }
 
@@ -343,8 +341,7 @@ a:hover { text-decoration: underline; }
 
 .page-card-title {
   font-weight: 600;
-  font-size: var(--title-size);
-  line-height: 1.65;
+  font-size: 1.02rem;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -417,12 +414,10 @@ a:hover { text-decoration: underline; }
   flex-wrap: wrap;
   align-items: baseline;
   column-gap: 0.6rem;
-  --pad-y: 0.45rem;
-  --title-size: 0.95rem;
-  padding: var(--pad-y) 0.9rem;
+  padding: 0.45rem 0.9rem;
 }
 .dense .page-card-head { display: contents; }
-.dense .page-card-title { flex: 1 1 16rem; }
+.dense .page-card-title { flex: 1 1 16rem; font-size: 0.95rem; }
 .dense .page-card .chip-row, .dense .page-card-summary { display: none; }
 
 /* Browse lists (assets/js/list.js) */
@@ -1096,8 +1091,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   .page-list.grouped { --node: 13px; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
-    --pad-y: 0.8rem;
-    padding: var(--pad-y) 0.9rem;
+    padding: 0.8rem 0.9rem;
   }
   .page-card-head {
     flex-direction: column;

@@ -14,14 +14,14 @@
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
 // the list when narrow (layout.js). Sort and the density toggle sit with the count.
-// A date sort groups the cards by month, on a rail (grouper() in sorts.js).
+// A date sort groups the cards by month (grouper() in sorts.js).
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, groupDay, grouper, groups, normaliseSort, parseSort } from "./sorts.js";
+import { SORTS, UNRATED, grouper, groups, normaliseSort, parseSort } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -286,9 +286,8 @@ async function mount(root) {
   // A month's group, a fold, open: its heading pins while its cards scroll
   // by — the month, linking to that date filter when the sort is by created
   // (the filter's date) and the list isn't already on it; a rule; how many it
-  // holds, "4 of 9 pages" when the rest are on other pages. Each card's day
-  // of the month on the rail, once per day.
-  function groupItem(g, dayOf, cardFor) {
+  // holds, "4 of 9 pages" when the rest are on other pages.
+  function groupItem(g, cardFor) {
     const li = document.createElement("li");
     li.className = "card-group";
     const fold = document.createElement("details");
@@ -331,14 +330,7 @@ async function mount(root) {
     head.append(h, rule, count);
     const ul = document.createElement("ul");
     ul.className = "card-group-items";
-    let last = "";
-    for (const it of g.items) {
-      const c = cardFor(it);
-      const day = dayOf(it);
-      if (day && day !== last) c.dataset.day = day;
-      last = day;
-      ul.append(c);
-    }
+    ul.append(...g.items.map(cardFor));
     fold.append(head, ul);
     li.append(fold);
     return li;
@@ -388,9 +380,8 @@ async function mount(root) {
     const cardFor = (it) => card(it, { activeTags: state.tag?.inc, onTag });
     const keyOf = compact ? null : grouper(state.sort);
     list.classList.toggle("grouped", Boolean(keyOf));
-    const dayOf = groupDay(state.sort);
     list.replaceChildren(...(keyOf
-      ? groups(slice, keyOf, filtered).map((g) => groupItem(g, dayOf, cardFor))
+      ? groups(slice, keyOf, filtered).map((g) => groupItem(g, cardFor))
       : slice.map(cardFor)));
     if (compact) return;
     sortSelect.value = state.sort;
