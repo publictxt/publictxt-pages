@@ -471,7 +471,8 @@ a:hover { text-decoration: underline; }
 .tl-chips { margin-bottom: 0.7rem; }
 .tl-chips[hidden] { display: none; }
 .tl, .tree { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-.tl-year, .tree-dir { position: relative; }
+/* flow-root: an open row's last margin stays inside, under the rail. */
+.tl-year, .tree-dir { position: relative; display: flow-root; }
 /* The rail, node centre to node centre. */
 .tl-year::before, .tree-dir::before {
   content: "";
