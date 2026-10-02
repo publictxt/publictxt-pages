@@ -15,6 +15,7 @@ Items marked **(TBD)** are not built.
   - The sidebar lists sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
   - Section index bodies render as prose and are search-indexed.
   - A `treeSections` folder with sub-folders shows its subtree below the index body (not search-indexed), sub-folders open one level, then the browse list.
+  - A `timelineSections` folder (default blog, posts; the section and every sub-folder) whose list spans two or more months shows that list by date below the index body (not search-indexed): server-rendered, no JS, in the archive timeline's look — years on a rail with a Jan–Dec sparkline, months with bars and counts, titles after their day; the newest year and month open; year and month labels link to the browse list below at that date.
   - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
   - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
   - Sections move to specialised Views over Collections (TBD)

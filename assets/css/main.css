@@ -451,10 +451,12 @@ a:hover { text-decoration: underline; }
 
 /* Timeline (timeline.js): years on a rail, each node opens its row, each
    label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
-   counts beside them carry the numbers. The folder tree (tree/aside.html)
+   counts beside them carry the numbers. A timeline section's contents
+   (timeline/content.html) is its markup server-rendered, <details> for
+   .open. The folder tree (tree/aside.html)
    shares its rules — nodes, rails, page branches — by selector list: one
    look, so change both together. */
-.timeline, .tree {
+.timeline, .tree, .contents {
   --row: 1.75rem;
   --node: 18px;
 }
@@ -512,9 +514,9 @@ a:hover { text-decoration: underline; }
   transform: translateX(-1px) rotate(-45deg);
   transition: transform 0.15s;
 }
-/* Tree: open is <details open>; current is on the page's path. */
-.open > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--accent); }
-.open > .tl-row > .tl-node::before,
+/* Tree and contents: open is <details open>; current is on the page's path. */
+.open > .tl-row > .tl-node, [open] > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--accent); }
+.open > .tl-row > .tl-node::before, [open] > .tl-row > .tl-node::before,
 [open] > .tree-row > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
 .current > .tl-row > .tl-node,
 .on-path > details > .tree-row > .tree-node { background: var(--accent); border-color: var(--accent); }
@@ -539,7 +541,7 @@ a:hover { text-decoration: underline; }
   text-align: left;
 }
 /* Top-level folders bold, as years; sub-folders plain, as months. */
-.tl-year > .tl-row > .tl-pick, .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+.tl-year > .tl-row > .tl-pick, .tl-year > details > .tl-row > .tl-pick, .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
 .tree-sub .tree-pick { font-weight: 400; letter-spacing: normal; }
 .tl-pick:hover, .tl-pick[aria-pressed="true"], .tree-pick:hover { color: var(--accent); text-decoration: none; }
 .tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
@@ -620,12 +622,20 @@ a:hover { text-decoration: underline; }
 .tl-pages li:has(a[aria-current])::before, .tree-pages li:has(a[aria-current])::before,
 .tl-pages li:has(a:hover)::before, .tree-pages li:has(a:hover)::before { background: var(--accent); }
 .tl-empty { font-size: 0.8rem; }
-/* A section's tree, in its content (tree/content.html): no box, body-sized. */
-.tree.tree-content { font-size: 0.95rem; }
-.tree-content { margin: 1.6rem 0 2rem; }
-.tree-content > .side-heading { margin-bottom: 0.5rem; }
-.tree-content > nav { max-width: 34rem; }   /* counts beside their names */
-.tree-content .tree-pages { font-size: 0.9rem; }
+/* A section's tree or timeline, in its content (tree/content.html,
+   timeline/content.html): no box, body-sized. */
+.contents { margin: 1.6rem 0 2rem; }
+.contents > .side-heading { margin-bottom: 0.5rem; }
+.contents > nav { max-width: 34rem; }   /* counts beside their names */
+.contents.tree, .contents .tl { font-size: 0.95rem; }
+.contents .tree-pages, .contents .tl-pages { font-size: 0.9rem; }
+.contents .tl-day { font-size: 0.8rem; }
+/* Contents only: a year's or month's row is its <summary>, as a folder's. */
+summary.tl-row { list-style: none; cursor: pointer; }
+summary.tl-row::-webkit-details-marker { display: none; }
+summary.tl-row:hover > .tl-node { border-color: var(--accent); }
+summary.tl-row:hover .tl-spark i:not(.none), summary.tl-row:hover .tl-bar i { opacity: 1; }
+summary.tl-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 /* Tree only: a folder's row is its <summary> — the node opens it, the name
    links to the folder; its pages are block rows, no day column. */
 .tree-row { grid-template-columns: var(--node) minmax(0, 1fr) auto; list-style: none; cursor: pointer; }

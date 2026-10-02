@@ -12,7 +12,7 @@
 {{ range . }}
   {{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "open") }}
 {{ end }}
-<section class="tree tree-content">
+<section class="tree contents">
   <h2 class="side-heading">Contents</h2>
   <nav aria-label="{{ partial "crumb-label.html" $ }} contents">
     {{- $html | safeHTML -}}

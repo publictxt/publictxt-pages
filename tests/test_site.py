@@ -142,7 +142,7 @@ class SiteIndexTest(unittest.TestCase):
     def test_section_tree(self):
         """A tree section's folder: its subtree after the index body — outside Pagefind's — first level open."""
         html = self.html("wiki", "site")
-        tree = re.search(r'<section class="tree tree-content">.*?</section>', html, re.S)
+        tree = re.search(r'<section class="tree contents">.*?</section>', html, re.S)
         self.assertIsNotNone(tree, "no section tree")
         body = re.search(r'<div class="prose" data-pagefind-body>.*?</div>', html, re.S)
         self.assertLess(body.end(), tree.start(), "tree inside the indexed body")
@@ -152,7 +152,7 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('<a href="/wiki/site/search/">Search</a>', tree)
         self.assertNotIn("/wiki/pipeline/", tree, "another folder's pages")
         # /wiki/: the whole tree, one level open.
-        top = re.search(r'<section class="tree tree-content">.*?</section>', self.html("wiki"), re.S)[0]
+        top = re.search(r'<section class="tree contents">.*?</section>', self.html("wiki"), re.S)[0]
         self.assertEqual(self.rows(top, "open"), ["/wiki/pipeline/", "/wiki/projects/", "/wiki/site/"])
         self.assertIn('href="/wiki/projects/publictxt/"', top)
 
@@ -165,8 +165,39 @@ class SiteIndexTest(unittest.TestCase):
 
     def test_section_tree_only_with_subfolders(self):
         """A flat tree-section folder, and a section outside treeSections: no tree."""
-        self.assertNotIn('class="tree tree-content"', self.html("wiki", "site", "lists"))
-        self.assertNotIn('class="tree tree-content"', self.html("notes"))
+        self.assertNotIn('class="tree contents"', self.html("wiki", "site", "lists"))
+        self.assertNotIn('class="tree contents"', self.html("notes"))
+
+    # A timeline section's contents (timeline/content.html).
+    @staticmethod
+    def contents(html):
+        found = re.search(r'<section class="contents tl-contents">.*?</section>', html, re.S)
+        return found[0] if found else None
+
+    def test_section_timeline(self):
+        """A timeline section: its list by year and month, with titles, after the index body, the newest open."""
+        html = self.html("blog")
+        tl = self.contents(html)
+        self.assertIsNotNone(tl, "no section timeline")
+        body = re.search(r'<div class="prose" data-pagefind-body>.*?</div>', html, re.S)
+        self.assertLess(body.end(), html.index(tl), "timeline inside the indexed body")
+        # Years newest first, with counts; each label links to the list below at that date.
+        self.assertEqual(re.findall(r'href="/blog/\?year=(\d{4})"[^\n]*\n.*?<span class="count">(\d+)</span>', tl, re.S),
+                         [("2026", "3"), ("2024", "1"), ("2023", "2")])
+        self.assertIn('href="/blog/?year=2026&month=09"', tl)
+        # Only the newest year, and its newest month, open.
+        self.assertEqual(re.findall(r'<li class="tl-(year|month)"><details open>', tl), ["year", "month"])
+        # Titles newest first, each after its day, shown once per day.
+        dec = tl[tl.index("month=12"):]
+        self.assertRegex(dec, r'<span class="tl-day" aria-hidden="true">17</span><a href="[^"]+" title="17 Dec 2023">')
+        self.assertEqual(dec.count(">17</span>"), 1, "a day shown twice")
+        self.assertLess(tl.index("A post with full front matter"), tl.index("Choosing Hugo"))
+
+    def test_section_timeline_only_across_months(self):
+        """One month's folder, and sections outside timelineSections: no timeline in their content."""
+        self.assertIsNone(self.contents(self.html("blog", "2023")), "one month: repeats the list")
+        self.assertIsNone(self.contents(self.html("wiki")))
+        self.assertIsNone(self.contents(self.html("notes")))
 
 if __name__ == "__main__":
     unittest.main()

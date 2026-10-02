@@ -44,8 +44,8 @@ layouts/baseof.html               shell: header + ☰, nav | main | "aside" bloc
 layouts/home.html                 hero, Recent list; aside: its filters
 layouts/page.html                 single page; data-pagefind-body; aside: page meta, then
                                   folder tree (treeSections) or timeline
-layouts/section.html              index body as prose, folder tree (treeSections),
-                                  browse list; aside: its filters
+layouts/section.html              index body as prose, folder tree (treeSections) and/or
+                                  timeline (timelineSections), browse list; aside: its filters
 layouts/term.html                 /tags/<term>/; aside: its filters
 layouts/taxonomy.html             /tags/
 layouts/search.html               search UI shell, filters in its aside; search.js fills it
@@ -63,6 +63,7 @@ layouts/_partials/
   recent.html           the one "recently updated first"
   page-date.html        created, + updated when shown
   date-labels.html      the one date form + >1-day rule, for page, sidebar, JSON, Pagefind
+  month-names.html      January..December in the site's language, for JS and templates (returns them)
   tag-cloud.html        weighted term chips
   site-index.html       publishes index.json, returns URL    (partialCached)
   list-json.html        pages -> index.json items, with Hugo-made display values
@@ -93,6 +94,10 @@ layouts/_partials/tree/   a folder tree of a tree section (params.treeSections)
   node.html             one folder's rows, recursing, all shut (partialCached, per folder)
   row.html              a row's opening tags, every form: shut, "on" (path), "open"
   mark.html             one row of a cached tree opened or marked, by row.html's forms
+
+layouts/_partials/timeline/   a folder's pages by date, in its content (params.timelineSections)
+  enabled.html          only reader of timelineSections: is a section in one?
+  content.html          years, months, titles: timeline.js's archive markup, server-rendered
 
 layouts/_markup/
   render-image.html     every ![](…): .md -> note-embed; YouTube -> iframe; audio -> <audio>; else <img>
