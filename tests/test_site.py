@@ -192,6 +192,7 @@ class SiteIndexTest(unittest.TestCase):
         self.assertRegex(dec, r'<span class="tl-day" aria-hidden="true">17</span><a href="[^"]+" title="17 Dec 2023">')
         self.assertEqual(dec.count(">17</span>"), 1, "a day shown twice")
         self.assertLess(tl.index("A post with full front matter"), tl.index("Choosing Hugo"))
+        self.assertNotIn("tl-bar", tl, "month bars: the sparkline is enough")
 
     def test_section_timeline_only_across_months(self):
         """One month's folder, and sections outside timelineSections: no timeline in their content."""

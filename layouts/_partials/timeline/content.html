@@ -5,7 +5,8 @@
   outside data-pagefind-body, above the browse list. Server-rendered, no
   JS: the archive timeline's markup (renderTimeline() in timeline.js, which
   main.css styles alike — traps.md), with <details> in place of its
-  buttons. The newest year and its newest month open; a year's or month's
+  buttons, and no month bars: the year's sparkline is enough, and the
+  counts carry the numbers. The newest year and its newest month open; a year's or month's
   label links to the browse list below at that date (?year=&month=).
   Only across two or more months, as list.js's timeline panel: within one,
   it would repeat the browse list. Undated pages left out, as timeline.js.
@@ -48,7 +49,6 @@
           <summary class="tl-row">
             <span class="tl-node" aria-hidden="true"></span>
             <a class="tl-pick" href="{{ $section.RelPermalink }}?year={{ $y.Key }}&month={{ .Key }}" title="List {{ $name }} {{ $y.Key }}">{{ $name }}</a>
-            <span class="tl-bar" aria-hidden="true"><i style="--v: {{ div (float (len .Pages)) $peak }}"></i></span>
             <span class="count">{{ len .Pages }}</span>
           </summary>
           {{- /* Each title after its day of the month, shown once per day. */}}
