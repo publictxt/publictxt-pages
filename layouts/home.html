@@ -15,7 +15,6 @@
 {{ $recent := first $limit (partial "recent.html" site.RegularPages) }}
 {{ with $recent }}
 <section class="home-recent">
-  <h2>Recent</h2>
   {{ partial "list-container.html" (dict "pages" . "order" "updated" "perPage" $limit "scope" (dict "kind" "recent" "value" 0)) }}
 </section>
 {{ end }}
