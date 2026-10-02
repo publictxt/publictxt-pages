@@ -310,7 +310,7 @@ a:hover { text-decoration: underline; }
 /* ---------- Lists ---------- */
 
 .list-header { margin-bottom: 1.4rem; }
-.list-header h1 { margin: 0 0 0.4rem; font-size: 1.7rem; }
+.list-header h1 { margin: 0 0 0.4rem; font-size: 1.7rem; overflow-wrap: anywhere; }
 .list-header p, .list-header .list-intro { color: var(--text-muted); margin: 0; }
 
 .page-list {
@@ -334,17 +334,32 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.75rem;
+  min-width: 0;
 }
 
-.page-card-title { font-weight: 600; font-size: 1.02rem; }
+.page-card-title {
+  font-weight: 600;
+  font-size: 1.02rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 
-.page-card-collections { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; flex-shrink: 0; }
+.page-card-collections {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
 
 .page-card-summary {
   margin: 0.4rem 0 0.5rem;
   color: var(--text-muted);
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 .page-card .chip-row { margin-top: 0.5rem; }
@@ -948,10 +963,32 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   .aside:empty { display: none; }
   html:not(.js) .sidebar { order: 1; }   /* after the page meta */
 
+  /* Cards need to stack before the text can force the layout wider than a phone. */
+  .page-card {
+    padding: 0.8rem 0.9rem;
+  }
+  .page-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .page-card-collections {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
   .header-search input[type="search"] { width: 42vw; }
 }
 
 @media (max-width: 700px) {
   .site-title.has-short-title .site-title-full { display: none; }
   .site-title.has-short-title .site-title-short { display: inline; }
+}
+
+@media (max-width: 520px) {
+  .page-card-head {
+    align-items: stretch;
+  }
+  .single-meta {
+    gap: 0.3rem;
+  }
 }
