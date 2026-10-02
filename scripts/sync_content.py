@@ -52,6 +52,10 @@ LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 # rejects it (failing the build), so the copy gets `:00` seconds.
 MINUTE_TIME_RE = re.compile(
     r"""^((?:created|updated)\s*:\s*["']?\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(["']?\s*)$""", re.MULTILINE)
+# Hugo reads `published:` as the opposite of `draft:`, so an empty one — a blank
+# Obsidian property, or Web Clipper's for an undated page — drops the page
+# unannounced. Dropped from the copy; a value (`false` hides) is kept.
+EMPTY_PUBLISHED_RE = re.compile(r"^published\s*:\s*(?:~|null)?\s*$", re.IGNORECASE)
 
 
 @dataclass
@@ -162,7 +166,8 @@ def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
 
     body = linkify(body)
 
-    fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
+    fm_lines = [l for l in (fm or "").split("\n")
+                if l.strip() and not EMPTY_PUBLISHED_RE.match(l)] + added
     fm_lines = merge_tags(fm_lines, body)
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 

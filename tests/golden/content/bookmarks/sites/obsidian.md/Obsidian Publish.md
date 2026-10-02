@@ -2,7 +2,6 @@
 title: Obsidian Publish
 bookmark: https://obsidian.md/publish
 author:
-published:
 created: 2026-09-25
 description: Obsidian's hosted service for publishing a vault as a website.
 tags:

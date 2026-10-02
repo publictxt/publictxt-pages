@@ -262,6 +262,7 @@ All optional.
 | `bookmark` / `bookmarks` | URL or list | Makes it a bookmark |
 | `facebook`, `mastodon`, … | URL or list | "Posted on" links |
 | `publish` | `off` | Keep off the site |
+| `published` | date, or `false` | Hugo's key, as in Jekyll: `false` keeps the page off too; a date or a blank is ignored |
 | `description` | text | The page's meta description (search engines, link previews) |
 | `order` / `perPage` | see [config](configuration.md#browse-lists) | On `_index.md`: this folder's list order and page size |
 | `author`, `source_repo` | text | Kept, not shown yet |

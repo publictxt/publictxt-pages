@@ -29,6 +29,32 @@
   "year": "2026"
  },
  {
+  "bookmarks": [
+   {
+    "label": "↗ obsidian.md/publish",
+    "url": "https://obsidian.md/publish"
+   }
+  ],
+  "collections": [
+   "bookmarks"
+  ],
+  "created": "2026-09-25T00:00:00Z",
+  "createdLabel": "25 Sep 2026",
+  "rating": 4,
+  "section": "bookmarks",
+  "summary": "Hosted publishing The paid, hosted way to do what publictxt-pages does from a Git repository.\nIn a folder named like a Markdown file (obsidian.md/); title: set, rating: quoted, …",
+  "tags": [
+   "clippings",
+   "#obsidian",
+   "#publishing",
+   "pkm"
+  ],
+  "title": "Obsidian Publish",
+  "updated": "2026-09-25T00:00:00Z",
+  "url": "/bookmarks/sites/obsidian.md/obsidian-publish/",
+  "year": "2026"
+ },
+ {
   "categories": [
    "Personal"
   ],
