@@ -63,6 +63,12 @@ class SiteIndexTest(unittest.TestCase):
         self.assertTrue(INDEX.is_file(), "no snapshot yet — run with GOLDEN_UPDATE=1")
         self.assertEqual(INDEX.read_text(encoding="utf-8").replace("\r\n", "\n"), self.index)
 
+    def test_index_text_is_plain(self):
+        """index.json carries plain text (cards.js escapes it): no HTML entities left in summaries."""
+        items = json.loads(self.index)
+        self.assertEqual([it["url"] for it in items if re.search(r"&[a-z]+;|&#\d+;", it.get("summary", ""))], [])
+        self.assertTrue(any("->" in it.get("summary", "") for it in items), "fixture lost its ->")
+
     def test_note_embed(self):
         """notes/embeds.md: a standalone `![](…/Search.md)` embeds; inline, a link; videos and audio keep their <p>."""
         html = (self.public / "notes" / "embeds" / "index.html").read_text(encoding="utf-8")
