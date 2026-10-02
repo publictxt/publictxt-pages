@@ -1,9 +1,10 @@
 {{/*
   A page's folder tree, below "This page" (page.html's right column), in
   place of its timeline when tree-root.html gives its section.
-  Server-rendered, no JS: nested <details>, open along the page's path —
-  the path lit, the page marked, every other folder shut with its page
-  count (focus + context). Folders first, by folder name; then pages, by
+  Server-rendered, no JS, in the timeline's look (a fold; folders as its
+  years, pages as its pages): nested <details>, open along the page's
+  path — those nodes filled, the page marked — every other folder shut
+  with its page count (focus + context). Folders first, by folder name; then pages, by
   title. Built from Hugo's sections — sync gives every folder an
   _index.md, so the folders are the source repo's.
   Rendered once per tree (partialCached), then each page's path patched
@@ -21,12 +22,10 @@
 {{ end }}
 {{ $html = replace $html (partial "tree-row.html" (dict "url" .page.RelPermalink))
   (partial "tree-row.html" (dict "url" .page.RelPermalink "on" true)) 1 }}
-<nav class="side-block tree" aria-label="{{ $root.Section | humanize }} pages">
-  <h2 class="side-heading tree-head">
-    <a href="{{ $root.RelPermalink }}">{{ $root.Section | humanize }}</a>
-    <span class="count">{{ len $root.RegularPagesRecursive }}</span>
-  </h2>
-  <ul class="tree-list">
+{{ $name := $root.Section | humanize }}
+<details class="timeline fold tree" open>
+  <summary><span class="side-heading">{{ $name }} tree</span></summary>
+  <nav aria-label="{{ $name }} pages">
     {{- $html | safeHTML -}}
-  </ul>
-</nav>
+  </nav>
+</details>

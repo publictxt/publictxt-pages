@@ -438,7 +438,9 @@ a:hover { text-decoration: underline; }
 
 /* Timeline (timeline.js): years on a rail, each node opens its row, each
    label picks the date filter (lists, search) or links to it (a page's archive). Bars are one hue, baseline-anchored; the
-   counts beside them carry the numbers. */
+   counts beside them carry the numbers. The folder tree (page-tree.html)
+   shares its rules — nodes, rails, page branches — by selector list: one
+   look, so change both together. */
 .timeline {
   --row: 1.75rem;
   --node: 18px;
@@ -447,14 +449,14 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   padding: 0.7rem 0.9rem;
 }
-.tl, .tl-months, .tl-pages { list-style: none; margin: 0; padding: 0; }
+.tl, .tl-months, .tl-pages, .tree-dirs, .tree-pages { list-style: none; margin: 0; padding: 0; }
 /* A shared page timeline's collection chips (page-timeline.js), above the rail. */
 .tl-chips { margin-bottom: 0.7rem; }
 .tl-chips[hidden] { display: none; }
-.tl { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-.tl-year { position: relative; }
+.tl, .tree { font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.tl-year, .tree-dir { position: relative; }
 /* The rail, node centre to node centre. */
-.tl-year::before {
+.tl-year::before, .tree-dir::before {
   content: "";
   position: absolute;
   left: calc(var(--node) / 2 - 1px);
@@ -463,17 +465,17 @@ a:hover { text-decoration: underline; }
   width: 2px;
   background: var(--border);
 }
-.tl-year:first-child::before { top: calc(var(--row) / 2); }
-.tl-year:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
-.tl-year:only-child::before { display: none; }
-.tl-row {
+.tl-year:first-child::before, .tree-dir:first-child::before { top: calc(var(--row) / 2); }
+.tl-year:last-child::before, .tree-dir:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
+.tl-year:only-child::before, .tree-dir:only-child::before { display: none; }
+.tl-row, .tree-row {
   display: grid;
   grid-template-columns: var(--node) auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 0.55rem;
   min-height: var(--row);
 }
-.tl-node {
+.tl-node, .tree-node {
   position: relative;   /* over the rail */
   width: var(--node);
   height: var(--node);
@@ -486,7 +488,7 @@ a:hover { text-decoration: underline; }
   place-items: center;
 }
 /* A chevron: right when shut, down when open, as .fold's. */
-.tl-node::before {
+.tl-node::before, .tree-node::before {
   content: "";
   width: 0.28rem;
   height: 0.28rem;
@@ -495,19 +497,24 @@ a:hover { text-decoration: underline; }
   transform: translateX(-1px) rotate(-45deg);
   transition: transform 0.15s;
 }
-.open > .tl-row > .tl-node { border-color: var(--accent); }
-.open > .tl-row > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
-.current > .tl-row > .tl-node { background: var(--accent); border-color: var(--accent); }
-.current > .tl-row > .tl-node::before { border-color: var(--bg); }
-.tl-node:hover { border-color: var(--accent); }
+/* Tree: open is <details open>; current is on the page's path. */
+.open > .tl-row > .tl-node, [open] > .tree-row > .tree-node { border-color: var(--accent); }
+.open > .tl-row > .tl-node::before,
+[open] > .tree-row > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
+.current > .tl-row > .tl-node,
+.on-path > details > .tree-row > .tree-node { background: var(--accent); border-color: var(--accent); }
+.current > .tl-row > .tl-node::before,
+.on-path > details > .tree-row > .tree-node::before { border-color: var(--bg); }
+.tl-node:hover, .tree-row:hover > .tree-node { border-color: var(--accent); }
 /* A month with nothing to open (filter mode): a dot on the branch. */
 .tl-dot { cursor: default; transform: scale(0.6); }
 .tl-dot::before { display: none; }
 .tl-dot:hover { border-color: var(--border); }
 .current > .tl-row > .tl-dot:hover { border-color: var(--accent); }
-.tl-node:hover::before { border-color: var(--accent); }
-.current > .tl-row > .tl-node:hover::before { border-color: var(--bg); }
-.tl-pick {
+.tl-node:hover::before, .tree-row:hover > .tree-node::before { border-color: var(--accent); }
+.current > .tl-row > .tl-node:hover::before,
+.on-path > details > .tree-row:hover > .tree-node::before { border-color: var(--bg); }
+.tl-pick, .tree-pick {
   font: inherit;
   color: var(--text);
   background: none;
@@ -516,15 +523,17 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   text-align: left;
 }
-.tl-year > .tl-row > .tl-pick { font-weight: 700; letter-spacing: 0.02em; }
-.tl-pick:hover, .tl-pick[aria-pressed="true"] { color: var(--accent); }
+.tl-year > .tl-row > .tl-pick,
+.tree > nav > .tree-dirs > .tree-dir > details > .tree-row > .tree-pick { font-weight: 700; letter-spacing: 0.02em; }
+.tl-pick:hover, .tl-pick[aria-pressed="true"], .tree-pick:hover { color: var(--accent); text-decoration: none; }
 .tl-pick[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 3px; }
-.tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible {
+.tl-node:focus-visible, .tl-pick:focus-visible, .tl-pages a:focus-visible,
+.tree-row:focus-visible, .tree-pick:focus-visible, .tree-pages a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 3px;
 }
-.tl .count { color: var(--text-muted); font-size: 0.72rem; text-align: right; min-width: 1.5em; }
+.tl .count, .tree .count { color: var(--text-muted); font-size: 0.72rem; text-align: right; min-width: 1.5em; }
 
 /* A year's months, Jan..Dec. */
 .tl-spark { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
@@ -540,8 +549,8 @@ a:hover { text-decoration: underline; }
 .tl-year:hover > .tl-row .tl-spark i:not(.none),
 .tl-year.current > .tl-row .tl-spark i:not(.none) { opacity: 1; }
 
-.tl-months { margin: 0.1rem 0 0.35rem calc(var(--node) + 0.55rem); }
-.tl-month { --node: 13px; --row: 1.6rem; }
+.tl-months, .tree-sub { margin: 0.1rem 0 0.35rem calc(var(--node) + 0.55rem); }
+.tl-month, .tree-sub { --node: 13px; --row: 1.6rem; }
 .tl-month .tl-pick { min-width: 5.6em; }
 .tl-bar { display: block; height: 6px; background: var(--bg-inset); border-radius: 3px; overflow: hidden; }
 .tl-bar i {
@@ -555,7 +564,7 @@ a:hover { text-decoration: underline; }
 .tl-month:hover > .tl-row .tl-bar i, .tl-month.current > .tl-row .tl-bar i { opacity: 1; }
 
 /* An open month's pages, on a dashed branch of the rail. */
-.tl-pages {
+.tl-pages, .tree-pages {
   margin: 0.1rem 0 0.4rem calc(var(--node) / 2 - 0.5px);
   padding: 0.1rem 0 0.1rem 0.9rem;
   border-left: 1px dashed var(--border);
@@ -573,7 +582,7 @@ a:hover { text-decoration: underline; }
 .tl-pages li.tl-newday { margin-top: 0.3rem; }
 /* Day of the month, once per day. */
 .tl-day { color: var(--text-muted); font-size: 0.72rem; text-align: right; }
-.tl-pages li::before {
+.tl-pages li::before, .tree-pages li::before {
   content: "";
   position: absolute;
   left: calc(-0.9rem - 3px);
@@ -583,130 +592,25 @@ a:hover { text-decoration: underline; }
   border-radius: 50%;
   background: var(--text-muted);
 }
-.tl-pages a {
+.tl-pages a, .tree-pages a {
   color: var(--text);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.tl-pages a:hover { color: var(--accent); text-decoration: none; }
-.tl-pages a[aria-current] { color: var(--accent); font-weight: 600; }
-.tl-pages li:has(a[aria-current])::before { background: var(--accent); }
-.tl-pages li:has(a:hover)::before { background: var(--accent); }
+.tl-pages a:hover, .tree-pages a:hover { color: var(--accent); text-decoration: none; }
+.tl-pages a[aria-current], .tree-pages a[aria-current] { color: var(--accent); font-weight: 600; }
+.tl-pages li:has(a[aria-current])::before, .tree-pages li:has(a[aria-current])::before,
+.tl-pages li:has(a:hover)::before, .tree-pages li:has(a:hover)::before { background: var(--accent); }
 .tl-empty { font-size: 0.8rem; }
+/* Tree only: a folder's row is its <summary> — the node opens it, the name
+   links to the folder; its pages are block rows, no day column. */
+.tree-row { grid-template-columns: var(--node) minmax(0, 1fr) auto; list-style: none; cursor: pointer; }
+.tree-row::-webkit-details-marker { display: none; }
+.tree-pages li { position: relative; padding: 0.2rem 0; }
 @media (prefers-reduced-motion: reduce) {
-  .tl-node::before, .list-facet > summary::after { transition: none; }
-}
-
-/* Folder tree (page-tree.html): the timeline's rail-and-node language, for
-   place instead of time — folders are square nodes, pages dots, each joined
-   to its parent's rail by an elbow. The rail from the section down to this
-   page is lit (:has(); without it, unlit). */
-.tree {
-  --row: 1.6rem;
-  --node: 14px;
-  --indent: 0.85rem;
-  --rail: 1.5px;
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-.tree-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
-.tree .count { color: var(--text-muted); font-size: 0.72rem; font-weight: 400; letter-spacing: 0; }
-.tree-list { list-style: none; margin: 0; padding: 0; }
-.tree-list .tree-list { margin-left: calc(var(--node) / 2 - var(--rail) / 2); }
-.tree-list .tree-list > li { position: relative; padding-left: var(--indent); }
-/* This row's stretch of the parent's rail; the last one stops at its elbow. */
-.tree-list .tree-list > li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--rail);
-  background: var(--border);
-}
-.tree-list .tree-list > li:last-child::before { bottom: auto; height: calc(var(--row) / 2); }
-.tree-list .tree-list > li::after {
-  content: "";
-  position: absolute;
-  left: var(--rail);   /* off the rail: a grey elbow mustn't notch a lit one */
-  top: calc(var(--row) / 2 - var(--rail) / 2);
-  width: calc(var(--indent) - var(--rail) - 3px);
-  height: var(--rail);
-  background: var(--border);
-}
-/* The lit path: every stretch above the path's row, then its top half. */
-.tree-list .tree-list > li:has(~ .on-path, ~ .current)::before { background: var(--accent); }
-.tree-list .tree-list > :is(.on-path, .current)::before {
-  background: linear-gradient(var(--accent) 0 calc(var(--row) / 2), var(--border) 0);
-}
-.tree-list .tree-list > :is(.on-path, .current)::after { background: var(--accent); }
-
-/* Rows: node | label | count. Labels wrap; node and elbow stay on line one. */
-.tree summary, .tree-page > a {
-  display: grid;
-  grid-template-columns: var(--node) minmax(0, 1fr) auto;
-  column-gap: 0.5rem;
-  align-items: start;
-}
-.tree summary { position: relative; list-style: none; cursor: pointer; }
-.tree summary::-webkit-details-marker { display: none; }
-.tree summary > a, .tree-page > a { padding: 0.2rem 0; }
-.tree summary > .count { padding-top: 0.3rem; }
-/* A folder: a square node, its chevron right when shut, down when open. */
-.tree summary::before {
-  content: "";
-  width: var(--node);
-  height: var(--node);
-  margin-top: calc((var(--row) - var(--node)) / 2);
-  border: var(--rail) solid var(--border);
-  border-radius: 4px;
-  background: var(--bg-raised);
-  box-sizing: border-box;
-}
-.tree summary::after {
-  content: "";
-  position: absolute;
-  left: calc(var(--node) / 2 - 0.15rem);
-  top: calc(var(--row) / 2 - 0.15rem);
-  width: 0.3rem;
-  height: 0.3rem;
-  border-right: 1.5px solid var(--text-muted);
-  border-bottom: 1.5px solid var(--text-muted);
-  transform: translateX(-1px) rotate(-45deg);
-  transition: transform 0.15s;
-}
-.tree details[open] > summary::after { transform: translateY(-1px) rotate(45deg); }
-.tree summary > a { color: var(--text); font-weight: 600; }
-.tree-dir.on-path > details > summary::before { border-color: var(--accent); }
-.tree-dir.on-path > details > summary > a { color: var(--accent); }
-/* A page: a dot; this page's filled, ringed. */
-.tree-page > a { color: var(--text); grid-template-columns: var(--node) minmax(0, 1fr); }
-.tree-page > a::before {
-  content: "";
-  justify-self: center;
-  width: 6px;
-  height: 6px;
-  margin-top: calc(var(--row) / 2 - 3px - 0.2rem);   /* less the link's padding */
-  border-radius: 50%;
-  background: var(--text-muted);
-}
-.tree-page.current > a { color: var(--accent); font-weight: 600; }
-.tree-page.current > a::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.tree a:hover { color: var(--accent); text-decoration: none; }
-.tree-page > a:hover::before { background: var(--accent); }
-@media (hover: hover) {
-  .tree summary:hover::before { border-color: var(--accent); }
-  .tree summary:hover::after { border-color: var(--accent); }
-}
-.tree summary:focus-visible, .tree a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 3px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .tree summary::after { transition: none; }
+  .tl-node::before, .tree-node::before, .list-facet > summary::after { transition: none; }
 }
 
 .pagination {

@@ -102,23 +102,24 @@ class SiteIndexTest(unittest.TestCase):
     def test_wiki_tree(self):
         """A wiki page: the folder tree, not the timeline — open along its path, the page marked."""
         html = (self.public / "wiki" / "site" / "lists" / "browse-lists" / "index.html").read_text(encoding="utf-8")
-        tree = re.search(r'<nav class="side-block tree".*?</nav>', html, re.S)
+        tree = re.search(r'<details class="timeline fold tree".*?</nav>', html, re.S)
         self.assertIsNotNone(tree, "no folder tree")
         self.assertNotIn("data-page-timeline", html)
         tree = tree[0]
-        self.assertEqual(re.findall(r'<li class="tree-dir on-path">\s*<details open>\s*<summary><a href="([^"]+)"', tree),
+        self.assertEqual(re.findall(r'<li class="tree-dir on-path"><details open><summary class="tree-row">'
+                                    r'<span class="tree-node" aria-hidden="true"></span><a class="tree-pick" href="([^"]+)"', tree),
                          ["/wiki/site/", "/wiki/site/lists/"])
         self.assertEqual(tree.count("<details open>"), 2, "only the path open")
         self.assertIn('<li class="tree-page current"><a href="/wiki/site/lists/browse-lists/" aria-current="page">', tree)
         # Shut folders keep their pages, and counts.
         self.assertIn('<a href="/wiki/pipeline/dates/">Dates</a>', tree)
-        self.assertRegex(tree, r'<a href="/wiki/projects/">Projects</a><span class="count">4</span>')
+        self.assertIn('<a class="tree-pick" href="/wiki/projects/">Projects</a><span class="count">4</span>', tree)
 
     def test_timeline_outside_tree_sections(self):
         """A page outside params.treeSections keeps its timeline."""
         html = (self.public / "notes" / "sample" / "index.html").read_text(encoding="utf-8")
         self.assertIn("data-page-timeline", html)
-        self.assertNotIn('class="side-block tree"', html)
+        self.assertNotIn('class="timeline fold tree"', html)
 
 
 if __name__ == "__main__":

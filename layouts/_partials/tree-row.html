@@ -6,6 +6,6 @@
   escapes the href (café -> caf%C3%A9), which a hand-built string misses.
   Takes dict url, dir (folder, else page), on.
 */ -}}
-{{- if .dir -}}<li class="tree-dir{{ if .on }} on-path{{ end }}"><details{{ if .on }} open{{ end }}><summary><a href="{{ .url }}">
+{{- if .dir -}}<li class="tree-dir{{ if .on }} on-path{{ end }}"><details{{ if .on }} open{{ end }}><summary class="tree-row"><span class="tree-node" aria-hidden="true"></span><a class="tree-pick" href="{{ .url }}">
 {{- else -}}<li class="tree-page{{ if .on }} current{{ end }}"><a href="{{ .url }}"{{ if .on }} aria-current="page"{{ end }}>
 {{- end -}}
