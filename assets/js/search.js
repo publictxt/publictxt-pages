@@ -7,7 +7,10 @@
 // count as the lists' do, from a search without the rating filter. The
 // timeline (timeline.js, filter mode) picks ?year= / ?month= from Pagefind's
 // month counts, recounted without the date filter while one is set.
+// A date or rating sort groups the results (card-groups.js), sized by
+// Pagefind's month and rating counts; Relevance doesn't group.
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
+import { cardGroups, grouper, groupTitle } from "./card-groups.js";
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matchToggle, pagefindConditions,
@@ -64,18 +67,20 @@ function readURL() {
   const s = p.get("sort");
   state.sort = !s ? null : s === RELEVANCE ? RELEVANCE : normaliseSort(s);
 }
-function writeURL() {
+function url(overrides = {}) {
+  const s = { ...state, ...overrides };
   const p = new URLSearchParams();
-  if (state.q) p.set("q", state.q);
-  CHIPS.write(p, state);
-  if (state.year) p.set("year", state.year);
-  if (state.month) p.set("month", state.month);
-  if (state.rating) p.set("rating", state.rating);
+  if (s.q) p.set("q", s.q);
+  CHIPS.write(p, s);
+  if (s.year) p.set("year", s.year);
+  if (s.month) p.set("month", s.month);
+  if (s.rating) p.set("rating", s.rating);
   const sort = activeSort();
   if (state.sort && sort !== defaultSort()) p.set("sort", sort);
   const qs = p.toString();
-  history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
+  return location.pathname + (qs ? "?" + qs : "");
 }
+const writeURL = () => history.replaceState(null, "", url());
 // Card tags filter only while tag is a chip facet that includes; else they link.
 const toggleTag = state.tag?.states.includes("include") ? (t) => { toggleInclude(state.tag, t); run(); } : null;
 
@@ -148,7 +153,26 @@ function pagefindFilters(skip) {
   return filters;
 }
 
-let shown = 0, current = [], runs = 0;
+// A group's title (card-groups.js): a created month links to that date
+// filter, unless the search is on it.
+const titleFor = (key) => groupTitle(key, {
+  field: parseSort(activeSort()).field,
+  months: params.months,
+  href: (y, m) => state.year === y && state.month === m ? null : url({ year: y, month: m }),
+  pick: (y, m) => { state.year = y; state.month = m; tlOpen.add(y); run(); el.root.scrollIntoView({ block: "start" }); },
+});
+
+// A group's size, from Pagefind's counts for this search: its created month
+// or rating filter value; none for updated, which has no filter.
+function groupTotal(field, counts) {
+  if (field === "created") return (k) => (k ? counts.month?.[k] : undefined);
+  if (field === "rating") return (k) => counts.rating?.[k || UNRATED_FILTER];
+  return () => undefined;
+}
+
+// addCard(item, el): into the list, grouped or not; set per run, so "Show
+// more" carries on the last group.
+let shown = 0, current = [], runs = 0, addCard;
 async function run() {
   const id = ++runs;
   writeURL();
@@ -169,6 +193,11 @@ async function run() {
   current = res.results; shown = 0;
   el.list.replaceChildren();
   const counts = res.filters || allFilters;
+  const keyOf = sort === RELEVANCE ? null : grouper(sort);
+  el.list.classList.toggle("grouped", Boolean(keyOf));
+  addCard = keyOf
+    ? cardGroups(el.list, keyOf, { title: titleFor, total: groupTotal(parseSort(sort).field, counts) })
+    : (item, cardEl) => el.list.append(cardEl);
   const countsWithout = (k) => { const i = recount.indexOf(k); return i < 0 ? counts : others[i]?.filters || allFilters; };
   const facetCounts = Object.fromEntries(CHIPS.keys.map((k) => [k, countsWithout(k)[k]]));
   renderFilters(facetCounts, countsWithout("rating").rating || {});
@@ -186,14 +215,17 @@ async function showMore() {
   const batch = current.slice(shown, shown + PAGE);
   const data = await Promise.all(batch.map((r) => r.data()));
   if (mine !== current) return;   // a newer run replaced the list
-  for (const d of data) el.list.appendChild(resultCard(d));
+  for (const d of data) {
+    const item = resultItem(d);
+    addCard(item, card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" }));
+  }
   shown += batch.length;
   el.more.hidden = shown >= current.length;
 }
 
 // A Pagefind result in the shape index.json uses (see cards.js).
-function resultCard(d) {
-  const item = {
+function resultItem(d) {
+  return {
     url: d.url,
     title: d.meta?.title || d.url,
     collections: d.filters?.collection || [],
@@ -204,7 +236,6 @@ function resultCard(d) {
     updatedLabel: d.meta?.updated_label || "",
     rating: Number(d.meta?.rating) || 0,
   };
-  return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });
 }
 
 // ---- wiring -------------------------------------------------------------

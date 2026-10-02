@@ -23,8 +23,8 @@ search. Add one to both, or search cards go without it. What's still implemented
 | each list template's page collection (incl. the dataview hook) | its kind in `scope()` |
 | stars in `page-meta.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
-| `created`'s and `updated`'s `2006-01-…` form in `list-json.html` | `monthOf()` in `timeline.js`, `grouper()` in `sorts.js` read their digits |
-| Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js` |
+| `created`'s and `updated`'s `2006-01-…` form in `list-json.html` and `pagefind-keys.html`'s meta | `monthOf()` in `timeline.js`, `grouper()` in `card-groups.js` read their digits |
+| Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js`; `grouper()` keys look up search's month group sizes |
 | `timeline/content.html`: grouping (year, month, newest first, undated out, ≥2 months) and markup (`.tl-*` classes; no sparklines or month bars) | `timeline()`, `monthCount()` and `renderTimeline()` in `timeline.js`; `main.css` styles both |
 
 A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter

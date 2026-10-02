@@ -113,7 +113,8 @@ The **Search** page: full text over every page and section intro, with:
 
 - Collection, Category, Tag and Rating filters — usable with no query, to browse
 - Year and month from the timeline
-- The same sorts as browse lists
+- The same sorts as browse lists, grouped by month or stars alike (not by Relevance, the
+  default with a query)
 
 *More* loads further results. Search runs in the browser ([Pagefind](https://pagefind.app));
 nothing is sent to a server.

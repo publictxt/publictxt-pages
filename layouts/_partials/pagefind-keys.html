@@ -5,7 +5,8 @@
   `created` year (= index.json `year`) and month ("2006-01", for search's
   timeline: timeline.js countsTree), rating ("unrated" when none), and
   category — one span per value, as an attribute holds only one. Meta: the
-  date labels (date-labels.html) and rating, for result cards.
+  dates in index.json's form (list-json.html: card <time>, search's month
+  groups), their labels (date-labels.html) and rating, for result cards.
 
   Every `data-pagefind-body` template must include this, or the page drops out
   of sorted and filtered results. See docs/wiki/traps.md.
@@ -13,7 +14,7 @@
 {{ $categories := partial "categories.html" . }}
 {{ $rating := partial "rating.html" . }}
 {{ $d := partial "date-labels.html" . }}
-{{ $meta := slice }}
+{{ $meta := slice "created[data-created-iso]" "updated[data-updated-iso]" }}
 {{ with $d.created }}{{ $meta = $meta | append "created_label[data-created-label]" }}{{ end }}
 {{ with $d.updated }}{{ $meta = $meta | append "updated_label[data-updated-label]" }}{{ end }}
 {{ with $rating }}{{ $meta = $meta | append "rating[data-rating]" }}{{ end }}
@@ -23,6 +24,7 @@
   {{- with $d.created }} data-created-label="{{ . }}"{{ end }}
   {{- with $d.updated }} data-updated-label="{{ . }}"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
+  data-created-iso="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}" data-updated-iso="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}"
   data-year="{{ .Date.Format "2006" }}" data-month="{{ .Date.Format "2006-01" }}"
   data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}"></span>
 {{- range $categories }}

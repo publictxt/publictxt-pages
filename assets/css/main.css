@@ -364,10 +364,11 @@ a:hover { text-decoration: underline; }
 
 .page-card .chip-row { margin-top: 0.5rem; }
 
-/* Grouped cards (list.js, a date or rating sort): each month or star count a
-   fold — the timeline's node (.tl-node) opens and shuts it; its heading, a
-   rule out to the count, pins under the header while its cards scroll by. */
-.page-list.grouped {
+/* Grouped cards (card-groups.js; lists and search, a date or rating sort):
+   each month or star count a fold — the timeline's node (.tl-node) opens and
+   shuts it; its heading, a rule out to the count, pins under the header
+   while its cards scroll by. */
+.grouped {
   --node: 18px;
   gap: 0.4rem;
 }
@@ -1088,7 +1089,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 
 @media (max-width: 600px) {
-  .page-list.grouped { --node: 13px; }
+  .grouped { --node: 13px; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
     padding: 0.8rem 0.9rem;
