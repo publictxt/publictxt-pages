@@ -13,6 +13,9 @@ site always shows the generator as it is on `main`.
 | [`_index.md`](_index.md) | Home: the pitch, getting started, what readers get |
 | [`wiki/`](wiki/_index.md) | The user guide — the only copy. Update it when a user-visible behaviour, setting or default changes |
 | [`wiki/About/`](wiki/About/_index.md) | Background: how it works, PublicTxt, FAQ, contributing |
+| [`blog/`](blog/_index.md) | The dev log, a post per milestone; dated by file name (`2026/20261002-….md`) |
+| [`posts/`](posts/_index.md) | Short, one-feature updates; they share the blog's timeline |
+| [`bookmarks/`](bookmarks/_index.md) | The tools it's built on, one file per link under `sites/<domain>/` |
 | [`settings/site.toml`](settings/site.toml) | The site's settings (not a page) |
 
 ## Rules

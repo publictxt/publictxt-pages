@@ -54,4 +54,6 @@ Git repositories as a home for public knowledge.
 Built by publictxt-pages from the
 [`project-site/`](https://github.com/publictxt/publictxt-pages/tree/main/project-site)
 folder of its own repository — the same pipeline, nothing extra. The user guide is the
-[wiki](wiki/_index.md); how it all fits together is [About](wiki/About/_index.md).
+[wiki](wiki/_index.md), and how it all fits together is [About](wiki/About/_index.md).
+What's new is in the [blog](blog/_index.md) and [posts](posts/_index.md); the tools it's
+built on are in [bookmarks](bookmarks/_index.md).
