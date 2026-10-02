@@ -324,11 +324,14 @@ a:hover { text-decoration: underline; }
   gap: 0.8rem;
 }
 
+/* --pad-y, --title-size: also the day on a grouped list's rail (below). */
 .page-card {
+  --pad-y: 0.9rem;
+  --title-size: 1.02rem;
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.9rem 1.1rem;
+  padding: var(--pad-y) 1.1rem;
 }
 .page-card time, .page-card-dates > .muted { font-size: 0.8rem; }
 
@@ -341,7 +344,8 @@ a:hover { text-decoration: underline; }
 
 .page-card-title {
   font-weight: 600;
-  font-size: 1.02rem;
+  font-size: var(--title-size);
+  line-height: 1.65;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -391,11 +395,22 @@ a:hover { text-decoration: underline; }
   align-items: center;
   gap: 0.55rem;
   padding: 0.5rem 0;
-  /* Opaque to cover cards when pinned, but not over the rail. */
-  background: linear-gradient(to right, transparent var(--node), var(--bg) var(--node));
+  background: var(--bg);   /* covers the cards when pinned */
   list-style: none;
   cursor: pointer;
 }
+/* The rail through the heading, under its node, as its background hides the
+   list's; from the node down on the first. */
+.card-group-head::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--node) / 2 - 1px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.card-group:first-child .card-group-head::before { top: 50%; }
 .card-group-head::-webkit-details-marker { display: none; }
 .card-group-head > .tl-node { flex: none; }
 .card-group > [open] > .card-group-head > .tl-node, .card-group-head:hover > .tl-node { border-color: var(--accent); }
@@ -421,17 +436,16 @@ a:hover { text-decoration: underline; }
   content: attr(data-day);
   position: absolute;
   left: calc(-1 * var(--gutter));
-  top: 1rem;
+  top: calc(var(--pad-y) + 1px);   /* the card's padding and border */
   width: var(--node);
   text-align: center;
   font-size: 0.72rem;
-  line-height: 1.5;
+  line-height: calc(var(--title-size) * 1.65);   /* .page-card-title's line */
   color: var(--text-muted);
   background: var(--bg);
   font-variant-numeric: tabular-nums;
 }
 .dense .card-group-items { gap: 0.35rem; }
-.dense .card-group-items > li[data-day]::before { top: 0.55rem; }
 
 /* Compact cards (densityToggle in cards.js): one line each, title then
    collections, date and stars; no summary, links or tags. The head's parts
@@ -442,10 +456,12 @@ a:hover { text-decoration: underline; }
   flex-wrap: wrap;
   align-items: baseline;
   column-gap: 0.6rem;
-  padding: 0.45rem 0.9rem;
+  --pad-y: 0.45rem;
+  --title-size: 0.95rem;
+  padding: var(--pad-y) 0.9rem;
 }
 .dense .page-card-head { display: contents; }
-.dense .page-card-title { flex: 1 1 16rem; font-size: 0.95rem; }
+.dense .page-card-title { flex: 1 1 16rem; }
 .dense .page-card .chip-row, .dense .page-card-summary { display: none; }
 
 /* Browse lists (assets/js/list.js) */
@@ -1119,7 +1135,8 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   .page-list.grouped { --node: 13px; --gutter: 1.9rem; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
-    padding: 0.8rem 0.9rem;
+    --pad-y: 0.8rem;
+    padding: var(--pad-y) 0.9rem;
   }
   .page-card-head {
     flex-direction: column;
