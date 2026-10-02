@@ -33,6 +33,8 @@ tests/test_site.py          that content through Hugo: index.json vs tests/golde
 tests/test_build.py         build.py's search index check, on made-up public/ trees
 tests/test_map_lint.py      map_lint.py's reading of the map: folder headings, namesakes
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
+tests/js/cards.test.mjs     cards.js: remembered density, storage that throws
+tests/js/card-groups.test.mjs  card-groups.js: group keys per sort, counts
 tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling, tag chips
 ```
 
@@ -111,10 +113,11 @@ assets/js/site-index.js   fetch index.json (recent-first) once per document; sco
 assets/js/layout.js       breakpoints for JS; dock(): filters right column <-> page flow
 assets/js/nav.js          ☰: collapse the nav (wide), drawer (narrower); blocking, in <head>
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
-assets/js/cards.js        the one card renderer; rating filter value
+assets/js/cards.js        the one card renderer; rating filter value; density toggle
+assets/js/card-groups.js  cards under month or star headings, lists and search: keys, titles, counts
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating
                           chips; remembered section folds — shared by lists and search
-assets/js/list.js         browse list: state<->URL, facets, paging
+assets/js/list.js         browse list: state<->URL, facets, paging, month and star groups
 assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
 assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared, timelineTags chips
 assets/js/search.js       Pagefind UI: filters, sort, incremental results

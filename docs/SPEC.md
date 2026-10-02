@@ -48,6 +48,8 @@ Items marked **(TBD)** are not built.
   - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
   - Home *Recent*: every page, recently updated first, `recentLimit` a page, with filters and timeline; nothing filtered to start. (Not "this month": empty on quiet months.)
   - Sorting in all by Date, Recency, Alphabetical.
+  - A date sort groups the cards by that date's month: a heading per month — its node folds it (open to start, not remembered), pinned while its cards scroll, a rule out to its count ("4 of 9 pages" when split across pages); under a `created` sort it links to that month's date filter. A rating sort groups by stars, unrated where it sorts (as 2.5); no link, as the rating filter is a minimum. Also in Search. Title groups TBD.
+  - A Compact toggle beside sort (lists and Search): one line per card, remembered per browser, not in the URL.
   - Filter by Collection, and by Year (the `created` year) or a month of it (`?year=&month=`) — picked in the timeline; no year select.
   - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars and counts — no titles, the list shows those. A year or month label picks the date filter; the other filters narrow it. The newest year open to start.
   - Filter by Category and Tag, as the facets above (also in Search)
@@ -58,7 +60,7 @@ Items marked **(TBD)** are not built.
   - Full text search
   - Collection, Year and Tag filters as 'facets' are available without a query
   - Year and month from the timeline, as the browse lists' (Pagefind's `month` filter counts); ranges (TBD)
-  - Also Sortable
+  - Also Sortable; a date or rating sort groups the results as the browse lists' (sized by Pagefind's month and rating counts — none for updated, which has no filter); Relevance doesn't group. *More* carries on the last group.
 - Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
 - Bookmarks
   - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives (it joins collection `bookmarks`); pages filed under `bookmarks/` are too, by folder

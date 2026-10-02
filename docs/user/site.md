@@ -48,6 +48,15 @@ Home, section and tag lists share one interface.
 **Sort**: Newest, Oldest, Title, Recently updated, Top/Lowest rated (unrated counts as
 2.5). Starts at the [configured order](configuration.md#browse-lists).
 
+**Newest, Oldest and Recently updated group by month.** A month's heading stays pinned
+while you scroll its pages and shows how many it holds — "4 of 9 pages" when the month
+runs onto another page. Click its circle to fold it; under Newest and Oldest, click its
+name to filter to it. **Top and Lowest rated group by stars** alike, Unrated between ★3
+and ★2, where it sorts.
+
+**Compact**, beside sort: one line per page — title, date, stars — for skimming. Remembered
+in your browser for lists and search; not part of the URL.
+
 **Filter chips** — Collection, Category, Tags (as [configured](configuration.md#filter-chips)):
 
 - Click a chip to **include** it; click again to clear.
@@ -104,7 +113,8 @@ The **Search** page: full text over every page and section intro, with:
 
 - Collection, Category, Tag and Rating filters — usable with no query, to browse
 - Year and month from the timeline
-- The same sorts as browse lists
+- The same sorts as browse lists, grouped by month or stars alike (not by Relevance, the
+  default with a query)
 
 *More* loads further results. Search runs in the browser ([Pagefind](https://pagefind.app));
 nothing is sent to a server.

@@ -13,8 +13,10 @@
 //
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
-// the list when narrow (layout.js). Sort sits with the count.
-import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+// the list when narrow (layout.js). Sort and the density toggle sit with the count.
+// A date or rating sort groups the cards, by month or stars (card-groups.js).
+import { cardGroups, countBy, grouper, groupTitle } from "./card-groups.js";
+import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
@@ -121,11 +123,14 @@ async function mount(root) {
     `<option value="${v}">${l}</option>`).join("")}</select>`;
   const sortSelect = sortWrap.querySelector("select");
   sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; state.page = 1; render(true); });
-  const head = document.createElement("div");
-  head.className = "results-head";
-  head.append(status, sortWrap);
   const list = document.createElement("ul");
   list.className = "page-list";
+  const head = document.createElement("div");
+  head.className = "results-head";
+  const tools = document.createElement("div");
+  tools.className = "results-tools";
+  tools.append(sortWrap, densityToggle(list));
+  head.append(status, tools);
   const pager = document.createElement("nav");
   pager.className = "pagination";
   pager.setAttribute("aria-label", "Pagination");
@@ -279,6 +284,20 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
+  // A group's title (card-groups.js): a created month links to that date
+  // filter, unless the list is on it.
+  const titleFor = (key) => groupTitle(key, {
+    field: parseSort(state.sort).field,
+    months: params.months,
+    href: (y, m) => state.year === y && state.month === m ? null : url({ year: y, month: m, page: 1 }),
+    pick: (y, m) => {
+      state.year = y; state.month = m; state.page = 1;
+      tlOpen.add(y);
+      render(true);
+      root.scrollIntoView({ block: "start" });
+    },
+  });
+
   const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
   const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
 
@@ -320,7 +339,15 @@ async function mount(root) {
       toggleInclude(state.tag, t);
       state.page = 1; render(true);
     };
-    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag?.inc, onTag })));
+    const cardFor = (it) => card(it, { activeTags: state.tag?.inc, onTag });
+    const keyOf = compact ? null : grouper(state.sort);
+    list.classList.toggle("grouped", Boolean(keyOf));
+    list.replaceChildren();
+    if (keyOf) {
+      const totals = countBy(filtered, keyOf);
+      const add = cardGroups(list, keyOf, { title: titleFor, total: (k) => totals.get(k) });
+      for (const it of slice) add(it, cardFor(it));
+    } else list.append(...slice.map(cardFor));
     if (compact) return;
     sortSelect.value = state.sort;
 

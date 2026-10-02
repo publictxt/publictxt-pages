@@ -242,7 +242,14 @@ a:hover { text-decoration: underline; }
 /* Stars from rating.html's value: sidebar and cards. */
 .rating { color: var(--accent); letter-spacing: 0.05em; white-space: nowrap; }
 
-.chip-link { font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace; }
+/* A long URL ellipsed to its card, not pushing a phone wider. */
+.chip-link {
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
 .bookmark-links, .source-links { margin-top: 0.4rem; }
 .source-links { align-items: center; }
 
@@ -313,7 +320,8 @@ a:hover { text-decoration: underline; }
 .list-header h1 { margin: 0 0 0.4rem; font-size: 1.7rem; overflow-wrap: anywhere; }
 .list-header p, .list-header .list-intro { color: var(--text-muted); margin: 0; }
 
-.page-list {
+/* A column of cards: a browse list, search results, a group's cards. */
+.page-list, .result-list, .card-group-items {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -328,7 +336,7 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   padding: 0.9rem 1.1rem;
 }
-.page-card time { font-size: 0.8rem; }
+.page-card time, .page-card-dates > .muted { font-size: 0.8rem; }
 
 .page-card-head {
   display: flex;
@@ -361,6 +369,51 @@ a:hover { text-decoration: underline; }
 }
 
 .page-card .chip-row { margin-top: 0.5rem; }
+
+/* Grouped cards (card-groups.js; lists and search, a date or rating sort):
+   each month or star count a fold — the timeline's node (.tl-node) opens and
+   shuts it, open and hovered as the contents heading's (below); its heading,
+   a rule out to the count, pins under the header while its cards scroll by. */
+.grouped {
+  --node: 18px;
+  gap: 0.4rem;
+}
+.card-group-head {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0;
+  background: var(--bg);   /* covers the cards when pinned */
+  list-style: none;
+  cursor: pointer;
+}
+.card-group-head::-webkit-details-marker { display: none; }
+.card-group-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.card-group-title { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+.card-group-title a { color: var(--text); }
+.card-group-title a:hover { color: var(--accent); text-decoration: none; }
+.card-group-year { color: var(--text-muted); }
+.card-group-rule { flex: 1; min-width: 1rem; height: 1px; background: var(--border); }
+.card-group .count { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.card-group-items { margin: 0.2rem 0 0.6rem; }
+
+/* Compact cards (densityToggle in cards.js): one line each, title then
+   collections, date and stars; no summary, links or tags. The head's parts
+   join the card's row, so a phone wraps them under the title, not stacked. */
+.dense, .dense .card-group-items { gap: 0.35rem; }
+.dense .page-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.6rem;
+  padding: 0.45rem 0.9rem;
+}
+.dense .page-card-head { display: contents; }
+.dense .page-card-title { flex: 1 1 16rem; font-size: 0.95rem; }
+.dense .page-card .chip-row, .dense .page-card-summary { display: none; }
 
 /* Browse lists (assets/js/list.js) */
 .link-list { margin: 0; padding-left: 1.2rem; }
@@ -633,12 +686,15 @@ a:hover { text-decoration: underline; }
 .contents.fold > summary { justify-content: flex-start; gap: 0.55rem; width: fit-content; }
 .contents.fold > summary::after { display: none; }
 .contents.fold[open] > summary { margin-bottom: var(--gap); }
-.contents > summary > .tl-node, .contents > summary > .tree-node { flex: none; }
-.contents[open] > summary > .tl-node, .contents[open] > summary > .tree-node,
-.contents > summary:hover > .tl-node, .contents > summary:hover > .tree-node { border-color: var(--accent); }
-.contents[open] > summary > .tl-node::before,
-.contents[open] > summary > .tree-node::before { transform: translateY(-1px) rotate(45deg); }
-.contents > summary:hover > .tl-node::before, .contents > summary:hover > .tree-node::before { border-color: var(--accent); }
+/* Its heading's node; a card group's too (card-groups.js). */
+.contents > summary > .tl-node, .contents > summary > .tree-node, .card-group-head > .tl-node { flex: none; }
+.contents[open] > summary > .tl-node, .contents[open] > summary > .tree-node, [open] > .card-group-head > .tl-node,
+.contents > summary:hover > .tl-node, .contents > summary:hover > .tree-node,
+.card-group-head:hover > .tl-node { border-color: var(--accent); }
+.contents[open] > summary > .tl-node::before, .contents[open] > summary > .tree-node::before,
+[open] > .card-group-head > .tl-node::before { transform: translateY(-1px) rotate(45deg); }
+.contents > summary:hover > .tl-node::before, .contents > summary:hover > .tree-node::before,
+.card-group-head:hover > .tl-node::before { border-color: var(--accent); }
 /* The rail up to the root, across the heading's margin. */
 .contents > nav > .tl > .tl-year:first-child::before,
 .contents > nav > .tree-dirs > .tree-dir:first-child::before { display: block; top: calc(-1 * var(--gap)); }
@@ -914,14 +970,6 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 .match-toggle:hover { border-color: var(--accent); }
 
-.result-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
 .result-list mark {
   background: var(--accent-soft);
   color: var(--accent);
@@ -938,6 +986,10 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   margin-bottom: 0.8rem;
 }
 #search-status { margin: 0; }
+/* Sort and the density toggle: together, at the right, wrapped or not. */
+.results-tools { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; }
+.density-toggle { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.density-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 #search-more { margin-top: 1rem; }
 
 /* ---------- Responsive ---------- */
@@ -1026,6 +1078,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 }
 
 @media (max-width: 600px) {
+  .grouped { --node: 13px; }
   /* Cards need to stack before the text can force the layout wider than a phone. */
   .page-card {
     padding: 0.8rem 0.9rem;
