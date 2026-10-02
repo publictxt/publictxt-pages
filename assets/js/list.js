@@ -13,8 +13,8 @@
 //
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
-// the list when narrow (layout.js). Sort sits with the count.
-import { card, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+// the list when narrow (layout.js). Sort and the density toggle sit with the count.
+import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
@@ -121,11 +121,14 @@ async function mount(root) {
     `<option value="${v}">${l}</option>`).join("")}</select>`;
   const sortSelect = sortWrap.querySelector("select");
   sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; state.page = 1; render(true); });
-  const head = document.createElement("div");
-  head.className = "results-head";
-  head.append(status, sortWrap);
   const list = document.createElement("ul");
   list.className = "page-list";
+  const head = document.createElement("div");
+  head.className = "results-head";
+  const tools = document.createElement("div");
+  tools.className = "results-tools";
+  tools.append(sortWrap, densityToggle(list));
+  head.append(status, tools);
   const pager = document.createElement("nav");
   pager.className = "pagination";
   pager.setAttribute("aria-label", "Pagination");

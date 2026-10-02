@@ -41,6 +41,30 @@ export function tagURL(name) {
   return base.replace(/\/?$/, "/") + "tags/" + encodeURIComponent(name.toLowerCase()) + "/";
 }
 
+// Compact cards (main.css .dense): one line each — title, date, rating — no
+// summary, links or tags. A reading preference, so remembered per browser
+// and left out of the URL. Storage can throw or be empty; then cards start full.
+const DENSE_KEY = "cards-dense";
+export function readDense(storage) {
+  try { return storage.getItem(DENSE_KEY) === "1"; } catch { return false; }
+}
+
+// The toggle for `list` (a .page-list or .result-list), set as remembered.
+export function densityToggle(list) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "btn-ghost density-toggle";
+  b.textContent = "Compact";
+  const set = (on) => { list.classList.toggle("dense", on); b.setAttribute("aria-pressed", String(on)); };
+  set(readDense(globalThis.localStorage));
+  b.addEventListener("click", () => {
+    const on = !list.classList.contains("dense");
+    set(on);
+    try { localStorage.setItem(DENSE_KEY, on ? "1" : "0"); } catch { /* this page only, then */ }
+  });
+  return b;
+}
+
 /**
  * A page card. Options:
  *   activeTags   a Set of tag names to mark as selected
@@ -61,7 +85,7 @@ export function card(item, opts = {}) {
       ${(item.collections || []).length ? `<span class="page-card-collections">${item.collections.map((t) =>
         `<span class="chip chip-collection">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>
-    ${dateHTML(item)}${ratingHTML(item)}
+    <span class="page-card-dates">${dateHTML(item)}${ratingHTML(item)}</span>
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((b) =>
       `<a class="chip chip-link" href="${escapeHTML(b.url)}" rel="noopener external" target="_blank">${escapeHTML(b.label)}</a>`).join("")}</div>` : ""}
     ${opts.summaryHTML ? `<p class="page-card-summary">${opts.summaryHTML}</p>`
