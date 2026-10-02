@@ -364,9 +364,9 @@ a:hover { text-decoration: underline; }
 
 .page-card .chip-row { margin-top: 0.5rem; }
 
-/* Grouped cards (list.js, a date sort): each month a fold — the timeline's
-   node (.tl-node) opens and shuts it; its heading, a rule out to the count,
-   pins under the header while its cards scroll by. */
+/* Grouped cards (list.js, a date or rating sort): each month or star count a
+   fold — the timeline's node (.tl-node) opens and shuts it; its heading, a
+   rule out to the count, pins under the header while its cards scroll by. */
 .page-list.grouped {
   --node: 18px;
   gap: 0.4rem;

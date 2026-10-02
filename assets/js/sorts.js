@@ -31,12 +31,14 @@ export function parseSort(s) {
 }
 
 // How `sort` groups cards: a function from an item to its group key, or null
-// when it doesn't group. A date sort groups by that date's month, "2026-09"
-// ("" undated, as Hugo's zero date), read from the ISO string's digits as
-// timeline.js's monthOf: the page's own date, no zone shift. Title and
-// rating don't group (yet).
+// when it doesn't group; "" when the item has no value (undated, unrated).
+// A date sort groups by that date's month, "2026-09" (Hugo's zero date is
+// undated), read from the ISO string's digits as timeline.js's monthOf: the
+// page's own date, no zone shift. A rating sort groups by stars, "1"–"5";
+// unrated pages sort, and so group, as UNRATED. Title doesn't group (yet).
 export function grouper(sort) {
   const { field } = parseSort(sort);
+  if (field === "rating") return (it) => (it.rating ? String(it.rating) : "");
   if (field !== "created" && field !== "updated") return null;
   return (it) => {
     const d = it[field] || "";

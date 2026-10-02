@@ -115,7 +115,7 @@ assets/js/sorts.js        the sort vocabulary, ?sort= spellings; how a sort grou
 assets/js/cards.js        the one card renderer; rating filter value; density toggle
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating
                           chips; remembered section folds — shared by lists and search
-assets/js/list.js         browse list: state<->URL, facets, paging, month groups
+assets/js/list.js         browse list: state<->URL, facets, paging, month and star groups
 assets/js/timeline.js     the timeline: pages by year/month; picks the date filter, or archive links + titles
 assets/js/page-timeline.js  a page's archive timeline, the page marked; collection chips when shared, timelineTags chips
 assets/js/search.js       Pagefind UI: filters, sort, incremental results

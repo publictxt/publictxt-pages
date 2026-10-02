@@ -14,8 +14,8 @@
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
 // the list when narrow (layout.js). Sort and the density toggle sit with the count.
-// A date sort groups the cards by month (grouper() in sorts.js).
-import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+// A date or rating sort groups the cards, by month or stars (grouper() in sorts.js).
+import { card, densityToggle, ratingFilter, ratingFilterLabel, ratingHTML, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
@@ -283,24 +283,27 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  // A month's group, a fold, open: its heading pins while its cards scroll
-  // by — the month, linking to that date filter when the sort is by created
-  // (the filter's date) and the list isn't already on it; a rule; how many it
-  // holds, "4 of 9 pages" when the rest are on other pages.
-  function groupItem(g, cardFor) {
-    const li = document.createElement("li");
-    li.className = "card-group";
-    const fold = document.createElement("details");
-    fold.open = true;
-    const head = document.createElement("summary");
-    head.className = "card-group-head";
-    head.innerHTML = `<span class="tl-node" aria-hidden="true"></span>`;
+  // A group's title, from its key (grouper()): stars, as the cards' — no
+  // link, as the rating filter is a minimum (★4 would list the 5s too); or a
+  // month, its year muted, linking to that date filter when the sort is by
+  // created (the filter's date) and the list isn't already on it.
+  function groupTitle(key) {
     const h = document.createElement("h2");
     h.className = "card-group-title";
-    const [y, m] = g.key.split("-");
-    const month = g.key && params.months[Number(m) - 1];
+    const { field } = parseSort(state.sort);
+    if (field === "rating") {
+      if (key) h.innerHTML = ratingHTML({ rating: Number(key) }).trim();
+      else h.append("Unrated");
+      return h;
+    }
+    if (!key) {
+      h.append("Undated");
+      return h;
+    }
+    const [y, m] = key.split("-");
+    const month = params.months[Number(m) - 1];
     let label = h;
-    if (g.key && parseSort(state.sort).field === "created" && state.month !== m) {
+    if (field === "created" && state.month !== m) {
       const a = document.createElement("a");
       a.href = url({ year: y, month: m, page: 1 });
       a.title = `List ${month} ${y}`;
@@ -315,19 +318,31 @@ async function mount(root) {
       h.append(a);
       label = a;
     }
-    if (g.key) {
-      const year = document.createElement("span");
-      year.className = "card-group-year";
-      year.textContent = y;
-      label.append(month + " ", year);
-    } else label.append("Undated");
+    const year = document.createElement("span");
+    year.className = "card-group-year";
+    year.textContent = y;
+    label.append(month + " ", year);
+    return h;
+  }
+
+  // A group, a fold, open: its heading pins while its cards scroll by — its
+  // title, a rule, how many it holds ("4 of 9 pages" when the rest are on
+  // other pages).
+  function groupItem(g, cardFor) {
+    const li = document.createElement("li");
+    li.className = "card-group";
+    const fold = document.createElement("details");
+    fold.open = true;
+    const head = document.createElement("summary");
+    head.className = "card-group-head";
+    head.innerHTML = `<span class="tl-node" aria-hidden="true"></span>`;
     const rule = document.createElement("span");
     rule.className = "card-group-rule";
     const count = document.createElement("span");
     count.className = "count";
     const pages = (n) => `${n} page${n === 1 ? "" : "s"}`;
     count.textContent = g.items.length < g.total ? `${g.items.length} of ${pages(g.total)}` : pages(g.total);
-    head.append(h, rule, count);
+    head.append(groupTitle(g.key), rule, count);
     const ul = document.createElement("ul");
     ul.className = "card-group-items";
     ul.append(...g.items.map(cardFor));

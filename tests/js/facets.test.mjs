@@ -150,7 +150,16 @@ test("sorts: a date sort groups by that date's month, as written; others don't",
   assert.equal(grouper("created")({ created: "0001-01-01T00:00:00Z" }), "", "Hugo's zero date: undated");
   assert.equal(grouper("created")({}), "");
   assert.equal(grouper("title"), null);
-  assert.equal(grouper("rating"), null);
+});
+
+test("sorts: a rating sort groups by stars, unrated where it sorts", () => {
+  assert.equal(grouper("rating")({ rating: 4 }), "4");
+  assert.equal(grouper("rating asc")({ rating: 1 }), "1");
+  assert.equal(grouper("rating")({}), "", "unrated: no value");
+  // Top rated, unrated as 2.5: a run of its own between the 3s and the 2s.
+  const items = [5, 3, undefined, undefined, 2].map((rating) => ({ rating }));
+  assert.deepEqual(groups(items, grouper("rating"), items).map((g) => [g.key, g.total]),
+    [["5", 1], ["3", 1], ["", 2], ["2", 1]]);
 });
 
 test("sorts: groups are runs of a page, each with its total across pages", () => {
