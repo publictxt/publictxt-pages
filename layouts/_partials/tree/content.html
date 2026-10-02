@@ -4,7 +4,7 @@
   it), above the browse list. The folder's own subtree, its sub-folders
   open one level; cached per folder, so /wiki/ shares the right column's
   (tree/aside.html). Only with sub-folders: a flat folder's tree would
-  repeat the browse list.
+  repeat the browse list. A fold, open: shut, the list is one row away.
   Takes a section in a tree section (tree/enabled.html).
 */}}
 {{ with .Sections }}
@@ -12,10 +12,10 @@
 {{ range . }}
   {{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "open") }}
 {{ end }}
-<section class="tree contents">
-  <h2 class="side-heading">Contents</h2>
+<details class="tree contents fold" open>
+  <summary><h2 class="side-heading">Contents</h2></summary>
   <nav aria-label="{{ partial "crumb-label.html" $ }} contents">
     {{- $html | safeHTML -}}
   </nav>
-</section>
+</details>
 {{ end }}

@@ -9,6 +9,7 @@
   label links to the browse list below at that date (?year=&month=).
   Only across two or more months, as list.js's timeline panel: within one,
   it would repeat the browse list. Undated pages left out, as timeline.js.
+  A fold, open, as tree/content.html.
   Takes a section in a timeline section (timeline/enabled.html).
 */}}
 {{ $section := . }}
@@ -18,8 +19,8 @@
 {{- range $years }}{{ $monthCount = add $monthCount (len (.Pages.GroupByDate "01")) }}{{ end }}
 {{ if ge $monthCount 2 }}
 {{- $names := partialCached "month-names.html" site }}
-<section class="contents tl-contents">
-  <h2 class="side-heading">Contents</h2>
+<details class="contents tl-contents fold" open>
+  <summary><h2 class="side-heading">Contents</h2></summary>
   <nav aria-label="{{ partial "crumb-label.html" $section }} by date">
   <ol class="tl">
   {{- range $yi, $y := $years }}
@@ -66,5 +67,5 @@
   {{- end }}
   </ol>
   </nav>
-</section>
+</details>
 {{- end }}

@@ -142,7 +142,7 @@ class SiteIndexTest(unittest.TestCase):
     def test_section_tree(self):
         """A tree section's folder: its subtree after the index body — outside Pagefind's — first level open."""
         html = self.html("wiki", "site")
-        tree = re.search(r'<section class="tree contents">.*?</section>', html, re.S)
+        tree = re.search(r'<details class="tree contents fold" open>.*?</nav>', html, re.S)
         self.assertIsNotNone(tree, "no section tree")
         body = re.search(r'<div class="prose" data-pagefind-body>.*?</div>', html, re.S)
         self.assertLess(body.end(), tree.start(), "tree inside the indexed body")
@@ -152,7 +152,7 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('<a href="/wiki/site/search/">Search</a>', tree)
         self.assertNotIn("/wiki/pipeline/", tree, "another folder's pages")
         # /wiki/: the whole tree, one level open.
-        top = re.search(r'<section class="tree contents">.*?</section>', self.html("wiki"), re.S)[0]
+        top = re.search(r'<details class="tree contents fold" open>.*?</nav>', self.html("wiki"), re.S)[0]
         self.assertEqual(self.rows(top, "open"), ["/wiki/pipeline/", "/wiki/projects/", "/wiki/site/"])
         self.assertIn('href="/wiki/projects/publictxt/"', top)
 
@@ -165,13 +165,13 @@ class SiteIndexTest(unittest.TestCase):
 
     def test_section_tree_only_with_subfolders(self):
         """A flat tree-section folder, and a section outside treeSections: no tree."""
-        self.assertNotIn('class="tree contents"', self.html("wiki", "site", "lists"))
-        self.assertNotIn('class="tree contents"', self.html("notes"))
+        self.assertNotIn('class="tree contents', self.html("wiki", "site", "lists"))
+        self.assertNotIn('class="tree contents', self.html("notes"))
 
     # A timeline section's contents (timeline/content.html).
     @staticmethod
     def contents(html):
-        found = re.search(r'<section class="contents tl-contents">.*?</section>', html, re.S)
+        found = re.search(r'<details class="contents tl-contents fold" open>.*?</nav>', html, re.S)
         return found[0] if found else None
 
     def test_section_timeline(self):
