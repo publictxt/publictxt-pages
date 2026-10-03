@@ -1,91 +1,72 @@
 # Spec
 
-What the site does and should do. Implementation lives in [`docs/wiki/`](wiki/index.md) —
-read that before the source.
+What the site does and should do. How it works lives in [`docs/wiki/`] ( that before the source)and the source; settings and defaults in `docs/user/`.
 
 Items marked **(TBD)** are not built.
 
 ## Feature list
 
-- No PublicTxt.Syntax / .NET dependency
 - Build operates on generated copy `build/content/`.
-- Hugo renders `.md` extensions to `.html`
 - Sections
   - Top-level folders are sections (`wiki/`, `blog/`, `notes/`, `bookmarks/`, `posts/`, …). Root-level `.md` → plain pages.
-  - The sidebar lists sections by folder name, ordered by `params.sectionOrder`. (TBD-ISSUE)
-  - Section index bodies render as prose and are search-indexed.
-  - A `treeSections` folder with sub-folders shows its subtree below the index body (not search-indexed), sub-folders open one level, then the browse list. Both contents views below fold shut (open to start, not remembered).
-  - A `timelineSections` folder (default blog, posts; the section and every sub-folder) whose list spans two or more months shows that list by date below the index body (not search-indexed): server-rendered, no JS, in the archive timeline's look — years on a rail, then months, with counts, titles after their day; the newest year and month open; year and month labels link to the browse list below at that date.
-  - Collections: see [Collections](#collections) — a top-level section lists every page of its collection, wherever filed.
-  - A folder's index (section page) is `_index.md`, Hugo's name — the only one; any depth, and the root's is home.
+  - A folder's index (section page) is `_index.md` — at any depth; the root's is home. Its body renders as prose and is search-indexed.
+  - The sidebar lists sections by folder name, in `params.sectionOrder`. (TBD-ISSUE)
+  - Top-level sections list every page of their [collection](#collections), wherever filed.
+  - Contents views below a section's index body (server-rendered, not search-indexed):
+    - Folder tree for `treeSections` (default wiki).
+    - Timeline by date for `timelineSections` (default blog, posts) once the list spans two or more months.
   - Sections move to specialised Views over Collections (TBD)
-    - Blog view should show timeline like view - that toggles collections. eg. show microblogs/posts, show wiki, show notes, show bookmarks (TBD; a page's shared timeline does this for `timelineCollections`)
-    - Bookmarks should show Bookmark specialised view (TBD)
-    - Wiki view: a right-column panel of categories (TBD) and the folder tree (built: `treeSections`, below)
-    - Panels per section, not one view each (TBD): a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md` like `order:` — so wiki/notes can keep a timeline beside the tree. Then `timelineCollections`/`timelineTags` fold into a `[params.timeline]` table, each panel its own partial. `treeSections` folds into `panels:` too; `tree/enabled.html`, its only reader, is the seam.
-    - A non-log timeline (wiki, notes) may want `updated`, not `created`, as its date (TBD; timeline.js takes one date field throughout)
-- Layout: left sidebar, content, right sidebar, up to a max width (`--layout-max`), centred beyond it
-  - Header ☰ toggles the left sidebar: collapses it on wide screens (remembered per browser), a drawer on narrower ones. No JS: no button, the sidebar sits below the page.
-  - One column on phones: filters fold above the results (open when one is set), page meta below the page.
-- Left sidebar
-  - Sections, categories, tag cloud
+    - Blog view: timeline-like, toggling collections (a page's shared timeline already does this for `timelineCollections`).
+    - Bookmarks view.
+    - Wiki view: a right-column panel of categories, beside the folder tree.
+    - Panels per section, not one view each: a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md`. `timelineCollections`/`timelineTags` and `treeSections` would fold into it.
+    - Non-log timelines (wiki, notes) may want `updated`, not `created`, as their date.
+- Layout: left sidebar, content, right sidebar, centred beyond a max width. Header ☰ toggles the left sidebar. One column on phones. Works without JS.
+- Left sidebar: sections, categories, tag cloud.
 - Right sidebar — context for what's shown
-  - widens into spare width (main keeps `--main-fit` first), up to `--aside-max`
-  - page meta (collections, dates, categories, tags) on pages, then a timeline with titles (each after its day of the month, shown once per day): the page's year and month open, the page marked, year and month labels linking to a list at that date. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips to narrow it (remembered per browser, carried into the links, which go to the home list); other pages their section's; root-level pages none. The shared timeline also gets a chip per `timelineTags` tag (default `journal`: blog entries of a special kind) that some of its pages have and some don't — a filter on that panel only, not a collection; remembered and carried alike.
-  - pages of `treeSections` (default wiki) get a folder tree of their section instead of the timeline: server-rendered, no JS; folders then pages, A→Z; in the timeline's look (folders as its years, pages as its pages); open along the page's path, those folders' nodes filled, the page marked; other folders shut, with page counts. Folders only — a page filed elsewhere with `collections: wiki` isn't in it.
-  - filters on browse lists and search, then a browse list's timeline; sort stays by the results
-  - Author **(TBD)** — carried in front matter, rendered nowhere
+  - Page meta (collections, dates, categories, tags), then a timeline of the page's neighbours with the page marked. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips and `timelineTags` chips to narrow it; other pages get their section's; root-level pages none.
+  - Pages of `treeSections` get their section's folder tree instead — folders only, so a page filed elsewhere with `collections: wiki` isn't in it.
+  - On browse lists and search: the filters, then (lists) a timeline.
+  - Author (TBD) — carried in front matter, rendered nowhere.
 - Categories
-  - `categories:` (or `category:`), one or a list per page, from a closed list in `hugo.toml`; feature toggleable.
+  - `categories:` (or `category:`) from a closed list in `hugo.toml`; feature toggleable.
   - Category pages (TBD)
-  - Sidebar: a page's categories, and a site-wide list with counts; both link to search
 - Tags
   - Inline `#hashtags` merged into `tags`.
-  - Facets: tags, collection.
-  - tag pages
-  - Tag and category facets: include or exclude values; match all or any of the included (default all). One mode per facet — no mixed groups within it like `(a OR b) AND c` (TBD if needed).
-- Browse Lists
-  - All browse lists (home *Recent*, sections, tag pages) rendered client-side from one site-wide JSON index; plain `<ul>` no-JS fallback.
-  - Home *Recent*: every page, recently updated first, `recentLimit` a page, with filters and timeline; nothing filtered to start. (Not "this month": empty on quiet months.)
-  - Sorting in all by Date, Recency, Alphabetical.
-  - Filter by Collection, and by Year (the `created` year) or a month of it (`?year=&month=`) — picked in the timeline; no year select.
-  - Timeline panel below the filters (full lists spanning two or more months): years on a rail with a Jan–Dec sparkline, open to months with bars and counts — no titles, the list shows those. A year or month label picks the date filter; the other filters narrow it. The newest year open to start.
-  - Filter by Category and Tag, as the facets above (also in Search)
-  - Sort by Source/Author (TBD)
-  - Sort (Top/Lowest rated, unrated as 2.5) and filter (minimum) by Rating, 1–5 `rating:` front matter (also in Search): chips, one at a time, each counting that rating or better.
-  - Each filter section (Rating, Collection, Category, Tags; Search's Year too) shuts on its own, remembered per browser across lists and Search; a shut one shows how many values are picked.
+  - Tag pages.
+  - Tag and category facets: include or exclude values; match all or any (default all). One mode per facet — no mixed groups like `(a OR b) AND c` (TBD if needed).
+- Browse lists
+  - Home *Recent*, sections and tag pages render client-side from one site-wide JSON index, with a plain `<ul>` no-JS fallback.
+  - Home *Recent*: every page, recently updated first.
+  - Sort by Date, Recency, Alphabetical, Rating. Sort by Source/Author (TBD).
+  - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
+  - Compact toggle for one-line cards.
 - Search
-  - Full text search
-  - Collection, Year and Tag filters as 'facets' are available without a query
-  - Year and month from the timeline, as the browse lists' (Pagefind's `month` filter counts); ranges (TBD)
-  - Also Sortable
-- Breadcrumbs from `.Ancestors` on all pages but home; folder names, date folders literal.
+  - Full-text search via Pagefind.
+  - Same facets and sorts as browse lists, usable without a query. Date ranges (TBD).
+- Breadcrumbs on all pages but home, from folder names.
 - Bookmarks
-  - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives (it joins collection `bookmarks`); pages filed under `bookmarks/` are too, by folder
+  - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives; pages under `bookmarks/` are too.
 - Post sources
-  - A URL (or list) under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link on the page.
-  - Filter by source, source chips on cards (TBD)
-  - Any page with post sources, should be put in Posts collection (TBD)
+  - A URL under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link.
+  - Filter by source, source chips on cards (TBD).
+  - Pages with post sources join the Posts collection (TBD).
 - Pages
-  - Folders are sections and notes are pages, whatever a folder holds — a post folder (a note + its attachments) is a section with one page. Attach files beside the note instead; no folder needed.
-  - `publish: off` (or false / no / 0) keeps a page off the site — and every file of a folder whose Markdown is all unpublished (a draft's attachments; beside published notes, they're published). Hidden, not private: it stays in the source repo.
-  - `params.excludeFolders` in `settings/site.toml` leaves whole folders out, notes and attachments (e.g. `["settings/Templates"]`, with Obsidian's Templates plugin pointed at that folder; `settings/` itself isn't skipped, only `site.toml` is special there): paths from the repo root, case-insensitive. Like `publish: off`, hidden not private. Links into them dangle.
-  - `![alt](youtube-url)` embeds the video; `![alt](file.mp3)` (also m4a, ogg, oga, opus, wav, flac, aac) an audio player; other images stay images.
-  - A relative image/audio path must be beside the note (its folder, or a subfolder of it like `attachments/`) or in a top-level folder of files (`media/`); elsewhere it's left as written, with a build warning.
-  - `![](page.md)` on its own line embeds that page's content, as Obsidian does; inline, a link. One level deep (nested embeds become links). `#heading` section embeds (TBD — a link for now).
-  - A ` ```dataview ` block `LIST FROM #tag` (optional `LIMIT n`) embeds a compact list of that tag's pages, recently updated first; other Dataview queries stay code. Multiple tags, `WHERE`, `SORT` (TBD).
-- Date Properties
-  - Converts from YYYYMMDD to required format (TBD)
-- Chips
-  - Chips showing tags/categories/collections
-  - Some chips can toggle in 3 states - include/exclude/off (per facet: `params.chipFacets` `states`, `match`)
-  - Click a chip to include it (again to clear); a small ✕ at its right excludes it. The ✕ shows on set chips, and on others on hover / focus
+  - Folders are sections and notes are pages, whatever a folder holds. A post folder (a note + attachments) is a section with one page; attaching beside the note needs no folder.
+  - `publish: off` keeps a page — and a folder's attachments when all its Markdown is unpublished — off the site. Hidden, not private: it stays in the source repo.
+  - `params.excludeFolders` leaves whole folders out, likewise hidden not private. Links into them dangle.
+  - `![alt](youtube-url)` embeds the video; `![alt](file.mp3)` (and other common audio) a player.
+  - Relative media must sit beside the note or in a top-level media folder; otherwise it's left as written, with a build warning.
+  - `![](page.md)` on its own line embeds that page, one level deep; inline it's a link. `#heading` section embeds (TBD).
+  - A ` ```dataview ` block `LIST FROM #tag` (optional `LIMIT n`) embeds that tag's pages. Other Dataview queries stay code; multiple tags, `WHERE`, `SORT` (TBD).
+- Date properties: convert YYYYMMDD to the required format (TBD).
+- Chips show tags, categories and collections. Facet chips toggle include / exclude / off (`params.chipFacets`): click to include (again to clear), ✕ to exclude.
 
 ## Content Structure
 
 ```txt
 
-_index.md, Projects.md                  (home + root pages)
+_index.md, About.md                     (home + root pages)
 
 wiki/_index.md, wiki/A/_index.md        (folder index = section page (any depth))
 
@@ -164,3 +145,8 @@ Per-site settings: `HUGO_*` env vars in the workflow, or the content repo's `set
 - Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index (per-page fetch), a count in it.
 - Link weights, trust tiers — no data source yet; a subscriber-declared tier in subscription config is the honest v1 shape.
 - Related pages by tag co-occurrence — the site index already holds the data.
+- Remove Category Sidebar, linking to search until we have Category Pages
+
+## Issues
+
+- see `docs/wiki/issues.md`
