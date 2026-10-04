@@ -1088,12 +1088,20 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   }
   .js[data-aside-open] .aside { transform: none; visibility: visible; transition: transform 0.2s ease; }
 
-  .header-search input[type="search"] { width: 42vw; }
+  /* The search takes what the title and buttons leave. */
+  .header-search { flex: 1 1 auto; min-width: 0; display: flex; justify-content: flex-end; }
+  .header-search input[type="search"] { width: min(280px, 100%); min-width: 0; }
 }
 
 @media (max-width: 700px) {
   .site-title.has-short-title .site-title-full { display: none; }
   .site-title.has-short-title .site-title-short { display: inline; }
+}
+
+/* Phones: the logo alone (its alt names the site), so search keeps room
+   beside ☰ and the right column's button. */
+@media (max-width: 480px) {
+  .site-title .site-title-full, .site-title.has-short-title .site-title-short { display: none; }
 }
 
 @media (max-width: 600px) {

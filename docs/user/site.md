@@ -121,7 +121,8 @@ nothing is sent to a server.
 - **Phones** (below 900px): one column, content first. The right column becomes a drawer,
   opened by a header button named for it — **Filters** on lists and search (with a count
   of filters set; while open it reads "Show 12 pages" and closes the drawer), **This
-  page** on pages. ☰ opens the left column the same way; one drawer at a time.
+  page** on pages. ☰ opens the left column the same way; one drawer at a time. Below
+  480px the header shows the logo without the site title.
 - **No JavaScript**: pages, navigation and the folder tree all work; lists fall back to
   plain links without filters; search needs JavaScript. On phones the right column
   follows the content.
