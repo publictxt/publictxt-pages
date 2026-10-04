@@ -19,7 +19,7 @@ views put more navigation in the content. Results:
   of `.contents` CSS undoing the shared look.
 - **Two tag UIs** — sidebar cloud (site-wide, links) and the Tags filter (per list,
   filters) — that look alike and act differently.
-- **No room planned for backlinks** (SPEC TBD).
+- **No room reserved for backlinks** (SPEC TBD).
 
 ## Target
 
@@ -29,8 +29,8 @@ One job per column:
 |---|---|---|---|---|
 | Header menu | where to go | sections, Tags, (categories) | same | same |
 | Left | where am I | section tree or archive timeline | same, the section's | — |
-| Main | what's shown | article, then **Linked from** | index body, list | results |
-| Right | about / refine this | This page (+ backlink count) | filters (incl. Tags), timeline filter, Other tags | filters |
+| Main | what's shown | article, then Linked from *(reserved)* | index body, list | results |
+| Right | about / refine this | This page (+ backlink count, *reserved*) | filters (incl. Tags), timeline filter, Other tags | filters |
 
 Rules that fall out:
 
@@ -40,6 +40,9 @@ Rules that fall out:
   column's archive timeline navigates (titles; labels open/jump, never filter).
 - **No section panel → the left shows the sections list** (home, search, tags, root pages),
   so the layout doesn't jump between kinds.
+- **Backlinks are a separate feature** (`feat/backlinks`, `docs/features/backlinks.md`).
+  This one only keeps their slot free: below the article, as in Obsidian, with a count in
+  This page. Nothing in this reorg goes there.
 
 ## Slices
 
@@ -71,24 +74,7 @@ server/client pair for traps.md.
 
 Done when: one tag UI on lists and search; sidebar tag cloud gone or reduced to a link.
 
-### B. Backlinks — "Linked from"
-
-Independent of A and C.
-
-- **Place:** end of the article, outside `data-pagefind-body` (or `data-pagefind-ignore`),
-  else every page matches its linkers' titles. Count in "This page", anchored to it.
-  "Related by tag" (SPEC TBD) joins this block later. Not a side panel: it answers
-  "where next" when reading ends, and needs no docking on phones.
-- **Data:** sync builds the graph and writes `build/data/backlinks.json` keyed by page;
-  Hugo renders it server-side. No JS, no fetch, no pop-in, nothing in `index.json` but
-  (optionally) a count. *Supersedes SPEC's "per-page fetch".* Not in front matter — sync
-  edits that line by line (traps.md).
-- **Extraction:** Markdown links to `.md`, relative paths resolved, external URLs out.
-  Skip code and inline code by reusing `hashtags.py`'s protected-region ordering — not a
-  second regex. `![](page.md)` embeds count, labelled "embedded in".
-- **Tests:** a linked-to fixture in `example/txt`; golden + site tests.
-
-### C. Left column: tree / timeline; sections to a header menu
+### B. Left column: tree / timeline; sections to a header menu
 
 Thin first step: **wiki pages only** — `tree/aside.html` into the left column (no new
 rendering; cached per folder), sections into a header menu. Judge at 1366px and on a phone
@@ -97,7 +83,7 @@ before going further.
 Then:
 
 - **Sections** get the left panel of their section (tree, or archive timeline), replacing
-  the in-content Contents views (D).
+  the in-content Contents views (C).
 - **Archive timeline, server-rendered**, as the tree is: rendered once per section
   (`partialCached`), each page's place marked in (as `tree/mark.html`). No JS, no
   `index.json` fetch, no pop-in — a late-filling nav column reads as broken.
@@ -105,7 +91,7 @@ Then:
   or those move to filters. *Open.*
 - **Drawer breakpoint.** Below 1440px the left column is a hidden drawer — most laptops.
   Either lower it, or invert priority between 900–1440px: left stays, right folds into the
-  page flow. *Must decide before C ships beyond wiki.*
+  page flow. *Must decide before B ships beyond wiki.*
 - **Phones:** ☰ drawer holds menu (top) and tree/timeline (below) — the docs-site pattern.
 - **Categories:** to the menu while few; else list filters only. Ties to SPEC's "remove
   category sidebar until category pages".
@@ -114,9 +100,9 @@ Touches: `baseof.html`, `sidebar.html`, `nav.js`, `layout.js` (+ breakpoints pai
 `main.css`), `page.html`, `section.html`, `tree/*`, `timeline/*`, `page-timeline.*`.
 Supersedes SPEC's right-column `panels:` — it becomes a left-column choice.
 
-### D. Retire in-content Contents
+### C. Retire in-content Contents
 
-Lands with C, not before: `timeline/content.html` is the starting point for C's
+Lands with B, not before: `timeline/content.html` is the starting point for B's
 server-rendered archive. Remove `.contents` CSS, `timelineSections` (or fold into
 `panels:`), their tests and the traps pair row once nothing renders them.
 
@@ -133,7 +119,7 @@ fragment per section, fetched and cached — at the cost of no-JS and pop-in.
 
 ## Open questions
 
-1. Drawer breakpoint vs left-column priority (C).
+1. Drawer breakpoint vs left-column priority (B).
 2. Shared-timeline collection/tag chips: keep on the archive panel (JS), or move to filters?
 3. Non-log timelines (wiki, notes) dated by `updated`? (SPEC TBD, now matters for the left
    archive.)
