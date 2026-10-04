@@ -142,7 +142,7 @@ Per-site settings: `HUGO_*` env vars in the workflow, or the content repo's `set
 - `[[wikilink]]` conversion at sync — a repo in hand where legacy wikilinks bite.
 - `author` / `source_repo` filters — carried already, but one value per site, so the facets would hide; multi-repo or multi-author content.
 - Multi-repo fan-in — aggregation is upstream PublicTxt's job; needs a defined aggregate content model.
-- Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index (per-page fetch), a count in it.
+- Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index, a count in it. Proposed: below the article, server-rendered from a sync data file — [features/backlinks.md](features/backlinks.md).
 - Link weights, trust tiers — no data source yet; a subscriber-declared tier in subscription config is the honest v1 shape.
 - Related pages by tag co-occurrence — the site index already holds the data.
 - Remove Category Sidebar, linking to search until we have Category Pages
