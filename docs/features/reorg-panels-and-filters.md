@@ -40,41 +40,47 @@ Rules that fall out:
   column's archive timeline navigates (titles; labels open/jump, never filter).
 - **No section panel → the left shows the sections list** (home, search, tags, root pages),
   so the layout doesn't jump between kinds.
+- **On phones, content first:** both columns are drawers — ☰ left, a button right (B).
 - **Backlinks are a separate feature** (`feat/backlinks`, `docs/features/backlinks.md`).
   This one only keeps their slot free: below the article, as in Obsidian, with a count in
   This page. Nothing in this reorg goes there.
 
 ## Slices
 
-### A. Tags panel: filters on top, other tags below
+### A. Tags panel — done (`19fe712`, `7099fd6`)
 
-On lists and search, the Tags filter becomes two tiers in one panel, headed **Tags**
-(linked to `/tags/`), with a muted "click to filter" hint:
+Lists' Tags filter: chips that filter, then **Other tags** (the cloud less every tag the
+list carries), unfilled links. Sidebar cloud → a Tags link. Search unchanged: its Tags
+already lists every tag. Left as they are: `tagCloudLimit` (30) vs the facet's `limit`
+(20) — they now count different things; Other tags' heading links to all tags.
 
-1. **Filterable here** — the existing facet: list counts, include/exclude, 20 then "more".
-   Tooltip carries the site total: "3 here · 40 on the site".
-2. Separator, **Other tags** — the site cloud *less the tier above*, linking to tag pages,
-   site totals, weighted. No tag appears twice.
+### B. Right column as a drawer below 900px
 
-- Pages: no cloud (their own tags are header chips); Tags in the menu instead. *(Pushback
-  on a site-wide cloud per page: identical everywhere = noise. Revisit if missed.)*
-- No JS: tier 1 absent, tier 2 server-rendered links. Fine.
-- Phones: tier 1 docks above results with the other filters (`dock()`); tier 2 stays in
-  the aside, which falls *below* content in one column — "where else" after the results.
-- Each filter section stays collapsible and remembered (`facets.js` folds). Tags starts
-  shut on narrow screens.
-- Unify `tagCloudLimit` (30) and the facet's `limit` (20).
+Below 900px the right column becomes a drawer, as ☰ makes the left: a header button
+opens it over the content. Content comes first; nothing docks into the page.
 
-Touches: `tag-cloud.html`, `list.js`/`search.js` (tier 1 → tier 2 exclusion),
-`facets.js`, `search.html`/`section.html`/`term.html` asides, `main.css`, `sidebar.html`.
-**Trap:** the right column is filled from both sides — the JS-filled
-`[data-list-controls]` must stay whitespace-free for `:empty`; the cloud sits beside it,
-not in it. The exclusion (tier 2 less tier 1) runs client-side over a server list: a new
-server/client pair for traps.md.
+- **Simpler, not just tidier:** `dock()` (`layout.js`) and its two callers go — asides
+  stay where they are in the DOM, CSS makes them a drawer. The `:empty`/whitespace part
+  of traps.md's right-column entry goes with it (the button still hides when the column
+  has nothing).
+- **One drawer mechanism for both sides.** `nav.js` grows from one toggle to two, sharing
+  Escape, click-outside, focus and close-on-resize; opening one closes the other.
+  Breakpoints become a choice per column — which answers C's 900–1440px question.
+- **Button:** "Filters" on lists and search, with a badge counting set filters (the
+  results' status line already spells them out). On pages, named for what's there
+  ("Timeline", "Tree") — until C moves those left; then a page's right column is only its
+  meta, already in the article header on phones, so pages get no button.
+- **While picking**, the drawer covers results: its header shows the live count
+  ("12 pages"), and closing shows them. A partial-width sheet keeps a strip of results
+  visible.
+- **No JS:** aside after the content, as now; no button.
+- **Lost:** filters at a glance on phones — set filters show only as the badge and status
+  line.
 
-Done when: one tag UI on lists and search; sidebar tag cloud gone or reduced to a link.
+Touches: `baseof.html` (button), `nav.js`, `layout.js`, `list.js`, `search.js`, `main.css`
+(+ breakpoints pair), traps.md.
 
-### B. Left column: tree / timeline; sections to a header menu
+### C. Left column: tree / timeline; sections to a header menu
 
 Thin first step: **wiki pages only** — `tree/aside.html` into the left column (no new
 rendering; cached per folder), sections into a header menu. Judge at 1366px and on a phone
@@ -83,15 +89,15 @@ before going further.
 Then:
 
 - **Sections** get the left panel of their section (tree, or archive timeline), replacing
-  the in-content Contents views (C).
+  the in-content Contents views (D).
 - **Archive timeline, server-rendered**, as the tree is: rendered once per section
   (`partialCached`), each page's place marked in (as `tree/mark.html`). No JS, no
   `index.json` fetch, no pop-in — a late-filling nav column reads as broken.
   `page-timeline.js` stays only for `timelineCollections` chips and `timelineTags` chips —
   or those move to filters. *Open.*
 - **Drawer breakpoint.** Below 1440px the left column is a hidden drawer — most laptops.
-  Either lower it, or invert priority between 900–1440px: left stays, right folds into the
-  page flow. *Must decide before B ships beyond wiki.*
+  With B, either column can be the drawer there: likely left stays, right becomes the
+  drawer. *Must decide before C ships beyond wiki.*
 - **Phones:** ☰ drawer holds menu (top) and tree/timeline (below) — the docs-site pattern.
 - **Categories:** to the menu while few; else list filters only. Ties to SPEC's "remove
   category sidebar until category pages".
@@ -100,9 +106,9 @@ Touches: `baseof.html`, `sidebar.html`, `nav.js`, `layout.js` (+ breakpoints pai
 `main.css`), `page.html`, `section.html`, `tree/*`, `timeline/*`, `page-timeline.*`.
 Supersedes SPEC's right-column `panels:` — it becomes a left-column choice.
 
-### C. Retire in-content Contents
+### D. Retire in-content Contents
 
-Lands with B, not before: `timeline/content.html` is the starting point for B's
+Lands with C, not before: `timeline/content.html` is the starting point for C's
 server-rendered archive. Remove `.contents` CSS, `timelineSections` (or fold into
 `panels:`), their tests and the traps pair row once nothing renders them.
 
@@ -119,7 +125,7 @@ fragment per section, fetched and cached — at the cost of no-JS and pop-in.
 
 ## Open questions
 
-1. Drawer breakpoint vs left-column priority (B).
+1. Drawer breakpoint vs left-column priority (B gives the means, C decides).
 2. Shared-timeline collection/tag chips: keep on the archive panel (JS), or move to filters?
 3. Non-log timelines (wiki, notes) dated by `updated`? (SPEC TBD, now matters for the left
    archive.)
