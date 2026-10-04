@@ -19,7 +19,7 @@ Items marked **(TBD)** are not built.
     - Blog view: timeline-like, toggling collections (a page's shared timeline already does this for `timelineCollections`).
     - Bookmarks view.
     - Wiki view: a right-column panel of categories, beside the folder tree.
-    - Panels per section, not one view each: a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md`. `timelineCollections`/`timelineTags` and `treeSections` would fold into it.
+    - Panels per section, not one view each: a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md`. `timelineCollections`/`timelineTags` and `treeSections` would fold into it. Proposed instead: tree/timeline in the left column, sections in a header menu — [features/reorg-panels-and-filters.md](features/reorg-panels-and-filters.md).
     - Non-log timelines (wiki, notes) may want `updated`, not `created`, as their date.
 - Layout: left sidebar, content, right sidebar, centred beyond a max width. Header ☰ toggles the left sidebar. One column on phones. Works without JS.
 - Left sidebar: sections, categories, tag cloud.
@@ -142,7 +142,7 @@ Per-site settings: `HUGO_*` env vars in the workflow, or the content repo's `set
 - `[[wikilink]]` conversion at sync — a repo in hand where legacy wikilinks bite.
 - `author` / `source_repo` filters — carried already, but one value per site, so the facets would hide; multi-repo or multi-author content.
 - Multi-repo fan-in — aggregation is upstream PublicTxt's job; needs a defined aggregate content model.
-- Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index (per-page fetch), a count in it.
+- Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index, a count in it. Proposed: server-rendered from a sync data file, end of article — [features/reorg-panels-and-filters.md](features/reorg-panels-and-filters.md).
 - Link weights, trust tiers — no data source yet; a subscriber-declared tier in subscription config is the honest v1 shape.
 - Related pages by tag co-occurrence — the site index already holds the data.
 - Remove Category Sidebar, linking to search until we have Category Pages
