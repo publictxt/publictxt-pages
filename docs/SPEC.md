@@ -22,7 +22,7 @@ Items marked **(TBD)** are not built.
     - Panels per section, not one view each: a section lists its right-column panels in order (e.g. `panels: [tree, timeline]`), cascading from its `_index.md`. `timelineCollections`/`timelineTags` and `treeSections` would fold into it. Proposed instead: tree/timeline in the left column, sections in a header menu — [features/reorg-panels-and-filters.md](features/reorg-panels-and-filters.md).
     - Non-log timelines (wiki, notes) may want `updated`, not `created`, as their date.
 - Layout: left sidebar, content, right sidebar, centred beyond a max width. Header ☰ toggles the left sidebar. One column on phones. Works without JS.
-- Left sidebar: sections, categories, tag cloud.
+- Left sidebar: sections, then Search and Tags links; categories. The tag cloud is in lists' Tags filter, as Other tags.
 - Right sidebar — context for what's shown
   - Page meta (collections, dates, categories, tags), then a timeline of the page's neighbours with the page marked. Scope: pages of `timelineCollections` (default blog, posts) share one, with collection chips and `timelineTags` chips to narrow it; other pages get their section's; root-level pages none.
   - Pages of `treeSections` get their section's folder tree instead — folders only, so a page filed elsewhere with `collections: wiki` isn't in it.

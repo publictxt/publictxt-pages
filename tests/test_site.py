@@ -121,6 +121,15 @@ class SiteIndexTest(unittest.TestCase):
                 self.assertTrue(aside[1].endswith("</nav>"), "whitespace after the cloud")
                 self.assertRegex(aside[1], r'<a class="chip tag-w\d" data-tag="site" href="/tags/site/"')
 
+    def test_sidebar_tags_link(self):
+        """The left column: a Tags link after Search, marked on tag pages; no cloud of its own."""
+        for path, here in [(("wiki",), False), (("tags", "site"), True)]:
+            with self.subTest(path=path):
+                nav = re.search(r'<aside class="sidebar".*?</aside>', self.html(*path), re.S)[0]
+                self.assertRegex(nav, r'<a class="chip chip-section chip-all( active)?" href="/tags/"')
+                self.assertEqual('chip-all active" href="/tags/"' in nav, here)
+                self.assertNotIn("data-tag=", nav, "a tag cloud in the left column")
+
     @staticmethod
     def rows(tree, state):
         """hrefs of a tree's folder rows that are `on` (the page's path) or `open` (any opened), in order."""

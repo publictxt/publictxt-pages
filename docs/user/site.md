@@ -18,7 +18,7 @@ Three columns, centred on wide screens:
 
 | Left: navigation | Middle: content | Right: context |
 |---|---|---|
-| Sections, categories with counts, tag cloud | The page or list | On a page: its details and timeline or folder tree. On a list: filters and timeline |
+| Sections, Search, Tags; categories with counts | The page or list | On a page: its details and timeline or folder tree. On a list: filters and timeline |
 
 **☰** in the header collapses the left column on wide screens (remembered), or opens it
 as a drawer on narrower ones.

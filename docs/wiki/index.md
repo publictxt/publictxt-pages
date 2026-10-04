@@ -54,7 +54,7 @@ layouts/404.html
 
 layouts/_partials/
   head.html             title, description, favicon, Mastodon rel="me", stylesheet, nav.js
-  sidebar.html          left nav: sections / categories / tag cloud
+  sidebar.html          left nav: sections, search, tags / categories
   page-meta.html        "This page": a page's meta, in its right column
   page-timeline.html    below it: a timeline with titles — timelineCollections', or the section's; timelineTags
   breadcrumbs.html      .Ancestors trail

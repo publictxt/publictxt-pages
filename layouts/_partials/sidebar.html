@@ -16,6 +16,11 @@
     <a class="chip chip-section chip-all{{ if $onSearch }} active{{ end }}" href="{{ "search/" | relURL }}"{{ if $onSearch }} aria-current="page"{{ end }}>
       {{- "Search Site " -}}
       <span class="count">{{ $all }}</span></a>
+    {{/* Then every tag: the cloud itself is in a list's Tags filter (list-tags.html). */}}
+    {{ $onTags := in (slice "taxonomy" "term") .Kind }}
+    <a class="chip chip-section chip-all{{ if $onTags }} active{{ end }}" href="{{ "tags/" | relURL }}"{{ if $onTags }} aria-current="true"{{ end }}>
+      {{- "Tags " -}}
+      <span class="count">{{ len site.Taxonomies.tags }}</span></a>
   </div>
 </nav>
 
@@ -31,8 +36,3 @@
   </div>
 </nav>
 {{ end }}
-
-<div class="side-block" aria-label="Top tags">
-  <h2 class="side-heading"><a href="{{ "tags/" | relURL }}">Tags</a></h2>
-  {{ partial "tag-cloud.html" (dict "limit" (site.Params.tagCloudLimit | default 20)) }}
-</div>
