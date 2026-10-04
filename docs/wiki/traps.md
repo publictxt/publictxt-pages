@@ -56,9 +56,11 @@ A template's `{{ define "aside" }}` is its right column; none, no column. List f
 are JS-only: `home.html`/`section.html`/`term.html` emit a `[data-list-controls]` aside
 holding only the tag cloud (`list-tags.html`), which `list.js` lifts into the Tags filter
 before filling the aside; search's filters are server-rendered in `search.html`'s aside.
-Below 900px the aside is a drawer (`nav.js`), shown by a header button that
-`main.css` hides unless the page has an aside, not `[hidden]` — so an aside with
-nothing to show must be `hidden` (`list.js` does), not merely empty.
+Below 900px the aside is a drawer (`nav.js`), opened by a header button that
+`main.css` shows only if the page has an aside, not `[hidden]` (`:has()`) — so an aside
+with nothing to show must be `hidden` (`list.js`, `search.js` do), not merely empty. The
+drawer rules sit under `@supports selector(:has(*))`: a drawer with no button would
+strand the column off-screen; without `:has()` it follows the content instead.
 
 ## Search counts run higher than list counts
 

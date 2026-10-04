@@ -54,31 +54,16 @@ list carries), unfilled links. Sidebar cloud → a Tags link. Search unchanged: 
 already lists every tag. Left as they are: `tagCloudLimit` (30) vs the facet's `limit`
 (20) — they now count different things; Other tags' heading links to all tags.
 
-### B. Right column as a drawer below 900px
+### B. Right column as a drawer below 900px — done (`0222ab0`, `7175199`, + `:has` fallback)
 
-Below 900px the right column becomes a drawer, as ☰ makes the left: a header button
-opens it over the content. Content comes first; nothing docks into the page.
+Below 900px the aside is a drawer from the right, behind a header button named for it
+(Filters, with a badge of filters set, "Show N pages" while open; This page). One drawer
+function in `nav.js` serves both columns. `dock()` is gone, and with it the `:empty`
+rule. Header: search shrinks to fit; below 480px the logo stands alone. Without `:has()`
+(the button's visibility) the column follows the content, as without JS.
 
-- **Simpler, not just tidier:** `dock()` (`layout.js`) and its two callers go — asides
-  stay where they are in the DOM, CSS makes them a drawer. The `:empty`/whitespace part
-  of traps.md's right-column entry goes with it (the button still hides when the column
-  has nothing).
-- **One drawer mechanism for both sides.** `nav.js` grows from one toggle to two, sharing
-  Escape, click-outside, focus and close-on-resize; opening one closes the other.
-  Breakpoints become a choice per column — which answers C's 900–1440px question.
-- **Button:** "Filters" on lists and search, with a badge counting set filters (the
-  results' status line already spells them out). On pages, named for what's there
-  ("Timeline", "Tree") — until C moves those left; then a page's right column is only its
-  meta, already in the article header on phones, so pages get no button.
-- **While picking**, the drawer covers results: its header shows the live count
-  ("12 pages"), and closing shows them. A partial-width sheet keeps a strip of results
-  visible.
-- **No JS:** aside after the content, as now; no button.
-- **Lost:** filters at a glance on phones — set filters show only as the badge and status
-  line.
-
-Touches: `baseof.html` (button), `nav.js`, `layout.js`, `list.js`, `search.js`, `main.css`
-(+ breakpoints pair), traps.md.
+Left for later: the drawer's inner "Filters" fold is redundant inside a drawer named
+Filters; on pages, the button goes once C moves the tree/timeline left.
 
 ### C. Left column: tree / timeline; sections to a header menu
 

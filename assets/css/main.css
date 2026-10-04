@@ -1049,7 +1049,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
 
 /* NARROW: one column, content first. The right column is a drawer from the
    right, as the nav from the left, opened by its header button (nav.js);
-   without JS it goes after the content. */
+   without JS — or :has(), which shows the button — it goes after the content. */
 @media (max-width: 900px) {
   :root { --gutter: 1rem; }
 
@@ -1060,7 +1060,7 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
     gap: 1.25rem;
   }
 
-  html:not(.js) .aside, html:not(.js) .sidebar {
+  .aside, html:not(.js) .sidebar {
     position: static;
     width: auto;
     max-height: none;
@@ -1069,24 +1069,24 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   }
   html:not(.js) .sidebar { order: 1; }   /* after the page meta */
 
-  .js:has(.aside:not([hidden])) .aside-toggle[aria-controls] { display: inline-flex; }
-  .js .aside {
-    position: fixed;
-    top: calc(var(--header-h) + 1px);
-    bottom: 0;
-    right: 0;
-    z-index: 9;
-    width: min(calc(var(--aside-width) + 2 * var(--gutter)), 85vw);
-    max-height: none;
-    margin: 0;
-    padding: 1rem var(--gutter) 2rem;
-    background: var(--bg);
-    border-left: 1px solid var(--border);
-    transform: translateX(100%);
-    visibility: hidden;   /* out of the tab order while shut, as the nav */
-    transition: transform 0.2s ease, visibility 0s 0.2s;
+  @supports selector(:has(*)) {
+    .js:has(.aside:not([hidden])) .aside-toggle[aria-controls] { display: inline-flex; }
+    .js .aside {
+      position: fixed;
+      top: calc(var(--header-h) + 1px);
+      bottom: 0;
+      right: 0;
+      z-index: 9;
+      width: min(calc(var(--aside-width) + 2 * var(--gutter)), 85vw);
+      padding: 1rem var(--gutter) 2rem;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      transform: translateX(100%);
+      visibility: hidden;   /* out of the tab order while shut, as the nav */
+      transition: transform 0.2s ease, visibility 0s 0.2s;
+    }
+    .js[data-aside-open] .aside { transform: none; visibility: visible; transition: transform 0.2s ease; }
   }
-  .js[data-aside-open] .aside { transform: none; visibility: visible; transition: transform 0.2s ease; }
 
   /* The search takes what the title and buttons leave. */
   .header-search { flex: 1 1 auto; min-width: 0; display: flex; justify-content: flex-end; }
