@@ -84,6 +84,26 @@ a:hover { text-decoration: underline; }
 .nav-toggle:hover { color: var(--accent); border-color: var(--border); }
 .nav-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .nav-toggle[aria-expanded="true"] { color: var(--text); }
+/* The right column's button (nav.js): only while that column is a drawer —
+   NARROW, with JS, on a page with a column to show (below). */
+.aside-toggle {
+  display: none;
+  flex: none;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.aside-toggle:hover, .aside-toggle[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+.aside-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.aside-toggle .facet-badge[hidden] { display: none; }
 
 .site-title {
   display: inline-flex;
@@ -849,7 +869,7 @@ a.pager:hover { color: var(--accent); border-color: var(--accent); text-decorati
 }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-/* Results only; search.js docks the filters above them on narrow screens. */
+/* Results only; the filters are the right column's (a drawer when narrow). */
 .search-layout {
   display: flex;
   flex-direction: column;
@@ -1002,14 +1022,15 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
     transition: transform 0.2s ease, visibility 0s 0.2s;
   }
   .js[data-nav-open] .sidebar { transform: none; visibility: visible; transition: transform 0.2s ease; }
-  .js[data-nav-open] body::after {
+  /* Either drawer (the right one only opens when NARROW). */
+  .js[data-nav-open] body::after, .js[data-aside-open] body::after {
     content: "";
     position: fixed;
     inset: calc(var(--header-h) + 1px) 0 0;
     z-index: 8;
     background: rgba(0, 0, 0, 0.55);
   }
-  .js[data-nav-open] { overflow: hidden; }
+  .js[data-nav-open], .js[data-aside-open] { overflow: hidden; }
 
   /* No JS: the nav goes under the page. */
   html:not(.js) .sidebar {
@@ -1023,11 +1044,12 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sidebar { transition: none !important; }
+  .sidebar, .aside { transition: none !important; }
 }
 
-/* NARROW: one column — content, then page meta; filters dock into the
-   content (layout.js), leaving their aside :empty. */
+/* NARROW: one column, content first. The right column is a drawer from the
+   right, as the nav from the left, opened by its header button (nav.js);
+   without JS it goes after the content. */
 @media (max-width: 900px) {
   :root { --gutter: 1rem; }
 
@@ -1038,15 +1060,33 @@ span.filter-chip { display: inline-flex; align-items: baseline; }
     gap: 1.25rem;
   }
 
-  .aside, html:not(.js) .sidebar {
+  html:not(.js) .aside, html:not(.js) .sidebar {
     position: static;
     width: auto;
     max-height: none;
     margin: 0;
     padding: 0;
   }
-  .aside:empty { display: none; }
   html:not(.js) .sidebar { order: 1; }   /* after the page meta */
+
+  .js:has(.aside:not([hidden])) .aside-toggle[aria-controls] { display: inline-flex; }
+  .js .aside {
+    position: fixed;
+    top: calc(var(--header-h) + 1px);
+    bottom: 0;
+    right: 0;
+    z-index: 9;
+    width: min(calc(var(--aside-width) + 2 * var(--gutter)), 85vw);
+    max-height: none;
+    margin: 0;
+    padding: 1rem var(--gutter) 2rem;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    visibility: hidden;   /* out of the tab order while shut, as the nav */
+    transition: transform 0.2s ease, visibility 0s 0.2s;
+  }
+  .js[data-aside-open] .aside { transform: none; visibility: visible; transition: transform 0.2s ease; }
 
   .header-search input[type="search"] { width: 42vw; }
 }

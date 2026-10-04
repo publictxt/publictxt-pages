@@ -34,6 +34,9 @@ export function chipFacets(config) {
     write: (p, s) => keys.forEach((k) => writeFacet(p, s[k])),
     clear: (s) => keys.forEach((k) => clearFacet(s[k])),
     anySet: (s) => keys.some((k) => isSet(s[k])),
+    // Filters set — chip values, a date, a rating — as the right column's
+    // badge counts them (layout.js asideStatus). `s`: a list's or search's state.
+    picked: (s) => keys.reduce((n, k) => n + s[k].inc.size + s[k].exc.size, 0) + (s.year ? 1 : 0) + (s.rating ? 1 : 0),
     describe: (s) => defs.flatMap((d) => describe(s[d.key], d.prefix)),
   };
 }

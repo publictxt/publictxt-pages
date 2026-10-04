@@ -110,16 +110,23 @@ class SiteIndexTest(unittest.TestCase):
         return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")
 
     def test_list_tag_cloud(self):
-        """Home, section and tag lists: the tag cloud alone in the filters' aside, flush
-        against it — list.js lifts it into the Tags filter, and the aside must go :empty."""
+        """Home, section and tag lists: the tag cloud alone in the filters' aside, for
+        list.js to lift into the Tags filter."""
         for path in [(), ("blog",), ("tags", "site")]:
             with self.subTest(path=path):
                 aside = re.search(r'<aside class="aside" aria-label="Filters" data-list-controls>(.*?)</aside>',
                                   self.html(*path), re.S)
                 self.assertIsNotNone(aside, "no filters aside")
-                self.assertRegex(aside[1], r'^<nav class="side-block list-tags" aria-label="Tags" data-list-tags>')
-                self.assertTrue(aside[1].endswith("</nav>"), "whitespace after the cloud")
+                self.assertRegex(aside[1], re.compile(
+                    r'^\s*<nav class="side-block list-tags" aria-label="Tags" data-list-tags>.*</nav>\s*$', re.S))
                 self.assertRegex(aside[1], r'<a class="chip tag-w\d" data-tag="site" href="/tags/site/"')
+
+    def test_aside_toggle(self):
+        """The header's right-column button, for nav.js to label and wire: on every page —
+        main.css shows it only when narrow, with JS and an aside to show."""
+        for path in [(), ("wiki",), ("search",)]:
+            with self.subTest(path=path):
+                self.assertIn('<button class="aside-toggle" type="button" aria-expanded="false">', self.html(*path))
 
     def test_sidebar_tags_link(self):
         """The left column: a Tags link after Search, marked on tag pages; no cloud of its own."""

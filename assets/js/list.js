@@ -12,14 +12,15 @@
 //   data-limit        compact: the first N only
 //
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
-// column (home.html, section.html, term.html), claimed by the first full list, or above
-// the list when narrow (layout.js). Its tag cloud (list-tags.html) moves into
-// the Tags filter. Sort and the density toggle sit with the count.
+// column (home.html, section.html, term.html), claimed by the first full list
+// — a drawer when narrow (nav.js) — or else above the list. Its tag cloud
+// (list-tags.html) moves into the Tags filter. Sort and the density toggle sit
+// with the count.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
-import { dock } from "./layout.js";
+import { asideStatus } from "./layout.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
@@ -137,7 +138,7 @@ async function mount(root) {
   pager.setAttribute("aria-label", "Pagination");
   if (compact) root.append(list);
   else root.append(head, list, pager);
-  // Filters and timeline dock as one, so they keep their order when narrow.
+  // Filters, then the timeline: one block.
   const side = document.createElement("div");
   side.className = "list-side";
   const tl = document.createElement("details");
@@ -164,8 +165,7 @@ async function mount(root) {
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
   // The cloud, less every tag a listed page carries: those filter, as chips
-  // above it; these lead to other lists. Out of the aside either way, which
-  // turns :empty once the filters dock elsewhere (traps.md).
+  // above it; these lead to other lists. Out of the aside either way.
   const carried = new Set(items.flatMap((it) => it.tags || []));
   for (const a of cloud?.querySelectorAll("[data-tag]") || []) if (carried.has(a.dataset.tag)) a.remove();
   cloud?.remove();
@@ -368,8 +368,9 @@ async function mount(root) {
     const detail = document.createElement("span");
     detail.className = "muted";
     detail.textContent = extra ? ` (${extra})` : "";
-    status.replaceChildren(
-      `${n} page${n === 1 ? "" : "s"}` + (n !== items.length ? ` of ${items.length}` : ""), detail);
+    const pages = `${n} page${n === 1 ? "" : "s"}`;
+    status.replaceChildren(pages + (n !== items.length ? ` of ${items.length}` : ""), detail);
+    if (slot) asideStatus(CHIPS.picked(state), pages);
     writeURL(pushHistory);
   }
 
@@ -379,15 +380,12 @@ async function mount(root) {
     const y = state.year ? fullTree.find((t) => t.year === state.year) : fullTree[0];
     if (y) tlOpen.add(y.year);
   }
-  // Folded when narrow, unless the URL set a filter (for the timeline, a
-  // date). Nothing to filter and no timeline, no box.
+  // Nothing to filter and no timeline, no box.
   if (!compact && hasFilters) side.append(controls);
   if (hasTimeline) side.append(tl);
-  if (side.childElementCount) dock(side, slot, root, (narrow) => {
-    controls.open = !narrow || filtering();
-    tl.open = !narrow || Boolean(state.year);
-  });
-  else if (slot) slot.hidden = true;
+  if (!side.childElementCount) { if (slot) slot.hidden = true; }
+  else if (slot) slot.append(side);
+  else root.prepend(side);
   render(false);
 }
 

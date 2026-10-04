@@ -12,7 +12,7 @@ import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } 
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matchToggle, pagefindConditions,
   ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
-import { dock } from "./layout.js";
+import { asideStatus } from "./layout.js";
 import { SORTS, normaliseSort, parseSort } from "./sorts.js";
 import { countsTree, monthCount, monthFilter, renderTimeline } from "./timeline.js";
 
@@ -23,7 +23,7 @@ const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/")
 const $ = (id) => document.getElementById(id);
 const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
-  side: $("search-side"), timeline: $("search-timeline"), tl: $("search-tl"), layout: $("search-layout"),
+  side: $("search-side"), timeline: $("search-timeline"), tl: $("search-tl"),
   rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), ratingHint: $("filter-rating-hint"),
   sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
@@ -39,6 +39,7 @@ try {
   await pagefind.init();
 } catch (e) {
   $("search-unavailable").hidden = false;
+  el.side.closest(".aside").hidden = true;   // nothing to filter: no drawer button (main.css)
   throw e;
 }
 el.root.hidden = false;
@@ -47,7 +48,6 @@ el.root.hidden = false;
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
 const state = { q: "", ...CHIPS.read(), year: "", month: "", rating: "", sort: null };
-const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -177,7 +177,9 @@ async function run() {
   const n = current.length;
   const what = [hasQuery() ? `“${state.q}”` : "", ...CHIPS.describe(state), dateLabel(),
     state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
-  el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "");
+  const pages = `${n} page${n === 1 ? "" : "s"}`;
+  el.status.textContent = pages + (what ? ` — ${what}` : "");
+  asideStatus(CHIPS.picked(state), pages);
   await showMore();
 }
 
@@ -225,12 +227,7 @@ if (hasTimeline) {
   tlOpen.add(state.year || countsTree(allFilters.month)[0].year);
   el.timeline.hidden = false;
 }
-// The right column; above the results when narrow, each folded unless it has
-// a filter set.
+// The right column — a drawer when narrow (nav.js).
 el.side.hidden = false;
-dock(el.side, el.side.closest(".aside"), el.layout, (narrow) => {
-  el.filters.open = !narrow || filtering();
-  el.timeline.open = !narrow || Boolean(state.year);
-});
 await run();
 if (!state.q) el.q.focus();

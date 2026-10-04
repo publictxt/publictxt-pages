@@ -20,6 +20,9 @@
       <form class="header-search" action="{{ "search/" | relURL }}" method="get" role="search">
         <input type="search" name="q" placeholder="Search…" aria-label="Search the site">
       </form>
+      {{/* The right column's, when narrow: nav.js labels and wires it (layout.js
+           draws it); main.css shows it then, if the page has a column. */}}
+      <button class="aside-toggle" type="button" aria-expanded="false"><span class="aside-toggle-label"></span> <span class="facet-badge" hidden></span></button>
     </div>
   </header>
 

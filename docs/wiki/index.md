@@ -110,8 +110,9 @@ layouts/_markup/
 
 ```txt
 assets/js/site-index.js   fetch index.json (recent-first) once per document; scope() subsets
-assets/js/layout.js       breakpoints for JS; dock(): filters right column <-> page flow
-assets/js/nav.js          ☰: collapse the nav (wide), drawer (narrower); blocking, in <head>
+assets/js/layout.js       breakpoints for JS; the right column's header button: label, badge, count
+assets/js/nav.js          the header's column buttons: ☰ collapses or drawers the nav; the right
+                          column's drawers it when narrow; blocking, in <head>
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value; density toggle
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating

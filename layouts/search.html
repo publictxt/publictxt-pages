@@ -17,8 +17,7 @@
     <button type="button" id="search-clear" class="btn-ghost">Clear all</button>
   </form>
 
-  {{/* search.js docks #search-filters here on narrow screens. */}}
-  <div class="search-layout" id="search-layout">
+  <div class="search-layout">
     <section class="search-results" aria-live="polite">
       <div class="results-head">
         <p id="search-status" class="muted"></p>
@@ -42,9 +41,7 @@
 {{ define "aside" }}
 <aside class="aside" aria-label="Filters">
   {{- /* Filters, then the timeline, as the browse lists'; shown with #search.
-     search.js docks the pair in the results on narrow screens, each closed
-     unless it has a filter set. The aside has no whitespace, so it is :empty
-     then (main.css). */ -}}
+     A drawer on narrow screens (nav.js). */ -}}
   <div class="list-side" id="search-side" hidden>
   <details class="search-filters fold" id="search-filters" open>
     <summary><h3 class="side-heading">Filters</h3></summary>

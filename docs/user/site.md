@@ -118,7 +118,10 @@ nothing is sent to a server.
 
 ## Phones, and no JavaScript
 
-- **Phones**: one column. Filters fold above the results (open when one is set); a
-  page's details move below it.
+- **Phones** (below 900px): one column, content first. The right column becomes a drawer,
+  opened by a header button named for it — **Filters** on lists and search (with a count
+  of filters set; while open it reads "Show 12 pages" and closes the drawer), **This
+  page** on pages. ☰ opens the left column the same way; one drawer at a time.
 - **No JavaScript**: pages, navigation and the folder tree all work; lists fall back to
-  plain links without filters; search needs JavaScript.
+  plain links without filters; search needs JavaScript. On phones the right column
+  follows the content.

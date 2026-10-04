@@ -39,6 +39,15 @@ test("config beats the URL: disallowed states and modes are dropped", () => {
   assert.deepEqual([...facet("tag=&tag=a").inc], ["a"]);
 });
 
+test("chipFacets picked: chip values, a date and a rating — the drawer button's badge", () => {
+  const c = chipFacets([{ key: "tag" }, { key: "collection" }]);
+  const s = { ...c.read(qs("tag=a&tag-not=b&collection=blog")), year: "", rating: "" };
+  assert.equal(c.picked(s), 3);
+  assert.equal(c.picked({ ...s, year: "2026", rating: "4" }), 5);
+  c.clear(s);
+  assert.equal(c.picked(s), 0);
+});
+
 test("chipFacets: config order, unknown keys dropped, defaults filled", () => {
   const c = chipFacets([
     { key: "tag", label: "Tags" },
