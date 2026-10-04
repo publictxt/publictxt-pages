@@ -22,5 +22,5 @@
 
 {{/* As section.html; only with a list to filter. */}}
 {{ define "aside" }}
-{{ if site.RegularPages }}<aside class="aside" aria-label="Filters" data-list-controls></aside>{{ end }}
+{{ if site.RegularPages }}<aside class="aside" aria-label="Filters" data-list-controls>{{ partial "list-tags.html" }}</aside>{{ end }}
 {{ end }}

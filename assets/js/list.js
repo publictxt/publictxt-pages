@@ -12,8 +12,9 @@
 //   data-limit        compact: the first N only
 //
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
-// column (section.html, term.html), claimed by the first full list, or above
-// the list when narrow (layout.js). Sort and the density toggle sit with the count.
+// column (home.html, section.html, term.html), claimed by the first full list, or above
+// the list when narrow (layout.js). Its tag cloud (list-tags.html) moves into
+// the Tags filter. Sort and the density toggle sit with the count.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
@@ -61,12 +62,14 @@ async function mount(root) {
   // Claimed before the await, so mount order decides.
   const slot = compact ? null : document.querySelector("[data-list-controls]");
   slot?.removeAttribute("data-list-controls");
-  let items;
+  const cloud = slot?.querySelector("[data-list-tags]");
+  let all, items;
   try {
-    items = scope(await siteIndex(), root.dataset.scopeKind, root.dataset.scopeValue);
+    all = await siteIndex();
+    items = scope(all, root.dataset.scopeKind, root.dataset.scopeValue);
   } catch (e) {
-    if (slot) slot.hidden = true;
-    return;   // keep Hugo's plain link list
+    if (slot && !cloud) slot.hidden = true;
+    return;   // keep Hugo's plain link list, and the cloud
   }
 
   // ---- state <-> URL --------------------------------------------------
@@ -160,7 +163,20 @@ async function mount(root) {
   const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
-  const hasFilters = hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length);
+  // The cloud, less every tag a listed page carries: those filter, as chips
+  // above it; these lead to other lists. Out of the aside either way, which
+  // turns :empty once the filters dock elsewhere (traps.md).
+  const carried = new Set(items.flatMap((it) => it.tags || []));
+  for (const a of cloud?.querySelectorAll("[data-tag]") || []) if (carried.has(a.dataset.tag)) a.remove();
+  cloud?.remove();
+  const others = cloud?.querySelector("[data-tag]") ? cloud : null;
+  if (others) {
+    others.className = "list-tags tag-others";
+    others.querySelector(".side-heading a").textContent = "Other tags";
+  }
+  // Each tag's site-wide count, for its chip's title.
+  const siteTags = new Map(FACETS.tag ? counts(all, "tag") : []);
+  const hasFilters = hasRatings || Boolean(others) || CHIPS.defs.some((d) => chipValues[d.key].length);
   // Nothing to pick in a single month. The newest year open to start,
   // or the ones the URL picked (readURL, below).
   const fullTree = timeline(items);
@@ -168,12 +184,17 @@ async function mount(root) {
   const tlOpen = new Set();
 
   function chip(d, name, n) {
-    return filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
+    const c = filterChip(state[d.key], name, d.prefix + name, n, () => { state.page = 1; render(true); });
+    const body = c.querySelector(".chip-body");
+    const total = d.key === "tag" && siteTags.get(name);
+    if (total) body.title = `${total} on the site. ${body.title}`;
+    return c;
   }
 
   // A filter section, shut or open on its own (facets.js). `f`: a facets.js
-  // facet, for its match toggle; `picked`: values picked, shown while shut.
-  function facetRow(key, label, chips, f, picked) {
+  // facet, for its match toggle; `picked`: values picked, shown while shut;
+  // `hint`: muted, after the label, while open; `extra`: below the chips.
+  function facetRow(key, label, chips, f, picked, { hint, extra } = {}) {
     const row = document.createElement("details");
     row.className = "list-facet";
     rememberFold(row, key);
@@ -181,12 +202,17 @@ async function mount(root) {
     const lab = document.createElement("span");
     lab.className = "facet-label";
     lab.append(label);
+    if (hint) lab.append(" ", Object.assign(document.createElement("span"), { className: "facet-hint", textContent: hint }));
     for (const x of foldHint(picked, f && matchToggle(f, () => { state.page = 1; render(true); }))) lab.append(" ", x);
     summary.append(lab);
-    const wrap = document.createElement("div");
-    wrap.className = "chip-row";
-    wrap.append(...chips);
-    row.append(summary, wrap);
+    row.append(summary);
+    if (chips.length) {
+      const wrap = document.createElement("div");
+      wrap.className = "chip-row";
+      wrap.append(...chips);
+      row.append(wrap);
+    }
+    if (extra) row.append(extra);
     return row;
   }
 
@@ -220,7 +246,8 @@ async function mount(root) {
     // Past a facet's `limit`, chips fold behind "more"; selected ones stay.
     for (const d of CHIPS.defs) {
       const values = chipValues[d.key];
-      if (!values.length) continue;
+      const extra = d.key === "tag" ? others : null;
+      if (!values.length && !extra) continue;
       const f = state[d.key];
       const c = new Map(counts(forFacet(d.key), d.key));
       const open = !d.limit || state.more.has(d.key);
@@ -240,8 +267,11 @@ async function mount(root) {
         });
         chips.push(more);
       }
-      body.append(facetRow(d.key, d.label, chips, f, f.inc.size + f.exc.size));
+      body.append(facetRow(d.key, d.label, chips, f, f.inc.size + f.exc.size,
+        { extra, hint: extra && chips.length ? "click to filter" : "" }));
     }
+    // Tags not a chip facet (params.chipFacets): the cloud on its own.
+    if (others && !state.tag) body.append(facetRow("tag", "Tags", [], null, 0, { extra: others }));
   }
 
   function pageLink(n, label, cls, rel) {

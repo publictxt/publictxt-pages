@@ -461,6 +461,17 @@ a:hover { text-decoration: underline; }
 .list-reset { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
 .list-status { margin: 0; font-size: 1.15rem; font-weight: 700; }
 .filter-chip.more { border-style: dashed; color: var(--text-muted); }
+/* A section's muted aside after its label ("click to filter"), while open. */
+.facet-hint { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.list-facet:not([open]) .facet-hint { display: none; }
+/* A list's tag cloud (list-tags.html): a side block without JS; with it,
+   "Other tags" in the Tags filter, below a rule from the chips that filter. */
+.tag-others { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
+.list-facet > summary + .tag-others { margin-top: 0; padding-top: 0; border-top: 0; }
+.tag-others .side-heading { margin-bottom: 0.45rem; font-size: 0.68rem; }
+/* Links, not filters: unfilled, so they don't pass for the chips above. */
+.tag-others .chip { background: transparent; border-color: transparent; color: var(--text-muted); padding-inline: 0.3rem; }
+.tag-others .chip:hover { color: var(--accent); border-color: transparent; text-decoration: underline; }
 /* Filters, then the timeline (list.js): one block, docked together. */
 .list-side { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 0.8rem; }
 .aside .list-side { gap: 1.25rem; margin: 0; }

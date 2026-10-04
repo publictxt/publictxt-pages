@@ -24,6 +24,7 @@ search. Add one to both, or search cards go without it. What's still implemented
 | stars in `page-meta.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
 | `created`'s `2006-01-…` form in `list-json.html` | `monthOf()` in `timeline.js` reads its digits |
+| `data-tag` in `tag-cloud.html`, `tags` in `list-json.html`: both a term's `.LinkTitle` | `list.js` drops cloud tags the list carries by comparing them |
 | Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js` |
 | `timeline/content.html`: grouping (year, month, newest first, undated out, ≥2 months) and markup (`.tl-*` classes; no sparklines or month bars) | `timeline()`, `monthCount()` and `renderTimeline()` in `timeline.js`; `main.css` styles both |
 
@@ -52,8 +53,9 @@ source of `@params`.
 ## The right column is filled from both sides
 
 A template's `{{ define "aside" }}` is its right column; none, no column. List filters
-are JS-only: `section.html`/`term.html` emit an empty `[data-list-controls]` aside that
-`list.js` claims and fills; search's filters are server-rendered in `search.html`'s aside.
+are JS-only: `home.html`/`section.html`/`term.html` emit a `[data-list-controls]` aside
+holding only the tag cloud (`list-tags.html`), which `list.js` lifts into the Tags filter
+before filling the aside; search's filters are server-rendered in `search.html`'s aside.
 Below 900px, `dock()` (`layout.js`) moves them into the page, and `main.css` hides the
 aside by `:empty` — so these asides must hold no whitespace (`{{- -}}`) around their child.
 

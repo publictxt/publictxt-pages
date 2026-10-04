@@ -60,7 +60,7 @@ title = "My notes"
 ```toml
 [params]
   sectionOrder = ["blog", "wiki", "notes"]   # top-level folders; unlisted ones follow A→Z
-  tagCloudLimit = 30                         # tags in the sidebar cloud
+  tagCloudLimit = 30                         # tags in the sidebar cloud, and in a list's Other tags
   recentLimit = 8                            # cards per page in the home "Recent" list
 ```
 

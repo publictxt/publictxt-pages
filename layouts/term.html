@@ -10,5 +10,5 @@
 </section>
 {{ end }}
 
-{{/* list.js docks the list's filters here; empty (no JS) keeps the column. */}}
-{{ define "aside" }}<aside class="aside" aria-label="Filters" data-list-controls></aside>{{ end }}
+{{/* list.js docks the list's filters here, and lifts the tag cloud into them. */}}
+{{ define "aside" }}<aside class="aside" aria-label="Filters" data-list-controls>{{ partial "list-tags.html" }}</aside>{{ end }}

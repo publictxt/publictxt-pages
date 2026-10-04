@@ -1,0 +1,15 @@
+{{- /*
+  A list's tag cloud, in its right column (home.html, section.html,
+  term.html): the site's top params.tagCloudLimit tags, linking to their
+  pages. list.js lifts it into the Tags filter, below its chips, as "Other
+  tags": the cloud less every tag the list's pages carry — those filter,
+  these go elsewhere. No JS: the column's only content.
+  No whitespace either side: the aside must turn :empty once list.js
+  lifts this out (traps.md).
+  Takes nothing.
+*/ -}}
+<nav class="side-block list-tags" aria-label="Tags" data-list-tags>
+  <h2 class="side-heading"><a href="{{ "tags/" | relURL }}" title="All tags">Tags</a></h2>
+  {{ partial "tag-cloud.html" (dict "limit" (site.Params.tagCloudLimit | default 20)) }}
+</nav>
+{{- /* */ -}}

@@ -59,6 +59,10 @@ in your browser for lists and search; not part of the URL.
 - **Rating** chips: one at a time, each meaning "this many stars or more".
 - Each filter group folds; a folded group shows how many values are picked. Folds are
   remembered across lists and search.
+- **Tags** holds two kinds: the list's own tags above, which filter, then, past a rule,
+  **Other tags** — popular tags no page in the list carries, which link to their tag
+  pages. A filter chip's tooltip gives its site-wide count. Without JavaScript the column
+  shows the tag cloud as links.
 
 **Every list state is in the URL** — sort, chips, page, date. Copy the address to share
 exactly what you see.

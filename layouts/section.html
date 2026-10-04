@@ -32,5 +32,5 @@
 
 {{/* As term.html; only with a list to filter. */}}
 {{ define "aside" }}
-{{ if (partial "section-pages.html" .).pages }}<aside class="aside" aria-label="Filters" data-list-controls></aside>{{ end }}
+{{ if (partial "section-pages.html" .).pages }}<aside class="aside" aria-label="Filters" data-list-controls>{{ partial "list-tags.html" }}</aside>{{ end }}
 {{ end }}

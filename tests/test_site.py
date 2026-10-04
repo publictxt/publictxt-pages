@@ -109,6 +109,18 @@ class SiteIndexTest(unittest.TestCase):
     def html(self, *path):
         return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")
 
+    def test_list_tag_cloud(self):
+        """Home, section and tag lists: the tag cloud alone in the filters' aside, flush
+        against it — list.js lifts it into the Tags filter, and the aside must go :empty."""
+        for path in [(), ("blog",), ("tags", "site")]:
+            with self.subTest(path=path):
+                aside = re.search(r'<aside class="aside" aria-label="Filters" data-list-controls>(.*?)</aside>',
+                                  self.html(*path), re.S)
+                self.assertIsNotNone(aside, "no filters aside")
+                self.assertRegex(aside[1], r'^<nav class="side-block list-tags" aria-label="Tags" data-list-tags>')
+                self.assertTrue(aside[1].endswith("</nav>"), "whitespace after the cloud")
+                self.assertRegex(aside[1], r'<a class="chip tag-w\d" data-tag="site" href="/tags/site/"')
+
     @staticmethod
     def rows(tree, state):
         """hrefs of a tree's folder rows that are `on` (the page's path) or `open` (any opened), in order."""

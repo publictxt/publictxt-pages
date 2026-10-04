@@ -66,6 +66,7 @@ layouts/_partials/
   date-labels.html      the one date form + >1-day rule, for page, sidebar, JSON, Pagefind
   month-names.html      January..December in the site's language, for JS and templates (returns them)
   tag-cloud.html        weighted term chips
+  list-tags.html        a list's tag cloud, in its aside; list.js lifts it into the Tags filter
   site-index.html       publishes index.json, returns URL    (partialCached)
   list-json.html        pages -> index.json items, with Hugo-made display values
   list-container.html   [data-list] + no-JS <ul> + loads list.js
