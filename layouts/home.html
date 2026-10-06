@@ -10,8 +10,9 @@
 
 {{/* Every page, recently updated first, $limit a page, filters and timeline
      beside. The no-JS fallback is the first page only: the whole site is too
-     long a home page. */}}
-{{ $limit := site.Params.recentLimit | default 8 }}
+     long a home page. params.pagerSize only: a root _index.md `pagerSize:`
+     is the sections' (list-per-page.html), not home's. */}}
+{{ $limit := int (site.Params.pagerSize | default 20) }}
 {{ $recent := first $limit (partial "recent.html" site.RegularPages) }}
 {{ with $recent }}
 <section class="home-recent">

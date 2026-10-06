@@ -48,7 +48,11 @@ Home, section and tag lists share one interface.
 **Sort**: Newest, Oldest, Title, Recently updated, Top/Lowest rated (unrated counts as
 2.5). Starts at the [configured order](configuration.md#browse-lists).
 
-**Compact**, beside sort: one line per page — title, date, stars — for skimming. Remembered
+**Show**, beside sort: cards per page — 10, 20, 50 or All, plus the list's own
+[default](configuration.md#browse-lists). Changing it keeps the cards you were looking at
+on screen. Remembered in your browser for every list; not part of the URL.
+
+**Compact**, beside them: one line per page — title, date, stars — for skimming. Remembered
 in your browser for lists and search; not part of the URL.
 
 **Filter chips** — Collection, Category, Tags (as [configured](configuration.md#filter-chips)):
@@ -109,7 +113,7 @@ The **Search** page: full text over every page and section intro, with:
 - Year and month from the timeline
 - The same sorts as browse lists
 
-*More* loads further results. Search runs in the browser ([Pagefind](https://pagefind.app));
+*Show more* loads further results, a batch at a time ([`pagerSize`](configuration.md#browse-lists)). Search runs in the browser ([Pagefind](https://pagefind.app));
 nothing is sent to a server.
 
 ## Phones, and no JavaScript
