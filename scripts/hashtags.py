@@ -104,12 +104,14 @@ def parse_tags(lines: list[str]) -> tuple[list[str], tuple[int, int] | None]:
 def merge_tags(fm_lines: list[str], body: str) -> list[str]:
     """
     Front matter lines with `body`'s hashtags merged into `tags` (existing
-    first, deduped). Unchanged — block style kept — when the body adds none;
+    first, deduped, a leading `#` dropped). Unchanged — block style kept — when the body adds none;
     else one inline `tags:` line, in place or appended.
     """
-    existing, span = parse_tags(fm_lines)
+    raw, span = parse_tags(fm_lines)
+    # Obsidian can store `- #tag`; the site adds its own `#`, which would show `##tag`.
+    existing = [t for t in (t.lstrip("#") for t in raw) if t]
     merged = list(dict.fromkeys([*existing, *find_hashtags(body)]))
-    if merged == existing:
+    if merged == raw:
         return fm_lines
     line = "tags: [" + ", ".join(f'"{t}"' for t in merged) + "]"
     if span is None:

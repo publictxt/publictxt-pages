@@ -5,11 +5,7 @@ author:
 published:
 created: 2026-09-25
 description: Obsidian's hosted service for publishing a vault as a website.
-tags:
-  - clippings
-  - "#obsidian"
-  - "#publishing"
-  - pkm
+tags: ["clippings", "obsidian", "publishing", "pkm"]
 rating: "4"
 created_source: front-matter
 updated: 2026-09-25
