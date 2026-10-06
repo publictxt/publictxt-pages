@@ -61,7 +61,6 @@ title = "My notes"
 [params]
   sectionOrder = ["blog", "wiki", "notes"]   # top-level folders; unlisted ones follow A→Z
   tagCloudLimit = 30                         # tags in the sidebar cloud
-  recentLimit = 8                            # cards per page in the home "Recent" list
 ```
 
 Sections are fixed-order on purpose: ordering by date would reshuffle your navigation
@@ -74,7 +73,7 @@ Site-wide defaults for every section and tag list:
 ```toml
 [params]
   listOrder = "created"   # created | updated | title | rating, optionally + " asc"/" desc"
-  listPerPage = 20
+  pagerSize = 20          # cards per page; search results per *Show more*
 ```
 
 `created` and `updated` default newest first, `title` A→Z, `rating` top first.
@@ -85,11 +84,17 @@ every folder below it, unless one sets its own.
 ```yaml
 ---
 order: title
-perPage: 50
+pagerSize: 50
 ---
 ```
 
-Readers can still change the sort; this is the starting order.
+Readers can still change the sort and the page size; these are where they start. A
+reader's page size is remembered in their browser and then applies to every list.
+
+`pagerSize` is one setting for home, section and tag lists, and search. In the root
+`_index.md` it sets every section's, not home's: home reads only the site setting. (It
+is not Hugo's own `[pagination] pagerSize` — lists page in the browser, so that one does
+nothing here.)
 
 ## Timeline and folder tree
 
@@ -195,7 +200,7 @@ title = "Jo's notes"
   timelineTags = []
   treeSections = ["wiki"]
   excludeFolders = ["settings/Templates"]
-  listPerPage = 30
+  pagerSize = 30
 
   [params.footer]
     text = "Jo · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"

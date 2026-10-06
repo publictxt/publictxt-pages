@@ -1,9 +1,11 @@
 {{/*
-  Cards per list page: same cascade as list-order.html over `perPage:` /
-  params.listPerPage. Returns an int (0 = list.js default).
+  Cards per list page: same cascade as list-order.html over `pagerSize:` /
+  params.pagerSize — the root _index.md's included, as home is every
+  section's ancestor (home's own list reads only the param). Returns an int
+  (0 = list.js default). A reader's own pick overrides it (page-size.js).
 */}}
-{{ $n := .Params.perPage }}
+{{ $n := .Params.pagerSize }}
 {{ if not $n }}
-  {{ range .Ancestors }}{{ if and (not $n) .Params.perPage }}{{ $n = .Params.perPage }}{{ end }}{{ end }}
+  {{ range .Ancestors }}{{ if and (not $n) .Params.pagerSize }}{{ $n = .Params.pagerSize }}{{ end }}{{ end }}
 {{ end }}
-{{ return (int ($n | default site.Params.listPerPage | default 0)) }}
+{{ return (int ($n | default site.Params.pagerSize | default 0)) }}

@@ -35,6 +35,7 @@ tests/test_build.py         build.py's search index check, on made-up public/ tr
 tests/test_map_lint.py      map_lint.py's reading of the map: folder headings, namesakes
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search
 tests/js/cards.test.mjs     cards.js: remembered density, storage that throws
+tests/js/page-size.test.mjs page-size.js: remembered size, choices, keeping place
 tests/js/timeline.test.mjs  timeline.js: year/month grouping, ?month= spelling, tag chips
 ```
 
@@ -73,7 +74,7 @@ layouts/_partials/
   js-params.html        @params for every js.Build — see traps.md
   chip-facets.html      only reader of params.chipFacets   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
-  list-per-page.html    perPage: cascade
+  list-per-page.html    pagerSize: cascade
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
   bookmark-links.html   the chip row
@@ -114,6 +115,7 @@ assets/js/layout.js       breakpoints for JS; dock(): filters right column <-> p
 assets/js/nav.js          ☰: collapse the nav (wide), drawer (narrower); blocking, in <head>
 assets/js/sorts.js        the sort vocabulary, ?sort= spellings
 assets/js/cards.js        the one card renderer; rating filter value; density toggle
+assets/js/page-size.js    lists' page size: the reader's remembered pick, its choices
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating
                           chips; remembered section folds — shared by lists and search
 assets/js/list.js         browse list: state<->URL, facets, paging

@@ -8,6 +8,7 @@
 // timeline (timeline.js, filter mode) picks ?year= / ?month= from Pagefind's
 // month counts, recounted without the date filter while one is set.
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
+// Results come in batches of #search's data-per-page; "Show more" adds one.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matchToggle, pagefindConditions,
@@ -17,7 +18,6 @@ import { SORTS, normaliseSort, parseSort } from "./sorts.js";
 import { countsTree, monthCount, monthFilter, renderTimeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
-const PAGE = 20;
 const TYPING_MS = 400;   // pause before a keystroke searches; Enter searches now
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
 const $ = (id) => document.getElementById(id);
@@ -28,6 +28,7 @@ const el = {
   sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
+const PAGE = Math.max(1, parseInt(el.root.dataset.perPage, 10) || 20);
 // Per chip facet, search.html's filter-{key}-group / filter-{key} / filter-{key}-hint.
 const groups = Object.fromEntries(CHIPS.keys.map((k) => [k, {
   group: $(`filter-${k}-group`), chips: $(`filter-${k}`), hint: $(`filter-${k}-hint`),

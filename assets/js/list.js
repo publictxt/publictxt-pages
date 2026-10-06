@@ -7,18 +7,19 @@
 //   data-scope-kind   section | collection | tag | recent
 //   data-scope-value  a path, a collection, a tag, or a limit
 //   data-order        default sort (sorts.js)
-//   data-per-page     cards per page
+//   data-per-page     cards per page, until the reader picks a size (page-size.js)
 //   data-compact      cards only: no controls, pager or URL (dataview)
 //   data-limit        compact: the first N only
 //
 // Filters, then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
-// the list when narrow (layout.js). Sort and the density toggle sit with the count.
+// the list when narrow (layout.js). Sort, page size and the density toggle sit with the count.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
+import { pageHolding, pageSizes, readPageSize, writePageSize } from "./page-size.js";
 import { siteIndex, scope } from "./site-index.js";
 import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
@@ -55,7 +56,8 @@ function counts(items, key) {
 
 async function mount(root) {
   const compact = "compact" in root.dataset;
-  const perPage = Math.max(1, parseInt(root.dataset.perPage, 10) || 20);
+  const listDefault = Math.max(1, parseInt(root.dataset.perPage, 10) || 20);
+  let perPage = compact ? listDefault : readPageSize(globalThis.localStorage) ?? listDefault;   // 0 = all
   const limit = parseInt(root.dataset.limit, 10) || undefined;
   const defaultSort = normaliseSort(root.dataset.order);
   // Claimed before the await, so mount order decides.
@@ -121,13 +123,27 @@ async function mount(root) {
     `<option value="${v}">${l}</option>`).join("")}</select>`;
   const sortSelect = sortWrap.querySelector("select");
   sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; state.page = 1; render(true); });
+  // Page size: remembered across lists; the first card shown stays on screen.
+  const sizeWrap = document.createElement("label");
+  sizeWrap.className = "list-sort";
+  sizeWrap.innerHTML = `<span class="facet-label">Show</span> <select aria-label="Cards per page">${pageSizes(listDefault, perPage).map((n) =>
+    `<option value="${n}">${n || "All"}</option>`).join("")}</select>`;
+  const sizeSelect = sizeWrap.querySelector("select");
+  sizeSelect.value = String(perPage);
+  sizeSelect.addEventListener("change", () => {
+    const first = perPage ? (state.page - 1) * perPage : 0;
+    perPage = Number(sizeSelect.value);
+    writePageSize(globalThis.localStorage, perPage);
+    state.page = pageHolding(first, perPage);
+    render(true);
+  });
   const list = document.createElement("ul");
   list.className = "page-list";
   const head = document.createElement("div");
   head.className = "results-head";
   const tools = document.createElement("div");
   tools.className = "results-tools";
-  tools.append(sortWrap, densityToggle(list));
+  tools.append(sortWrap, sizeWrap, densityToggle(list));
   head.append(status, tools);
   const pager = document.createElement("nav");
   pager.className = "pagination";
@@ -315,9 +331,10 @@ async function mount(root) {
 
   function render(pushHistory) {
     const filtered = sorted(items.filter((it) => passes(it)), state.sort);
-    const total = Math.max(1, Math.ceil(filtered.length / perPage));
+    const size = perPage || filtered.length || 1;
+    const total = Math.max(1, Math.ceil(filtered.length / size));
     if (state.page > total) state.page = total;
-    const slice = compact ? filtered.slice(0, limit) : filtered.slice((state.page - 1) * perPage, state.page * perPage);
+    const slice = compact ? filtered.slice(0, limit) : filtered.slice((state.page - 1) * size, state.page * size);
     // Card tags filter only while tag is a chip facet that includes; else they link.
     const onTag = compact || !state.tag?.states.includes("include") ? null : (t) => {
       toggleInclude(state.tag, t);

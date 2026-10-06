@@ -11,7 +11,8 @@
   <code>hugo server</code> live preview until then.
 </p>
 
-<div id="search" class="search" hidden>
+{{/* Results per "Show more": params.pagerSize, as the lists. */}}
+<div id="search" class="search" data-per-page="{{ int (site.Params.pagerSize | default 20) }}" hidden>
   <form class="search-form" role="search" onsubmit="return false">
     <input id="search-q" type="search" placeholder="Search pages…" aria-label="Search text" autocomplete="off">
     <button type="button" id="search-clear" class="btn-ghost">Clear all</button>
