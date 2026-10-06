@@ -19,7 +19,7 @@ minimal reliance on PublicTxt-specific syntax transforms.
 
 ## Requirements
 
-- **Hugo v0.158+** (plain works — no Sass). Distro packages are often stale; check
+- **Hugo v0.162+** (plain works — no Sass). Distro packages are often stale; check
   `hugo version`.
 - **Python 3.10+** — no packages.
 - **Pagefind 1.5.2** (pinned in `build.py`) — the [standalone binary](https://github.com/Pagefind/pagefind/releases)
