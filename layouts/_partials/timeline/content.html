@@ -21,7 +21,7 @@
 {{ if ge $monthCount 2 }}
 {{- $names := partialCached "month-names.html" site }}
 <details class="contents tl-contents fold" open>
-  <summary><span class="tl-node" aria-hidden="true"></span><h2 class="side-heading">Contents</h2></summary>
+  <summary><span class="tl-node" aria-hidden="true"></span><h2 class="side-heading">Folder contents</h2></summary>
   <nav aria-label="{{ partial "crumb-label.html" $section }} by date">
   <ol class="tl">
   {{- range $yi, $y := $years }}

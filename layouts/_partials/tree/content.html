@@ -14,7 +14,7 @@
   {{ $html = partial "tree/mark.html" (dict "html" $html "url" .RelPermalink "dir" true "as" "open") }}
 {{ end }}
 <details class="tree contents fold" open>
-  <summary><span class="tree-node" aria-hidden="true"></span><h2 class="side-heading">Contents</h2></summary>
+  <summary><span class="tree-node" aria-hidden="true"></span><h2 class="side-heading">Folder contents</h2></summary>
   <nav aria-label="{{ partial "crumb-label.html" $ }} contents">
     {{- $html | safeHTML -}}
   </nav>
