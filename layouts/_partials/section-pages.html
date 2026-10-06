@@ -5,8 +5,11 @@
   so the list, its count on home and the sidebar, and list.js agree.
   Expects a section page.
 */}}
+{{ $r := "" }}
 {{ if eq .Parent site.Home }}
   {{ $c := lower .Section }}{{/* page-collections.html lower-cases */}}
-  {{ return dict "pages" (partialCached "collection-pages.html" $c $c) "scope" (dict "kind" "collection" "value" $c) }}
+  {{ $r = dict "pages" (partialCached "collection-pages.html" $c $c) "scope" (dict "kind" "collection" "value" $c) }}
+{{ else }}
+  {{ $r = dict "pages" (partial "recent.html" .RegularPagesRecursive) "scope" (dict "kind" "section" "value" .RelPermalink) }}
 {{ end }}
-{{ return dict "pages" (partial "recent.html" .RegularPagesRecursive) "scope" (dict "kind" "section" "value" .RelPermalink) }}
+{{ return $r }}

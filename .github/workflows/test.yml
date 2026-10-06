@@ -28,10 +28,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      # test_site.py builds with Hugo (skipped without it); same version as the deploy template.
+      # test_site.py builds with Hugo (skipped without it); same version as the deploy template, the oldest supported (README, setup.md).
       - uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: "0.166.0"
+          hugo-version: "0.162.1"
       - run: python -m unittest -v
       - run: python scripts/map_lint.py
 
