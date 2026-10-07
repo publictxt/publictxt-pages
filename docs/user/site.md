@@ -26,7 +26,7 @@ as a drawer on narrower ones.
 ## Home
 
 Your root `_index.md` (or, without one, the site description), then **Recent**: every
-page, most recently updated first, with the full filters and timeline beside it.
+page, newest first ([`listOrder`](configuration.md#browse-lists)), with the full filters and timeline beside it.
 
 ## Section pages
 

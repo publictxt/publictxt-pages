@@ -8,15 +8,15 @@
   {{ end }}
 </section>
 
-{{/* Every page, recently updated first, $limit a page, filters and timeline
-     beside. The no-JS fallback is the first page only: the whole site is too
-     long a home page. params.pagerSize only: a root _index.md `pagerSize:`
-     is the sections' (list-per-page.html), not home's. */}}
+{{/* Every page, newest first (params.listOrder), $limit a page, filters and
+     timeline beside. The no-JS fallback is the first page only: the whole
+     site is too long a home page. Params only: a root _index.md `order:` /
+     `pagerSize:` is the sections' (list-order.html, list-per-page.html), not home's. */}}
 {{ $limit := int (site.Params.pagerSize | default 20) }}
-{{ $recent := first $limit (partial "recent.html" site.RegularPages) }}
+{{ $recent := first $limit (sort site.RegularPages "Date" "desc") }}
 {{ with $recent }}
 <section class="home-recent">
-  {{ partial "list-container.html" (dict "pages" . "order" "updated" "perPage" $limit "scope" (dict "kind" "recent" "value" 0)) }}
+  {{ partial "list-container.html" (dict "pages" . "order" (site.Params.listOrder | default "created") "perPage" $limit "scope" (dict "kind" "recent" "value" 0)) }}
 </section>
 {{ end }}
 {{ end }}

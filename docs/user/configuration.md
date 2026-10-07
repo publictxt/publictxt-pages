@@ -68,7 +68,7 @@ on every edit.
 
 ## Browse lists
 
-Site-wide defaults for every section and tag list:
+Site-wide defaults for home, every section and every tag list:
 
 ```toml
 [params]

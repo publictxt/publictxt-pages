@@ -37,7 +37,7 @@ Items marked **(TBD)** are not built.
   - Tag and category facets: include or exclude values; match all or any (default all). One mode per facet — no mixed groups like `(a OR b) AND c` (TBD if needed).
 - Browse lists
   - Home *Recent*, sections and tag pages render client-side from one site-wide JSON index, with a plain `<ul>` no-JS fallback.
-  - Home *Recent*: every page, recently updated first.
+  - Home *Recent*: every page, newest first (`listOrder`).
   - Sort by Date, Recency, Alphabetical, Rating. Sort by Source/Author (TBD).
   - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
   - Compact toggle for one-line cards.
