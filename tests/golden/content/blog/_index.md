@@ -1,5 +1,6 @@
 ---
 description: Journal and blog posts
+filter: tag-not=journal
 title: "Dev log"
 created: 2025-01-01T12:00:00+00:00
 created_source: git

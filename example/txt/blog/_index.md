@@ -1,5 +1,6 @@
 ---
 description: Journal and blog posts
+filter: tag-not=journal
 ---
 # Dev log
 
