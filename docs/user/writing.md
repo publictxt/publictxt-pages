@@ -27,7 +27,7 @@ optional.
   are plain pages, outside any section.
 - **`_index.md`** is a folder's own page: its intro text, shown above the folder's list
   and searchable. At the root, it's the home page. No `_index.md`? One is generated.
-- An `_index.md` can carry `order:` / `pagerSize:` for its list
+- An `_index.md` can carry `order:` / `pagerSize:` / `filter:` for its list
   ([Configuration](configuration.md#browse-lists)).
 - Folder names show as written (`Design notes`, not `design-notes`).
 

@@ -4,7 +4,8 @@
 // `modes` allow, excludes match none.
 //   ?tag=a&tag=b&tag-match=any&tag-not=c
 // `-match` is written only off the facet's default, modes[0] — so a URL
-// without it means whatever the config's default is now.
+// without it means whatever the config's default is now. Likewise a list's
+// default filter (`filter:`, chipFacets().write).
 
 import { ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 
@@ -28,15 +29,28 @@ export function chipFacets(config) {
   const defs = config.filter((c) => c.key in BUILTIN)
     .map((c) => ({ ...BUILTIN[c.key], ...c, states: allowed(STATES, c.states), modes: allowed(MODES, c.match) }));
   const keys = defs.map((d) => d.key);
+  const read = (p = new URLSearchParams()) => Object.fromEntries(defs.map((d) => [d.key, readFacet(p, d.key, d.states, d.modes)]));
+  const same = (a, b) => keys.every((k) => sameFacet(a[k], b[k]));
+  const inURL = (p) => keys.some((k) => [k, k + "-not", k + "-match"].some((n) => p.has(n)));
   return {
-    defs, keys,
-    read: (p = new URLSearchParams()) => Object.fromEntries(defs.map((d) => [d.key, readFacet(p, d.key, d.states, d.modes)])),
-    write: (p, s) => keys.forEach((k) => writeFacet(p, s[k])),
+    defs, keys, read, same,
+    // A list's default filter `d` (list.js, data-filter) holds while the URL
+    // has no chip-facet param; with one, the URL is the whole chip state. So
+    // at `d`, write nothing; cleared off `d`, write an empty `<key>-not=`.
+    readOr: (p, d) => inURL(p) ? read(p) : d,
+    write: (p, s, d) => {
+      if (d && same(s, d)) return;
+      keys.forEach((k) => writeFacet(p, s[k]));
+      if (d && !inURL(p)) p.set((keys.find((k) => isSet(d[k])) ?? keys[0]) + "-not", "");
+    },
     clear: (s) => keys.forEach((k) => clearFacet(s[k])),
     anySet: (s) => keys.some((k) => isSet(s[k])),
     describe: (s) => defs.flatMap((d) => describe(s[d.key], d.prefix)),
   };
 }
+
+const sameSet = (a, b) => a.size === b.size && [...a].every((v) => b.has(v));
+const sameFacet = (a, b) => a.match === b.match && sameSet(a.inc, b.inc) && sameSet(a.exc, b.exc);
 
 // Config beats the URL: a part the facet's `states` or `modes` don't allow is
 // dropped, not left filtering where no chip can clear it.

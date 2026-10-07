@@ -1,0 +1,11 @@
+{{/*
+  A list's default chip filters: its `filter:`, else the nearest ancestor's,
+  as the URL spells them — `tag-not=journal`. Set, even to "", it stops the
+  cascade. Readers can still change them; a URL with any chip filter replaces
+  them whole (facets.js). Returns a string, "" for none.
+*/}}
+{{ $f := "" }}
+{{ $found := isset .Params "filter" }}
+{{ if $found }}{{ $f = .Params.filter }}{{ end }}
+{{ range .Ancestors }}{{ if and (not $found) (isset .Params "filter") }}{{ $f = .Params.filter }}{{ $found = true }}{{ end }}{{ end }}
+{{ return (string $f) }}

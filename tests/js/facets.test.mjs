@@ -60,6 +60,27 @@ test("chipFacets: config order, unknown keys dropped, defaults filled", () => {
   assert.ok(!c.anySet(s));
 });
 
+test("a list's default filter: holds without chip params, URL replaces it whole", () => {
+  const c = chipFacets([{ key: "tag", label: "Tags" }, { key: "collection", label: "Collection" }]);
+  const d = () => c.read(qs("tag-not=journal"));
+  const write = (s) => { const p = qs(""); c.write(p, s, d()); return p.toString(); };
+  // No chip param (others don't count): the default.
+  assert.deepEqual([...c.readOr(qs("year=2026"), d()).tag.exc], ["journal"]);
+  assert.equal(write(d()), "");
+  // Any chip param: exactly the URL's, default dropped.
+  const s = c.readOr(qs("collection=blog"), d());
+  assert.deepEqual([[...s.tag.exc], [...s.collection.inc]], [[], ["blog"]]);
+  assert.equal(write(s), "collection=blog");
+  // Cleared off the default: an empty param says so, and reads back clear.
+  const cleared = d(); c.clear(cleared);
+  assert.equal(write(cleared), "tag-not=");
+  assert.ok(!c.anySet(c.readOr(qs(write(cleared)), d())));
+  // Added to: written whole.
+  const more = d(); more.tag.inc.add("a");
+  assert.equal(write(more), "tag=a&tag-not=journal");
+  assert.ok(c.same(c.readOr(qs(write(more)), d()), more));
+});
+
 // ---- chips --------------------------------------------------------------
 
 test("press: body toggles the first state; ✕ toggles exclude; never via the opposite", () => {

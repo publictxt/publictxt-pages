@@ -38,6 +38,7 @@ Items marked **(TBD)** are not built.
 - Browse lists
   - Home *Recent*, sections and tag pages render client-side from one site-wide JSON index, with a plain `<ul>` no-JS fallback.
   - Home *Recent*: every page, newest first (`listOrder`).
+  - A folder's default filters (`filter:`, e.g. blog without `#journal`); Reset returns to them.
   - Sort by Date, Recency, Alphabetical, Rating. Sort by Source/Author (TBD).
   - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
   - Compact toggle for one-line cards.

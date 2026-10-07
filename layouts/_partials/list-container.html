@@ -7,11 +7,12 @@
     pages    — the page collection, in the order the fallback should show
     scope    — dict: kind (section | collection | tag | recent), value
     order    — default sort (see list.js), optional
+    filter   — default chip filters, URL-spelled (list-filter.html), optional
     perPage  — cards per page, optional (0 = list.js default)
     compact  — true for cards only, no controls (dataview blocks)
     limit    — compact only: show the first N, optional (0 = all)
 */}}
-<div class="list" data-list data-scope-kind="{{ .scope.kind }}" data-scope-value="{{ .scope.value }}"{{ with .order }} data-order="{{ . }}"{{ end }}{{ with .perPage }} data-per-page="{{ . }}"{{ end }}{{ if .compact }} data-compact{{ end }}{{ with .limit }} data-limit="{{ . }}"{{ end }}>
+<div class="list" data-list data-scope-kind="{{ .scope.kind }}" data-scope-value="{{ .scope.value }}"{{ with .order }} data-order="{{ . }}"{{ end }}{{ with .filter }} data-filter="{{ . }}"{{ end }}{{ with .perPage }} data-per-page="{{ . }}"{{ end }}{{ if .compact }} data-compact{{ end }}{{ with .limit }} data-limit="{{ . }}"{{ end }}>
   <ul class="link-list">
     {{ range .pages }}
     <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> {{ range partial "page-collections.html" . }}<span class="chip chip-collection">{{ . }}</span> {{ end }}{{ partial "page-date.html" (dict "page" .) }}</li>

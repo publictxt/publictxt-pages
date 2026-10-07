@@ -7,6 +7,7 @@
 //   data-scope-kind   section | collection | tag | recent
 //   data-scope-value  a path, a collection, a tag, or a limit
 //   data-order        default sort (sorts.js)
+//   data-filter       default chip filters, as the URL spells them (`tag-not=journal`)
 //   data-per-page     cards per page, until the reader picks a size (page-size.js)
 //   data-compact      cards only: no controls, pager or URL (dataview)
 //   data-limit        compact: the first N only
@@ -16,7 +17,7 @@
 // the list when narrow (layout.js). Sort, page size and the density toggle sit with the count.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, filterChip, foldHint, matches, matchToggle, ratingChips, ratingCounts,
+import { addsPages, chipFacets, filterChip, foldHint, isSet, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { pageHolding, pageSizes, readPageSize, writePageSize } from "./page-size.js";
@@ -60,6 +61,9 @@ async function mount(root) {
   let perPage = compact ? listDefault : readPageSize(globalThis.localStorage) ?? listDefault;   // 0 = all
   const limit = parseInt(root.dataset.limit, 10) || undefined;
   const defaultSort = normaliseSort(root.dataset.order);
+  // Fresh each call: state's sets are mutated. `defaults` is only compared.
+  const defaultChips = () => CHIPS.read(new URLSearchParams(compact ? "" : root.dataset.filter || ""));
+  const defaults = defaultChips();
   // Claimed before the await, so mount order decides.
   const slot = compact ? null : document.querySelector("[data-list-controls]");
   slot?.removeAttribute("data-list-controls");
@@ -73,12 +77,12 @@ async function mount(root) {
 
   // ---- state <-> URL --------------------------------------------------
   // Chip facets by key (CHIPS.read); `more`: keys showing past their limit.
-  const state = { sort: defaultSort, ...CHIPS.read(), year: "", month: "", rating: "", page: 1, more: new Set() };
+  const state = { sort: defaultSort, ...defaultChips(), year: "", month: "", rating: "", page: 1, more: new Set() };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
-    Object.assign(state, CHIPS.read(p));
+    Object.assign(state, CHIPS.readOr(p, defaultChips()));
     // No timeline (one month, or compact), no date filter: nothing would
     // show it or clear it.
     state.year = hasTimeline ? p.get("year") || "" : "";
@@ -90,7 +94,7 @@ async function mount(root) {
     const s = { ...state, ...overrides };
     const p = new URLSearchParams();
     if (s.sort !== defaultSort) p.set("sort", s.sort);
-    CHIPS.write(p, s);
+    CHIPS.write(p, s, defaults);
     if (s.year) p.set("year", s.year);
     if (s.month) p.set("month", s.month);
     if (s.rating) p.set("rating", s.rating);
@@ -176,7 +180,7 @@ async function mount(root) {
   const ratings = [...new Set(items.map((it) => it.rating).filter(Boolean))].sort((a, b) => b - a);
   const hasUnrated = items.some((it) => !it.rating);
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
-  const hasFilters = hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length);
+  const hasFilters = hasRatings || CHIPS.defs.some((d) => chipValues[d.key].length || isSet(defaults[d.key]));
   // Nothing to pick in a single month. The newest year open to start,
   // or the ones the URL picked (readURL, below).
   const fullTree = timeline(items);
@@ -219,7 +223,7 @@ async function mount(root) {
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        CHIPS.clear(state); state.year = ""; state.month = ""; state.rating = ""; state.page = 1; render(true);
+        Object.assign(state, defaultChips()); state.year = ""; state.month = ""; state.rating = ""; state.page = 1; render(true);
       });
       row.append(clear);
       body.append(row);
@@ -233,16 +237,17 @@ async function mount(root) {
       body.append(facetRow("rating", "Rating", chips, null, state.rating ? 1 : 0));
     }
 
-    // Past a facet's `limit`, chips fold behind "more"; selected ones stay.
+    // Past a facet's `limit`, chips fold behind "more"; selected ones stay,
+    // and show even where the facet wouldn't — a default filter, say.
     for (const d of CHIPS.defs) {
       const values = chipValues[d.key];
-      if (!values.length) continue;
       const f = state[d.key];
+      if (!values.length && !isSet(f)) continue;
       const c = new Map(counts(forFacet(d.key), d.key));
       const open = !d.limit || state.more.has(d.key);
       const visible = open ? values : values.slice(0, d.limit);
       const chips = visible.map(([n]) => chip(d, n, c.get(n) || 0));
-      for (const v of d.limit ? [...f.inc, ...f.exc] : []) {
+      for (const v of [...f.inc, ...f.exc]) {
         if (!visible.some(([n]) => n === v)) chips.push(chip(d, v, c.get(v) || 0));
       }
       if (d.limit && values.length > d.limit) {
@@ -298,7 +303,8 @@ async function mount(root) {
     pager.append(step(cur > 1, cur - 1, "‹ Previous", "prev"), ol, step(cur < total, cur + 1, "Next ›", "next"));
   }
 
-  const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
+  // Off the list's defaults: what Reset undoes.
+  const filtering = () => Boolean(!CHIPS.same(state, defaults) || state.year || state.rating);
   const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
 
   // The other filters narrow it; its own pick shows as pressed, not as a cut.

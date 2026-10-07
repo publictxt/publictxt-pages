@@ -85,14 +85,20 @@ every folder below it, unless one sets its own.
 ---
 order: title
 pagerSize: 50
+filter: tag-not=journal
 ---
 ```
 
-Readers can still change the sort and the page size; these are where they start. A
+`filter` starts the list filtered — chip filters spelled as in the list's URL
+(`tag=a&tag-not=b&collection=blog`). Set it to `""` to stop a parent folder's from
+applying. *Reset* returns to it; a link carrying any chip filter replaces it.
+
+Readers can still change the sort, the page size and the filters; these are where they start. A
 reader's page size is remembered in their browser and then applies to every list.
 
 `pagerSize` is one setting for home, section and tag lists, and search. In the root
-`_index.md` it sets every section's, not home's: home reads only the site setting. (It
+`_index.md`, `order` / `pagerSize` / `filter` set every section's, not home's: home reads
+only the site settings. (It
 is not Hugo's own `[pagination] pagerSize` — lists page in the browser, so that one does
 nothing here.)
 

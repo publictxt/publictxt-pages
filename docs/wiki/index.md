@@ -74,6 +74,7 @@ layouts/_partials/
   js-params.html        @params for every js.Build — see traps.md
   chip-facets.html      only reader of params.chipFacets   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
+  list-filter.html      filter: cascade (page -> ancestors): default chip filters
   list-per-page.html    pagerSize: cascade
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
