@@ -4,20 +4,29 @@ hashtags.py — the one definition of an inline #hashtag, for sync_content.py:
 linkify() for the body, merge_tags() for front matter `tags`, so visible tags
 and the tag cloud agree.
 
-`#` + a letter, then letters/digits/`_`/`-`; not after a word char, `/` or `&`.
-Not inside code, HTML tags, links or URLs (`/page/#section` is no tag). An
+`#` + a letter, then letters/digits/`_`/`-`, optionally nested by `/`
+(`#dev/app`, as Obsidian); not after a word char, `/` or `&`. Not inside code, HTML tags, links or URLs (`/page/#section` is no tag). An
 already-linkified `[#tag](...)` counts but is never re-linked: both operations
 are idempotent.
 
 Merged at sync, not in templates: Hugo builds taxonomies from front matter
 before rendering, so inline tags would miss /tags/ pages and the tag cloud.
+
+Nested tags are flat, separate terms: `dev/app` doesn't include or count under
+`dev`. Hugo files a term containing `/` under its parent's path, then misreads
+the parent (its page, count, list), so a nested tag is stored under
+term_key() — `dev--app` — and sync gives that term page the real name as its
+title (term_titles()). Templates and JS show and filter on the title.
 """
 
 import re
 
+TAG = r"[A-Za-z][A-Za-z0-9_-]*(?:/[A-Za-z0-9_-]+)*"
+NEST_SEP = "--"   # `/` in a term key; tagURL() in cards.js and the dataview hook repeat it
+
 HASHTAG_RE = re.compile(
     # 1. an already-linkified hashtag — still a tag, but must not be re-linked
-    r"(?<!!)\[#(?P<linked>[A-Za-z][A-Za-z0-9_-]*)\]\([^)\n]*\)"
+    rf"(?<!!)\[#(?P<linked>{TAG})\]\([^)\n]*\)"
     # 2. regions that never contain tags (order matters: checked before 3)
     r"|(?P<protected>"
     r"!?\[[^\]\n]*\]\([^)\n]*\)"   # inline link or image
@@ -28,9 +37,19 @@ HASHTAG_RE = re.compile(
     r"|https?://\S+"                 # bare URL
     r")"
     # 3. a bare hashtag in prose
-    r"|(?<![\w/&])#(?P<tag>[A-Za-z][A-Za-z0-9_-]*)",
+    rf"|(?<![\w/&])#(?P<tag>{TAG})",
     re.DOTALL,
 )
+
+
+def term_key(tag: str) -> str:
+    """The Hugo term a tag is stored under: `/` can't be in it (module docstring)."""
+    return tag.replace("/", NEST_SEP)
+
+
+def tag_path(tag: str) -> str:
+    """A tag's /tags/<path>/ segment: Hugo's urlize of term_key(), for our tag charset."""
+    return term_key(tag).lower()
 
 
 def find_hashtags(body: str) -> list[str]:
@@ -48,14 +67,13 @@ def find_hashtags(body: str) -> list[str]:
 def linkify(body: str) -> str:
     """
     Bare `#tag` -> `[#tag](/tags/tag/)`, text unchanged. Hugo's link render hook
-    resolves the path (so sub-path deploys work); the lowercased slug matches
-    urlize and find_hashtags().
+    resolves the path (so sub-path deploys work); the slug is tag_path().
     """
     def repl(m: re.Match) -> str:
         tag = m.group("tag")
         if not tag:
             return m.group(0)   # protected region, or already a tag link
-        return f"[#{tag}](/tags/{tag.lower()}/)"
+        return f"[#{tag}](/tags/{tag_path(tag)}/)"
 
     return HASHTAG_RE.sub(repl, body)
 
@@ -101,16 +119,27 @@ def parse_tags(lines: list[str]) -> tuple[list[str], tuple[int, int] | None]:
     return [], None
 
 
+def page_tags(fm_lines: list[str], body: str) -> list[str]:
+    """A page's tags, as named: front matter's first, then `body`'s hashtags; deduped."""
+    raw, _ = parse_tags(fm_lines)
+    # Obsidian can store `- #tag`; the site adds its own `#`, which would show `##tag`.
+    existing = [t for t in (t.lstrip("#").strip("/") for t in raw) if t]
+    return list(dict.fromkeys([*existing, *find_hashtags(body)]))
+
+
+def term_titles(tags: list[str]) -> dict[str, str]:
+    """tag_path -> name for the nested tags: the term pages sync titles."""
+    return {tag_path(t): t for t in tags if "/" in t}
+
+
 def merge_tags(fm_lines: list[str], body: str) -> list[str]:
     """
-    Front matter lines with `body`'s hashtags merged into `tags` (existing
-    first, deduped, a leading `#` dropped). Unchanged — block style kept — when the body adds none;
-    else one inline `tags:` line, in place or appended.
+    Front matter lines with `tags` set to page_tags(), each as its term_key().
+    Unchanged — block style kept — when that changes nothing; else one inline
+    `tags:` line, in place or appended.
     """
     raw, span = parse_tags(fm_lines)
-    # Obsidian can store `- #tag`; the site adds its own `#`, which would show `##tag`.
-    existing = [t for t in (t.lstrip("#") for t in raw) if t]
-    merged = list(dict.fromkeys([*existing, *find_hashtags(body)]))
+    merged = list(dict.fromkeys(term_key(t) for t in page_tags(fm_lines, body)))
     if merged == raw:
         return fm_lines
     line = "tags: [" + ", ".join(f'"{t}"' for t in merged) + "]"

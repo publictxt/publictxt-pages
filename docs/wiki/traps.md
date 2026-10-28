@@ -27,6 +27,12 @@ search. Add one to both, or search cards go without it. What's still implemented
 | Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js` |
 | `timeline/content.html`: grouping (year, month, newest first, undated out, ≥2 months) and markup (`.tl-*` classes; no sparklines or month bars) | `timeline()`, `monthCount()` and `renderTimeline()` in `timeline.js`; `main.css` styles both |
 
+A nested tag's `/` is `--` in its term key and URL: `term_key()`/`tag_path()` in
+`hashtags.py` (sync also writes its term page's title), `tagURL()` in `cards.js`, the
+`$key` in `render-codeblock-dataview.html`. Hugo nests a term with `/` under its
+parent and misreads the parent; templates and JS use a term's `.LinkTitle` (its name),
+never `.Data.Term` (the key).
+
 A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.

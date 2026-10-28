@@ -16,7 +16,7 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`)
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
-scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`)
+scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags flat
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
 scripts/build.sh            shim -> build.py, for deploy workflows copied before it
 scripts/cloud-setup.sh      installs pinned Hugo + Pagefind on Linux (cloud env setup script)
@@ -30,7 +30,7 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_exclude.py       params.excludeFolders: whole subtrees left out of sync
-tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped
+tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
 tests/test_map_lint.py      map_lint.py's reading of the map: folder headings, namesakes

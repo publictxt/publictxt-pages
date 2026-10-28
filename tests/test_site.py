@@ -105,6 +105,18 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn("All 6 pages tagged #site", block[1])
         self.assertRegex(html, r"<pre[^>]*>.*TABLE rating FROM #site", "unsupported query not left as code")
 
+    def test_nested_tags_are_separate_terms(self):
+        """notes/nested-tags.md: `nesting` and `nesting/…` — Hugo nests a `/` term
+        under its parent and then misreads the parent, so sync flattens it (hashtags.py)."""
+        cloud = self.html("tags")
+        for path, name in [("nesting", "nesting"), ("nesting--front-matter", "nesting/front-matter"),
+                           ("nesting--inline", "nesting/inline")]:
+            self.assertRegex(cloud, rf'href="/tags/{path}/"[^>]*>#{name}<span class="count">1<')
+        self.assertIn("<title>nesting/inline", self.html("tags", "nesting--inline"))
+        page = self.html("notes", "nested-tags")
+        self.assertIn('href="/tags/nesting--inline/"', page)
+        self.assertIn('data-scope-kind="tag" data-scope-value="nesting/front-matter"', page)
+
     # The folder tree's markup is read here, and only here (tree/row.html).
     def html(self, *path):
         return (self.public.joinpath(*path) / "index.html").read_text(encoding="utf-8")

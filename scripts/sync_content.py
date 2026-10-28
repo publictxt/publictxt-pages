@@ -9,6 +9,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     Section indexes take their newest descendant's `updated`.
   * Folder with Markdown but no index -> generated `_index.md`.
   * `#hashtags` linkified and merged into `tags:` (hashtags.py).
+  * A nested tag (`dev/app`) -> a term page, `tags/dev--app/_index.md`,
+    titled with its name (hashtags.py: Hugo nests terms on `/`).
   * `source_path:` records the source path, for the edit link.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
@@ -32,7 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dates import DateResolver, sort_key
-from hashtags import linkify, merge_tags
+from hashtags import linkify, merge_tags, page_tags, term_titles
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
@@ -131,7 +133,8 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
     return Stamp(created, created_source, updated, authored)
 
 
-def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
+def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | None = None) -> str:
+    """`titles`: collects term_titles() of the page's tags, for write_term_pages()."""
     fm, body = split_front_matter(text)
     fm = rename_legacy_keys(fm)
     name = Path(rel).name
@@ -158,6 +161,9 @@ def normalise_md(text: str, rel: str, stamp: Stamp) -> str:
     body = linkify(body)
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
+    if titles is not None:
+        for path, name in term_titles(page_tags(fm_lines, body)).items():
+            titles.setdefault(path, name)
     fm_lines = merge_tags(fm_lines, body)
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 
@@ -223,6 +229,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
     indexes: dict[Path, Stamp] = {}   # existing section index -> stamp
+    titles: dict[str, str] = {}       # nested tag's term path -> its name
 
     for path in sorted(src.rglob("*")):
         if any(part in SKIP_DIRS for part in path.relative_to(src).parts):
@@ -253,7 +260,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                       "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, titles), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
@@ -264,6 +271,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     newest = newest_updated_by_folder(dest, pages)
     md_count += add_missing_indexes(dest, resolver.built_at, newest)
     inherit_index_dates(indexes, newest)
+    write_term_pages(dest, titles)   # after add_missing_indexes: tags/ is no section
     return md_count, other_count, unpublished
 
 
@@ -312,6 +320,14 @@ def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> i
         )
         created += 1
     return created
+
+
+def write_term_pages(dest: Path, titles: dict[str, str]) -> None:
+    """A nested tag's term page, titled with its name — Hugo would show the key."""
+    for path, name in titles.items():
+        index = dest / "tags" / path / "_index.md"
+        index.parent.mkdir(parents=True, exist_ok=True)
+        index.write_text(f"---\ntitle: {yaml_str(name)}\n---\n", encoding="utf-8")
 
 
 def main():
