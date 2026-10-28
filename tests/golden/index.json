@@ -194,6 +194,25 @@
   "year": "2025"
  },
  {
+  "collections": [
+   "notes"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "notes",
+  "summary": "Obsidian nests tags with /: #nesting/inline. Each is its own tag — #nesting lists only the pages tagged #nesting itself, not #nesting/inline’s.\nNested tags notes 1 Jan 2025 · …",
+  "tags": [
+   "nesting",
+   "nesting/front-matter",
+   "nesting/inline"
+  ],
+  "title": "Nested tags",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/notes/nested-tags/",
+  "year": "2025"
+ },
+ {
   "bookmarks": [
    {
     "label": "↗ obsidian.md",

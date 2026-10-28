@@ -17,7 +17,7 @@
 {{- $limit := 0 -}}
 {{- $ok := false -}}
 {{- with $lines -}}
-  {{- with findRESubmatch `(?i)^LIST\s+FROM\s+#([A-Za-z][A-Za-z0-9_-]*)$` (index . 0) 1 -}}
+  {{- with findRESubmatch `(?i)^LIST\s+FROM\s+#([A-Za-z][A-Za-z0-9_-]*(?:/[A-Za-z0-9_-]+)*)$` (index . 0) 1 -}}
     {{- $tag = index (index . 0) 1 -}}
     {{- $ok = true -}}
   {{- end -}}
@@ -30,7 +30,7 @@
   {{- end -}}
 {{- end -}}
 {{- if $ok -}}
-  {{- $key := $tag | lower | urlize -}}
+  {{- $key := replace $tag "/" "--" | lower | urlize -}}{{/* hashtags.py tag_path() */}}
   {{- $term := index site.Taxonomies.tags $key -}}
   {{- $pages := slice -}}
   {{- with $term }}{{ $pages = partial "recent.html" (where .Pages "Kind" "page") }}{{ end -}}

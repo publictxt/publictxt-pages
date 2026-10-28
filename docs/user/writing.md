@@ -83,8 +83,9 @@ Rules:
 
 - Starts with a letter; then letters, digits, `_`, `-`. Shown lower-case.
 - Not tags: anything in `code`, URLs (`page#section`), links, `C#`, `issue #42`.
-- Obsidian's nested tags (`#books/fiction`) aren't supported — the `/` ends the tag
-  (`books`). Use `books-fiction` or two tags.
+- Obsidian's nested tags (`#books/fiction`) work, as separate tags: `#books` lists
+  only the pages tagged `#books` itself, not `#books/fiction`'s. A nested tag's page is
+  `/tags/books--fiction/`, so don't also use a literal `books--fiction` tag.
 
 Each tag gets a page (`/tags/hugo/`), a place in the sidebar cloud, and a filter chip.
 

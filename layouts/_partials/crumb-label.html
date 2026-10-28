@@ -11,6 +11,6 @@
   {{- with .File }}{{ $b = path.Base .Dir }}{{ end -}}
   {{- if or (findRE `^\d+$` $b) (ne $b (lower $b)) }}{{ $b }}{{ else }}{{ $b | humanize }}{{ end -}}
 {{- else if eq .Kind "taxonomy" -}}{{ .Title | humanize }}
-{{- else if eq .Kind "term" -}}#{{ .Data.Term }}
+{{- else if eq .Kind "term" -}}#{{ .LinkTitle }}
 {{- else -}}{{ .Title }}
 {{- end -}}

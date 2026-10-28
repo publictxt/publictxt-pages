@@ -25,12 +25,15 @@ content/notes/Design notes/Why Git . 20240816.md
 content/notes/Design notes/_index.md
 content/notes/_index.md
 content/notes/embeds.md
+content/notes/nested-tags.md
 content/notes/pipeline.png
 content/notes/sample.md
 content/notes/tag-lists.md
 content/online-things.md
 content/posts/20260426-first-toot.md
 content/posts/_index.md
+content/tags/nesting--front-matter/_index.md
+content/tags/nesting--inline/_index.md
 content/wiki/Pipeline/Dates.md
 content/wiki/Pipeline/Hashtags.md
 content/wiki/Pipeline/_index.md

@@ -35,10 +35,11 @@ export function ratingFilterLabel(v) {
   return v === UNRATED_FILTER ? "Unrated" : `★${v}${Number(v) < 5 ? "+" : ""}`;
 }
 
-// <base>/tags/<term>/, base from <html data-base> for sub-path deploys.
+// <base>/tags/<term>/, base from <html data-base> for sub-path deploys. A
+// nested tag's `/` is `--` in its path (hashtags.py tag_path()).
 export function tagURL(name) {
   const base = document.documentElement.dataset.base || "/";
-  return base.replace(/\/?$/, "/") + "tags/" + encodeURIComponent(name.toLowerCase()) + "/";
+  return base.replace(/\/?$/, "/") + "tags/" + encodeURIComponent(name.toLowerCase().replaceAll("/", "--")) + "/";
 }
 
 // Compact cards (main.css .dense): one line each — title, date, rating — no

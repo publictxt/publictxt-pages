@@ -33,6 +33,7 @@ Items marked **(TBD)** are not built.
   - Category pages (TBD)
 - Tags
   - Inline `#hashtags` merged into `tags`.
+  - Nested tags (`#dev/app`) are separate, flat tags; `#dev` including its children, as Obsidian does (TBD).
   - Tag pages.
   - Tag and category facets: include or exclude values; match all or any (default all). One mode per facet — no mixed groups like `(a OR b) AND c` (TBD if needed).
 - Browse lists
