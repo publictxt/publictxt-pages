@@ -19,7 +19,7 @@ scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags flat
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
 scripts/build.sh            shim -> build.py, for deploy workflows copied before it
-scripts/cloud-setup.sh      installs pinned Hugo + Pagefind on Linux (cloud env setup script)
+scripts/cloud-setup.sh      installs latest Hugo + pinned Pagefind on Linux (cloud env setup script)
 scripts/map_lint.py         this map vs the tree; docstring: how it reads the map
 ```
 

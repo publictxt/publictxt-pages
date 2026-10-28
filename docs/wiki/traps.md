@@ -40,7 +40,7 @@ together.
 A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
 entry): change the default and shared links without it change meaning.
 
-The Pagefind version is pinned in `build.py` (and `cloud-setup.sh`, with CI's Hugo version); `search.js` is written against its JS
+The Pagefind version is pinned in `build.py` (`cloud-setup.sh` reads it); `search.js` is written against its JS
 API, so a bump means checking search too.
 
 Also: the breakpoints in `main.css` (1440px drawer, 900px one column) are repeated
