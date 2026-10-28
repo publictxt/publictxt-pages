@@ -58,7 +58,7 @@ jobs:
           # HUGO_PARAMS_MASTODON: "https://mastodon.social/@username"   # optional, rel="me"
           # "Edit this page" links for this repo and branch; "" hides them.
           HUGO_PARAMS_EDITURL: ${{ github.server_url }}/${{ github.repository }}/edit/${{ github.ref_name }}/
-        # The runner's python3 (3.10+) is enough; build.py needs no packages.
+        # The runner's python3 (3.11+; tomllib) is enough; build.py needs no packages.
         run: python3 site/scripts/build.py --source ../txt
 
       - name: Upload artifact

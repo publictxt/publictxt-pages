@@ -149,7 +149,7 @@ Obsidian Sync + desktop push setup are alternatives.
 
 See the site before you push. You need:
 
-- **Python 3.10+** (no packages)
+- **Python 3.11+** (no packages)
 - **Hugo v0.162+** — `hugo version` to check; distro packages are often too old,
   use the [release binaries](https://github.com/gohugoio/hugo/releases)
 - **Pagefind 1.5.2** on `PATH`, or **Node** (the build fetches Pagefind with `npx`)

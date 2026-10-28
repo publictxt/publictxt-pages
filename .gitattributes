@@ -1,0 +1,4 @@
+# Templates check out LF everywhere: a CRLF template puts \r into rendered text
+# (index.json summaries). Content keeps the platform's newlines — the Windows CI job
+# tests CRLF sources.
+layouts/** text eol=lf
