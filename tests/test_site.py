@@ -106,13 +106,14 @@ class SiteIndexTest(unittest.TestCase):
         self.assertRegex(html, r"<pre[^>]*>.*TABLE rating FROM #site", "unsupported query not left as code")
 
     def test_nested_tags_are_separate_terms(self):
-        """notes/nested-tags.md: `nesting` and `nesting/…` — Hugo nests a `/` term
-        under its parent and then misreads the parent, so sync flattens it (hashtags.py)."""
+        """notes/nested-tags.md: `nesting/…` only, so `nesting` by ancestry — Hugo nests
+        a `/` term under its parent and then misreads the parent, so sync flattens it (hashtags.py)."""
         cloud = self.html("tags")
         for path, name in [("nesting", "nesting"), ("nesting--front-matter", "nesting/front-matter"),
                            ("nesting--inline", "nesting/inline")]:
             self.assertRegex(cloud, rf'href="/tags/{path}/"[^>]*>#{name}<span class="count">1<')
         self.assertIn("<title>nesting/inline", self.html("tags", "nesting--inline"))
+        self.assertIn('href="/notes/nested-tags/"', self.html("tags", "nesting"))
         page = self.html("notes", "nested-tags")
         self.assertIn('href="/tags/nesting--inline/"', page)
         self.assertIn('data-scope-kind="tag" data-scope-value="nesting/front-matter"', page)
