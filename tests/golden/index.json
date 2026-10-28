@@ -200,7 +200,7 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "notes",
-  "summary": "Obsidian nests tags with /: #nesting/inline. Each is its own tag — #nesting lists only the pages tagged #nesting itself, not #nesting/inline’s.\nNested tags notes 1 Jan 2025 · …",
+  "summary": "Obsidian nests tags with /: #nesting/inline. A nested tag also tags the page with its parents, so this page is under #nesting too, though it never says so.\nNested tags notes 1 Jan …",
   "tags": [
    "nesting",
    "nesting/front-matter",

@@ -12,11 +12,13 @@ are idempotent.
 Merged at sync, not in templates: Hugo builds taxonomies from front matter
 before rendering, so inline tags would miss /tags/ pages and the tag cloud.
 
-Nested tags are flat, separate terms: `dev/app` doesn't include or count under
-`dev`. Hugo files a term containing `/` under its parent's path, then misreads
-the parent (its page, count, list), so a nested tag is stored under
-term_key() — `dev--app` — and sync gives that term page the real name as its
-title (term_titles()). Templates and JS show and filter on the title.
+A nested tag also tags the page with its parents, as Obsidian's search counts
+`#dev/app` under `#dev`: page_tags() adds them, so `dev` lists, counts and
+filters its children's pages. But not as Hugo nests them: Hugo files a term
+containing `/` under its parent's path, then misreads the parent (its page,
+count, list), so a nested tag is stored under term_key() — `dev--app` — and
+sync gives that term page the real name as its title (term_titles()).
+Templates and JS show and filter on the title.
 """
 
 import re
@@ -120,11 +122,21 @@ def parse_tags(lines: list[str]) -> tuple[list[str], tuple[int, int] | None]:
 
 
 def page_tags(fm_lines: list[str], body: str) -> list[str]:
-    """A page's tags, as named: front matter's first, then `body`'s hashtags; deduped."""
+    """
+    A page's tags, as named: front matter's first, then `body`'s hashtags; each
+    nested one after its parents (`dev`, `dev/app`); deduped.
+    """
     raw, _ = parse_tags(fm_lines)
     # Obsidian can store `- #tag`; the site adds its own `#`, which would show `##tag`.
     existing = [t for t in (t.lstrip("#").strip("/") for t in raw) if t]
-    return list(dict.fromkeys([*existing, *find_hashtags(body)]))
+    named = [*existing, *find_hashtags(body)]
+    return list(dict.fromkeys(a for t in named for a in ancestry(t)))
+
+
+def ancestry(tag: str) -> list[str]:
+    """`a/b/c` -> [`a`, `a/b`, `a/b/c`]; an empty segment (`a//b`) is dropped."""
+    parts = [p for p in tag.split("/") if p]
+    return ["/".join(parts[:i]) for i in range(1, len(parts) + 1)]
 
 
 def term_titles(tags: list[str]) -> dict[str, str]:

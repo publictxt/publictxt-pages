@@ -16,7 +16,7 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`)
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
-scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags flat
+scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags + parents, flat keys
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
 scripts/build.sh            shim -> build.py, for deploy workflows copied before it
 scripts/cloud-setup.sh      installs latest Hugo + pinned Pagefind on Linux (cloud env setup script)
