@@ -1,6 +1,6 @@
 # publictxt-pages
 
-Statically-hosted web interface for [PublicTxt](../publictxt) repos — deployable
+Statically-hosted web interface for [PublicTxt](https://github.com/publictxt/publictext) repos — deployable
 to GitHub/GitLab Pages for free, with no backend required.
 
 Python preprocessing + Hugo build produce the static site; a dynamic
