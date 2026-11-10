@@ -85,7 +85,8 @@ my-notes/
 inside a folder. Any folder works; these names are just the conventions the default
 config orders and styles. Details: [Writing](writing.md).
 
-`README.md`, `LICENSE`, `CNAME` and `.obsidian/` are never published.
+`LICENSE`, `CNAME`, `.gitignore` and `.obsidian/` are never published. `README.md` is — to keep
+it off, add it to [`skipFiles`](configuration.md#leave-files-out).
 
 ## 5. Add the publish workflow
 
@@ -186,7 +187,7 @@ A `CNAME` file isn't needed with Actions deploys (and the site doesn't publish o
 | A link shows as `[[text]]` | Wikilink — rewrite as `[text](path.md)` (step 3) |
 | An image doesn't show | It's not beside the note or in a top-level folder — see [Images](writing.md#images-audio-and-video); the build log warns |
 | Search finds nothing locally | `--serve` skips the search index; run a full build first |
-| A page is missing | `publish: off`, an excluded folder, or a `README.md`/`LICENSE` name |
+| A page is missing | `publish: off`, an excluded folder, or a skipped file name (`skipFiles`) |
 | A Templates note appears on the site | Add its folder to `excludeFolders` |
 
 Build warnings (bad category, missing bookmark URL, misplaced image) are in the

@@ -36,6 +36,7 @@ the site reads — but any editor works. See [Other editors](other-editors.md).
 | Add a section | Create a top-level folder (`recipes/`) |
 | Hide a page | `publish: off` in its front matter |
 | Hide a folder | `params.excludeFolders` in `settings/site.toml` |
+| Hide a file name (e.g. `README.md`) | `params.skipFiles` in `settings/site.toml` |
 | Tag a page | `#hashtag` in the text, or `tags:` in front matter |
 | Set the site title | `HUGO_TITLE` in the workflow, or `title` in `settings/site.toml` |
 | Date a post | Name it `20260509-title.md`, or set `created:` |
