@@ -14,8 +14,8 @@ git diff tests/golden                                  # read it: every change s
 
 | Case | File(s) |
 |---|---|
-| Title from the first `# H1`, removed from the body | `wiki/Site/Search.md` |
-| … with a line before the H1 | `wiki/Projects/PublicTxt/PublicTxt.md` |
+| Title from a `# H1` on the first line, removed from the body | `wiki/Site/Search.md` |
+| … but a line before the H1: file name, H1 kept | `wiki/Projects/PublicTxt/PublicTxt.md` |
 | … `title:` set, so the H1 stays | `blog/20260915-a-post-with-full-front-matter.md` |
 | Title from the file name (no H1) | `notes/sample.md`, `wiki/Site/Pagefind.md` |
 | `created` from `YYYYMMDD` / `YYYY-MM-DD` in the name | `blog/20260509-…`, `blog/2024/2024-10-13-…`, `notes/Design notes/Why Git . 20240816.md` |

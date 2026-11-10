@@ -191,6 +191,19 @@ Typical use: Obsidian's Templates folder, whose `{{date}}` placeholders would ot
 publish. Excluded is **hidden, not private** — it's still in your public repo. Links
 into an excluded folder break.
 
+## Titles from headings
+
+A note without `title:` takes a `# Heading` on its first line as its title, removed from
+the body ([Writing → Titles](writing.md#titles)). To title every such note by its file
+name instead, and keep the heading in the body:
+
+```toml
+[params]
+  titleFromHeading = false
+```
+
+`title:` in front matter still wins. Read at sync, like `excludeFolders`.
+
 ## A full example
 
 ```toml

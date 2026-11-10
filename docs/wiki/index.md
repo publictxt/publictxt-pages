@@ -14,7 +14,8 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 
 ```txt
 scripts/sync_content.py     source repo -> build/content: titles, dates,
-                            hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`)
+                            hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`);
+                            reads `params.titleFromHeading`
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags + parents, flat keys
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
@@ -29,6 +30,7 @@ scripts/map_lint.py         this map vs the tree; docstring: how it reads the ma
 tests/test_golden.py        example/txt through sync vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
+tests/test_title.py         derive_title: the H1 on the first line only; titleFromHeading
 tests/test_exclude.py       params.excludeFolders: whole subtrees left out of sync
 tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)

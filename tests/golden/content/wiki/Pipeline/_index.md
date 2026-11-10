@@ -1,5 +1,5 @@
 ---
-title: "The sync pipeline"
+title: "Pipeline"
 created: 2025-01-01T12:00:00+00:00
 created_source: git
 updated: 2025-03-01T12:00:00+00:00
@@ -7,6 +7,7 @@ source_path: "wiki/Pipeline/_index.md"
 ---
 [Wiki home](../_index.md)
 
+# The sync pipeline
 
 `scripts/sync_content.py` copies the source repo into Hugo's content folder, filling in what Hugo can't work out: titles, dates, tags.
 

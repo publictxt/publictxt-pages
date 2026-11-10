@@ -121,7 +121,7 @@ All front matter optional; sync derives the rest.
 
 | Key                     | Purpose                    | Notes                                                                           |
 | ----------------------- | -------------------------- | ------------------------------------------------------------------------------- |
-| `title`                 | Page title                 | Falls back to first H1 (removed from body), then filename                       |
+| `title`                 | Page title                 | If unset: an H1 on the first non-blank line (removed from body), else the file name (an `_index.md`: its folder's). `params.titleFromHeading = false` skips the H1 step; the H1 stays in the body |
 | `collections`           | Extra collections, value or list | Page also lists under those top-level sections and collection filters. See [Collections](#collections) |
 | `tags`                  | Inline or block list       | Merged with `#hashtags`; deduplicated                                           |
 | `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
