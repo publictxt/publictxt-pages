@@ -4,7 +4,8 @@ sync_content.py — copy a PublicTxt/Obsidian repo into Hugo's content dir,
 fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
   * A folder's index is `_index.md`, Hugo's name, passed through as written.
-  * No `title:` -> the leading `# H1` (removed from the body), else filename.
+  * No `title:` -> a `# H1` on the first non-blank line (removed from the
+    body), else filename. An H1 further down stays a heading.
   * No `created:`/`updated:` -> dates.py ladders; `date:`/`lastmod:` renamed.
     Section indexes take their newest descendant's `updated`.
   * Folder with Markdown but no index -> generated `_index.md`.
@@ -46,7 +47,10 @@ BOOKMARK_KEYS = ("bookmark", "bookmarks")
 
 # Fences may carry trailing spaces (`--- `), as editors leave them.
 FRONT_MATTER_RE = re.compile(r"^---[ \t]*\r?\n(.*?)^---[ \t]*\r?\n?", re.DOTALL | re.MULTILINE)
-H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
+# The title H1: on the first non-blank line, CommonMark's way — up to 3 spaces
+# of indent (4 is code), a closing `#` run only after a space (`# C#` is "C#").
+# `[ \t]`, not `\s`: a lone `#` must not take the next line as its title.
+TITLE_H1_RE = re.compile(r"\A(?:[ \t]*\r?\n)*[ ]{0,3}#[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*\r?$", re.MULTILINE)
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
@@ -99,15 +103,9 @@ def rename_legacy_keys(fm: str | None) -> str | None:
 
 
 def derive_title(body: str, fallback: str) -> tuple[str, str]:
-    """Return (title, body). Uses and removes the first H1 if it precedes any other content."""
-    m = H1_RE.search(body)
-    if m:
-        before = body[:m.start()].strip()
-        # Only treat the H1 as the page title if nothing but whitespace/links precedes it
-        if not before or len(before) < 200 and "\n" not in before.strip():
-            title = m.group(1).strip("# ").strip()
-            body = body[:m.start()] + body[m.end():]
-            return title, body.lstrip("\n")
+    """Return (title, body). Uses and removes an H1 only if it is the first non-blank line."""
+    if m := TITLE_H1_RE.match(body):
+        return m.group(1), body[m.end():].lstrip("\r\n")
     return fallback, body
 
 

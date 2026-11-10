@@ -309,12 +309,12 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "wiki",
-  "summary": "see the repo here https://github.com/publictxt/publictext\nPublicTxt is an experiment in using Git repositories as an interoperability layer for public knowledge: plain Markdown, …",
+  "summary": "see the repo here https://github.com/publictxt/publictext\nProject PublicTxt PublicTxt is an experiment in using Git repositories as an interoperability layer for public knowledge: …",
   "tags": [
    "publictxt",
    "commons"
   ],
-  "title": "Project PublicTxt",
+  "title": "PublicTxt",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/wiki/projects/publictxt/publictxt/",

@@ -48,7 +48,8 @@ navigation.
 First match wins:
 
 1. `title:` in front matter
-2. The first `# Heading` — removed from the body so it isn't shown twice
+2. A `# Heading` on the first line (blank lines before it are fine) — removed from the
+   body so it isn't shown twice. A `# Heading` further down stays a heading.
 3. The file name
 
 Obsidian's "inline title" is the file name, so a note with neither is titled as it
@@ -254,7 +255,7 @@ All optional.
 
 | Key | Value | Effect |
 |---|---|---|
-| `title` | text | Page title (else first H1, else file name) |
+| `title` | text | Page title (else an H1 on the first line of the body, else file name) |
 | `created` / `updated` | date or date-time | Override Git-derived dates (`date` / `lastmod` also read) |
 | `tags` | list | Merged with inline `#hashtags` |
 | `collections` | value or list | Extra collections — see [Collections](#collections) |

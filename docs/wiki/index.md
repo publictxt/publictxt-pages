@@ -29,6 +29,7 @@ scripts/map_lint.py         this map vs the tree; docstring: how it reads the ma
 tests/test_golden.py        example/txt through sync vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
+tests/test_title.py         derive_title: the H1 on the first line only
 tests/test_exclude.py       params.excludeFolders: whole subtrees left out of sync
 tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
