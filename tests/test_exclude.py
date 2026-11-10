@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
 class SkipFilesTest(unittest.TestCase):
     FILES = {"README.md": "# Root\n", "wiki/README.md": "# Wiki\n", "CONTRIBUTING.md": "# C\n",
-             "LICENSE.md": "# L\n", "LICENSE": "x", "CNAME": "x", "a/NOTES.txt": "x"}
+             "LICENSE.md": "# L\n", "LICENSE": "x", "CNAME": "x", ".gitignore": "x", "a/NOTES.txt": "x"}
 
     def synced(self, extra):
         files = dict(self.FILES)
@@ -109,8 +109,9 @@ class SkipFilesTest(unittest.TestCase):
 
     def test_defaults(self):
         out = self.synced(None)
-        self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE.md", "README.md", "a/NOTES.txt", "wiki/README.md", "wiki/_index.md"])
+        self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE", "LICENSE.md", "README.md", "a/NOTES.txt",
+                               "wiki/README.md", "wiki/_index.md"])
 
     def test_setting_adds_by_name_at_any_depth_case_insensitive(self):
         out = self.synced('["readme.md", "NOTES.txt"]')
-        self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE.md"])
+        self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE", "LICENSE.md"])

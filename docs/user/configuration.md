@@ -193,7 +193,7 @@ into an excluded folder break.
 
 ## Leave files out
 
-`LICENSE`, `CNAME` and `.gitignore` are never published. Any other file name — in any
+`CNAME` and `.gitignore` are never published. Any other file name — in any
 folder, case-insensitive — can be added to that list:
 
 ```toml
@@ -201,7 +201,7 @@ folder, case-insensitive — can be added to that list:
   skipFiles = ["README.md", "NOTES.txt"]
 ```
 
-`README.md`, `LICENSE.md` and `CONTRIBUTING.md` **are** published as ordinary pages. A
+`README.md`, `LICENSE`, `LICENSE.md` and `CONTRIBUTING.md` **are** published as ordinary pages. A
 repo's `README.md` usually describes the repo, not the site — list it here to keep it off.
 Hidden, not private, like `excludeFolders`.
 

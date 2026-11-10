@@ -86,7 +86,7 @@ notes/note-name.md
 
 media/                             (non-Markdown copied verbatim)
 
-LICENSE, CNAME, .git/, params.skipFiles   (skipped during sync)
+CNAME, .gitignore, .git/, params.skipFiles   (skipped during sync)
 
 ```
 

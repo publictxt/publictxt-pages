@@ -1,3 +1,4 @@
+content/LICENSE
 content/Roadmap.md
 content/_index.md
 content/blog/2023/12/17/20231217.md

@@ -40,9 +40,9 @@ from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
-# Always skipped, by name in any folder, case-insensitive. README.md, LICENSE.md and
+# Always skipped, by name in any folder, case-insensitive. README.md, LICENSE(.md) and
 # CONTRIBUTING.md are published; a repo opts out with `params.skipFiles`.
-SKIP_FILES = {"license", "cname", ".gitignore"}
+SKIP_FILES = {"cname", ".gitignore"}
 INDEX_NAMES = {"_index.md"}
 SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.toml
 # `publish:` values that keep a page off the site (YAML reads off/no as false).

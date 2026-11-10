@@ -40,7 +40,7 @@ git diff tests/golden                                  # read it: every change s
 | ` ```dataview ` tag list, with `LIMIT`; unsupported query left as code | `notes/tag-lists.md` |
 | `[[wikilinks]]`, dangling and cross-section links | `Roadmap.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
 | Root-level pages | `_index.md`, `Roadmap.md`, `online-things.md` |
-| Skipped: this README, `LICENSE`, `CNAME`, `.obsidian/` | — |
+| Skipped: this README (`skipFiles`), `CNAME`, `.obsidian/` | — |
 | Non-Markdown copied verbatim | `media/icon.png`; beside a note in a section, `notes/pipeline.png` |
 | An image beside a post (no post folder); Obsidian's pasted name, `%20` in the link | `blog/2026/Pasted image 20260925101500.png` |
 | Site settings, not content | `settings/site.toml` |
