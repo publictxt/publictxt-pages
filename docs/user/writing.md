@@ -50,6 +50,7 @@ First match wins:
 1. `title:` in front matter
 2. A `# Heading` on the first line (blank lines before it are fine) — removed from the
    body so it isn't shown twice. A `# Heading` further down stays a heading.
+   Turn this step off with [`titleFromHeading`](configuration.md#titles-from-headings).
 3. The file name
 
 Obsidian's "inline title" is the file name, so a note with neither is titled as it

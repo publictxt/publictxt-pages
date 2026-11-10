@@ -5,7 +5,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
   * A folder's index is `_index.md`, Hugo's name, passed through as written.
   * No `title:` -> a `# H1` on the first non-blank line (removed from the
-    body), else filename. An H1 further down stays a heading.
+    body), else filename. An H1 further down stays a heading. Site settings
+    `params.titleFromHeading = false`: always the filename, the H1 kept.
   * No `created:`/`updated:` -> dates.py ladders; `date:`/`lastmod:` renamed.
     Section indexes take their newest descendant's `updated`.
   * Folder with Markdown but no index -> generated `_index.md`.
@@ -131,8 +132,10 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
     return Stamp(created, created_source, updated, authored)
 
 
-def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | None = None) -> str:
-    """`titles`: collects term_titles() of the page's tags, for write_term_pages()."""
+def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | None = None,
+                 title_from_heading: bool = True) -> str:
+    """`titles`: collects term_titles() of the page's tags, for write_term_pages().
+    `title_from_heading`: params.titleFromHeading — False, the H1 is never the title."""
     fm, body = split_front_matter(text)
     fm = rename_legacy_keys(fm)
     name = Path(rel).name
@@ -144,7 +147,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | Non
         if name in INDEX_NAMES:
             parent = Path(rel).parent.name
             fallback = parent.replace("-", " ") if parent and parent != "." else fallback
-        title, body = derive_title(body, fallback)
+        title, body = derive_title(body, fallback) if title_from_heading else (fallback, body)
         added.append(f"title: {yaml_str(title)}")
 
     if not has_key(fm, "created"):
@@ -166,16 +169,29 @@ def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | Non
     return "---\n" + "\n".join(fm_lines) + "\n---\n" + body
 
 
+def site_params(src: Path) -> dict:
+    """`[params]` of the repo's site settings; {} without the file."""
+    config = src / SITE_CONFIG
+    if not config.is_file():
+        return {}
+    with config.open("rb") as f:
+        return tomllib.load(f).get("params", {})
+
+
+def title_from_heading(src: Path) -> bool:
+    """`params.titleFromHeading` from the repo's site settings; default true."""
+    value = site_params(src).get("titleFromHeading", True)
+    if not isinstance(value, bool):
+        raise SystemExit(f"error: {SITE_CONFIG}: params.titleFromHeading must be true or false")
+    return value
+
+
 def excluded_folders(src: Path) -> list[tuple[str, ...]]:
     """`params.excludeFolders` from the repo's site settings, as case-folded path parts.
 
     Paths are from the repo root, `/`-separated; a leading or trailing slash is fine.
     """
-    config = src / SITE_CONFIG
-    if not config.is_file():
-        return []
-    with config.open("rb") as f:
-        value = tomllib.load(f).get("params", {}).get("excludeFolders", [])
+    value = site_params(src).get("excludeFolders", [])
     if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
         raise SystemExit(f"error: {SITE_CONFIG}: params.excludeFolders must be a list of folder paths")
     return [tuple(p.casefold() for p in v.replace("\\", "/").strip("/").split("/") if p)
@@ -223,6 +239,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
 
     excluded = excluded_folders(src)
     hidden = hidden_folders(src, excluded)
+    from_heading = title_from_heading(src)
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -258,7 +275,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                       "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, titles), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, titles, from_heading), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
