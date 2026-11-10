@@ -136,7 +136,7 @@ module serve lists and search; see traps.md.
 ## Config and delivery
 
 ```txt
-hugo.toml                            mounts, front matter mapping, params
+hugo.toml                            mounts, front matter mapping, params (incl. skipFiles default)
 deploy/publish-to-github-pages.yml   template for the CONTENT repo; header has setup
 .github/workflows/test.yml           tests + map_lint on push and PR
 site-content/                        site-owned pages (search)

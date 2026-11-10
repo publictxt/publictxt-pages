@@ -85,8 +85,8 @@ my-notes/
 inside a folder. Any folder works; these names are just the conventions the default
 config orders and styles. Details: [Writing](writing.md).
 
-`CNAME`, `.gitignore` and `.obsidian/` are never published. `README.md` and `LICENSE` are — to keep
-them off, add them to [`skipFiles`](configuration.md#leave-files-out).
+`CNAME`, `.gitignore` and `.obsidian/` are not published. `README.md` and `LICENSE` are — to keep
+them off, list them in [`skipFiles`](configuration.md#leave-files-out).
 
 ## 5. Add the publish workflow
 

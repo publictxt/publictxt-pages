@@ -10,9 +10,9 @@
   # Folders (from the repo root) left out whole: notes and attachments.
   # The example's settings/Templates (Obsidian templates) stays off the site.
   excludeFolders = ["settings/Templates"]
-  # File names (any folder) left out. CNAME and .gitignore always are;
-  # README.md is published unless listed — the example's is about the repo.
-  skipFiles = ["README.md"]
+  # File names (any folder) left out; replaces hugo.toml's default list, so
+  # CNAME and .gitignore are repeated. The example's README is about the repo.
+  skipFiles = ["CNAME", ".gitignore", "README.md"]
   # A `# Heading` on a note's first line is its title (removed from the body).
   # false: the file name is the title, the heading stays. `title:` beats both.
 #   titleFromHeading = false

@@ -17,8 +17,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
 
-Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep), files named in the repo's
-`params.skipFiles` (by name, in any folder), the folders listed in
+Skipped: housekeeping (SKIP_DIRS, *.gitkeep), files named in `params.skipFiles` (by name, in
+any folder; hugo.toml's default, which the repo's settings/site.toml replaces), the folders listed in
 the repo's settings/site.toml `params.excludeFolders` (whole subtrees, notes and
 attachments alike — e.g. settings/Templates), and `publish: off`
 pages — and every file of a folder whose Markdown is all unpublished (a
@@ -40,9 +40,7 @@ from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
-# Always skipped, by name in any folder, case-insensitive. README.md, LICENSE(.md) and
-# CONTRIBUTING.md are published; a repo opts out with `params.skipFiles`.
-SKIP_FILES = {"cname", ".gitignore"}
+HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
 INDEX_NAMES = {"_index.md"}
 SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.toml
 # `publish:` values that keep a page off the site (YAML reads off/no as false).
@@ -202,11 +200,14 @@ def excluded_folders(src: Path) -> list[tuple[str, ...]]:
 
 
 def skipped_files(src: Path) -> set[str]:
-    """SKIP_FILES plus `params.skipFiles` from the repo's site settings, case-folded names."""
-    value = site_params(src).get("skipFiles", [])
+    """`params.skipFiles` as case-folded names: the repo's site settings, else hugo.toml's
+    default — replaced whole, as Hugo overlays any other list."""
+    with HUGO_CONFIG.open("rb") as f:
+        default = tomllib.load(f).get("params", {}).get("skipFiles", [])
+    value = site_params(src).get("skipFiles", default)
     if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
         raise SystemExit(f"error: {SITE_CONFIG}: params.skipFiles must be a list of file names")
-    return SKIP_FILES | {v.casefold() for v in value if v.strip()}
+    return {v.casefold() for v in value if v.strip()}
 
 
 def is_excluded(rel: Path, excluded: list[tuple[str, ...]]) -> bool:
@@ -217,7 +218,7 @@ def is_excluded(rel: Path, excluded: list[tuple[str, ...]]) -> bool:
 
 
 def hidden_folders(src: Path, excluded: list[tuple[str, ...]] = (),
-                   skip: set[str] = SKIP_FILES) -> set[Path]:
+                   skip: set[str] = frozenset()) -> set[Path]:
     """Folders with Markdown below them, none of it published: their other files stay off too."""
     has_md, published = set(), set()
     for md in src.rglob("*.md"):

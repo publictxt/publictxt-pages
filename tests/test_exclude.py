@@ -113,5 +113,9 @@ class SkipFilesTest(unittest.TestCase):
                                "wiki/README.md", "wiki/_index.md"])
 
     def test_setting_adds_by_name_at_any_depth_case_insensitive(self):
-        out = self.synced('["readme.md", "NOTES.txt"]')
+        out = self.synced('["readme.md", "NOTES.txt", "cname", ".GITIGNORE"]')
         self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE", "LICENSE.md"])
+
+    def test_setting_replaces_the_default(self):
+        out = self.synced('["README.md"]')
+        self.assertIn("CNAME", out)

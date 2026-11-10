@@ -193,12 +193,13 @@ into an excluded folder break.
 
 ## Leave files out
 
-`CNAME` and `.gitignore` are never published. Any other file name — in any
-folder, case-insensitive — can be added to that list:
+By default `CNAME` and `.gitignore` are kept off the site. `skipFiles` sets the list of
+file names to leave out — in any folder, case-insensitive. It **replaces** the default,
+so repeat those two:
 
 ```toml
 [params]
-  skipFiles = ["README.md", "NOTES.txt"]
+  skipFiles = ["CNAME", ".gitignore", "README.md", "NOTES.txt"]
 ```
 
 `README.md`, `LICENSE`, `LICENSE.md` and `CONTRIBUTING.md` **are** published as ordinary pages. A
@@ -233,7 +234,7 @@ title = "Jo's notes"
   timelineTags = []
   treeSections = ["wiki"]
   excludeFolders = ["settings/Templates"]
-  skipFiles = ["README.md"]
+  skipFiles = ["CNAME", ".gitignore", "README.md"]
   pagerSize = 30
 
   [params.footer]
