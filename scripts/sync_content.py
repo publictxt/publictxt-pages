@@ -17,7 +17,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
 
-Skipped: housekeeping (SKIP_DIRS, SKIP_FILES, *.gitkeep), the folders listed in
+Skipped: housekeeping (SKIP_DIRS, *.gitkeep), files named in `params.skipFiles` (by name, in
+any folder; hugo.toml's default, which the repo's settings/site.toml replaces), the folders listed in
 the repo's settings/site.toml `params.excludeFolders` (whole subtrees, notes and
 attachments alike — e.g. settings/Templates), and `publish: off`
 pages — and every file of a folder whose Markdown is all unpublished (a
@@ -39,7 +40,7 @@ from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
-SKIP_FILES = {"README.md", "LICENSE", "LICENSE.md", "CONTRIBUTING.md", "CNAME", ".gitignore"}
+HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
 INDEX_NAMES = {"_index.md"}
 SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.toml
 # `publish:` values that keep a page off the site (YAML reads off/no as false).
@@ -198,6 +199,17 @@ def excluded_folders(src: Path) -> list[tuple[str, ...]]:
             for v in value if v.strip("/ ")]
 
 
+def skipped_files(src: Path) -> set[str]:
+    """`params.skipFiles` as case-folded names: the repo's site settings, else hugo.toml's
+    default — replaced whole, as Hugo overlays any other list."""
+    with HUGO_CONFIG.open("rb") as f:
+        default = tomllib.load(f).get("params", {}).get("skipFiles", [])
+    value = site_params(src).get("skipFiles", default)
+    if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+        raise SystemExit(f"error: {SITE_CONFIG}: params.skipFiles must be a list of file names")
+    return {v.casefold() for v in value if v.strip()}
+
+
 def is_excluded(rel: Path, excluded: list[tuple[str, ...]]) -> bool:
     """`rel` (a path from the repo root) is inside an excluded folder. Case-insensitive,
     like the Windows and macOS file systems Obsidian vaults live on."""
@@ -205,12 +217,13 @@ def is_excluded(rel: Path, excluded: list[tuple[str, ...]]) -> bool:
     return any(parts[:len(e)] == e for e in excluded)
 
 
-def hidden_folders(src: Path, excluded: list[tuple[str, ...]] = ()) -> set[Path]:
+def hidden_folders(src: Path, excluded: list[tuple[str, ...]] = (),
+                   skip: set[str] = frozenset()) -> set[Path]:
     """Folders with Markdown below them, none of it published: their other files stay off too."""
     has_md, published = set(), set()
     for md in src.rglob("*.md"):
         rel = md.relative_to(src)
-        if (not md.is_file() or md.name in SKIP_FILES or any(p in SKIP_DIRS for p in rel.parts)
+        if (not md.is_file() or md.name.casefold() in skip or any(p in SKIP_DIRS for p in rel.parts)
                 or is_excluded(rel, excluded)):
             continue
         folders = list(md.parents)[:len(rel.parts) - 1]   # up to, not including, src
@@ -238,7 +251,8 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
               file=sys.stderr)
 
     excluded = excluded_folders(src)
-    hidden = hidden_folders(src, excluded)
+    skip = skipped_files(src)
+    hidden = hidden_folders(src, excluded, skip)
     from_heading = title_from_heading(src)
 
     md_count = other_count = unpublished = 0
@@ -253,7 +267,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
             continue
         if is_excluded(path.relative_to(src), excluded):
             continue
-        if path.name in SKIP_FILES or path.name.endswith(".gitkeep"):
+        if path.name.casefold() in skip or path.name.endswith(".gitkeep"):
             continue
         if path.relative_to(src).as_posix() == SITE_CONFIG:
             continue

@@ -57,6 +57,10 @@ capitalizeListTitles = false
   # the browse list: a log, read by date. Shown across two months or more.
   # Empty = none.
   timelineSections = ["blog", "posts"]
+  # File names (any folder, case-insensitive) kept off the site: not content.
+  # A repo's settings/site.toml `skipFiles` replaces this list whole, so repeat
+  # these to keep them. Add "README.md" to keep a repo's README off.
+  skipFiles = ["CNAME", ".gitignore"]
   # Browse list defaults: sort "<field> [asc|desc]" over created (newest first),
   # title (A→Z), updated, rating (top first). A section index overrides for
   # its subtree with `order:` / `pagerSize:`.

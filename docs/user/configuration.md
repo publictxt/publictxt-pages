@@ -191,6 +191,21 @@ Typical use: Obsidian's Templates folder, whose `{{date}}` placeholders would ot
 publish. Excluded is **hidden, not private** — it's still in your public repo. Links
 into an excluded folder break.
 
+## Leave files out
+
+By default `CNAME` and `.gitignore` are kept off the site. `skipFiles` sets the list of
+file names to leave out — in any folder, case-insensitive. It **replaces** the default,
+so repeat those two:
+
+```toml
+[params]
+  skipFiles = ["CNAME", ".gitignore", "README.md", "NOTES.txt"]
+```
+
+`README.md`, `LICENSE`, `LICENSE.md` and `CONTRIBUTING.md` **are** published as ordinary pages. A
+repo's `README.md` usually describes the repo, not the site — list it here to keep it off.
+Hidden, not private, like `excludeFolders`.
+
 ## Titles from headings
 
 A note without `title:` takes a `# Heading` on its first line as its title, removed from
@@ -219,6 +234,7 @@ title = "Jo's notes"
   timelineTags = []
   treeSections = ["wiki"]
   excludeFolders = ["settings/Templates"]
+  skipFiles = ["CNAME", ".gitignore", "README.md"]
   pagerSize = 30
 
   [params.footer]
