@@ -86,3 +86,31 @@ class ExcludeFoldersTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SkipFilesTest(unittest.TestCase):
+    FILES = {"README.md": "# Root\n", "wiki/README.md": "# Wiki\n", "CONTRIBUTING.md": "# C\n",
+             "LICENSE.md": "# L\n", "LICENSE": "x", "CNAME": "x", "a/NOTES.txt": "x"}
+
+    def synced(self, extra):
+        files = dict(self.FILES)
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            for rel, text in files.items():
+                (src / rel).parent.mkdir(parents=True, exist_ok=True)
+                (src / rel).write_text(text, encoding="utf-8")
+            if extra is not None:
+                (src / "settings").mkdir()
+                (src / "settings/site.toml").write_text(f"[params]\nskipFiles = {extra}\n", encoding="utf-8")
+            out = Path(tmp) / "out" / "content"
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                sync(src, out, FixedDates(src))
+            return sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file())
+
+    def test_defaults(self):
+        out = self.synced(None)
+        self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE.md", "README.md", "a/NOTES.txt", "wiki/README.md", "wiki/_index.md"])
+
+    def test_setting_adds_by_name_at_any_depth_case_insensitive(self):
+        out = self.synced('["readme.md", "NOTES.txt"]')
+        self.assertEqual(out, ["CONTRIBUTING.md", "LICENSE.md"])

@@ -10,6 +10,9 @@
   # Folders (from the repo root) left out whole: notes and attachments.
   # The example's settings/Templates (Obsidian templates) stays off the site.
   excludeFolders = ["settings/Templates"]
+  # File names (any folder) left out. LICENSE, CNAME and .gitignore always are;
+  # README.md is published unless listed — the example's is about the repo.
+  skipFiles = ["README.md"]
   # A `# Heading` on a note's first line is its title (removed from the body).
   # false: the file name is the title, the heading stays. `title:` beats both.
 #   titleFromHeading = false
