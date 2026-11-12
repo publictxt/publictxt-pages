@@ -231,7 +231,7 @@ substack:
 ```
 
 Default keys: `facebook`, `twitter`, `substack`, `mastodon`, `github`. Add others in
-[Configuration](configuration.md#post-sources).
+[Configuration](configuration.md#posted-on-links).
 
 ## Drafts and hidden pages
 

@@ -9,7 +9,7 @@ Everything is optional — the defaults give a working site. Change what you nee
 - [Timeline and folder tree](#timeline-and-folder-tree)
 - [Categories](#categories)
 - [Filter chips](#filter-chips)
-- [Post sources](#post-sources)
+- [Posted on links](#posted-on-links)
 - [Leave folders out](#leave-folders-out)
 - [A full example](#a-full-example)
 
@@ -162,7 +162,7 @@ whole default — list every facet you want, in display order.
 Changing a facet's default `match` changes what existing shared links mean (links omit
 the default).
 
-## Post sources
+## Posted on links
 
 Front matter keys holding a URL where a page was also posted, shown as "Posted on"
 links. Key → label:
