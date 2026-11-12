@@ -153,6 +153,15 @@ whole default — list every facet you want, in display order.
   # defaults: states = ["include", "exclude"], match = ["all", "any"]
 ```
 
+The **Source** filter (the [Community](site.md#community) block) isn't in this list: it
+shows whenever a list has pages from more than one source. `ownSource` names your own
+pages there:
+
+```toml
+[params]
+  ownSource = "this repo"   # also the URL value: ?source=this+repo
+```
+
 | Field | Meaning |
 |---|---|
 | `key` | Which facet. Leave a key out to drop its chips |

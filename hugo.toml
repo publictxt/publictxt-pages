@@ -70,6 +70,10 @@ capitalizeListTitles = false
   # Not Hugo's [pagination] pagerSize: lists page in the browser.
   pagerSize = 20
 
+  # What the Source filter calls this repo's own pages (forks carry their
+  # follow's name). Also its value in URLs: ?source=this+repo.
+  ownSource = "this repo"
+
   # Tables ([params.x]) from here on: a plain key below one belongs to it.
 
   # Footer wording, optional; "" hides a line. `text` is inline markdown;

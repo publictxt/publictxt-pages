@@ -1,0 +1,6 @@
+{{/*
+  The Source filter's value for this repo's own pages — params.ownSource,
+  default "this repo". Forks carry their source's name (fork-source.html).
+  Returns it; expects nothing.
+*/}}
+{{ return (site.Params.ownSource | default "this repo" | string) }}

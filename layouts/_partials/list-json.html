@@ -21,6 +21,7 @@
   }}
   {{ with partial "categories.html" . }}{{ $item = merge $item (dict "categories" .) }}{{ end }}
   {{ with partial "rating.html" . }}{{ $item = merge $item (dict "rating" .) }}{{ end }}
+  {{ with partial "fork-source.html" . }}{{ $item = merge $item (dict "source" .name) }}{{ end }}
   {{ $d := partial "date-labels.html" . }}
   {{ with $d.created }}{{ $item = merge $item (dict "createdLabel" .) }}{{ end }}
   {{ with $d.updated }}{{ $item = merge $item (dict "updatedLabel" .) }}{{ end }}
