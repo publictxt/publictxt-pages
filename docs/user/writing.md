@@ -16,6 +16,7 @@ optional.
 - [Tag lists (Dataview)](#tag-lists-dataview)
 - [Bookmarks](#bookmarks)
 - [Posted elsewhere](#posted-elsewhere)
+- [Follows and forks](#follows-and-forks)
 - [Drafts and hidden pages](#drafts-and-hidden-pages)
 - [Front matter reference](#front-matter-reference)
 
@@ -233,6 +234,31 @@ substack:
 Default keys: `facebook`, `twitter`, `substack`, `mastodon`, `github`. Add others in
 [Configuration](configuration.md#posted-on-links).
 
+## Follows and forks
+
+Tools such as obsidian-publictxt-remotes follow other repos and fork pages from them;
+the site reads what they write.
+
+- **A follow** is a note in `follows/` with the repo's `url` (or `local: true`, for a
+  repo with no public URL). The file name is the follow's name; its `rating` is your
+  rating of that repo.
+- **A fork** is a page with `fork_*` keys saying where it was copied from. It shows
+  **Forked from** — the follow's name, linked to its note — and **↗ original**: the file
+  it was forked from on GitHub, GitLab or Codeberg; elsewhere the repo; for a local
+  follow, nothing.
+
+```yaml
+---
+# follows/ann-notes.md
+url: https://github.com/ann/notes
+rating: 4
+---
+Why I follow Ann, and what to read there.
+```
+
+A fork whose `fork_remote` names no follow — the follow was renamed or removed — gets a
+build warning, and shows that name unlinked.
+
 ## Drafts and hidden pages
 
 ```yaml
@@ -264,9 +290,13 @@ All optional.
 | `rating` | 1–5 | Stars; rating sort and filter |
 | `bookmark` / `bookmarks` | URL or list | Makes it a bookmark |
 | `facebook`, `mastodon`, … | URL or list | "Posted on" links |
+| `fork_remote`, `fork_repo`, `fork_path`, … | written by the forking tool | A fork — see [Follows and forks](#follows-and-forks) |
+| `url`, `local`, `rating` in `follows/` | repo URL, `true`, 1–5 | A follow, and your rating of it |
 | `publish` | `off` | Keep off the site |
 | `description` | text | The page's meta description (search engines, link previews) |
 | `order` / `pagerSize` | see [config](configuration.md#browse-lists) | On `_index.md`: this folder's list order and page size |
 | `author`, `source_repo` | text | Kept, not shown yet |
 
-Any other key is kept and ignored — your own Dataview fields are safe.
+Any other key is kept and ignored — your own Dataview fields are safe. The site
+computes `source_name`, `source_rating`, `source_follow`, `source_original` and
+`follow_url` itself: written in a note, they are dropped.

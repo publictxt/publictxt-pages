@@ -1,6 +1,6 @@
 {{/*
   "This page": a page's collections, dates, rating, bookmarks, "Posted on" links,
-  categories and tags — page.html's right column. Takes the page.
+  source (a fork's), categories and tags — page.html's right column. Takes the page.
 */}}
 <div class="side-block page-meta">
   <h2 class="side-heading">This page</h2>
@@ -31,6 +31,10 @@
     {{ end }}
     {{ with partial "posted-links.html" . }}
     <dt>Posted on</dt>
+    <dd class="chip-row">{{ . }}</dd>
+    {{ end }}
+    {{ with partial "fork-source-links.html" . }}
+    <dt>Source</dt>
     <dd class="chip-row">{{ . }}</dd>
     {{ end }}
     {{/* No category pages: each links to search, filtered. */}}

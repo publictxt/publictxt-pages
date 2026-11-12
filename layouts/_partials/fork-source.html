@@ -1,0 +1,14 @@
+{{/*
+  A fork's source — the repo its text came from — as sync computed it
+  (sources.py): a dict of name, rating (int 1–5, else 0), follow (the follow's
+  page, or nil) and original (a URL back to the forked file or its repo, or "").
+  Nothing for this repo's own pages. The only reader of the source_* keys.
+  Expects a page.
+*/}}
+{{ $out := false }}
+{{ with .Params.source_name }}
+  {{ $follow := false }}
+  {{ with $.Params.source_follow }}{{ with site.GetPage (printf "/%s" .) }}{{ $follow = . }}{{ end }}{{ end }}
+  {{ $out = dict "name" (printf "%v" .) "rating" (int (default 0 $.Params.source_rating)) "follow" $follow "original" (default "" $.Params.source_original) }}
+{{ end }}
+{{ return $out }}
