@@ -99,6 +99,7 @@ const hasTimeline = monthCount(countsTree(allFilters.month)) > 1;
 const tlOpen = new Set();
 const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
 
+const more = new Set();   // facets showing past their `limit`
 function chip(d, name, count) {
   return filterChip(state[d.key], name, d.prefix + name, count, run);
 }
@@ -113,7 +114,23 @@ function renderFilters(facetCounts, ratingExact, sourceRatingExact) {
     const names = sortedKeys(allFilters[d.key]);
     // A facet with a `missing` value (source) always has that one: two to offer a choice.
     g.group.hidden = names.length < (d.missing ? 2 : 1);
-    g.chips.replaceChildren(...names.map((n) => chip(d, n, (facetCounts[d.key] || {})[n] ?? 0)));
+    // Past a facet's `limit`, chips fold behind "more", as the lists'; picked ones stay.
+    const open = !d.limit || more.has(d.key);
+    const visible = open ? names : [...names.slice(0, d.limit),
+      ...[...f.inc, ...f.exc].filter((v) => names.indexOf(v) >= d.limit)];
+    const chips = visible.map((n) => chip(d, n, (facetCounts[d.key] || {})[n] ?? 0));
+    if (d.limit && names.length > d.limit) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip filter-chip more";
+      b.textContent = open ? "fewer " + d.label.toLowerCase() : `+${names.length - d.limit} more`;
+      b.addEventListener("click", () => {
+        if (open) more.delete(d.key); else more.add(d.key);
+        renderFilters(facetCounts, ratingExact, sourceRatingExact);
+      });
+      chips.push(b);
+    }
+    g.chips.replaceChildren(...chips);
     g.hint.replaceChildren(...foldHint(f.inc.size + f.exc.size, matchToggle(f, run)));
   }
   const ratings = Object.keys(allFilters.rating || {}).filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);

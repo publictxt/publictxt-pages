@@ -13,8 +13,8 @@ export const STATES = ["include", "exclude"];
 export const MODES = ["all", "any"];
 
 // What config can't change, per key. `key` is the URL param and Pagefind filter
-// (traps.md); `item` the index.json field. Lists only: `shared` shows values
-// every listed page has; `limit` chips before "more". From chip-facets.html,
+// (traps.md); `item` the index.json field; `limit` chips before "more". Lists
+// only: `shared` shows values every listed page has. From chip-facets.html,
 // not here: `missing`, the value of a page with none (a source: this repo's
 // own pages), and `group`, the section the facet sits in ("community").
 const BUILTIN = {
