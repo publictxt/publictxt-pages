@@ -1,0 +1,10 @@
+{{/*
+  A fork's source as chips (fork-source.html): its name, linked to the follow's
+  page when there is one, and a link back to the original; nothing for this
+  repo's own pages. Expects a page.
+*/}}
+{{- with partial "fork-source.html" . -}}
+{{ $name := .name }}
+{{ with .follow }}<a class="chip" href="{{ .RelPermalink }}">{{ $name }}</a>{{ else }}<span class="chip">{{ $name }}</span>{{ end }}
+{{ with .original }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">↗ original</a>{{ end }}
+{{ end -}}

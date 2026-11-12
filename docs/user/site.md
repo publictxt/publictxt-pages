@@ -83,6 +83,7 @@ Right column, top: **this page's details** —
 
 - collections, created and updated dates, categories, rating stars, tags
 - the bookmark link, if any; "Posted on" links to where it was cross-posted
+- for a [fork](writing.md#follows-and-forks), its source and a link to the original
 
 Below that, **where it sits**:
 

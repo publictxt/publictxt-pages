@@ -93,6 +93,18 @@ class SiteIndexTest(unittest.TestCase):
         page = "/blog/2026/20260925-attachments-beside-the-note---no-post-folders/"
         self.assertIn(f'<a href="{page}">attachments</a>, or <a href="{page}">escaped</a>', html)
 
+    def test_fork_source(self):
+        """A fork names its source, linked to the follow's page, with a link back; a local one has none."""
+        page = self.html("remotes", "ann-notes", "wiki", "federated-wikis")
+        chips = ('<a class="chip" href="/follows/ann-notes/">ann-notes</a>\n<a class="chip chip-link" href="'
+                 'https://github.com/example/notes/blob/85f3c01ab408f962ce6ba605e40c96f606e381f9/wiki/Federated%20wikis.md"')
+        self.assertEqual(page.count(chips), 2, "header and page meta")
+        self.assertIn('<span class="muted">Forked from</span>', page)
+        local = self.html("notes", "forked-from-a-local-vault")
+        self.assertIn('<a class="chip" href="/follows/laptop-vault/">laptop-vault</a>', local)
+        self.assertNotIn("↗ original", local)
+        self.assertNotIn("Forked from", self.html("follows", "ann-notes"), "a follow is this repo's own page")
+
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #site` + `LIMIT 2` of 6; a TABLE query stays code."""
         html = (self.public / "notes" / "tag-lists" / "index.html").read_text(encoding="utf-8")

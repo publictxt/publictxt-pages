@@ -15,7 +15,8 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 ```txt
 scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`, `params.skipFiles`);
-                            reads `params.titleFromHeading`
+                            reads `params.titleFromHeading`; a fork's source_* keys, a follow's `url` -> `follow_url`
+scripts/sources.py          follows, forks and the join: a fork's source, source rating, link to the original
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags + parents, flat keys
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
@@ -32,6 +33,7 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_title.py         derive_title: the H1 on the first line only; titleFromHeading
 tests/test_exclude.py       params.excludeFolders (whole subtrees) and params.skipFiles, left out of sync
+tests/test_sources.py       sources.py: canonical URLs, follows, the join; what sync writes from it
 tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
@@ -88,6 +90,8 @@ layouts/_partials/
   bookmark-label.html   one URL's short form (returns it)
   posted-urls.html      only reader of params.sources keys (facebook:, …)
   posted-links.html     "Posted on" chips
+  fork-source.html      only reader of the source_* keys sync writes on a fork (returns a dict)
+  fork-source-links.html  "Forked from" chips: the source, its follow's page, the original
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating:

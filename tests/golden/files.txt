@@ -20,12 +20,16 @@ content/bookmarks/sites/gohugo.io/_index.md
 content/bookmarks/sites/gohugo.io/gohugo.io.md
 content/bookmarks/sites/obsidian.md/Obsidian Publish.md
 content/bookmarks/sites/obsidian.md/_index.md
+content/follows/_index.md
+content/follows/ann-notes.md
+content/follows/laptop-vault.md
 content/media/icon.png
 content/media/silence.wav
 content/notes/Design notes/Why Git . 20240816.md
 content/notes/Design notes/_index.md
 content/notes/_index.md
 content/notes/embeds.md
+content/notes/forked-from-a-local-vault.md
 content/notes/nested-tags.md
 content/notes/pipeline.png
 content/notes/sample.md
@@ -33,6 +37,10 @@ content/notes/tag-lists.md
 content/online-things.md
 content/posts/20260426-first-toot.md
 content/posts/_index.md
+content/remotes/_index.md
+content/remotes/ann-notes/_index.md
+content/remotes/ann-notes/wiki/Federated wikis.md
+content/remotes/ann-notes/wiki/_index.md
 content/tags/nesting--front-matter/_index.md
 content/tags/nesting--inline/_index.md
 content/wiki/Pipeline/Dates.md
