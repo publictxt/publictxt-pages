@@ -46,7 +46,7 @@ Items marked **(TBD)** are not built.
   - Compact toggle for one-line cards.
 - Search
   - Full-text search via Pagefind.
-  - Same facets and sorts as browse lists, usable without a query. Date ranges (TBD).
+  - Same facets and sorts as browse lists, usable without a query. Tags past the first 20 fold behind "more", as in lists. Date ranges (TBD).
 - Breadcrumbs on all pages but home, from folder names.
 - Bookmarks
   - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives; pages under `bookmarks/` are too.
