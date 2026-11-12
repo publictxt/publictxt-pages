@@ -64,10 +64,10 @@ Items marked **(TBD)** are not built.
     - Cards of forks show "from *source*".
     - Source rating: a minimum, as Rating (`?source-rating=4`), over forks; "Unrated" is forks whose source has no rating. This repo's own pages have no source rating, so any value leaves them out. Shown when forks' source ratings vary. A fork's page shows it under Source.
     - Sort by source rating (TBD). Author (TBD).
-    - A card's source chip: a tooltip with the repo's details — its URL, source rating, the follow's description (TBD).
+    - A card's source chip links to the follow's page; its tooltip gives the repo, the source rating and the follow's `description:`.
   - `params.hiddenCollections` (default `remotes`): excluded by default in the Collection filter of lists (home, sections, tags, dataview) and search, so the excluded chip — or the collection's own section — brings them back, and Reset hides them again. A fork brought into another folder isn't in `remotes`, so it shows. No feeds yet to keep them out of.
-  - A follow's page as its source's landing page: the repo link, its forks (TBD).
-  - A fork's dates are this repo's (when it was forked or last changed here), not the original's (TBD).
+  - A follow's page is its source's landing page: page details show the repository (linked; "local repository" for a local follow), the source rating, and a link to its forked pages (search, by source). Its `rating` is the repo's, so the page itself is unrated in lists, search and the Rating filter.
+  - A fork's dates follow the usual ladder, so `created:` or a date in the file name carried over from the original holds. Without either, the dates are this repo's — when it was forked and last changed here — as the original's history isn't in this repo (TBD: the forking tool could write `created`/`updated`; show such a date as "forked").
 - Pages
   - Folders are sections and notes are pages, whatever a folder holds. A post folder (a note + attachments) is a section with one page; attaching beside the note needs no folder.
   - `publish: off` keeps a page — and a folder's attachments when all its Markdown is unpublished — off the site. Hidden, not private: it stays in the source repo.
@@ -146,7 +146,7 @@ All front matter optional; sync derives the rest.
 | `facebook`, `mastodon`, … | URL or list            | Where else it was posted; keys and labels in `[params.sources]`. Shown as "Posted on" links |
 | `fork_remote`, `fork_repo`, `fork_path`, `fork_branch`, `fork_commit`, `fork_blob` | Fork provenance (PublicTxt spec §5.2) | Make a page a fork: its source, source rating and link to the original |
 | `url`, `local`, `rating` in `follows/` | A follow (PublicTxt spec §3.2) | `url` is written out as `follow_url`, canonical: Hugo reads `url` as the page's address |
-| `source_name`, `source_rating`, `source_follow`, `source_original`, `follow_url` | A fork's source; a follow's repo | Written by sync; dropped if authored |
+| `source_name`, `source_rating`, `source_follow`, `source_original`, `follow_name`, `follow_url` | A fork's source; a follow's repo | Written by sync; dropped if authored |
 | `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.

@@ -36,3 +36,10 @@ test("source rating: a minimum over forks; this repo's own pages never pass", as
   assert.deepEqual([own, unrated, four].map((it) => sourceRatingPasses(it, "5")), [false, false, false]);
   assert.deepEqual([own, unrated, four].map((it) => sourceRatingPasses(it, "unrated")), [false, true, false]);
 });
+
+test("source chip tooltip: repo, rating, description — what there is", async () => {
+  const { sourceTitle } = await import("../../assets/js/cards.js");
+  assert.equal(sourceTitle("ann", { repo: "github.com/ann/notes", rating: 4, description: "Ann's wiki." }),
+    "ann — github.com/ann/notes\nSource rating ★★★★☆\nAnn's wiki.");
+  assert.equal(sourceTitle("vault", { repo: "local repository", rating: 0, description: "" }), "vault — local repository");
+});

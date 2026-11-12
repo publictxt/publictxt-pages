@@ -19,7 +19,8 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     joined to the repo's `follows/` (sources.py). Computed here, so the same
     keys in the source are dropped. Warns on a fork whose `fork_remote`
     names no follow.
-  * A follow's `url:` -> `follow_url:`, canonical: Hugo reads `url:` as the
+  * A follow gets `follow_name:` (its name: what forks call their source), and
+    its `url:` becomes `follow_url:`, canonical: Hugo reads `url:` as the
     page's own address. Dropped from every other document in `follows/`.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
@@ -65,7 +66,7 @@ UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 # Written by sync from a fork's source (sources.py); never read from the source repo.
-COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "follow_url")
+COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "follow_name", "follow_url")
 
 
 @dataclass
@@ -323,7 +324,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     hidden = hidden_folders(src, excluded, skip)
     from_heading = title_from_heading(src)
     follows, follow_pages = follows_of(src, excluded, skip)
-    follow_urls = {f.path: f.url for f in follows.values() if f.url}
+    follow_by_path = {f.path: f for f in follows.values()}
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -363,8 +364,10 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                 print(f"warning: {rel}: fork_remote {source.name!r} names no follow in "
                       f"{FOLLOWS_DIR}/ — its source is unrated", file=sys.stderr)
             computed = source_lines(source, follow_pages)
-            if rel in follow_urls:
-                computed.append(f"follow_url: {yaml_str(follow_urls[rel])}")
+            if follow := follow_by_path.get(rel):
+                computed.append(f"follow_name: {yaml_str(follow.name)}")
+                if follow.url:
+                    computed.append(f"follow_url: {yaml_str(follow.url)}")
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp

@@ -88,7 +88,8 @@ appears under Filters, in lists and in search:
 - **Source rating** — your rating of the repo (the follow's `rating`), as a minimum:
   ★4+ shows forks from repos you rated 4 or 5. "Unrated" is forks from repos you haven't
   rated. Your own pages have no source rating, so picking one leaves them out.
-- A fork's card says **from** *source*; its page shows the source's rating too.
+- A fork's card says **from** *source* — a link to the follow's note; hover for the
+  repo, your rating and the follow's description. Its page shows the source's rating too.
 
 Pages under `remotes/` — pages fetched from repos you follow — are left out of lists and
 search to start with: **remotes** shows crossed out under Collection; click it to bring

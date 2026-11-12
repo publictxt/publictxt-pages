@@ -5,6 +5,7 @@ created: 2025-01-01T12:00:00+00:00
 created_source: git
 updated: 2025-03-01T12:00:00+00:00
 source_path: "follows/laptop-vault.md"
+follow_name: "laptop-vault"
 ---
 A follow of a repo with no public URL — another vault on the author's computer —
 has `local: true` instead of a `url`. Pages forked through it name it as their

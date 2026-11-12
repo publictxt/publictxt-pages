@@ -1,0 +1,14 @@
+{{/*
+  The site's sources, for a fork card's source chip (cards.js): each follow
+  (follow.html) by name -> {page (its URL), repo (label), rating, description}.
+  A source with no follow page isn't here; its chip is plain. For
+  js-params.html (partialCached). Returns a dict; expects nothing.
+*/}}
+{{ $out := dict }}
+{{ range site.RegularPages }}
+  {{ $page := . }}
+  {{ with partial "follow.html" . }}
+    {{ $out = merge $out (dict .name (dict "page" $page.RelPermalink "repo" .label "rating" .rating "description" .description)) }}
+  {{ end }}
+{{ end }}
+{{ return $out }}
