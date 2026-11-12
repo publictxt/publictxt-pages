@@ -14,7 +14,7 @@ index count that differs from the body pages; `hugo server` builds skip it.
 
 ## Pairs that must change together
 
-Display values (date labels, year, bookmark labels, recent order) are made once, in Hugo,
+Display values (date labels and their `forked` flag, year, bookmark labels, recent order) are made once, in Hugo,
 and reach JS as data: `index.json` for lists, Pagefind meta (`pagefind-keys.html`) for
 search. Add one to both, or search cards go without it. What's still implemented twice:
 

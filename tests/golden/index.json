@@ -166,6 +166,7 @@
   ],
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
+  "forked": true,
   "rating": 3,
   "section": "remotes",
   "source": "ann-notes",
@@ -176,22 +177,6 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/remotes/ann-notes/wiki/federated-wikis/",
-  "year": "2025"
- },
- {
-  "collections": [
-   "notes"
-  ],
-  "created": "2025-01-01T12:00:00Z",
-  "createdLabel": "1 Jan 2025",
-  "section": "notes",
-  "source": "laptop-vault",
-  "summary": "A fork brought into this repo’s own folders, through a local follow: its source is laptop-vault, unrated (the follow has no rating), and with no fork_repo there is no …",
-  "tags": [],
-  "title": "forked from a local vault",
-  "updated": "2025-03-01T12:00:00Z",
-  "updatedLabel": "1 Mar 2025",
-  "url": "/notes/forked-from-a-local-vault/",
   "year": "2025"
  },
  {
@@ -510,6 +495,22 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/notes/design-notes/why-git-.-20240816/",
+  "year": "2024"
+ },
+ {
+  "collections": [
+   "notes"
+  ],
+  "created": "2024-03-02T00:00:00Z",
+  "createdLabel": "2 Mar 2024",
+  "section": "notes",
+  "source": "laptop-vault",
+  "summary": "A fork brought into this repo’s own folders, through a local follow: its source is laptop-vault, unrated (the follow has no rating), and with no fork_repo there is no …",
+  "tags": [],
+  "title": "forked from a local vault",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/notes/forked-from-a-local-vault/",
   "year": "2024"
  },
  {

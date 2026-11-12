@@ -144,6 +144,18 @@ class SiteIndexTest(unittest.TestCase):
         self.assertNotIn("Source rated", local)
         self.assertNotIn("rating", next(it for it in json.loads(self.index) if it["url"] == "/follows/ann-notes/"))
 
+    def test_forked_date(self):
+        """A fork dated only by this repo's history shows "forked"; one with its own date, and own pages, don't."""
+        fork = self.html("remotes", "ann-notes", "wiki", "federated-wikis")
+        self.assertIn('<span class="muted">forked</span> <time class="muted"', fork)
+        self.assertIn("<dt>Forked</dt>", fork)
+        self.assertIn('data-forked="true"', fork)
+        for page in (self.html("notes", "forked-from-a-local-vault"), self.html("notes", "sample")):
+            self.assertNotIn('<span class="muted">forked</span>', page)
+            self.assertIn("<dt>Created</dt>", page)
+        forked = [it["url"] for it in json.loads(self.index) if it.get("forked")]
+        self.assertEqual(forked, ["/remotes/ann-notes/wiki/federated-wikis/"])
+
     def test_hidden_collections(self):
         """params.hiddenCollections (remotes): out of the no-JS lists, but for the collection's own."""
         fork = 'href="/remotes/ann-notes/wiki/federated-wikis/"'

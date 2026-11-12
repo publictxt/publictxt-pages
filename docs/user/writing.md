@@ -259,6 +259,10 @@ description: Ann's wiki on federation.
 Why I follow Ann, and what to read there.
 ```
 
+A fork keeps its date if it has one of its own — `created:`, or a date in the file name.
+Without one, its date is when it came into your repo, shown as **forked** *date*: the
+original's history isn't in your repo.
+
 A fork whose `fork_remote` names no follow — the follow was renamed or removed — gets a
 build warning, and shows that name unlinked.
 

@@ -11,7 +11,7 @@
     <dd>{{ range $t := partial "page-collections.html" . }}{{ $s := site.GetPage (printf "/%s" $t) }}{{ if and $s $s.IsSection }}<a class="chip chip-collection" href="{{ $s.RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
     {{ $d := partial "date-labels.html" . }}
     {{ with $d.created }}
-    <dt>Created</dt>
+    <dt>{{ if $d.forked }}Forked{{ else }}Created{{ end }}</dt>
     <dd><time datetime="{{ $.Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ . }}</time></dd>
     {{ end }}
     {{ with $d.updated }}
