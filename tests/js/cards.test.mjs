@@ -27,3 +27,12 @@ test("tag URL: lower-cased, a nested tag's / as -- (hashtags.py tag_path)", () =
     delete globalThis.document;
   }
 });
+
+test("source rating: a minimum over forks; this repo's own pages never pass", async () => {
+  const { sourceRatingPasses } = await import("../../assets/js/cards.js");
+  const own = {}, unrated = { source: "a" }, four = { source: "b", sourceRating: 4 };
+  assert.deepEqual([own, unrated, four].map((it) => sourceRatingPasses(it, "")), [true, true, true]);
+  assert.deepEqual([own, unrated, four].map((it) => sourceRatingPasses(it, "4")), [false, false, true]);
+  assert.deepEqual([own, unrated, four].map((it) => sourceRatingPasses(it, "5")), [false, false, false]);
+  assert.deepEqual([own, unrated, four].map((it) => sourceRatingPasses(it, "unrated")), [false, true, false]);
+});

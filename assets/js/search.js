@@ -9,7 +9,7 @@
 // month counts, recounted without the date filter while one is set.
 // Chip facets (CHIPS, from config): include / exclude / any-or-all, as facets.js.
 // Results come in batches of #search's data-per-page; "Show more" adds one.
-import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+import { card, densityToggle, NO_SOURCE, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, isSet, matchToggle, pagefindConditions,
   ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
@@ -27,6 +27,7 @@ const el = {
   root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"), community: $("search-community"),
   side: $("search-side"), timeline: $("search-timeline"), tl: $("search-tl"), layout: $("search-layout"),
   rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), ratingHint: $("filter-rating-hint"),
+  srcRating: $("filter-source-rating"), srcRatingGroup: $("filter-source-rating-group"), srcRatingHint: $("filter-source-rating-hint"),
   sort: $("search-sort"),
   status: $("search-status"), list: $("search-list"), more: $("search-more"),
 };
@@ -49,8 +50,8 @@ el.root.hidden = false;
 // ---- state <-> URL --------------------------------------------------
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
-const state = { q: "", ...CHIPS.read(), year: "", month: "", rating: "", sort: null };
-const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating);
+const state = { q: "", ...CHIPS.read(), year: "", month: "", rating: "", sourceRating: "", sort: null };
+const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating || state.sourceRating);
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -64,6 +65,7 @@ function readURL() {
   state.year = p.get("year") || "";
   state.month = monthFilter(p.get("month"), state.year);
   state.rating = ratingFilter(p.get("rating"));
+  state.sourceRating = ratingFilter(p.get("source-rating"));
   const s = p.get("sort");
   state.sort = !s ? null : s === RELEVANCE ? RELEVANCE : normaliseSort(s);
 }
@@ -74,6 +76,7 @@ function writeURL() {
   if (state.year) p.set("year", state.year);
   if (state.month) p.set("month", state.month);
   if (state.rating) p.set("rating", state.rating);
+  if (state.sourceRating) p.set("source-rating", state.sourceRating);
   const sort = activeSort();
   if (state.sort && sort !== defaultSort()) p.set("sort", sort);
   const qs = p.toString();
@@ -94,10 +97,10 @@ function chip(d, name, count) {
   return filterChip(state[d.key], name, d.prefix + name, count, run);
 }
 
-// facetCounts: chip facet counts, per addsPages(); ratingExact: exact rating
-// counts without the rating filter. A chip facet the index lacks hides —
+// facetCounts: chip facet counts, per addsPages(); ratingExact / sourceRatingExact: exact
+// counts without that filter (a source rating's less NO_SOURCE, this repo's own pages). A chip facet the index lacks hides —
 // categories when disabled.
-function renderFilters(facetCounts, ratingExact) {
+function renderFilters(facetCounts, ratingExact, sourceRatingExact) {
   for (const d of CHIPS.defs) {
     const g = groups[d.key];
     const f = state[d.key];
@@ -107,14 +110,23 @@ function renderFilters(facetCounts, ratingExact) {
     g.chips.replaceChildren(...names.map((n) => chip(d, n, (facetCounts[d.key] || {})[n] ?? 0)));
     g.hint.replaceChildren(...foldHint(f.inc.size + f.exc.size, matchToggle(f, run)));
   }
-  // The Community block shows while a facet inside does.
-  if (el.community) el.community.hidden = !el.community.querySelector(".list-facet:not([hidden])");
   const ratings = Object.keys(allFilters.rating || {}).filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);
   const hasUnrated = UNRATED_FILTER in (allFilters.rating || {});
   el.ratingGroup.hidden = ratings.length === 0;
   el.rating.replaceChildren(...ratingChips([...ratings, ...(hasUnrated ? [UNRATED_FILTER] : [])],
     ratingCounts(ratingExact), state.rating, (v) => { state.rating = v; run(); }));
   el.ratingHint.replaceChildren(...foldHint(state.rating ? 1 : 0));
+  // Source rating: as Rating, over forks; shown when their sources' ratings vary.
+  const src = Object.keys(allFilters["source-rating"] || {}).filter((r) => r !== NO_SOURCE);
+  const srcRatings = src.filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);
+  const srcUnrated = src.includes(UNRATED_FILTER);
+  el.srcRatingGroup.hidden = src.length < 2;
+  const { [NO_SOURCE]: _own, ...srcExact } = sourceRatingExact;
+  el.srcRating.replaceChildren(...ratingChips([...srcRatings, ...(srcUnrated ? [UNRATED_FILTER] : [])],
+    ratingCounts(srcExact), state.sourceRating, (v) => { state.sourceRating = v; run(); }));
+  el.srcRatingHint.replaceChildren(...foldHint(state.sourceRating ? 1 : 0));
+  // The Community block shows while a facet inside does.
+  if (el.community) el.community.hidden = !el.community.querySelector(".list-facet:not([hidden])");
 }
 
 // monthCounts: Pagefind's month counts without the date filter, so the
@@ -149,6 +161,10 @@ function pagefindFilters(skip) {
     filters.rating = state.rating === UNRATED_FILTER ? UNRATED_FILTER
       : { any: ["1", "2", "3", "4", "5"].slice(Number(state.rating) - 1) };
   }
+  if (skip !== "source-rating" && state.sourceRating) {
+    filters["source-rating"] = state.sourceRating === UNRATED_FILTER ? UNRATED_FILTER
+      : { any: ["1", "2", "3", "4", "5"].slice(Number(state.sourceRating) - 1) };
+  }
   const all = CHIPS.keys.flatMap((k) => pagefindConditions(state[k], k !== skip));
   if (all.length) filters.all = all;
   return filters;
@@ -165,6 +181,7 @@ async function run() {
   // An addsPages facet counts from a search without its includes, and a set
   // rating or date from one without it; or the totals when nothing else narrows.
   const recount = [...CHIPS.keys.filter((k) => addsPages(state[k])), ...(state.rating ? ["rating"] : []),
+    ...(state.sourceRating ? ["source-rating"] : []),
     ...(hasTimeline && state.year ? ["date"] : [])];
   const without = (k) => {
     const filters = pagefindFilters(k);
@@ -177,12 +194,13 @@ async function run() {
   const counts = res.filters || allFilters;
   const countsWithout = (k) => { const i = recount.indexOf(k); return i < 0 ? counts : others[i]?.filters || allFilters; };
   const facetCounts = Object.fromEntries(CHIPS.keys.map((k) => [k, countsWithout(k)[k]]));
-  renderFilters(facetCounts, countsWithout("rating").rating || {});
+  renderFilters(facetCounts, countsWithout("rating").rating || {}, countsWithout("source-rating")["source-rating"] || {});
   if (hasTimeline) drawTimeline(countsWithout("date").month);
   renderSort();
   const n = current.length;
   const what = [hasQuery() ? `“${state.q}”` : "", ...CHIPS.describe(state), dateLabel(),
-    state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
+    state.rating && ratingFilterLabel(state.rating),
+    state.sourceRating && "source " + ratingFilterLabel(state.sourceRating)].filter(Boolean).join(" · ");
   el.status.textContent = `${n} page${n === 1 ? "" : "s"}` + (what ? ` — ${what}` : "");
   await showMore();
 }
@@ -220,7 +238,7 @@ const typed = () => { clearTimeout(timer); state.q = el.q.value; run(); };
 el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(typed, TYPING_MS); });
 el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; CHIPS.clear(state); state.year = ""; state.month = ""; state.rating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; CHIPS.clear(state); state.year = ""; state.month = ""; state.rating = ""; state.sourceRating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 el.sort.closest(".results-tools").append(densityToggle(el.list));
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
@@ -237,7 +255,7 @@ if (hasTimeline) {
 el.side.hidden = false;
 dock(el.side, el.side.closest(".aside"), el.layout, (narrow) => {
   el.filters.open = !narrow || filtering();
-  if (el.community) el.community.open = !narrow || COMMUNITY.some((k) => isSet(state[k]));
+  if (el.community) el.community.open = !narrow || Boolean(state.sourceRating) || COMMUNITY.some((k) => isSet(state[k]));
   el.timeline.open = !narrow || Boolean(state.year);
 });
 await run();

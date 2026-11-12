@@ -114,11 +114,18 @@ class SiteIndexTest(unittest.TestCase):
         sources = {it["url"]: it["source"] for it in json.loads(self.index) if "source" in it}
         self.assertEqual(sources, {"/remotes/ann-notes/wiki/federated-wikis/": "ann-notes",
                                    "/notes/forked-from-a-local-vault/": "laptop-vault"})
+        ratings = {it["url"]: it["sourceRating"] for it in json.loads(self.index) if "sourceRating" in it}
+        self.assertEqual(ratings, {"/remotes/ann-notes/wiki/federated-wikis/": 4}, "a follow's rating; not on the follow itself")
+        self.assertIn('data-source-rating="4"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
+        self.assertIn('data-source-rating="unrated"', self.html("notes", "forked-from-a-local-vault"))
+        self.assertIn('data-source-rating="none"', self.html("follows", "ann-notes"))
+        self.assertIn('aria-label="Source rated 4 of 5"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
         search = self.html("search")
         block = re.search(r'<details class="search-filters fold" id="search-community".*?</details>\s*</div>\s*</details>', search, re.S)
         self.assertIsNotNone(block, "no Community block")
         self.assertIn('id="filter-source-group" data-facet="source"', block[0])
         self.assertEqual(search.count('id="filter-source-group"'), 1)
+        self.assertIn('id="filter-source-rating-group" data-facet="source-rating"', block[0])
 
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #site` + `LIMIT 2` of 6; a TABLE query stays code."""

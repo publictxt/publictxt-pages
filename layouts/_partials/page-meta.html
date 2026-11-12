@@ -37,6 +37,11 @@
     <dt>Source</dt>
     <dd class="chip-row">{{ . }}</dd>
     {{ end }}
+    {{/* The follow's rating: this author's of the repo, apart from the page's own. */}}
+    {{ with partial "fork-source.html" . }}{{ with .rating }}
+    <dt>Source rating</dt>
+    <dd><span class="rating" role="img" aria-label="Source rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
+    {{ end }}{{ end }}
     {{/* No category pages: each links to search, filtered. */}}
     {{ with partial "categories.html" . }}
     <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>

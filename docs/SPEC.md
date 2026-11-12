@@ -41,7 +41,7 @@ Items marked **(TBD)** are not built.
   - Home *Recent*: every page, newest first (`listOrder`).
   - A folder's default filters (`filter:`, e.g. blog without `#journal`); Reset returns to them.
   - Sort by Date, Recency, Alphabetical, Rating. Sort by Source/Author (TBD).
-  - Community filters: Source — see Sources.
+  - Community filters: Source, Source rating — see Sources.
   - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
   - Compact toggle for one-line cards.
 - Search
@@ -62,7 +62,9 @@ Items marked **(TBD)** are not built.
   - Community: a collapsible block of its own in lists and search, after Filters, for filters on where pages came from. Hidden with nothing to offer — a site, or a list, with one source.
     - Source: include / exclude chips, any of the included; this repo's own pages are `params.ownSource` ("this repo"). Not in `params.chipFacets`: always on.
     - Cards of forks show "from *source*".
-    - Source rating filter (TBD). Author (TBD).
+    - Source rating: a minimum, as Rating (`?source-rating=4`), over forks; "Unrated" is forks whose source has no rating. This repo's own pages have no source rating, so any value leaves them out. Shown when forks' source ratings vary. A fork's page shows it under Source.
+    - Sort by source rating (TBD). Author (TBD).
+    - A card's source chip: a tooltip with the repo's details — its URL, source rating, the follow's description (TBD).
   - The `remotes` collection off by default in lists, home and feeds (TBD).
   - A follow's page as its source's landing page: the repo link, its forks (TBD).
   - A fork's dates are this repo's (when it was forked or last changed here), not the original's (TBD).

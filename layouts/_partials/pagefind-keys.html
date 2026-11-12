@@ -4,7 +4,9 @@
   case-sensitively), rating (2.5 unrated, = UNRATED in sorts.js). Filters:
   `created` year (= index.json `year`) and month ("2006-01", for search's
   timeline: timeline.js countsTree), rating ("unrated" when none), source (a
-  fork's, fork-source.html; own-source.html's for this repo's pages), and
+  fork's, fork-source.html; own-source.html's for this repo's pages),
+  source-rating (a fork's source's: "1"–"5" or "unrated"; "none" for this
+  repo's pages, which no source rating filter matches — NO_SOURCE in cards.js), and
   category — one span per value, as an attribute holds only one. Meta: the
   date labels (date-labels.html) and rating, for result cards.
 
@@ -15,19 +17,20 @@
 {{ $rating := partial "rating.html" . }}
 {{ $d := partial "date-labels.html" . }}
 {{ $source := partial "own-source.html" . }}
-{{ with partial "fork-source.html" . }}{{ $source = .name }}{{ end }}
+{{ $sourceRating := "none" }}
+{{ with partial "fork-source.html" . }}{{ $source = .name }}{{ $sourceRating = .rating | default "unrated" }}{{ end }}
 {{ $meta := slice }}
 {{ with $d.created }}{{ $meta = $meta | append "created_label[data-created-label]" }}{{ end }}
 {{ with $d.updated }}{{ $meta = $meta | append "updated_label[data-updated-label]" }}{{ end }}
 {{ with $rating }}{{ $meta = $meta | append "rating[data-rating]" }}{{ end }}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title], rating[data-rating-sort]"
-  data-pagefind-filter="year[data-year], month[data-month], rating[data-rating], source[data-source]"
+  data-pagefind-filter="year[data-year], month[data-month], rating[data-rating], source[data-source], source-rating[data-source-rating]"
   {{- with $meta }} data-pagefind-meta="{{ delimit . ", " }}"{{ end }}
   {{- with $d.created }} data-created-label="{{ . }}"{{ end }}
   {{- with $d.updated }} data-updated-label="{{ . }}"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
   data-year="{{ .Date.Format "2006" }}" data-month="{{ .Date.Format "2006-01" }}"
-  data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}" data-source="{{ $source }}"></span>
+  data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}" data-source="{{ $source }}" data-source-rating="{{ $sourceRating }}"></span>
 {{- range $categories }}
 <span hidden data-pagefind-filter="category[data-category]" data-category="{{ . }}"></span>
 {{- end }}

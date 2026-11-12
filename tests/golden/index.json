@@ -170,6 +170,7 @@
   "rating": 3,
   "section": "remotes",
   "source": "ann-notes",
+  "sourceRating": 4,
   "summary": "A fork: a page copied from a followed repo, with where it came from in fork_* keys. Its source is the follow fork_remote names (case aside), shown as “Forked from” with …",
   "tags": [],
   "title": "Federated wikis",
