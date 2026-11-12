@@ -127,6 +127,19 @@ class SiteIndexTest(unittest.TestCase):
         self.assertEqual(search.count('id="filter-source-group"'), 1)
         self.assertIn('id="filter-source-rating-group" data-facet="source-rating"', block[0])
 
+    def test_follow_page(self):
+        """A follow shows its repo, the rating as the source's (the page itself unrated), and its forks."""
+        page = self.html("follows", "ann-notes")
+        self.assertIn('href="https://github.com/example/notes" rel="noopener external" target="_blank">↗ github.com/example/notes</a>', page)
+        self.assertIn('aria-label="Source rated 4 of 5"', page)
+        self.assertNotIn('aria-label="Rated 4 of 5"', page)
+        self.assertIn('data-rating="unrated"', page)
+        self.assertIn('<a href="/search/?source=ann-notes">1 page</a>', page)
+        local = self.html("follows", "laptop-vault")
+        self.assertIn('<span class="muted">local repository</span>', local)
+        self.assertNotIn("Source rated", local)
+        self.assertNotIn("rating", next(it for it in json.loads(self.index) if it["url"] == "/follows/ann-notes/"))
+
     def test_hidden_collections(self):
         """params.hiddenCollections (remotes): out of the no-JS lists, but for the collection's own."""
         fork = 'href="/remotes/ann-notes/wiki/federated-wikis/"'

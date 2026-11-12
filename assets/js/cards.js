@@ -77,11 +77,27 @@ export function densityToggle(list) {
   return b;
 }
 
+// A fork card's source: with a follow page (`sources`, sources.html), a link
+// to it whose tooltip gives the repo, this author's rating and the follow's
+// description; else the bare name.
+export function sourceTitle(name, s) {
+  return [`${name} — ${s.repo}`, s.rating ? `Source rating ${"★".repeat(s.rating)}${"☆".repeat(5 - s.rating)}` : "",
+    s.description].filter(Boolean).join("\n");
+}
+function sourceChip(name, sources) {
+  const s = sources?.[name];
+  return s
+    ? `<a class="chip chip-source" href="${escapeHTML(s.page)}" title="${escapeHTML(sourceTitle(name, s))}">${escapeHTML(name)}</a>`
+    : `<span class="chip chip-source">${escapeHTML(name)}</span>`;
+}
+
 /**
  * A page card. Options:
  *   activeTags   a Set of tag names to mark as selected
  *   onTag(name)  when given, tag chips are filter buttons instead of links
  *   summaryHTML  pre-rendered HTML (a search excerpt with <mark>) in place of item.summary
+ *   sources      @params' sources (sources.html), for the source chip: a link to
+ *                the follow's page, the repo's details its tooltip
  */
 export function card(item, opts = {}) {
   const li = document.createElement("li");
@@ -97,7 +113,7 @@ export function card(item, opts = {}) {
       ${(item.collections || []).length ? `<span class="page-card-collections">${item.collections.map((t) =>
         `<span class="chip chip-collection">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>
-    ${item.source ? `<span class="page-card-source muted">from <span class="chip chip-source">${escapeHTML(item.source)}</span></span>` : ""}
+    ${item.source ? `<span class="page-card-source muted">from ${sourceChip(item.source, opts.sources)}</span>` : ""}
     <span class="page-card-dates">${dateHTML(item)}${ratingHTML(item)}</span>
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((b) =>
       `<a class="chip chip-link" href="${escapeHTML(b.url)}" rel="noopener external" target="_blank">${escapeHTML(b.label)}</a>`).join("")}</div>` : ""}

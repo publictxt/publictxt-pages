@@ -15,7 +15,7 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 ```txt
 scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`, `params.skipFiles`);
-                            reads `params.titleFromHeading`; a fork's source_* keys, a follow's `url` -> `follow_url`
+                            reads `params.titleFromHeading`; a fork's source_* keys, a follow's `follow_name` and `url` -> `follow_url`
 scripts/sources.py          follows, forks and the join: a fork's source, source rating, link to the original
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags + parents, flat keys
@@ -91,12 +91,14 @@ layouts/_partials/
   bookmark-label.html   one URL's short form (returns it)
   posted-urls.html      only reader of params.sources keys (facebook:, …)
   posted-links.html     "Posted on" chips
+  follow.html           a follow page's repo, rating (the repo's), description, fork count (returns a dict)
+  sources.html          every follow by name, for cards' source chips (@params)   (partialCached)
   fork-source.html      only reader of the source_* keys sync writes on a fork (returns a dict)
   own-source.html       only reader of params.ownSource: the Source filter's value for this repo's own pages
   fork-source-links.html  "Forked from" chips: the source, its follow's page, the original
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
-  rating.html           only reader of rating:
+  rating.html           only reader of rating: — but a follow's, which is follow.html's
   note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
   attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
 

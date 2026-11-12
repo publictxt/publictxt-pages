@@ -166,7 +166,8 @@ class SyncTest(unittest.TestCase):
         """Hugo takes `url:` for the page's own address (and panics on this one)."""
         pages, _ = self.synced({"follows/ann.md": "---\nurl: git@github.com:ann/notes.git\n---\n",
                                 "follows/note.md": "---\nurl: /elsewhere/\n---\n"})
-        self.assertIn(f'follow_url: "{REPO}"', pages["follows/ann.md"])
+        self.assertIn(f'follow_name: "ann"\nfollow_url: "{REPO}"', pages["follows/ann.md"])
+        self.assertNotIn("follow_name", pages["follows/note.md"])
         self.assertNotIn("\nurl:", pages["follows/ann.md"] + pages["follows/note.md"])
 
     def test_drop_keys(self):

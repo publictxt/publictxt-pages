@@ -252,7 +252,7 @@ function resultCard(d) {
     rating: Number(d.meta?.rating) || 0,
     source: (d.filters?.source || []).find((s) => s !== SOURCE?.missing) || "",
   };
-  return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });
+  return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "", sources: params.sources });
 }
 
 // ---- wiring -------------------------------------------------------------

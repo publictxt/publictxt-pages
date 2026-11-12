@@ -387,7 +387,7 @@ async function mount(root) {
       toggleInclude(state.tag, t);
       state.page = 1; render(true);
     };
-    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag?.inc, onTag })));
+    list.replaceChildren(...slice.map((it) => card(it, { activeTags: state.tag?.inc, onTag, sources: params.sources })));
     if (compact) return;
     sortSelect.value = state.sort;
 
