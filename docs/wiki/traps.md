@@ -37,6 +37,12 @@ A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.
 
+`source` is a chip facet no config lists: `chip-facets.html` appends it, with `group:
+"community"` — its own block, built by `list.js` and written out in `search.html` — and
+`missing`, the value of this repo's own pages (`own-source.html`). `index.json` leaves
+`source` off those pages and `facetValues()` fills it in; Pagefind can't, so
+`pagefind-keys.html` writes it on every page. Both read `own-source.html`.
+
 A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
 entry): change the default and shared links without it change meaning.
 

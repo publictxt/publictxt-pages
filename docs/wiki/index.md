@@ -77,7 +77,7 @@ layouts/_partials/
   list-json.html        pages -> index.json items, with Hugo-made display values
   list-container.html   [data-list] + no-JS <ul> + loads list.js
   js-params.html        @params for every js.Build — see traps.md
-  chip-facets.html      only reader of params.chipFacets   (partialCached)
+  chip-facets.html      only reader of params.chipFacets; appends `source`, in the Community block   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
   list-filter.html      filter: cascade (page -> ancestors): default chip filters
   list-per-page.html    pagerSize: cascade
@@ -91,6 +91,7 @@ layouts/_partials/
   posted-urls.html      only reader of params.sources keys (facebook:, …)
   posted-links.html     "Posted on" chips
   fork-source.html      only reader of the source_* keys sync writes on a fork (returns a dict)
+  own-source.html       only reader of params.ownSource: the Source filter's value for this repo's own pages
   fork-source-links.html  "Forked from" chips: the source, its follow's page, the original
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)

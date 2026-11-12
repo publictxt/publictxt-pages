@@ -77,6 +77,16 @@ Below the filters, on lists spanning two or more months:
 
 Dates here are `created` — see [Dates](writing.md#dates).
 
+## Community
+
+When a list holds pages from more than one source — your own and
+[forks](writing.md#follows-and-forks) from repos you follow — a **Community** block
+appears under Filters, in lists and in search:
+
+- **Source** — a chip per source: click to show only those, ✕ to leave one out. Your own
+  pages are "this repo" ([`ownSource`](configuration.md#filter-chips) renames it).
+- A fork's card says **from** *source*.
+
 ## On a page
 
 Right column, top: **this page's details** —

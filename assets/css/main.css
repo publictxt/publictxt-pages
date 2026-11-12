@@ -345,6 +345,10 @@ a:hover { text-decoration: underline; }
   overflow-wrap: anywhere;
 }
 
+/* A fork's source, on its card (cards.js) — dashed: not this repo's. */
+.chip-source { border-style: dashed; }
+.page-card-source { font-size: 0.8rem; }
+.dense .page-card-source { display: none; }
 .page-card-collections {
   display: flex;
   flex-wrap: wrap;

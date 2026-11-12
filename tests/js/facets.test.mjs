@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  addsPages, chipFacets, describe, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
+  addsPages, chipFacets, describe, facetValues, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
 import { normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
@@ -58,6 +58,23 @@ test("chipFacets: config order, unknown keys dropped, defaults filled", () => {
   assert.equal(p.toString(), "tag=a&collection=blog");
   c.clear(s);
   assert.ok(!c.anySet(s));
+});
+
+test("source: one value a page, `missing` for this repo's own; grouped apart", () => {
+  // As chip-facets.html appends it.
+  const c = chipFacets([{ key: "tag" }, { key: "source", label: "Source", match: ["any"], group: "community", missing: "this repo" }]);
+  const [tag, source] = c.defs;
+  assert.deepEqual([source.item, source.group, source.modes], ["source", "community", ["any"]]);
+  assert.deepEqual(facetValues(source, { source: "ann" }), ["ann"]);
+  assert.deepEqual(facetValues(source, {}), ["this repo"]);
+  assert.deepEqual(facetValues(tag, {}), []);
+  assert.deepEqual(facetValues(tag, { tags: ["a", "", "b"] }), ["a", "b"]);
+
+  const s = c.read(qs("source=ann&source=bob&source-not=this+repo"));
+  assert.ok(matches(s.source, facetValues(source, { source: "bob" })));
+  assert.ok(!matches(s.source, facetValues(source, {})));
+  assert.deepEqual(pagefindConditions(s.source), [{ source: { any: ["ann", "bob"] } }, { source: { none: ["this repo"] } }]);
+  assert.deepEqual(c.describe(s), ["ann or bob", "not this repo"]);
 });
 
 test("a list's default filter: holds without chip params, URL replaces it whole", () => {

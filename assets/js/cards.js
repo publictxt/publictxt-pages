@@ -1,7 +1,8 @@
 // The one page card, for list.js and search.js. Item shape = index.json's
 // (list-json.html): { url, title, collections[], section, tags[], categories[],
 // created, updated, year, createdLabel, updatedLabel, summary,
-// bookmarks[{url, label}], rating }. Display values come from Hugo; JS never
+// bookmarks[{url, label}], rating, source }. `source`: a fork's (the repo its
+// text came from); absent on this repo's own pages. Display values come from Hugo; JS never
 // formats a date or a label.
 
 export function escapeHTML(s) {
@@ -86,6 +87,7 @@ export function card(item, opts = {}) {
       ${(item.collections || []).length ? `<span class="page-card-collections">${item.collections.map((t) =>
         `<span class="chip chip-collection">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>
+    ${item.source ? `<span class="page-card-source muted">from <span class="chip chip-source">${escapeHTML(item.source)}</span></span>` : ""}
     <span class="page-card-dates">${dateHTML(item)}${ratingHTML(item)}</span>
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((b) =>
       `<a class="chip chip-link" href="${escapeHTML(b.url)}" rel="noopener external" target="_blank">${escapeHTML(b.label)}</a>`).join("")}</div>` : ""}

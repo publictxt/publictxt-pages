@@ -11,18 +11,20 @@
 // Results come in batches of #search's data-per-page; "Show more" adds one.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, filterChip, foldHint, matchToggle, pagefindConditions,
+import { addsPages, chipFacets, filterChip, foldHint, isSet, matchToggle, pagefindConditions,
   ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { SORTS, normaliseSort, parseSort } from "./sorts.js";
 import { countsTree, monthCount, monthFilter, renderTimeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
+const COMMUNITY = CHIPS.defs.filter((d) => d.group === "community").map((d) => d.key);   // its own block
+const SOURCE = CHIPS.defs.find((d) => d.key === "source");   // for a result card's source chip
 const TYPING_MS = 400;   // pause before a keystroke searches; Enter searches now
 const base = (document.documentElement.dataset.base || "/").replace(/\/?$/, "/");
 const $ = (id) => document.getElementById(id);
 const el = {
-  root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"),
+  root: $("search"), q: $("search-q"), clear: $("search-clear"), filters: $("search-filters"), community: $("search-community"),
   side: $("search-side"), timeline: $("search-timeline"), tl: $("search-tl"), layout: $("search-layout"),
   rating: $("filter-rating"), ratingGroup: $("filter-rating-group"), ratingHint: $("filter-rating-hint"),
   sort: $("search-sort"),
@@ -100,10 +102,13 @@ function renderFilters(facetCounts, ratingExact) {
     const g = groups[d.key];
     const f = state[d.key];
     const names = sortedKeys(allFilters[d.key]);
-    g.group.hidden = names.length === 0;
+    // A facet with a `missing` value (source) always has that one: two to offer a choice.
+    g.group.hidden = names.length < (d.missing ? 2 : 1);
     g.chips.replaceChildren(...names.map((n) => chip(d, n, (facetCounts[d.key] || {})[n] ?? 0)));
     g.hint.replaceChildren(...foldHint(f.inc.size + f.exc.size, matchToggle(f, run)));
   }
+  // The Community block shows while a facet inside does.
+  if (el.community) el.community.hidden = !el.community.querySelector(".list-facet:not([hidden])");
   const ratings = Object.keys(allFilters.rating || {}).filter((r) => r !== UNRATED_FILTER).sort((a, b) => b - a);
   const hasUnrated = UNRATED_FILTER in (allFilters.rating || {});
   el.ratingGroup.hidden = ratings.length === 0;
@@ -204,6 +209,7 @@ function resultCard(d) {
     createdLabel: d.meta?.created_label || "",
     updatedLabel: d.meta?.updated_label || "",
     rating: Number(d.meta?.rating) || 0,
+    source: (d.filters?.source || []).find((s) => s !== SOURCE?.missing) || "",
   };
   return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "" });
 }
@@ -219,7 +225,7 @@ el.more.addEventListener("click", showMore);
 el.sort.closest(".results-tools").append(densityToggle(el.list));
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });
 
-for (const g of document.querySelectorAll("#search-filters [data-facet]")) rememberFold(g, g.dataset.facet);
+for (const g of document.querySelectorAll("#search-side [data-facet]")) rememberFold(g, g.dataset.facet);
 readURL();
 el.q.value = state.q;
 if (hasTimeline) {
@@ -231,6 +237,7 @@ if (hasTimeline) {
 el.side.hidden = false;
 dock(el.side, el.side.closest(".aside"), el.layout, (narrow) => {
   el.filters.open = !narrow || filtering();
+  if (el.community) el.community.open = !narrow || COMMUNITY.some((k) => isSet(state[k]));
   el.timeline.open = !narrow || Boolean(state.year);
 });
 await run();

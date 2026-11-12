@@ -14,12 +14,19 @@ export const MODES = ["all", "any"];
 
 // What config can't change, per key. `key` is the URL param and Pagefind filter
 // (traps.md); `item` the index.json field. Lists only: `shared` shows values
-// every listed page has; `limit` chips before "more".
+// every listed page has; `limit` chips before "more". From chip-facets.html,
+// not here: `missing`, the value of a page with none (a source: this repo's
+// own pages), and `group`, the section the facet sits in ("community").
 const BUILTIN = {
   collection: { item: "collections", prefix: "", shared: true },
   category: { item: "categories", prefix: "" },
   tag: { item: "tags", prefix: "#", limit: 20 },
+  source: { item: "source", prefix: "" },
 };
+
+// A page's values for facet `d` (a def): index.json holds a list, one value
+// or nothing — then `missing`, if the facet has one.
+export const facetValues = (d, item) => [].concat(item[d.item] ?? d.missing ?? []).filter(Boolean);
 
 // The chip facets from config — @params' chipFacets (chip-facets.html: order,
 // label, states, match → `modes`), passed in so this module stays Hugo-free. `defs` in display order;
