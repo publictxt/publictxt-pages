@@ -23,7 +23,7 @@ import { addsPages, chipFacets, facetValues, filterChip, foldHint, hideByDefault
 import { dock } from "./layout.js";
 import { pageHolding, pageSizes, readPageSize, writePageSize } from "./page-size.js";
 import { siteIndex, scope } from "./site-index.js";
-import { SORTS, UNRATED, normaliseSort, parseSort } from "./sorts.js";
+import { OWN_SOURCE, UNRATED, normaliseSort, parseSort, sortsFor } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -38,7 +38,9 @@ const FACETS = Object.fromEntries(CHIPS.defs.map((d) => [d.key, { values: (it) =
 // get a block of their own, after Filters; search.html has the same.
 const COMMUNITY = CHIPS.defs.filter((d) => d.group === "community");
 
-// Rating ties: newest first either way.
+// Rating ties: newest first either way. Source rating: this repo's own pages
+// above any source (OWN_SOURCE), as search's.
+const sourceRatingOf = (it) => it.source ? it.sourceRating || UNRATED : OWN_SOURCE;
 function sorted(items, sort) {
   const { field, dir } = parseSort(sort);
   const sign = dir === "asc" ? 1 : -1;
@@ -46,6 +48,7 @@ function sorted(items, sort) {
   const byDate = (f) => (a, b) => (Date.parse(a[f]) || 0) - (Date.parse(b[f]) || 0);
   return [...items].sort(field === "title" ? (a, b) => sign * byTitle(a, b)
     : field === "rating" ? (a, b) => sign * ((a.rating || UNRATED) - (b.rating || UNRATED)) || -byDate("created")(a, b) || byTitle(a, b)
+    : field === "source-rating" ? (a, b) => sign * (sourceRatingOf(a) - sourceRatingOf(b)) || -byDate("created")(a, b) || byTitle(a, b)
     : (a, b) => sign * byDate(field)(a, b) || byTitle(a, b));
 }
 
@@ -93,6 +96,7 @@ async function mount(root) {
     if (compact) return;
     const p = new URLSearchParams(location.search);
     state.sort = normaliseSort(p.get("sort") || defaultSort);
+    if (!sorts.some(([v]) => v === state.sort)) state.sort = defaultSort;   // source rating, no forks
     Object.assign(state, CHIPS.readOr(p, defaultChips()));
     // No timeline (one month, or compact), no date filter: nothing would
     // show it or clear it.
@@ -143,7 +147,8 @@ async function mount(root) {
   status.className = "list-status";
   const sortWrap = document.createElement("label");
   sortWrap.className = "list-sort";
-  sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${SORTS.map(([v, l]) =>
+  const sorts = sortsFor(items.some((it) => it.source));
+  sortWrap.innerHTML = `<span class="facet-label">Sort</span> <select aria-label="Sort order">${sorts.map(([v, l]) =>
     `<option value="${v}">${l}</option>`).join("")}</select>`;
   const sortSelect = sortWrap.querySelector("select");
   sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; state.page = 1; render(true); });

@@ -8,7 +8,7 @@ import {
   addsPages, chipFacets, describe, facetValues, hideByDefault, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
-import { normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
+import { normaliseSort, parseSort, sortLabel, sortsFor, SORTS } from "../../assets/js/sorts.js";
 
 const qs = (s) => new URLSearchParams(s);
 const url = (f) => { const p = new URLSearchParams(); writeFacet(p, f); return p.toString(); };
@@ -187,6 +187,14 @@ test("matches() and pagefindConditions() agree on every combination", () => {
 });
 
 // ---- sorts --------------------------------------------------------------
+
+test("source rating sort: highest first by default; offered only with forks", () => {
+  assert.equal(normaliseSort("source-rating desc"), "source-rating");
+  assert.deepEqual(parseSort("source-rating asc"), { field: "source-rating", dir: "asc" });
+  assert.equal(sortLabel("source-rating"), "Top rated source");
+  assert.equal(sortsFor(true), SORTS);
+  assert.deepEqual(sortsFor(false).map(([v]) => v).filter((v) => v.includes("source")), []);
+});
 
 test("sorts: canonical URL form omits the natural direction", () => {
   assert.equal(normaliseSort(""), "created");

@@ -85,6 +85,8 @@ appears under Filters, in lists and in search:
 
 - **Source** — a chip per source: click to show only those, ✕ to leave one out. Your own
   pages are "this repo" ([`ownSource`](configuration.md#filter-chips) renames it).
+- **Sort by source** — *Top rated source* / *Lowest rated source*, in the Sort menu where
+  a list has forks. Your own pages count as above any source.
 - **Source rating** — your rating of the repo (the follow's `rating`), as a minimum:
   ★4+ shows forks from repos you rated 4 or 5. "Unrated" is forks from repos you haven't
   rated. Your own pages have no source rating, so picking one leaves them out.
