@@ -1,8 +1,8 @@
 // The one page card, for list.js and search.js. Item shape = index.json's
 // (list-json.html): { url, title, collections[], section, tags[], categories[],
 // created, updated, year, createdLabel, updatedLabel, summary,
-// bookmarks[{url, label}], rating, source }. `source`: a fork's (the repo its
-// text came from); absent on this repo's own pages. Display values come from Hugo; JS never
+// bookmarks[{url, label}], rating, source, sourceRating }. `source`: a fork's (the repo its
+// text came from), `sourceRating` that repo's 1–5; both absent on this repo's own pages. Display values come from Hugo; JS never
 // formats a date or a label.
 
 export function escapeHTML(s) {
@@ -29,6 +29,16 @@ export function ratingHTML(item) {
 export const UNRATED_FILTER = "unrated";
 export function ratingFilter(v) {
   return /^[1-5]$/.test(v || "") || v === UNRATED_FILTER ? v : "";
+}
+
+// `?source-rating=`, spelled as `?rating=`: a fork's source's rating. This
+// repo's own pages have no source, so no value passes them — in Pagefind
+// they carry NO_SOURCE (pagefind-keys.html), which no filter asks for.
+export const NO_SOURCE = "none";
+export function sourceRatingPasses(item, v) {
+  if (!v) return true;
+  if (!item.source) return false;
+  return v === UNRATED_FILTER ? !item.sourceRating : (item.sourceRating || 0) >= Number(v);
 }
 
 // A rating filter value as the lists and search show it: "★4+", "★5", "Unrated".

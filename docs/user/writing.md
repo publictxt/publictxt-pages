@@ -241,7 +241,7 @@ the site reads what they write.
 
 - **A follow** is a note in `follows/` with the repo's `url` (or `local: true`, for a
   repo with no public URL). The file name is the follow's name; its `rating` is your
-  rating of that repo.
+  rating of that repo — the [source rating](site.md#community) of every page forked from it.
 - **A fork** is a page with `fork_*` keys saying where it was copied from. It shows
   **Forked from** — the follow's name, linked to its note — and **↗ original**: the file
   it was forked from on GitHub, GitLab or Codeberg; elsewhere the repo; for a local

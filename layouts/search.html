@@ -81,6 +81,11 @@
     <summary><h3 class="side-heading">Community</h3></summary>
     <div class="list-controls-body">
       {{ range . }}{{ template "search-facet" . }}{{ end }}
+      {{/* The source's rating, a minimum as Rating is: chips, one at a time. */}}
+      <details class="list-facet" id="filter-source-rating-group" data-facet="source-rating" open hidden>
+        <summary><span class="facet-label">Source rating <span id="filter-source-rating-hint"></span></span></summary>
+        <div id="filter-source-rating" class="chip-row"></div>
+      </details>
     </div>
   </details>
   {{ end }}

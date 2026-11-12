@@ -1,6 +1,6 @@
 // Browse lists: each `[data-list]` swaps Hugo's fallback <ul> for sortable,
 // filterable, paged cards from the site index. State lives in the URL:
-// ?tag=&category=&collection=&source=&year=&month=&rating=&sort=&page= (`q` is search's);
+// ?tag=&category=&collection=&source=&source-rating=&year=&month=&rating=&sort=&page= (`q` is search's);
 // tag, category, collection and source also take -not / -match (facets.js); month
 // only with year (timeline.js).
 //
@@ -15,7 +15,7 @@
 // Filters, Community (where pages came from), then the timeline, go in the page's `[data-list-controls]` right
 // column (section.html, term.html), claimed by the first full list, or above
 // the list when narrow (layout.js). Sort, page size and the density toggle sit with the count.
-import { card, densityToggle, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
+import { card, densityToggle, ratingFilter, ratingFilterLabel, sourceRatingPasses, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, facetValues, filterChip, foldHint, isSet, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
@@ -81,7 +81,7 @@ async function mount(root) {
 
   // ---- state <-> URL --------------------------------------------------
   // Chip facets by key (CHIPS.read); `more`: keys showing past their limit.
-  const state = { sort: defaultSort, ...defaultChips(), year: "", month: "", rating: "", page: 1, more: new Set() };
+  const state = { sort: defaultSort, ...defaultChips(), year: "", month: "", rating: "", sourceRating: "", page: 1, more: new Set() };
   function readURL() {
     if (compact) return;
     const p = new URLSearchParams(location.search);
@@ -92,6 +92,7 @@ async function mount(root) {
     state.year = hasTimeline ? p.get("year") || "" : "";
     state.month = monthFilter(p.get("month"), state.year);
     state.rating = ratingFilter(p.get("rating"));
+    state.sourceRating = hasSourceRatings ? ratingFilter(p.get("source-rating")) : "";
     state.page = Math.max(1, parseInt(p.get("page"), 10) || 1);
   }
   function url(overrides = {}) {
@@ -102,6 +103,7 @@ async function mount(root) {
     if (s.year) p.set("year", s.year);
     if (s.month) p.set("month", s.month);
     if (s.rating) p.set("rating", s.rating);
+    if (s.sourceRating) p.set("source-rating", s.sourceRating);
     if (s.page > 1) p.set("page", String(s.page));
     const qs = p.toString();
     return location.pathname + (qs ? "?" + qs : "");
@@ -193,7 +195,12 @@ async function mount(root) {
   const hasRatings = ratings.length > 1 || (ratings.length === 1 && hasUnrated);
   const offers = (d) => chipValues[d.key].length || isSet(defaults[d.key]);
   const hasFilters = hasRatings || CHIPS.defs.some((d) => !COMMUNITY.includes(d) && offers(d));
-  const hasCommunity = COMMUNITY.some(offers);
+  // Source rating, among forks only: shows when their sources' ratings vary, as Rating does.
+  const forks = items.filter((it) => it.source);
+  const sourceRatings = [...new Set(forks.map((it) => it.sourceRating).filter(Boolean))].sort((a, b) => b - a);
+  const hasUnratedSource = forks.some((it) => !it.sourceRating);
+  const hasSourceRatings = sourceRatings.length > 1 || (sourceRatings.length === 1 && hasUnratedSource);
+  const hasCommunity = hasSourceRatings || COMMUNITY.some(offers);
   // Nothing to pick in a single month. The newest year open to start,
   // or the ones the URL picked (readURL, below).
   const fullTree = timeline(items);
@@ -223,9 +230,9 @@ async function mount(root) {
     return row;
   }
 
-  // forRating / forFacet(key): `filtered` minus that filter, so options
-  // count what picking them gives.
-  function renderControls(filtered, forRating, forFacet) {
+  // forRating / forSourceRating / forFacet(key): `filtered` minus that filter,
+  // so options count what picking them gives.
+  function renderControls(filtered, forRating, forFacet, forSourceRating) {
     body.replaceChildren();
     communityBody.replaceChildren();
     // Filters only; sort isn't in this box. Reset clears both blocks; it sits in the first shown.
@@ -237,7 +244,7 @@ async function mount(root) {
       clear.className = "btn-ghost list-reset";
       clear.textContent = "Reset";
       clear.addEventListener("click", () => {
-        Object.assign(state, defaultChips()); state.year = ""; state.month = ""; state.rating = ""; state.page = 1; render(true);
+        Object.assign(state, defaultChips()); state.year = ""; state.month = ""; state.rating = ""; state.sourceRating = ""; state.page = 1; render(true);
       });
       row.append(clear);
       (hasFilters ? body : communityBody).append(row);
@@ -276,6 +283,18 @@ async function mount(root) {
         chips.push(more);
       }
       (COMMUNITY.includes(d) ? communityBody : body).append(facetRow(d.key, d.label, chips, f, f.inc.size + f.exc.size));
+    }
+
+    if (hasSourceRatings) {
+      const exact = {};
+      for (const it of forSourceRating) {
+        if (!it.source) continue;
+        const k = it.sourceRating ? String(it.sourceRating) : UNRATED_FILTER;
+        exact[k] = (exact[k] || 0) + 1;
+      }
+      const values = [...sourceRatings.map(String), ...(hasUnratedSource ? [UNRATED_FILTER] : [])];
+      const chips = ratingChips(values, ratingCounts(exact), state.sourceRating, (v) => { state.sourceRating = v; state.page = 1; render(true); });
+      communityBody.append(facetRow("source-rating", "Source rating", chips, null, state.sourceRating ? 1 : 0));
     }
   }
 
@@ -318,7 +337,7 @@ async function mount(root) {
   }
 
   // Off the list's defaults: what Reset undoes.
-  const filtering = () => Boolean(!CHIPS.same(state, defaults) || state.year || state.rating);
+  const filtering = () => Boolean(!CHIPS.same(state, defaults) || state.year || state.rating || state.sourceRating);
   const dateLabel = () => state.month ? `${params.months[Number(state.month) - 1]} ${state.year}` : state.year;
 
   // The other filters narrow it; its own pick shows as pressed, not as a cut.
@@ -344,6 +363,7 @@ async function mount(root) {
     year: (it) => (!state.year || it.year === state.year) && (!state.month || monthOf(it) === state.month),
     rating: (it) => !state.rating
       || (state.rating === UNRATED_FILTER ? !it.rating : (it.rating || 0) >= Number(state.rating)),
+    sourceRating: (it) => sourceRatingPasses(it, state.sourceRating),
   };
   // Passes every test but `skip`'s; a skipped facet keeps its excludes.
   const passes = (it, skip) => Object.entries(tests).every(([k, test]) =>
@@ -365,12 +385,13 @@ async function mount(root) {
     sortSelect.value = state.sort;
 
     const forFacet = (k) => addsPages(state[k]) ? items.filter((it) => passes(it, k)) : filtered;
-    renderControls(filtered, items.filter((it) => passes(it, "rating")), forFacet);
+    renderControls(filtered, items.filter((it) => passes(it, "rating")), forFacet, items.filter((it) => passes(it, "sourceRating")));
     if (hasTimeline) drawTimeline(items.filter((it) => passes(it, "year")));
     renderPager(total);
     const n = filtered.length;
     const what = [...CHIPS.describe(state), dateLabel(),
-      state.rating && ratingFilterLabel(state.rating)].filter(Boolean).join(" · ");
+      state.rating && ratingFilterLabel(state.rating),
+      state.sourceRating && "source " + ratingFilterLabel(state.sourceRating)].filter(Boolean).join(" · ");
     const extra = [what, total > 1 && `page ${state.page} of ${total}`].filter(Boolean).join(" · ");
     const detail = document.createElement("span");
     detail.className = "muted";
@@ -393,7 +414,7 @@ async function mount(root) {
   if (hasTimeline) side.append(tl);
   if (side.childElementCount) dock(side, slot, root, (narrow) => {
     controls.open = !narrow || filtering();
-    community.open = !narrow || COMMUNITY.some((d) => isSet(state[d.key]));
+    community.open = !narrow || Boolean(state.sourceRating) || COMMUNITY.some((d) => isSet(state[d.key]));
     tl.open = !narrow || Boolean(state.year);
   });
   else if (slot) slot.hidden = true;
