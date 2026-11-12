@@ -43,3 +43,10 @@ test("source chip tooltip: repo, rating, description — what there is", async (
     "ann — github.com/ann/notes\nSource rating ★★★★☆\nAnn's wiki.");
   assert.equal(sourceTitle("vault", { repo: "local repository", rating: 0, description: "" }), "vault — local repository");
 });
+
+test("a fork's arrival date reads \"forked\"", async () => {
+  const { dateHTML } = await import("../../assets/js/cards.js");
+  const it = { created: "2025-01-01T12:00:00Z", createdLabel: "1 Jan 2025" };
+  assert.ok(!dateHTML(it).includes("forked"));
+  assert.ok(dateHTML({ ...it, forked: true }).startsWith('<span class="muted">forked</span> <time'));
+});

@@ -250,6 +250,7 @@ function resultCard(d) {
     updated: d.meta?.updated || "",
     createdLabel: d.meta?.created_label || "",
     updatedLabel: d.meta?.updated_label || "",
+    forked: d.meta?.forked === "true",
     rating: Number(d.meta?.rating) || 0,
     source: (d.filters?.source || []).find((s) => s !== SOURCE?.missing) || "",
   };

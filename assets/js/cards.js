@@ -1,6 +1,6 @@
 // The one page card, for list.js and search.js. Item shape = index.json's
 // (list-json.html): { url, title, collections[], section, tags[], categories[],
-// created, updated, year, createdLabel, updatedLabel, summary,
+// created, updated, year, createdLabel, updatedLabel, forked, summary,
 // bookmarks[{url, label}], rating, source, sourceRating }. `source`: a fork's (the repo its
 // text came from), `sourceRating` that repo's 1–5; both absent on this repo's own pages. Display values come from Hugo; JS never
 // formats a date or a label.
@@ -12,7 +12,9 @@ export function escapeHTML(s) {
 // As page-date.html; the labels and the "updated" rule are date-labels.html's.
 export function dateHTML(item) {
   if (!item.createdLabel) return "";
-  let html = `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(item.createdLabel)}</time>`;
+  // `forked`: the date is when a fork came into this repo, not when it was written (date-labels.html).
+  let html = (item.forked ? `<span class="muted">forked</span> ` : "")
+    + `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(item.createdLabel)}</time>`;
   if (item.updatedLabel) {
     html += ` <span class="muted">· updated <time datetime="${escapeHTML(item.updated)}">${escapeHTML(item.updatedLabel)}</time></span>`;
   }
