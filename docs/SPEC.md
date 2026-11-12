@@ -65,7 +65,7 @@ Items marked **(TBD)** are not built.
     - Source rating: a minimum, as Rating (`?source-rating=4`), over forks; "Unrated" is forks whose source has no rating. This repo's own pages have no source rating, so any value leaves them out. Shown when forks' source ratings vary. A fork's page shows it under Source.
     - Sort by source rating (TBD). Author (TBD).
     - A card's source chip: a tooltip with the repo's details — its URL, source rating, the follow's description (TBD).
-  - The `remotes` collection off by default in lists, home and feeds (TBD).
+  - `params.hiddenCollections` (default `remotes`): excluded by default in the Collection filter of lists (home, sections, tags, dataview) and search, so the excluded chip — or the collection's own section — brings them back, and Reset hides them again. A fork brought into another folder isn't in `remotes`, so it shows. No feeds yet to keep them out of.
   - A follow's page as its source's landing page: the repo link, its forks (TBD).
   - A fork's dates are this repo's (when it was forked or last changed here), not the original's (TBD).
 - Pages

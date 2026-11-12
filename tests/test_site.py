@@ -127,6 +127,14 @@ class SiteIndexTest(unittest.TestCase):
         self.assertEqual(search.count('id="filter-source-group"'), 1)
         self.assertIn('id="filter-source-rating-group" data-facet="source-rating"', block[0])
 
+    def test_hidden_collections(self):
+        """params.hiddenCollections (remotes): out of the no-JS lists, but for the collection's own."""
+        fork = 'href="/remotes/ann-notes/wiki/federated-wikis/"'
+        self.assertNotIn(fork, self.html())
+        self.assertIn(fork, self.html("remotes"))
+        self.assertIn(fork, self.html("remotes", "ann-notes"))
+        self.assertIn('href="/notes/forked-from-a-local-vault/"', self.html("notes"), "a fork in this repo's own folder shows")
+
     def test_dataview_tag_list(self):
         """notes/tag-lists.md: `LIST FROM #site` + `LIMIT 2` of 6; a TABLE query stays code."""
         html = (self.public / "notes" / "tag-lists" / "index.html").read_text(encoding="utf-8")

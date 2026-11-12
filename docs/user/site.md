@@ -90,6 +90,11 @@ appears under Filters, in lists and in search:
   rated. Your own pages have no source rating, so picking one leaves them out.
 - A fork's card says **from** *source*; its page shows the source's rating too.
 
+Pages under `remotes/` — pages fetched from repos you follow — are left out of lists and
+search to start with: **remotes** shows crossed out under Collection; click it to bring
+them in. The Remotes section itself always lists them. Forks you've moved into your own
+folders are yours to show, and do. ([`hiddenCollections`](configuration.md#browse-lists).)
+
 ## On a page
 
 Right column, top: **this page's details** —

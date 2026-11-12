@@ -11,7 +11,7 @@
 // Results come in batches of #search's data-per-page; "Show more" adds one.
 import { card, densityToggle, NO_SOURCE, ratingFilter, ratingFilterLabel, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, filterChip, foldHint, isSet, matchToggle, pagefindConditions,
+import { addsPages, chipFacets, filterChip, foldHint, hideByDefault, isSet, matchToggle, pagefindConditions,
   ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { SORTS, normaliseSort, parseSort } from "./sorts.js";
@@ -51,7 +51,9 @@ el.root.hidden = false;
 // `sort` null = not chosen, so the default follows the query.
 const RELEVANCE = "relevance";
 const state = { q: "", ...CHIPS.read(), year: "", month: "", rating: "", sourceRating: "", sort: null };
-const filtering = () => Boolean(CHIPS.anySet(state) || state.year || state.rating || state.sourceRating);
+// `defaults`: hidden collections excluded (set below, once the index says which exist).
+let defaults = CHIPS.read();
+const filtering = () => Boolean(!CHIPS.same(state, defaults) || state.year || state.rating || state.sourceRating);
 const hasQuery = () => state.q.trim().length > 0;
 const defaultSort = () => hasQuery() ? RELEVANCE : "created";
 function activeSort() {
@@ -61,7 +63,7 @@ function activeSort() {
 function readURL() {
   const p = new URLSearchParams(location.search);
   state.q = p.get("q") || "";
-  Object.assign(state, CHIPS.read(p));
+  Object.assign(state, CHIPS.readOr(p, defaultChips()));
   state.year = p.get("year") || "";
   state.month = monthFilter(p.get("month"), state.year);
   state.rating = ratingFilter(p.get("rating"));
@@ -72,7 +74,7 @@ function readURL() {
 function writeURL() {
   const p = new URLSearchParams();
   if (state.q) p.set("q", state.q);
-  CHIPS.write(p, state);
+  CHIPS.write(p, state, defaults);
   if (state.year) p.set("year", state.year);
   if (state.month) p.set("month", state.month);
   if (state.rating) p.set("rating", state.rating);
@@ -87,6 +89,10 @@ const toggleTag = state.tag?.states.includes("include") ? (t) => { toggleInclude
 
 // ---- filter chips -------------------------------------------------------
 const allFilters = await pagefind.filters();   // { tag: {name: count}, collection: {…}, category: {…}, year: {…}, rating: {…} }
+// The default chip state, as a list's: params.hiddenCollections the index has, excluded.
+const hidden = (params.hiddenCollections || []).filter((h) => h in (allFilters.collection || {}));
+const defaultChips = () => hideByDefault(CHIPS.read(), hidden);
+defaults = defaultChips();
 const sortedKeys = (obj) => Object.keys(obj || {}).sort((a, b) => (obj[b] - obj[a]) || a.localeCompare(b));
 // Nothing to pick in a single month. The newest year open to start, or the URL's.
 const hasTimeline = monthCount(countsTree(allFilters.month)) > 1;
@@ -238,7 +244,7 @@ const typed = () => { clearTimeout(timer); state.q = el.q.value; run(); };
 el.q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(typed, TYPING_MS); });
 el.q.addEventListener("keydown", (e) => { if (e.key === "Enter") typed(); });
 el.sort.addEventListener("change", () => { state.sort = el.sort.value; run(); });
-el.clear.addEventListener("click", () => { state.q = ""; CHIPS.clear(state); state.year = ""; state.month = ""; state.rating = ""; state.sourceRating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
+el.clear.addEventListener("click", () => { state.q = ""; Object.assign(state, defaultChips()); state.year = ""; state.month = ""; state.rating = ""; state.sourceRating = ""; state.sort = null; el.q.value = ""; run(); el.q.focus(); });
 el.more.addEventListener("click", showMore);
 el.sort.closest(".results-tools").append(densityToggle(el.list));
 window.addEventListener("popstate", () => { readURL(); el.q.value = state.q; run(); });

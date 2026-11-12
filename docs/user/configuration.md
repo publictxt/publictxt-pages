@@ -89,6 +89,11 @@ filter: tag-not=journal
 ---
 ```
 
+`hiddenCollections` (site-wide, default `["remotes"]`) keeps whole collections out of
+every list and of search until a reader asks: each starts excluded in the Collection
+filter, on top of any `filter`. The collection's own section still lists it. `[]` hides
+none; it needs the collection filter's `exclude` state ([Filter chips](#filter-chips)).
+
 `filter` starts the list filtered — chip filters spelled as in the list's URL
 (`tag=a&tag-not=b&collection=blog`). Set it to `""` to stop a parent folder's from
 applying. *Reset* returns to it; a link carrying any chip filter replaces it.

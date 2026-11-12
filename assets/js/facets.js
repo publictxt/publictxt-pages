@@ -56,6 +56,16 @@ export function chipFacets(config) {
   };
 }
 
+// Collections hidden by default (params.hiddenCollections): excluded in
+// chip state `s`, a list's or search's default — so Reset returns to it and
+// the excluded chip brings them back. Not one the default includes; nothing
+// where the collection facet can't exclude. Returns `s`.
+export function hideByDefault(s, hidden) {
+  const f = s.collection;
+  if (f?.states.includes("exclude")) for (const h of hidden) if (!f.inc.has(h)) f.exc.add(h);
+  return s;
+}
+
 const sameSet = (a, b) => a.size === b.size && [...a].every((v) => b.has(v));
 const sameFacet = (a, b) => a.match === b.match && sameSet(a.inc, b.inc) && sameSet(a.exc, b.exc);
 

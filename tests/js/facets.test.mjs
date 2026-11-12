@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  addsPages, chipFacets, describe, facetValues, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
+  addsPages, chipFacets, describe, facetValues, hideByDefault, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
 import { normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
@@ -75,6 +75,25 @@ test("source: one value a page, `missing` for this repo's own; grouped apart", (
   assert.ok(!matches(s.source, facetValues(source, {})));
   assert.deepEqual(pagefindConditions(s.source), [{ source: { any: ["ann", "bob"] } }, { source: { none: ["this repo"] } }]);
   assert.deepEqual(c.describe(s), ["ann or bob", "not this repo"]);
+});
+
+test("hidden collections: excluded in the default, so shown as a chip and reset to", () => {
+  const c = chipFacets([{ key: "tag" }, { key: "collection", match: ["any"] }]);
+  const d = () => hideByDefault(c.read(qs("tag-not=journal")), ["remotes"]);
+  assert.deepEqual([...d().collection.exc], ["remotes"]);
+  const write = (s) => { const p = qs(""); c.write(p, s, d()); return p.toString(); };
+  assert.equal(write(d()), "", "the default: a bare URL");
+  // Another filter on top: the URL carries the exclude too.
+  const s = d(); s.tag.inc.add("a");
+  assert.equal(write(s), "tag=a&tag-not=journal&collection-not=remotes");
+  // Brought back: the URL says the default no longer holds.
+  const shown = d(); shown.collection.exc.clear();
+  assert.deepEqual([...c.readOr(qs(write(shown)), d()).collection.exc], []);
+  // A default that includes it keeps it; a facet that can't exclude, or isn't there, hides nothing.
+  assert.deepEqual([...hideByDefault(c.read(qs("collection=remotes")), ["remotes"]).collection.exc], []);
+  const noX = chipFacets([{ key: "collection", states: ["include"] }]);
+  assert.deepEqual([...hideByDefault(noX.read(), ["remotes"]).collection.exc], []);
+  assert.deepEqual(hideByDefault(chipFacets([{ key: "tag" }]).read(), ["remotes"]).collection, undefined);
 });
 
 test("a list's default filter: holds without chip params, URL replaces it whole", () => {
