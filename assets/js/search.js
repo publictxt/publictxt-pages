@@ -14,7 +14,7 @@ import * as params from "@params";   // js-params.html
 import { addsPages, chipFacets, filterChip, foldHint, hideByDefault, isSet, matchToggle, pagefindConditions,
   ratingChips, ratingCounts, rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
-import { SORTS, normaliseSort, parseSort } from "./sorts.js";
+import { normaliseSort, parseSort, sortsFor } from "./sorts.js";
 import { countsTree, monthCount, monthFilter, renderTimeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -168,7 +168,8 @@ function drawTimeline(monthCounts) {
 }
 
 function renderSort() {
-  const options = hasQuery() ? [[RELEVANCE, "Relevance"], ...SORTS] : SORTS;
+  const sorts = sortsFor(Object.keys(allFilters["source-rating"] || {}).some((r) => r !== NO_SOURCE));
+  const options = hasQuery() ? [[RELEVANCE, "Relevance"], ...sorts] : sorts;
   const cur = activeSort();
   el.sort.replaceChildren(...options.map(([v, l]) => new Option(l, v, false, v === cur)));
 }

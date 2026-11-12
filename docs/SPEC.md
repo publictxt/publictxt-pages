@@ -40,7 +40,7 @@ Items marked **(TBD)** are not built.
   - Home *Recent*, sections and tag pages render client-side from one site-wide JSON index, with a plain `<ul>` no-JS fallback.
   - Home *Recent*: every page, newest first (`listOrder`).
   - A folder's default filters (`filter:`, e.g. blog without `#journal`); Reset returns to them.
-  - Sort by Date, Recency, Alphabetical, Rating. Sort by Source/Author (TBD).
+  - Sort by Date, Recency, Alphabetical, Rating, Source rating (only where there are forks). Sort by Source/Author (TBD).
   - Community filters: Source, Source rating — see Sources.
   - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
   - Compact toggle for one-line cards.
@@ -63,7 +63,7 @@ Items marked **(TBD)** are not built.
     - Source: include / exclude chips, any of the included; this repo's own pages are `params.ownSource` ("this repo"). Not in `params.chipFacets`: always on.
     - Cards of forks show "from *source*".
     - Source rating: a minimum, as Rating (`?source-rating=4`), over forks; "Unrated" is forks whose source has no rating. This repo's own pages have no source rating, so any value leaves them out. Shown when forks' source ratings vary. A fork's page shows it under Source.
-    - Sort by source rating (TBD). Author (TBD).
+    - Sort by source rating: "Top rated source" puts this repo's own pages first, above any source, then forks by their source's rating, unrated as 2.5 (mid-scale, as Rating's sort); ties newest first. Author (TBD).
     - A card's source chip links to the follow's page; its tooltip gives the repo, the source rating and the follow's `description:`.
   - `params.hiddenCollections` (default `remotes`): excluded by default in the Collection filter of lists (home, sections, tags, dataview) and search, so the excluded chip — or the collection's own section — brings them back, and Reset hides them again. A fork brought into another folder isn't in `remotes`, so it shows. No feeds yet to keep them out of.
   - A follow's page is its source's landing page: page details show the repository (linked; "local repository" for a local follow), the source rating, and a link to its forked pages (search, by source). Its `rating` is the repo's, so the page itself is unrated in lists, search and the Rating filter.

@@ -119,6 +119,10 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('data-source-rating="4"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
         self.assertIn('data-source-rating="unrated"', self.html("notes", "forked-from-a-local-vault"))
         self.assertIn('data-source-rating="none"', self.html("follows", "ann-notes"))
+        # Sort keys: own pages above any source, unrated forks mid-scale (OWN_SOURCE, UNRATED in sorts.js).
+        self.assertIn('data-source-rating-sort="6"', self.html("follows", "ann-notes"))
+        self.assertIn('data-source-rating-sort="4"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
+        self.assertIn('data-source-rating-sort="2.5"', self.html("notes", "forked-from-a-local-vault"))
         self.assertIn('aria-label="Source rated 4 of 5"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
         search = self.html("search")
         block = re.search(r'<details class="search-filters fold" id="search-community".*?</details>\s*</div>\s*</details>', search, re.S)
