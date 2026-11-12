@@ -34,7 +34,7 @@ git diff tests/golden                                  # read it: every change s
 | Hashtags that are not tags: code, URL fragments, `issue #42`, `C#` | `wiki/Pipeline/Hashtags.md`, `Dates.md`, `wiki/Site/Search.md` |
 | `categories:` / `category:`, `rating:`, `collections:` | `blog/20260509-…`, `blog/20260915-…`, `online-things.md` |
 | `bookmark:` / `bookmarks:`, in and outside `bookmarks/` | `bookmarks/sites/gohugo.io/gohugo.io.md`, `wiki/Projects/PublicTxt/Obsidian.md.md`, `wiki/Site/Pagefind.md` |
-| Post sources (`mastodon:`, `substack:` list) | `blog/20260915-a-post-with-full-front-matter.md` |
+| "Posted on" links (`mastodon:`, `substack:` list) | `blog/20260915-a-post-with-full-front-matter.md` |
 | Custom keys passed through | `online-things.md` (`web:`), `wiki/Site/Pagefind.md` (`web-links:`) |
 | YouTube and audio embeds in image syntax; note embed `![](page.md)`, and inline as a link | `notes/embeds.md` |
 | ` ```dataview ` tag list, with `LIMIT`; unsupported query left as code | `notes/tag-lists.md` |

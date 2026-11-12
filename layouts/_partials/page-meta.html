@@ -1,5 +1,5 @@
 {{/*
-  "This page": a page's collections, dates, rating, bookmarks, sources,
+  "This page": a page's collections, dates, rating, bookmarks, "Posted on" links,
   categories and tags — page.html's right column. Takes the page.
 */}}
 <div class="side-block page-meta">
@@ -29,7 +29,7 @@
       {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
     </dd>
     {{ end }}
-    {{ with partial "source-links.html" . }}
+    {{ with partial "posted-links.html" . }}
     <dt>Posted on</dt>
     <dd class="chip-row">{{ . }}</dd>
     {{ end }}

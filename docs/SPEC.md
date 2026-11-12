@@ -49,10 +49,10 @@ Items marked **(TBD)** are not built.
 - Breadcrumbs on all pages but home, from folder names.
 - Bookmarks
   - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives; pages under `bookmarks/` are too.
-- Post sources
+- "Posted on" links
   - A URL under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link.
-  - Filter by source, source chips on cards (TBD).
-  - Pages with post sources join the Posts collection (TBD).
+  - Filter by where it was posted, "Posted on" chips on cards (TBD).
+  - Pages with "Posted on" links join the Posts collection (TBD).
 - Pages
   - Folders are sections and notes are pages, whatever a folder holds. A post folder (a note + attachments) is a section with one page; attaching beside the note needs no folder.
   - `publish: off` keeps a page — and a folder's attachments when all its Markdown is unpublished — off the site. Hidden, not private: it stays in the source repo.
