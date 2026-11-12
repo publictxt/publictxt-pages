@@ -7,7 +7,8 @@
 //   data-scope-kind   section | collection | tag | recent
 //   data-scope-value  a path, a collection, a tag, or a limit
 //   data-order        default sort (sorts.js)
-//   data-filter       default chip filters, as the URL spells them (`tag-not=journal`)
+//   data-filter       default chip filters, as the URL spells them (`tag-not=journal`);
+//                     hidden collections (@params) are excluded on top
 //   data-per-page     cards per page, until the reader picks a size (page-size.js)
 //   data-compact      cards only: no controls, pager or URL (dataview)
 //   data-limit        compact: the first N only
@@ -17,7 +18,7 @@
 // the list when narrow (layout.js). Sort, page size and the density toggle sit with the count.
 import { card, densityToggle, ratingFilter, ratingFilterLabel, sourceRatingPasses, UNRATED_FILTER } from "./cards.js";
 import * as params from "@params";   // js-params.html
-import { addsPages, chipFacets, facetValues, filterChip, foldHint, isSet, matches, matchToggle, ratingChips, ratingCounts,
+import { addsPages, chipFacets, facetValues, filterChip, foldHint, hideByDefault, isSet, matches, matchToggle, ratingChips, ratingCounts,
   rememberFold, toggleInclude } from "./facets.js";
 import { dock } from "./layout.js";
 import { pageHolding, pageSizes, readPageSize, writePageSize } from "./page-size.js";
@@ -65,9 +66,6 @@ async function mount(root) {
   let perPage = compact ? listDefault : readPageSize(globalThis.localStorage) ?? listDefault;   // 0 = all
   const limit = parseInt(root.dataset.limit, 10) || undefined;
   const defaultSort = normaliseSort(root.dataset.order);
-  // Fresh each call: state's sets are mutated. `defaults` is only compared.
-  const defaultChips = () => CHIPS.read(new URLSearchParams(compact ? "" : root.dataset.filter || ""));
-  const defaults = defaultChips();
   // Claimed before the await, so mount order decides.
   const slot = compact ? null : document.querySelector("[data-list-controls]");
   slot?.removeAttribute("data-list-controls");
@@ -78,6 +76,15 @@ async function mount(root) {
     if (slot) slot.hidden = true;
     return;   // keep Hugo's plain link list
   }
+  // Hidden collections (params.hiddenCollections) this list has some pages of —
+  // not all: that's a list of the collection. Compact lists hide them too.
+  const hidden = (params.hiddenCollections || []).filter((h) => {
+    const n = items.filter((it) => (it.collections || []).includes(h)).length;
+    return n > 0 && n < items.length;
+  });
+  // Fresh each call: state's sets are mutated. `defaults` is only compared.
+  const defaultChips = () => hideByDefault(CHIPS.read(new URLSearchParams(compact ? "" : root.dataset.filter || "")), hidden);
+  const defaults = defaultChips();
 
   // ---- state <-> URL --------------------------------------------------
   // Chip facets by key (CHIPS.read); `more`: keys showing past their limit.

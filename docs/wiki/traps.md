@@ -44,6 +44,11 @@ together.
 `source` off those pages and `facetValues()` fills it in; Pagefind can't, so
 `pagefind-keys.html` writes it on every page. Both read `own-source.html`.
 
+`params.hiddenCollections` is hidden three times over, by one rule — a list with some
+pages of the collection, not all: `list-container.html` (the no-JS list), `list.js` and
+`search.js` (the default chip state, `hideByDefault()`). Anything else that lists pages
+(dataview's compact lists go through `list.js`; timelines and trees don't) shows them.
+
 A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
 entry): change the default and shared links without it change meaning.
 

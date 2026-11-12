@@ -81,6 +81,7 @@ layouts/_partials/
   list-order.html       order: cascade (page -> ancestors -> param)
   list-filter.html      filter: cascade (page -> ancestors): default chip filters
   list-per-page.html    pagerSize: cascade
+  hidden-collections.html  only reader of params.hiddenCollections: out of lists and search by default
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
   bookmark-links.html   the chip row

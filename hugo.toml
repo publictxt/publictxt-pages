@@ -70,6 +70,11 @@ capitalizeListTitles = false
   # Not Hugo's [pagination] pagerSize: lists page in the browser.
   pagerSize = 20
 
+  # Collections left out of lists and search by default — excluded in the
+  # Collection filter, so a reader can bring them back; a list of only that
+  # collection (its own section) shows them. Needs the collection filter's
+  # "exclude" state. [] hides none.
+  hiddenCollections = ["remotes"]
   # What the Source filter calls this repo's own pages (forks carry their
   # follow's name). Also its value in URLs: ?source=this+repo.
   ownSource = "this repo"
