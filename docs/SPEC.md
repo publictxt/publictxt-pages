@@ -40,19 +40,36 @@ Items marked **(TBD)** are not built.
   - Home *Recent*, sections and tag pages render client-side from one site-wide JSON index, with a plain `<ul>` no-JS fallback.
   - Home *Recent*: every page, newest first (`listOrder`).
   - A folder's default filters (`filter:`, e.g. blog without `#journal`); Reset returns to them.
-  - Sort by Date, Recency, Alphabetical, Rating. Sort by Source/Author (TBD).
+  - Sort by Date, Recency, Alphabetical, Rating, Source rating (only where there are forks). Sort by Source/Author (TBD).
+  - Community filters: Source, Source rating — see Sources.
   - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
   - Compact toggle for one-line cards.
 - Search
   - Full-text search via Pagefind.
-  - Same facets and sorts as browse lists, usable without a query. Date ranges (TBD).
+  - Same facets and sorts as browse lists, usable without a query. Tags past the first 20 fold behind "more", as in lists. Date ranges (TBD).
 - Breadcrumbs on all pages but home, from folder names.
 - Bookmarks
   - A page with a `bookmark:`/`bookmarks:` URL is a bookmark wherever it lives; pages under `bookmarks/` are too.
-- Post sources
+- "Posted on" links
   - A URL under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link.
-  - Filter by source, source chips on cards (TBD).
-  - Pages with post sources join the Posts collection (TBD).
+  - Filter by where it was posted, "Posted on" chips on cards (TBD).
+  - Pages with "Posted on" links join the Posts collection (TBD).
+- Sources — the PublicTxt spec's terms (§3.2, §5.2, §5.4, §5.5)
+  - A follow is a page in `follows/` with a repo `url` (or `local: true`, for a repo with no public URL); its file name is its name, its `rating` this author's rating of that repo.
+  - A fork (`fork_*` keys) has a source: the follow `fork_remote` names, else the one whose `url` is `fork_repo`; with no follow, that name or URL. Its source rating is the follow's `rating`, else unrated. Every other page is this repo's, with no source rating.
+  - A mirror (`mirror_*` keys, and no valid `fork_*`) has a source by the same rules, with `mirror_remote` and `mirror_repo`. It is the followed repo's page as its author wrote it; a fork is this author's version. It shows "From" where a fork shows "Forked from", and wherever below says fork, a mirror counts too. Its own `rating` is its author's.
+  - Computed at sync, never read from the repo. A fork shows "Forked from": the source, linked to the follow's page, and a link to the original — the forked file at the commit it was forked from (GitHub, GitLab, Codeberg), else the repo, else nothing (a local follow).
+  - A fork whose `fork_remote` names no follow, or a mirror whose `mirror_remote` names none: build warning.
+  - Community: a collapsible block of its own in lists and search, after Filters, for filters on where pages came from. Hidden with nothing to offer — a site, or a list, with one source.
+    - Source: include / exclude chips, any of the included; this repo's own pages are `params.ownSource` ("this repo"). Not in `params.chipFacets`: always on.
+    - Copy: include / exclude chips, "forked" and "mirrored", any of the included (`?copy=forked`, `?copy-not=mirrored`). This repo's own pages are neither, so an include leaves them out. Always on, as Source; shown where a list has some forks or mirrors, not only those of one kind.
+    - Cards of forks show "from *source*".
+    - Source rating: a minimum, as Rating (`?source-rating=4`), over forks; "Unrated" is forks whose source has no rating. This repo's own pages have no source rating, so any value leaves them out. Shown when forks' source ratings vary. A fork's page shows it under Source.
+    - Sort by source rating: "Top rated source" puts this repo's own pages first, above any source, then forks by their source's rating, unrated as 2.5 (mid-scale, as Rating's sort); ties newest first. Author (TBD).
+    - A card's source chip links to the follow's page; its tooltip gives the repo, the source rating and the follow's `description:`.
+  - `params.hiddenCollections` (default `community`, where mirrors live: `community/<follow>/<path in its repo>`): excluded by default in the Collection filter of lists (home, sections, tags, dataview) and search, so the excluded chip — or the collection's own section — brings them back, and Reset hides them again. A fork lives in this repo's own folders, not in `community`, so it shows. No feeds yet to keep them out of.
+  - A follow's page is its source's landing page: page details show the repository (linked; "local repository" for a local follow), the source rating, and how many pages were mirrored and forked through it, each a link to search by source and copy (`?source=ann-notes&copy=mirrored`). Its `rating` is the repo's, so the page itself is unrated in lists, search and the Rating filter.
+  - A fork's dates follow the usual ladder, so `created:` or a date in the file name carried over from the original holds. Without either, the dates are this repo's — when it was forked and last changed here — as the original's history isn't in this repo; such a date shows as "forked <date>", or "mirrored <date>" for a mirror (page, its details, cards). TBD: the forking tool could write `created`/`updated` from the source's history.
 - Pages
   - Folders are sections and notes are pages, whatever a folder holds. A post folder (a note + attachments) is a section with one page; attaching beside the note needs no folder.
   - `publish: off` keeps a page — and a folder's attachments when all its Markdown is unpublished — off the site. Hidden, not private: it stays in the source repo.
@@ -129,6 +146,10 @@ All front matter optional; sync derives the rest.
 | `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
 | `bookmark`, `bookmarks` | URL or list                | Adds collection `bookmarks`, wherever the page lives. See [Collections](#collections) |
 | `facebook`, `mastodon`, … | URL or list            | Where else it was posted; keys and labels in `[params.sources]`. Shown as "Posted on" links |
+| `fork_remote`, `fork_repo`, `fork_path`, `fork_branch`, `fork_commit`, `fork_blob` | Fork provenance (PublicTxt spec §5.2) | Make a page a fork: its source, source rating and link to the original |
+| `mirror_remote`, `mirror_repo`, `mirror_path`, `mirror_branch`, `mirror_commit`, `mirror_blob` | Mirror provenance (PublicTxt spec §5.5) | Make a page a mirror, unless it is a fork: the same, shown as "From" |
+| `url`, `local`, `rating` in `follows/` | A follow (PublicTxt spec §3.2) | `url` is written out as `follow_url`, canonical: Hugo reads `url` as the page's address |
+| `source_name`, `source_rating`, `source_follow`, `source_original`, `source_kind`, `follow_name`, `follow_url` | A fork's or a mirror's source (`source_kind: mirror` on a mirror); a follow's repo | Written by sync; dropped if authored |
 | `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.
@@ -142,10 +163,10 @@ Per-site settings: `HUGO_*` env vars in the workflow, or the content repo's `set
 ## Not built, and what would prompt it (TBD)
 
 - `[[wikilink]]` conversion at sync — a repo in hand where legacy wikilinks bite.
-- `author` / `source_repo` filters — carried already, but one value per site, so the facets would hide; multi-repo or multi-author content.
+- `author` / `source_repo` filters — carried already, but one value per site, so the facets would hide; multi-repo or multi-author content. (`source_repo` is where a page is published from; where its text came from is its source, above.)
 - Multi-repo fan-in — aggregation is upstream PublicTxt's job; needs a defined aggregate content model.
 - Backlinks ("Linked from") — link graph is cheap at sync; keep edges out of the list index (per-page fetch), a count in it.
-- Link weights, trust tiers — no data source yet; a subscriber-declared tier in subscription config is the honest v1 shape.
+- Link weights, trust tiers beyond this author's own rating of a follow (the source rating) — no data source yet.
 - Related pages by tag co-occurrence — the site index already holds the data.
 - Remove Category Sidebar, linking to search until we have Category Pages
 

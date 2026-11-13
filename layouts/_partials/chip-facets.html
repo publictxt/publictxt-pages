@@ -7,6 +7,14 @@
   dropped. The one source for search.html and
   js-params.html. Returns a slice of dicts {key, label, states, match}; expects
   nothing.
+
+  Then, always and last, `source` — the repo a page's text came from
+  (fork-source.html) — not configured: {group: "community"} puts it in the
+  Community block, apart from Filters, {missing} is the value of this repo's own pages
+  (own-source.html), which carry none. It hides itself on a site with no forks.
+  After it `copy`, in the same block: how a page with a source came —
+  "forked" (this author's version) or "mirrored" (the source's page as written
+  there). This repo's own pages have no value, so no `missing`.
 */}}
 {{ $known := slice "collection" "category" "tag" }}
 {{ $allStates := slice "include" "exclude" }}
@@ -37,4 +45,7 @@
       "states" ($states | default $allStates | uniq) "match" ($match | default $allMatch | uniq)) }}
   {{ end }}
 {{ end }}
+{{ $out = $out | append (dict "key" "source" "label" "Source" "states" $allStates "match" (slice "any")
+  "group" "community" "missing" (partial "own-source.html" .)) }}
+{{ $out = $out | append (dict "key" "copy" "label" "Copy" "states" $allStates "match" (slice "any") "group" "community") }}
 {{ return $out }}

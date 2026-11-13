@@ -1,6 +1,6 @@
 {{/*
-  "This page": a page's collections, dates, rating, bookmarks, sources,
-  categories and tags — page.html's right column. Takes the page.
+  "This page": a page's collections, dates, rating, bookmarks, "Posted on" links,
+  source (a fork's), repository (a follow's), categories and tags — page.html's right column. Takes the page.
 */}}
 <div class="side-block page-meta">
   <h2 class="side-heading">This page</h2>
@@ -11,7 +11,7 @@
     <dd>{{ range $t := partial "page-collections.html" . }}{{ $s := site.GetPage (printf "/%s" $t) }}{{ if and $s $s.IsSection }}<a class="chip chip-collection" href="{{ $s.RelPermalink }}">{{ $t }}</a>{{ else }}<span class="chip chip-collection">{{ $t }}</span>{{ end }} {{ end }}</dd>
     {{ $d := partial "date-labels.html" . }}
     {{ with $d.created }}
-    <dt>Created</dt>
+    <dt>{{ with $d.arrived }}{{ . | title }}{{ else }}Created{{ end }}</dt>
     <dd><time datetime="{{ $.Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ . }}</time></dd>
     {{ end }}
     {{ with $d.updated }}
@@ -23,16 +23,42 @@
     <dt>Rating</dt>
     <dd><span class="rating" role="img" aria-label="Rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
     {{ end }}
+    {{/* A follow: the repo, this author's rating of it, the pages mirrored and forked through it — in search, by source. */}}
+    {{ with partial "follow.html" . }}
+    <dt>Repository</dt>
+    <dd class="chip-row">{{ if .url }}<a class="chip chip-link" href="{{ .url }}" rel="noopener external" target="_blank">↗ {{ .label }}</a>{{ else }}<span class="muted">{{ .label }}</span>{{ end }}</dd>
+    {{ with .rating }}
+    <dt>Source rating</dt>
+    <dd><span class="rating" role="img" aria-label="Source rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
+    {{ end }}
+    {{ if .mirrors }}
+    <dt>Mirrored pages</dt>
+    <dd><a href="{{ "search/" | relURL }}?source={{ .name | urlquery }}&amp;copy=mirrored">{{ .mirrors }} page{{ if ne .mirrors 1 }}s{{ end }}</a></dd>
+    {{ end }}
+    {{ if .forks }}
+    <dt>Forked pages</dt>
+    <dd><a href="{{ "search/" | relURL }}?source={{ .name | urlquery }}&amp;copy=forked">{{ .forks }} page{{ if ne .forks 1 }}s{{ end }}</a></dd>
+    {{ end }}
+    {{ end }}
     {{ with partial "bookmark-urls.html" . }}
     <dt>Bookmark{{ if gt (len .) 1 }}s{{ end }}</dt>
     <dd class="chip-row">
       {{ range . }}<a class="chip chip-link" href="{{ . }}" rel="noopener external" target="_blank">{{ partial "bookmark-label.html" . }}</a>{{ end }}
     </dd>
     {{ end }}
-    {{ with partial "source-links.html" . }}
+    {{ with partial "posted-links.html" . }}
     <dt>Posted on</dt>
     <dd class="chip-row">{{ . }}</dd>
     {{ end }}
+    {{ with partial "fork-source-links.html" . }}
+    <dt>Source</dt>
+    <dd class="chip-row">{{ . }}</dd>
+    {{ end }}
+    {{/* The follow's rating: this author's of the repo, apart from the page's own. */}}
+    {{ with partial "fork-source.html" . }}{{ with .rating }}
+    <dt>Source rating</dt>
+    <dd><span class="rating" role="img" aria-label="Source rated {{ . }} of 5">{{ strings.Repeat . "★" }}{{ strings.Repeat (sub 5 .) "☆" }}</span></dd>
+    {{ end }}{{ end }}
     {{/* No category pages: each links to search, filtered. */}}
     {{ with partial "categories.html" . }}
     <dt>Categor{{ if gt (len .) 1 }}ies{{ else }}y{{ end }}</dt>

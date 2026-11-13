@@ -14,7 +14,7 @@ index count that differs from the body pages; `hugo server` builds skip it.
 
 ## Pairs that must change together
 
-Display values (date labels, year, bookmark labels, recent order) are made once, in Hugo,
+Display values (date labels and their `arrived` word — "forked", "mirrored" —, year, bookmark labels, recent order) are made once, in Hugo,
 and reach JS as data: `index.json` for lists, Pagefind meta (`pagefind-keys.html`) for
 search. Add one to both, or search cards go without it. What's still implemented twice:
 
@@ -23,6 +23,8 @@ search. Add one to both, or search cards go without it. What's still implemented
 | each list template's page collection (incl. the dataview hook) | its kind in `scope()` |
 | stars in `page-meta.html` | `ratingHTML()` in `cards.js` |
 | unrated sort value 2.5 in `pagefind-keys.html` | `UNRATED` in `sorts.js` |
+| own pages' source rating sort value 6 in `pagefind-keys.html` | `OWN_SOURCE` in `sorts.js` |
+| `source-rating` `"none"` on this repo's own pages, in `pagefind-keys.html` | `NO_SOURCE` in `cards.js`; `sourceRatingPasses()` is the lists' rule, `pagefindFilters()` search's |
 | `created`'s `2006-01-…` form in `list-json.html` | `monthOf()` in `timeline.js` reads its digits |
 | Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js` |
 | `timeline/content.html`: grouping (year, month, newest first, undated out, ≥2 months) and markup (`.tl-*` classes; no sparklines or month bars) | `timeline()`, `monthCount()` and `renderTimeline()` in `timeline.js`; `main.css` styles both |
@@ -36,6 +38,22 @@ never `.Data.Term` (the key).
 A chip facet key (`BUILTIN` in `facets.js`, `chip-facets.html`) is the URL param **and** the Pagefind filter
 name (`data-pagefind-filter` in the page templates, `pagefind-keys.html`); rename all
 together.
+
+`source` is a chip facet no config lists: `chip-facets.html` appends it, with `group:
+"community"` — its own block, built by `list.js` and written out in `search.html` — and
+`missing`, the value of this repo's own pages (`own-source.html`). `index.json` leaves
+`source` off those pages and `facetValues()` fills it in; Pagefind can't, so
+`pagefind-keys.html` writes it on every page. Both read `own-source.html`.
+
+`copy` ("forked", "mirrored") follows it in the same block, with no `missing`: this
+repo's own pages carry no value in `index.json` or Pagefind. It is not `arrived`, the
+date's word, which only an undated fork or mirror has (`date-labels.html`); both come
+from `fork-source.html`'s `mirror`.
+
+`params.hiddenCollections` is hidden three times over, by one rule — a list with some
+pages of the collection, not all: `list-container.html` (the no-JS list), `list.js` and
+`search.js` (the default chip state, `hideByDefault()`). Anything else that lists pages
+(dataview's compact lists go through `list.js`; timelines and trees don't) shows them.
 
 A URL omits `-match` at the facet's default (`params.chipFacets` `match`, first
 entry): change the default and shared links without it change meaning.

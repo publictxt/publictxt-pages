@@ -1,6 +1,9 @@
 {{/*
   A browse list: a plain link list for crawlers and no-JS, which list.js
   replaces with cards from the site index. Names its subset, not its data.
+  The plain list leaves out pages of a hidden collection
+  (hidden-collections.html), as list.js does by default — unless every page
+  is in it: a list of that collection.
   Client-side, not .Paginate: that fixes order and membership at build time,
   so sorting and filtering could only act on one page.
   Expects a dict:
@@ -13,8 +16,14 @@
     limit    — compact only: show the first N, optional (0 = all)
 */}}
 <div class="list" data-list data-scope-kind="{{ .scope.kind }}" data-scope-value="{{ .scope.value }}"{{ with .order }} data-order="{{ . }}"{{ end }}{{ with .filter }} data-filter="{{ . }}"{{ end }}{{ with .perPage }} data-per-page="{{ . }}"{{ end }}{{ if .compact }} data-compact{{ end }}{{ with .limit }} data-limit="{{ . }}"{{ end }}>
+  {{- $skip := slice -}}
+  {{- range $h := partialCached "hidden-collections.html" site -}}
+    {{- $in := slice -}}
+    {{- range $.pages }}{{ if in (partial "page-collections.html" .) $h }}{{ $in = $in | append . }}{{ end }}{{ end -}}
+    {{- if lt (len $in) (len $.pages) }}{{ $skip = $skip | append $in }}{{ end -}}
+  {{- end }}
   <ul class="link-list">
-    {{ range .pages }}
+    {{ range .pages | complement $skip }}
     <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> {{ range partial "page-collections.html" . }}<span class="chip chip-collection">{{ . }}</span> {{ end }}{{ partial "page-date.html" (dict "page" .) }}</li>
     {{ end }}
   </ul>

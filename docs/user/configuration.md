@@ -9,7 +9,7 @@ Everything is optional — the defaults give a working site. Change what you nee
 - [Timeline and folder tree](#timeline-and-folder-tree)
 - [Categories](#categories)
 - [Filter chips](#filter-chips)
-- [Post sources](#post-sources)
+- [Posted on links](#posted-on-links)
 - [Leave folders out](#leave-folders-out)
 - [A full example](#a-full-example)
 
@@ -89,6 +89,11 @@ filter: tag-not=journal
 ---
 ```
 
+`hiddenCollections` (site-wide, default `["community"]`, where mirrors live) keeps whole collections out of
+every list and of search until a reader asks: each starts excluded in the Collection
+filter, on top of any `filter`. The collection's own section still lists it. `[]` hides
+none; it needs the collection filter's `exclude` state ([Filter chips](#filter-chips)).
+
 `filter` starts the list filtered — chip filters spelled as in the list's URL
 (`tag=a&tag-not=b&collection=blog`). Set it to `""` to stop a parent folder's from
 applying. *Reset* returns to it; a link carrying any chip filter replaces it.
@@ -153,6 +158,16 @@ whole default — list every facet you want, in display order.
   # defaults: states = ["include", "exclude"], match = ["all", "any"]
 ```
 
+The **Source** and **Copy** filters (the [Community](site.md#community) block) aren't in
+this list: Source shows whenever a list has pages from more than one source, Copy where
+some of its pages are forks or mirrors. `ownSource` names your own
+pages there:
+
+```toml
+[params]
+  ownSource = "this repo"   # also the URL value: ?source=this+repo
+```
+
 | Field | Meaning |
 |---|---|
 | `key` | Which facet. Leave a key out to drop its chips |
@@ -162,7 +177,7 @@ whole default — list every facet you want, in display order.
 Changing a facet's default `match` changes what existing shared links mean (links omit
 the default).
 
-## Post sources
+## Posted on links
 
 Front matter keys holding a URL where a page was also posted, shown as "Posted on"
 links. Key → label:

@@ -13,13 +13,23 @@ export const STATES = ["include", "exclude"];
 export const MODES = ["all", "any"];
 
 // What config can't change, per key. `key` is the URL param and Pagefind filter
-// (traps.md); `item` the index.json field. Lists only: `shared` shows values
-// every listed page has; `limit` chips before "more".
+// (traps.md); `item` the index.json field; `limit` chips before "more". Lists
+// only: `shared` shows values every listed page has. From chip-facets.html,
+// not here: `missing`, the value of a page with none (a source: this repo's
+// own pages), and `group`, the section the facet sits in ("community").
+// `copy` — "forked" or "mirrored" — has no `missing`: this repo's own pages
+// are no copy, so they carry no value.
 const BUILTIN = {
   collection: { item: "collections", prefix: "", shared: true },
   category: { item: "categories", prefix: "" },
   tag: { item: "tags", prefix: "#", limit: 20 },
+  source: { item: "source", prefix: "" },
+  copy: { item: "copy", prefix: "" },
 };
+
+// A page's values for facet `d` (a def): index.json holds a list, one value
+// or nothing — then `missing`, if the facet has one.
+export const facetValues = (d, item) => [].concat(item[d.item] ?? d.missing ?? []).filter(Boolean);
 
 // The chip facets from config — @params' chipFacets (chip-facets.html: order,
 // label, states, match → `modes`), passed in so this module stays Hugo-free. `defs` in display order;
@@ -47,6 +57,16 @@ export function chipFacets(config) {
     anySet: (s) => keys.some((k) => isSet(s[k])),
     describe: (s) => defs.flatMap((d) => describe(s[d.key], d.prefix)),
   };
+}
+
+// Collections hidden by default (params.hiddenCollections): excluded in
+// chip state `s`, a list's or search's default — so Reset returns to it and
+// the excluded chip brings them back. Not one the default includes; nothing
+// where the collection facet can't exclude. Returns `s`.
+export function hideByDefault(s, hidden) {
+  const f = s.collection;
+  if (f?.states.includes("exclude")) for (const h of hidden) if (!f.inc.has(h)) f.exc.add(h);
+  return s;
 }
 
 const sameSet = (a, b) => a.size === b.size && [...a].every((v) => b.has(v));

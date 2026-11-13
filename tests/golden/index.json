@@ -92,6 +92,21 @@
  },
  {
   "collections": [
+   "follows"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "follows",
+  "summary": "A follow: a page about a repo this one follows — why, and what to read there. Its url makes it one (written here the SSH way; the site reads it as …",
+  "tags": [],
+  "title": "Ann's notes",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/follows/ann-notes/",
+  "year": "2025"
+ },
+ {
+  "collections": [
    "wiki"
   ],
   "created": "2025-01-01T12:00:00Z",
@@ -146,6 +161,26 @@
   "year": "2025"
  },
  {
+  "arrived": "forked",
+  "collections": [
+   "wiki"
+  ],
+  "copy": "forked",
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "rating": 3,
+  "section": "wiki",
+  "source": "ann-notes",
+  "sourceRating": 4,
+  "summary": "A fork: this author’s own page, made from one in a followed repo, with where it came from in fork_* keys. It lives in this repo’s own folders, so lists and search show …",
+  "tags": [],
+  "title": "Federated wikis",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/wiki/federated-wikis/",
+  "year": "2025"
+ },
+ {
   "bookmarks": [
    {
     "label": "↗ gohugo.io",
@@ -191,6 +226,21 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/wiki/pipeline/hashtags/",
+  "year": "2025"
+ },
+ {
+  "collections": [
+   "follows"
+  ],
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "section": "follows",
+  "summary": "A follow of a repo with no public URL — another vault on the author’s computer — has local: true instead of a url. Pages forked through it name it as their source, with no …",
+  "tags": [],
+  "title": "laptop vault",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/follows/laptop-vault/",
   "year": "2025"
  },
  {
@@ -300,6 +350,26 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/wiki/site/pagefind/",
+  "year": "2025"
+ },
+ {
+  "arrived": "mirrored",
+  "collections": [
+   "community"
+  ],
+  "copy": "mirrored",
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "rating": 5,
+  "section": "community",
+  "source": "ann-notes",
+  "sourceRating": 4,
+  "summary": "A mirror: a page from a followed repo, kept here as its author wrote it, with where it came from in mirror_* keys. It lives under community/, in a folder named for the follow, at …",
+  "tags": [],
+  "title": "Plain text tools",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/community/ann-notes/wiki/plain-text-tools/",
   "year": "2025"
  },
  {
@@ -446,6 +516,23 @@
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
   "url": "/notes/design-notes/why-git-.-20240816/",
+  "year": "2024"
+ },
+ {
+  "collections": [
+   "notes"
+  ],
+  "copy": "forked",
+  "created": "2024-03-02T00:00:00Z",
+  "createdLabel": "2 Mar 2024",
+  "section": "notes",
+  "source": "laptop-vault",
+  "summary": "A fork brought into this repo’s own folders, through a local follow: its source is laptop-vault, unrated (the follow has no rating), and with no fork_repo there is no …",
+  "tags": [],
+  "title": "forked from a local vault",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/notes/forked-from-a-local-vault/",
   "year": "2024"
  },
  {

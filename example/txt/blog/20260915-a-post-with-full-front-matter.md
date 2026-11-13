@@ -20,6 +20,6 @@ The front matter already has `title:`, `created:` and `updated:` (full ISO 8601 
 
 `collections:` lists it under Posts too; `announcements` has no folder, so it is only a chip and a filter value.
 
-`mastodon:` and `substack:` are post sources (`params.sources`): shown as "Posted on" links.
+`mastodon:` and `substack:` are "Posted on" keys (`params.sources`): shown as "Posted on" links.
 
 `author` and `source_repo` are carried but not shown in the UI (v1).

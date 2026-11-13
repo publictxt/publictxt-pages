@@ -13,7 +13,8 @@
       {{ end }}
     </div>
     {{ partial "bookmark-links.html" . }}
-    {{ with partial "source-links.html" . }}<div class="chip-row source-links"><span class="muted">Posted on</span> {{ . }}</div>{{ end }}
+    {{ with partial "posted-links.html" . }}<div class="chip-row posted-links"><span class="muted">Posted on</span> {{ . }}</div>{{ end }}
+    {{ with partial "fork-source-links.html" . }}<div class="chip-row posted-links" data-pagefind-ignore><span class="muted">{{ if (partial "fork-source.html" $).mirror }}From{{ else }}Forked from{{ end }}</span> {{ . }}</div>{{ end }}
   </header>
   <div class="prose">
     {{ .Content }}

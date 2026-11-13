@@ -70,6 +70,16 @@ capitalizeListTitles = false
   # Not Hugo's [pagination] pagerSize: lists page in the browser.
   pagerSize = 20
 
+  # Collections left out of lists and search by default — excluded in the
+  # Collection filter, so a reader can bring them back; a list of only that
+  # collection (its own section) shows them. Needs the collection filter's
+  # "exclude" state. [] hides none. `community`: mirrors, the pages of followed
+  # repos as their authors wrote them (obsidian-publictxt-remotes' community folder).
+  hiddenCollections = ["community"]
+  # What the Source filter calls this repo's own pages (forks carry their
+  # follow's name). Also its value in URLs: ?source=this+repo.
+  ownSource = "this repo"
+
   # Tables ([params.x]) from here on: a plain key below one belongs to it.
 
   # Footer wording, optional; "" hides a line. `text` is inline markdown;
@@ -107,7 +117,7 @@ capitalizeListTitles = false
     key = "tag"
     label = "Tags"
 
-  # Post sources: front matter keys holding a URL (or list) where a page was
+  # "Posted on" links: front matter keys holding a URL (or list) where a page was
   # also posted, shown as "Posted on" links; key → label. Unlisted keys are
   # ignored. (A page's `mastodon:` is a post; params.mastodon is the profile.)
   [params.sources]

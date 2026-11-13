@@ -5,10 +5,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  addsPages, chipFacets, describe, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
+  addsPages, chipFacets, describe, facetValues, hideByDefault, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
-import { normaliseSort, parseSort, sortLabel } from "../../assets/js/sorts.js";
+import { normaliseSort, parseSort, sortLabel, sortsFor, SORTS } from "../../assets/js/sorts.js";
 
 const qs = (s) => new URLSearchParams(s);
 const url = (f) => { const p = new URLSearchParams(); writeFacet(p, f); return p.toString(); };
@@ -58,6 +58,60 @@ test("chipFacets: config order, unknown keys dropped, defaults filled", () => {
   assert.equal(p.toString(), "tag=a&collection=blog");
   c.clear(s);
   assert.ok(!c.anySet(s));
+});
+
+test("source: one value a page, `missing` for this repo's own; grouped apart", () => {
+  // As chip-facets.html appends it.
+  const c = chipFacets([{ key: "tag" }, { key: "source", label: "Source", match: ["any"], group: "community", missing: "this repo" }]);
+  const [tag, source] = c.defs;
+  assert.deepEqual([source.item, source.group, source.modes], ["source", "community", ["any"]]);
+  assert.deepEqual(facetValues(source, { source: "ann" }), ["ann"]);
+  assert.deepEqual(facetValues(source, {}), ["this repo"]);
+  assert.deepEqual(facetValues(tag, {}), []);
+  assert.deepEqual(facetValues(tag, { tags: ["a", "", "b"] }), ["a", "b"]);
+
+  const s = c.read(qs("source=ann&source=bob&source-not=this+repo"));
+  assert.ok(matches(s.source, facetValues(source, { source: "bob" })));
+  assert.ok(!matches(s.source, facetValues(source, {})));
+  assert.deepEqual(pagefindConditions(s.source), [{ source: { any: ["ann", "bob"] } }, { source: { none: ["this repo"] } }]);
+  assert.deepEqual(c.describe(s), ["ann or bob", "not this repo"]);
+});
+
+test("copy: forked or mirrored, nothing for this repo's own pages", () => {
+  // As chip-facets.html appends it: no `missing`.
+  const c = chipFacets([{ key: "copy", label: "Copy", match: ["any"], group: "community" }]);
+  const [copy] = c.defs;
+  assert.deepEqual([copy.item, copy.group, copy.modes], ["copy", "community", ["any"]]);
+  assert.deepEqual(facetValues(copy, { copy: "mirrored" }), ["mirrored"]);
+  assert.deepEqual(facetValues(copy, {}), []);
+
+  const inc = c.read(qs("copy=forked"));
+  assert.ok(matches(inc.copy, facetValues(copy, { copy: "forked" })));
+  assert.ok(!matches(inc.copy, facetValues(copy, { copy: "mirrored" })));
+  assert.ok(!matches(inc.copy, facetValues(copy, {})), "own pages are no copy");
+  const exc = c.read(qs("copy-not=mirrored"));
+  assert.ok(matches(exc.copy, facetValues(copy, {})), "own pages stay");
+  assert.ok(!matches(exc.copy, facetValues(copy, { copy: "mirrored" })));
+  assert.deepEqual(pagefindConditions(exc.copy), [{ copy: { none: ["mirrored"] } }]);
+});
+
+test("hidden collections: excluded in the default, so shown as a chip and reset to", () => {
+  const c = chipFacets([{ key: "tag" }, { key: "collection", match: ["any"] }]);
+  const d = () => hideByDefault(c.read(qs("tag-not=journal")), ["community"]);
+  assert.deepEqual([...d().collection.exc], ["community"]);
+  const write = (s) => { const p = qs(""); c.write(p, s, d()); return p.toString(); };
+  assert.equal(write(d()), "", "the default: a bare URL");
+  // Another filter on top: the URL carries the exclude too.
+  const s = d(); s.tag.inc.add("a");
+  assert.equal(write(s), "tag=a&tag-not=journal&collection-not=community");
+  // Brought back: the URL says the default no longer holds.
+  const shown = d(); shown.collection.exc.clear();
+  assert.deepEqual([...c.readOr(qs(write(shown)), d()).collection.exc], []);
+  // A default that includes it keeps it; a facet that can't exclude, or isn't there, hides nothing.
+  assert.deepEqual([...hideByDefault(c.read(qs("collection=community")), ["community"]).collection.exc], []);
+  const noX = chipFacets([{ key: "collection", states: ["include"] }]);
+  assert.deepEqual([...hideByDefault(noX.read(), ["community"]).collection.exc], []);
+  assert.deepEqual(hideByDefault(chipFacets([{ key: "tag" }]).read(), ["community"]).collection, undefined);
 });
 
 test("a list's default filter: holds without chip params, URL replaces it whole", () => {
@@ -151,6 +205,14 @@ test("matches() and pagefindConditions() agree on every combination", () => {
 });
 
 // ---- sorts --------------------------------------------------------------
+
+test("source rating sort: highest first by default; offered only with forks", () => {
+  assert.equal(normaliseSort("source-rating desc"), "source-rating");
+  assert.deepEqual(parseSort("source-rating asc"), { field: "source-rating", dir: "asc" });
+  assert.equal(sortLabel("source-rating"), "Top rated source");
+  assert.equal(sortsFor(true), SORTS);
+  assert.deepEqual(sortsFor(false).map(([v]) => v).filter((v) => v.includes("source")), []);
+});
 
 test("sorts: canonical URL form omits the natural direction", () => {
   assert.equal(normaliseSort(""), "created");

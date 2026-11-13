@@ -1,0 +1,20 @@
+{{/*
+  Collections left out of lists and search until a reader asks for them —
+  params.hiddenCollections (default ["community"]), lower-cased as
+  page-collections.html's. The only reader of the param: js-params.html hands
+  it to list.js and search.js, which exclude each by default (facets.js
+  hideByDefault); list-container.html leaves them out of the no-JS list.
+  Warns when the Collection filter can't show the exclude. Returns a slice;
+  expects nothing.
+*/}}
+{{ $out := slice }}
+{{ range site.Params.hiddenCollections | default slice }}
+  {{ with (printf "%v" . | strings.TrimSpace | lower) }}{{ $out = $out | append . }}{{ end }}
+{{ end }}
+{{ if $out }}
+  {{ $collection := where (partialCached "chip-facets.html" site) "key" "collection" }}
+  {{ if not (and $collection (in (index $collection 0).states "exclude")) }}
+    {{ warnidf "hidden-collections" "params.hiddenCollections needs the collection filter with the \"exclude\" state (params.chipFacets) — %v shown everywhere" $out }}
+  {{ end }}
+{{ end }}
+{{ return ($out | uniq) }}

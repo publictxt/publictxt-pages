@@ -1,7 +1,8 @@
 // The one page card, for list.js and search.js. Item shape = index.json's
 // (list-json.html): { url, title, collections[], section, tags[], categories[],
-// created, updated, year, createdLabel, updatedLabel, summary,
-// bookmarks[{url, label}], rating }. Display values come from Hugo; JS never
+// created, updated, year, createdLabel, updatedLabel, arrived, copy, summary,
+// bookmarks[{url, label}], rating, source, sourceRating }. `source`: a fork's (the repo its
+// text came from), `sourceRating` that repo's 1–5; both absent on this repo's own pages. Display values come from Hugo; JS never
 // formats a date or a label.
 
 export function escapeHTML(s) {
@@ -11,7 +12,9 @@ export function escapeHTML(s) {
 // As page-date.html; the labels and the "updated" rule are date-labels.html's.
 export function dateHTML(item) {
   if (!item.createdLabel) return "";
-  let html = `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(item.createdLabel)}</time>`;
+  // `arrived` ("forked", "mirrored"): the date is when the page came into this repo, not when it was written (date-labels.html).
+  let html = (item.arrived ? `<span class="muted">${escapeHTML(item.arrived)}</span> ` : "")
+    + `<time class="muted" datetime="${escapeHTML(item.created)}">${escapeHTML(item.createdLabel)}</time>`;
   if (item.updatedLabel) {
     html += ` <span class="muted">· updated <time datetime="${escapeHTML(item.updated)}">${escapeHTML(item.updatedLabel)}</time></span>`;
   }
@@ -28,6 +31,16 @@ export function ratingHTML(item) {
 export const UNRATED_FILTER = "unrated";
 export function ratingFilter(v) {
   return /^[1-5]$/.test(v || "") || v === UNRATED_FILTER ? v : "";
+}
+
+// `?source-rating=`, spelled as `?rating=`: a fork's source's rating. This
+// repo's own pages have no source, so no value passes them — in Pagefind
+// they carry NO_SOURCE (pagefind-keys.html), which no filter asks for.
+export const NO_SOURCE = "none";
+export function sourceRatingPasses(item, v) {
+  if (!v) return true;
+  if (!item.source) return false;
+  return v === UNRATED_FILTER ? !item.sourceRating : (item.sourceRating || 0) >= Number(v);
 }
 
 // A rating filter value as the lists and search show it: "★4+", "★5", "Unrated".
@@ -66,11 +79,27 @@ export function densityToggle(list) {
   return b;
 }
 
+// A fork card's source: with a follow page (`sources`, sources.html), a link
+// to it whose tooltip gives the repo, this author's rating and the follow's
+// description; else the bare name.
+export function sourceTitle(name, s) {
+  return [`${name} — ${s.repo}`, s.rating ? `Source rating ${"★".repeat(s.rating)}${"☆".repeat(5 - s.rating)}` : "",
+    s.description].filter(Boolean).join("\n");
+}
+function sourceChip(name, sources) {
+  const s = sources?.[name];
+  return s
+    ? `<a class="chip chip-source" href="${escapeHTML(s.page)}" title="${escapeHTML(sourceTitle(name, s))}">${escapeHTML(name)}</a>`
+    : `<span class="chip chip-source">${escapeHTML(name)}</span>`;
+}
+
 /**
  * A page card. Options:
  *   activeTags   a Set of tag names to mark as selected
  *   onTag(name)  when given, tag chips are filter buttons instead of links
  *   summaryHTML  pre-rendered HTML (a search excerpt with <mark>) in place of item.summary
+ *   sources      @params' sources (sources.html), for the source chip: a link to
+ *                the follow's page, the repo's details its tooltip
  */
 export function card(item, opts = {}) {
   const li = document.createElement("li");
@@ -86,6 +115,7 @@ export function card(item, opts = {}) {
       ${(item.collections || []).length ? `<span class="page-card-collections">${item.collections.map((t) =>
         `<span class="chip chip-collection">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>
+    ${item.source ? `<span class="page-card-source muted">from ${sourceChip(item.source, opts.sources)}</span>` : ""}
     <span class="page-card-dates">${dateHTML(item)}${ratingHTML(item)}</span>
     ${(item.bookmarks || []).length ? `<div class="chip-row bookmark-links">${item.bookmarks.map((b) =>
       `<a class="chip chip-link" href="${escapeHTML(b.url)}" rel="noopener external" target="_blank">${escapeHTML(b.label)}</a>`).join("")}</div>` : ""}

@@ -15,7 +15,8 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 ```txt
 scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`, `params.skipFiles`);
-                            reads `params.titleFromHeading`
+                            reads `params.titleFromHeading`; a fork's or a mirror's source_* keys, a follow's `follow_name` and `url` -> `follow_url`
+scripts/sources.py          follows, forks, mirrors and the join: a fork's or a mirror's source, source rating, link to the original
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags + parents, flat keys
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
@@ -32,6 +33,7 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_title.py         derive_title: the H1 on the first line only; titleFromHeading
 tests/test_exclude.py       params.excludeFolders (whole subtrees) and params.skipFiles, left out of sync
+tests/test_sources.py       sources.py: canonical URLs, follows, the join; what sync writes from it
 tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags
 tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
@@ -75,10 +77,11 @@ layouts/_partials/
   list-json.html        pages -> index.json items, with Hugo-made display values
   list-container.html   [data-list] + no-JS <ul> + loads list.js
   js-params.html        @params for every js.Build — see traps.md
-  chip-facets.html      only reader of params.chipFacets   (partialCached)
+  chip-facets.html      only reader of params.chipFacets; appends `source` and `copy`, in the Community block   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
   list-filter.html      filter: cascade (page -> ancestors): default chip filters
   list-per-page.html    pagerSize: cascade
+  hidden-collections.html  only reader of params.hiddenCollections: out of lists and search by default
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
   bookmark-links.html   the chip row
@@ -86,11 +89,16 @@ layouts/_partials/
   collection-pages.html every page of a collection        (partialCached)
   section-pages.html    what a section lists, + its scope
   bookmark-label.html   one URL's short form (returns it)
-  source-urls.html      only reader of params.sources keys (facebook:, …)
-  source-links.html     "Posted on" chips
+  posted-urls.html      only reader of params.sources keys (facebook:, …)
+  posted-links.html     "Posted on" chips
+  follow.html           a follow page's repo, rating (the repo's), description, fork and mirror counts (returns a dict)
+  sources.html          every follow by name, for cards' source chips (@params)   (partialCached)
+  fork-source.html      only reader of the source_* keys sync writes on a fork or a mirror (returns a dict)
+  own-source.html       only reader of params.ownSource: the Source filter's value for this repo's own pages
+  fork-source-links.html  "Forked from" / "From" chips: the source, its follow's page, the original
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
-  rating.html           only reader of rating:
+  rating.html           only reader of rating: — but a follow's, which is follow.html's
   note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
   attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
 

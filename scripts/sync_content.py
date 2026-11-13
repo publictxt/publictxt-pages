@@ -14,6 +14,15 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
   * A nested tag (`dev/app`) -> a term page, `tags/dev--app/_index.md`,
     titled with its name (hashtags.py: Hugo nests terms on `/`).
   * `source_path:` records the source path, for the edit link.
+  * A fork (`fork_*` keys) or a mirror (`mirror_*`) gets its source —
+    `source_name:`, `source_rating:`, `source_follow:` (the follow's page),
+    `source_original:` (a link back), and for a mirror `source_kind: mirror` —
+    joined to the repo's `follows/` (sources.py). Computed here, so the same
+    keys in the source are dropped. Warns on one whose `fork_remote` or
+    `mirror_remote` names no follow.
+  * A follow gets `follow_name:` (its name: what forks call their source), and
+    its `url:` becomes `follow_url:`, canonical: Hugo reads `url:` as the
+    page's own address. Dropped from every other document in `follows/`.
   * Warns on a page under `bookmarks/` (not `bookmarks/wiki/`) with no
     `bookmark:` URL — only that key makes a bookmark.
 
@@ -38,6 +47,7 @@ from pathlib import Path
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
+from sources import FOLLOWS_DIR, KEYS as SOURCE_KEYS, MIRROR, Follow, Source, read_follows, source_of
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
@@ -56,6 +66,8 @@ TITLE_H1_RE = re.compile(r"\A(?:[ \t]*\r?\n)*[ ]{0,3}#[ \t]+(.+?)(?:[ \t]+#+)?[ 
 UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
+# Written by sync from a fork's source (sources.py); never read from the source repo.
+COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "source_kind", "follow_name", "follow_url")
 
 
 @dataclass
@@ -111,6 +123,42 @@ def derive_title(body: str, fallback: str) -> tuple[str, str]:
     return fallback, body
 
 
+def drop_keys(fm: str | None, keys: tuple[str, ...]) -> str | None:
+    """Front matter without `keys`, each with its indented or list lines."""
+    if not fm:
+        return fm
+    key_re = re.compile(rf"^(?:{'|'.join(keys)})\s*:")
+    out, dropping = [], False
+    for line in fm.split("\n"):
+        if key_re.match(line):
+            dropping = True
+        elif dropping and line[:1] in (" ", "\t", "-", ""):
+            pass
+        else:
+            dropping = False
+            out.append(line)
+    return "\n".join(out)
+
+
+def source_lines(source: Source | None, published: set[str]) -> list[str]:
+    """A fork's or a mirror's COMPUTED_KEYS; none for this repo's own page.
+    `source_kind:` only on a mirror: a page with a source is a fork unless it
+    says otherwise. `published`: the follow pages on the site — a link to any
+    other would dangle."""
+    if not source:
+        return []
+    lines = [f"source_name: {yaml_str(source.name)}"]
+    if source.rating:
+        lines.append(f"source_rating: {source.rating}")
+    if source.follow and source.follow.path in published:
+        lines.append(f"source_follow: {yaml_str(source.follow.path)}")
+    if source.original:
+        lines.append(f"source_original: {yaml_str(source.original)}")
+    if source.kind == MIRROR:
+        lines.append(f"source_kind: {MIRROR}")
+    return lines
+
+
 def yaml_str(s: str) -> str:
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -134,11 +182,14 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
 
 
 def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | None = None,
-                 title_from_heading: bool = True) -> str:
+                 title_from_heading: bool = True, source: list[str] = ()) -> str:
     """`titles`: collects term_titles() of the page's tags, for write_term_pages().
-    `title_from_heading`: params.titleFromHeading — False, the H1 is never the title."""
+    `title_from_heading`: params.titleFromHeading — False, the H1 is never the title.
+    `source`: the page's source_lines(), a follow's `follow_url:`."""
     fm, body = split_front_matter(text)
-    fm = rename_legacy_keys(fm)
+    fm = drop_keys(rename_legacy_keys(fm), COMPUTED_KEYS)
+    if rel.startswith(FOLLOWS_DIR + "/"):
+        fm = drop_keys(fm, ("url",))   # Hugo's key for a page's own URL
     name = Path(rel).name
     stem = Path(rel).stem
     added = []
@@ -159,6 +210,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | Non
         added.append(f"updated: {stamp.updated}")
     if not has_key(fm, "source_path"):
         added.append(f"source_path: {yaml_str(rel)}")
+    added.extend(source)
 
     body = linkify(body)
 
@@ -233,6 +285,28 @@ def hidden_folders(src: Path, excluded: list[tuple[str, ...]] = (),
     return has_md - published
 
 
+def source_values(fm: str | None) -> dict[str, str]:
+    return {k: front_matter_value(fm, k) for k in SOURCE_KEYS}
+
+
+def follows_of(src: Path, excluded: list[tuple[str, ...]], skip: set[str]) -> tuple[dict[str, Follow], set[str]]:
+    """The repo's follows (sources.py), and the paths of those with a page on
+    the site. An unpublished or left-out follow still rates its forks."""
+    docs, published = {}, set()
+    for md in sorted((src / FOLLOWS_DIR).rglob("*.md")):
+        rel = md.relative_to(src)
+        if not md.is_file() or md.name in INDEX_NAMES or any(p in SKIP_DIRS for p in rel.parts):
+            continue
+        text = md.read_text(encoding="utf-8")
+        docs[rel.as_posix()] = source_values(split_front_matter(text)[0])
+        if not (is_unpublished(text) or md.name.casefold() in skip or is_excluded(rel, excluded)):
+            published.add(rel.as_posix())
+    follows, warnings = read_follows(docs)
+    for warning in warnings:
+        print(f"warning: {warning}", file=sys.stderr)
+    return follows, published
+
+
 def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[int, int, int]:
     """`resolver`: a test's fixed dates; default reads this repo's Git history."""
     if dest.exists():
@@ -254,6 +328,8 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     skip = skipped_files(src)
     hidden = hidden_folders(src, excluded, skip)
     from_heading = title_from_heading(src)
+    follows, follow_pages = follows_of(src, excluded, skip)
+    follow_by_path = {f.path: f for f in follows.values()}
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -288,8 +364,17 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                 print(f"warning: {rel} is under bookmarks/ but has no bookmark: URL — "
                       "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
+            source = source_of(source_values(fm), follows)
+            if source and not source.follow and front_matter_value(fm, f"{source.kind}_remote"):
+                print(f"warning: {rel}: {source.kind}_remote {source.name!r} names no follow in "
+                      f"{FOLLOWS_DIR}/ — its source is unrated", file=sys.stderr)
+            computed = source_lines(source, follow_pages)
+            if follow := follow_by_path.get(rel):
+                computed.append(f"follow_name: {yaml_str(follow.name)}")
+                if follow.url:
+                    computed.append(f"follow_url: {yaml_str(follow.url)}")
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, titles, from_heading), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:

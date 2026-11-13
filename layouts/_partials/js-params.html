@@ -4,7 +4,10 @@
   (traps.md).
     chipFacets  chip-facets.html
     months      month-names.html — for timeline.js
+    hiddenCollections  hidden-collections.html
+    sources     sources.html — for cards' source chips
   Expects the surface, "lists", "search" or "page" — unused yet, for per-surface
   settings.
 */}}
-{{ return dict "chipFacets" (partialCached "chip-facets.html" site) "months" (partialCached "month-names.html" site) }}
+{{ return dict "chipFacets" (partialCached "chip-facets.html" site) "months" (partialCached "month-names.html" site)
+  "hiddenCollections" (partialCached "hidden-collections.html" site) "sources" (partialCached "sources.html" site) }}

@@ -1,9 +1,10 @@
 {{/*
   A page's `rating:` as an int 1–5, else 0; other values warned. The only
-  reader of the key. Expects a page.
+  reader of the key — but on a follow, where it rates the repo, not the page
+  (follow.html): 0 here. Expects a page.
 */}}
 {{ $out := 0 }}
-{{ with .Params.rating }}
+{{ with (cond (isset .Params "follow_name") false .Params.rating) }}
   {{ $s := "" }}
   {{ if not (or (reflect.IsSlice .) (reflect.IsMap .)) }}{{ $s = printf "%v" . }}{{ end }}
   {{ if findRE `^[1-5]$` $s }}
