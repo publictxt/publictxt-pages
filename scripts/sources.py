@@ -2,6 +2,8 @@
 sources.py — a document's source: the repo its text came from, and this
 author's rating of that repo. PublicTxt spec §5.4 (ADR-0016): computed when
 reading, never written to the source repo — sync writes them to build/content.
+A fork (§5.2) is this author's version of a followed repo's page; a mirror
+(§5.5, ADR-0017) is that page as its author wrote it. Both have a source.
 
   * A follow is a document in `follows/` (any depth) with a valid `url`
     (§3.2). Its name is its file name without `.md`; names and URLs compare
@@ -11,11 +13,14 @@ reading, never written to the source repo — sync writes them to build/content.
     `fork_remote` like any other.
   * A fork has a valid `fork_path` and `fork_blob`, and a valid `fork_repo`
     or a `fork_remote` (§5.2).
+  * A mirror has the same under `mirror_*`, and is not a fork: valid
+    `fork_*` keys win (§5.5). Below, a fork's rules are a mirror's too, with
+    `mirror_remote` and `mirror_repo`.
   * A fork's follow: the one named by `fork_remote`; with no `fork_remote`,
     the one whose `url` is `fork_repo`.
   * Source: the follow's name; with no follow, `fork_remote`, else
     `fork_repo`. Source rating: the follow's `rating` (1–5), else unrated.
-  * A document that is not a fork is this repo's: `source_of()` is None.
+  * A document that is neither is this repo's: `source_of()` is None.
 
 `original_url()` is the link back: the forked file on a forge whose URLs we
 know, else the repo, else nothing (a local follow has no URL).
@@ -30,7 +35,9 @@ from urllib.parse import quote
 FOLLOWS_DIR = "follows"
 FOLLOW_KEYS = ("url", "local", "rating")
 FORK_KEYS = ("fork_remote", "fork_repo", "fork_path", "fork_branch", "fork_commit", "fork_blob")
-KEYS = FOLLOW_KEYS + FORK_KEYS
+MIRROR_KEYS = tuple(k.replace("fork_", "mirror_") for k in FORK_KEYS)
+KEYS = FOLLOW_KEYS + FORK_KEYS + MIRROR_KEYS
+FORK, MIRROR = "fork", "mirror"
 
 HTTPS_RE = re.compile(r"^https://([^/\s:@]+)/([^/\s?#]+)/([^/\s?#]+?)(?:\.git)?/?(?:[?#]\S*)?$", re.IGNORECASE)
 SSH_RE = re.compile(r"^git@([^/\s:@]+):([^/\s?#]+)/([^/\s?#]+?)(?:\.git)?/?$")
@@ -59,6 +66,7 @@ class Source:
     rating: int          # 1–5; 0 unrated
     follow: Follow | None
     original: str        # URL of the forked file, or of its repo; "" if neither is known
+    kind: str = FORK     # FORK, or MIRROR: the source's text as it stands there
 
 
 def canonical_repo_url(url: str) -> str:
@@ -100,9 +108,18 @@ def read_follows(docs: dict[str, dict[str, str]]) -> tuple[dict[str, Follow], li
     return follows, warnings
 
 
+def has_provenance(fm: dict[str, str], kind: str) -> bool:
+    return bool(fm.get(f"{kind}_path") and SHA_RE.match(fm.get(f"{kind}_blob", ""))
+                and (fm.get(f"{kind}_remote") or canonical_repo_url(fm.get(f"{kind}_repo", ""))))
+
+
 def is_fork(fm: dict[str, str]) -> bool:
-    return bool(fm.get("fork_path") and SHA_RE.match(fm.get("fork_blob", ""))
-                and (fm.get("fork_remote") or canonical_repo_url(fm.get("fork_repo", ""))))
+    return has_provenance(fm, FORK)
+
+
+def kind_of(fm: dict[str, str]) -> str:
+    """FORK, MIRROR, or "" for this repo's own document. Fork keys win."""
+    return FORK if is_fork(fm) else MIRROR if has_provenance(fm, MIRROR) else ""
 
 
 def original_url(repo: str, path: str, commit: str = "", branch: str = "") -> str:
@@ -117,17 +134,18 @@ def original_url(repo: str, path: str, commit: str = "", branch: str = "") -> st
 
 
 def source_of(fm: dict[str, str], follows: dict[str, Follow]) -> Source | None:
-    """A fork's source; None for this repo's own documents."""
-    if not is_fork(fm):
+    """A fork's or a mirror's source; None for this repo's own documents."""
+    kind = kind_of(fm)
+    if not kind:
         return None
-    remote = fm.get("fork_remote", "")
-    repo = canonical_repo_url(fm.get("fork_repo", ""))
+    remote = fm.get(f"{kind}_remote", "")
+    repo = canonical_repo_url(fm.get(f"{kind}_repo", ""))
     if remote:
         follow = follows.get(remote.casefold())
     else:
         follow = next((f for f in follows.values() if f.url == repo), None)
-    original = original_url(repo or (follow.url if follow else ""), fm["fork_path"],
-                            fm.get("fork_commit", ""), fm.get("fork_branch", ""))
+    original = original_url(repo or (follow.url if follow else ""), fm[f"{kind}_path"],
+                            fm.get(f"{kind}_commit", ""), fm.get(f"{kind}_branch", ""))
     if follow:
-        return Source(follow.name, follow.rating, follow, original)
-    return Source(remote or repo, 0, None, original)
+        return Source(follow.name, follow.rating, follow, original, kind)
+    return Source(remote or repo, 0, None, original, kind)

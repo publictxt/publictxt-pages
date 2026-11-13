@@ -8,4 +8,4 @@ A fork brought into this repo's own folders, through a local follow: its source 
 `laptop-vault`, unrated (the follow has no `rating`), and with no `fork_repo`
 there is no original to link to. Its `created:` came with it, so its date is the
 original's; a fork without one shows **forked** and the date it arrived, as
-[Federated wikis](<../remotes/ann-notes/wiki/Federated wikis.md>) does.
+[Federated wikis](<../wiki/Federated wikis.md>) does.

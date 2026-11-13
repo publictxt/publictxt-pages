@@ -27,7 +27,7 @@
   {{ end }}
   {{ $d := partial "date-labels.html" . }}
   {{ with $d.created }}{{ $item = merge $item (dict "createdLabel" .) }}{{ end }}
-  {{ if $d.forked }}{{ $item = merge $item (dict "forked" true) }}{{ end }}
+  {{ with $d.arrived }}{{ $item = merge $item (dict "arrived" .) }}{{ end }}
   {{ with $d.updated }}{{ $item = merge $item (dict "updatedLabel" .) }}{{ end }}
   {{ $bookmarks := slice }}
   {{ range partial "bookmark-urls.html" . }}{{ $bookmarks = $bookmarks | append (dict "url" . "label" (partial "bookmark-label.html" .)) }}{{ end }}

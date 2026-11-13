@@ -54,20 +54,21 @@ Items marked **(TBD)** are not built.
   - A URL under a `[params.sources]` key (`facebook:`, `twitter:`, `substack:`, `mastodon:`, `github:`) shows as a "Posted on" link.
   - Filter by where it was posted, "Posted on" chips on cards (TBD).
   - Pages with "Posted on" links join the Posts collection (TBD).
-- Sources — the PublicTxt spec's terms (§3.2, §5.2, §5.4)
+- Sources — the PublicTxt spec's terms (§3.2, §5.2, §5.4, §5.5)
   - A follow is a page in `follows/` with a repo `url` (or `local: true`, for a repo with no public URL); its file name is its name, its `rating` this author's rating of that repo.
   - A fork (`fork_*` keys) has a source: the follow `fork_remote` names, else the one whose `url` is `fork_repo`; with no follow, that name or URL. Its source rating is the follow's `rating`, else unrated. Every other page is this repo's, with no source rating.
+  - A mirror (`mirror_*` keys, and no valid `fork_*`) has a source by the same rules, with `mirror_remote` and `mirror_repo`. It is the followed repo's page as its author wrote it; a fork is this author's version. It shows "From" where a fork shows "Forked from", and wherever below says fork, a mirror counts too. Its own `rating` is its author's.
   - Computed at sync, never read from the repo. A fork shows "Forked from": the source, linked to the follow's page, and a link to the original — the forked file at the commit it was forked from (GitHub, GitLab, Codeberg), else the repo, else nothing (a local follow).
-  - A fork whose `fork_remote` names no follow: build warning.
+  - A fork whose `fork_remote` names no follow, or a mirror whose `mirror_remote` names none: build warning.
   - Community: a collapsible block of its own in lists and search, after Filters, for filters on where pages came from. Hidden with nothing to offer — a site, or a list, with one source.
     - Source: include / exclude chips, any of the included; this repo's own pages are `params.ownSource` ("this repo"). Not in `params.chipFacets`: always on.
     - Cards of forks show "from *source*".
     - Source rating: a minimum, as Rating (`?source-rating=4`), over forks; "Unrated" is forks whose source has no rating. This repo's own pages have no source rating, so any value leaves them out. Shown when forks' source ratings vary. A fork's page shows it under Source.
     - Sort by source rating: "Top rated source" puts this repo's own pages first, above any source, then forks by their source's rating, unrated as 2.5 (mid-scale, as Rating's sort); ties newest first. Author (TBD).
     - A card's source chip links to the follow's page; its tooltip gives the repo, the source rating and the follow's `description:`.
-  - `params.hiddenCollections` (default `remotes`): excluded by default in the Collection filter of lists (home, sections, tags, dataview) and search, so the excluded chip — or the collection's own section — brings them back, and Reset hides them again. A fork brought into another folder isn't in `remotes`, so it shows. No feeds yet to keep them out of.
-  - A follow's page is its source's landing page: page details show the repository (linked; "local repository" for a local follow), the source rating, and a link to its forked pages (search, by source). Its `rating` is the repo's, so the page itself is unrated in lists, search and the Rating filter.
-  - A fork's dates follow the usual ladder, so `created:` or a date in the file name carried over from the original holds. Without either, the dates are this repo's — when it was forked and last changed here — as the original's history isn't in this repo; such a date shows as "forked <date>" (page, its details, cards). TBD: the forking tool could write `created`/`updated` from the source's history.
+  - `params.hiddenCollections` (default `community`, where mirrors live: `community/<follow>/<path in its repo>`): excluded by default in the Collection filter of lists (home, sections, tags, dataview) and search, so the excluded chip — or the collection's own section — brings them back, and Reset hides them again. A fork lives in this repo's own folders, not in `community`, so it shows. No feeds yet to keep them out of.
+  - A follow's page is its source's landing page: page details show the repository (linked; "local repository" for a local follow), the source rating, and how many pages were mirrored and forked through it, each a link to search by source. Its `rating` is the repo's, so the page itself is unrated in lists, search and the Rating filter.
+  - A fork's dates follow the usual ladder, so `created:` or a date in the file name carried over from the original holds. Without either, the dates are this repo's — when it was forked and last changed here — as the original's history isn't in this repo; such a date shows as "forked <date>", or "mirrored <date>" for a mirror (page, its details, cards). TBD: the forking tool could write `created`/`updated` from the source's history.
 - Pages
   - Folders are sections and notes are pages, whatever a folder holds. A post folder (a note + attachments) is a section with one page; attaching beside the note needs no folder.
   - `publish: off` keeps a page — and a folder's attachments when all its Markdown is unpublished — off the site. Hidden, not private: it stays in the source repo.
@@ -145,8 +146,9 @@ All front matter optional; sync derives the rest.
 | `bookmark`, `bookmarks` | URL or list                | Adds collection `bookmarks`, wherever the page lives. See [Collections](#collections) |
 | `facebook`, `mastodon`, … | URL or list            | Where else it was posted; keys and labels in `[params.sources]`. Shown as "Posted on" links |
 | `fork_remote`, `fork_repo`, `fork_path`, `fork_branch`, `fork_commit`, `fork_blob` | Fork provenance (PublicTxt spec §5.2) | Make a page a fork: its source, source rating and link to the original |
+| `mirror_remote`, `mirror_repo`, `mirror_path`, `mirror_branch`, `mirror_commit`, `mirror_blob` | Mirror provenance (PublicTxt spec §5.5) | Make a page a mirror, unless it is a fork: the same, shown as "From" |
 | `url`, `local`, `rating` in `follows/` | A follow (PublicTxt spec §3.2) | `url` is written out as `follow_url`, canonical: Hugo reads `url` as the page's address |
-| `source_name`, `source_rating`, `source_follow`, `source_original`, `follow_name`, `follow_url` | A fork's source; a follow's repo | Written by sync; dropped if authored |
+| `source_name`, `source_rating`, `source_follow`, `source_original`, `source_kind`, `follow_name`, `follow_url` | A fork's or a mirror's source (`source_kind: mirror` on a mirror); a follow's repo | Written by sync; dropped if authored |
 | `source_path`           | Path in the source repo    | Written by sync; with `params.editURL`, drives the footer "Edit this page" link |
 
 Other keys pass through unchanged. `hugo.toml` maps `created` → `.Date`, `updated` → `.Lastmod`.

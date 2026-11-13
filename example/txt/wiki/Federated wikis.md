@@ -11,8 +11,10 @@ source_name: "authored, so dropped"
 ---
 # Federated wikis
 
-A fork: a page copied from a followed repo, with where it came from in `fork_*`
-keys. Its **source** is the follow `fork_remote` names (case aside), shown as
+A fork: this author's own page, made from one in a followed repo, with where it came
+from in `fork_*` keys. It lives in this repo's own folders, so lists and search show
+it; [Plain text tools](<../community/ann-notes/wiki/Plain text tools.md>), a mirror,
+is the same repo's page as written there. Its **source** is the follow `fork_remote` names (case aside), shown as
 "Forked from" with a link back to the original — the forked file, at the commit it
 was forked from. Its source rating is the follow's `rating` (4), apart from the
 page's own (3).

@@ -89,7 +89,7 @@ filter: tag-not=journal
 ---
 ```
 
-`hiddenCollections` (site-wide, default `["remotes"]`) keeps whole collections out of
+`hiddenCollections` (site-wide, default `["community"]`, where mirrors live) keeps whole collections out of
 every list and of search until a reader asks: each starts excluded in the Collection
 filter, on top of any `filter`. The collection's own section still lists it. `[]` hides
 none; it needs the collection filter's `exclude` state ([Filter chips](#filter-chips)).

@@ -16,7 +16,7 @@ optional.
 - [Tag lists (Dataview)](#tag-lists-dataview)
 - [Bookmarks](#bookmarks)
 - [Posted elsewhere](#posted-elsewhere)
-- [Follows and forks](#follows-and-forks)
+- [Follows, mirrors and forks](#follows-and-forks)
 - [Drafts and hidden pages](#drafts-and-hidden-pages)
 - [Front matter reference](#front-matter-reference)
 
@@ -236,15 +236,20 @@ Default keys: `facebook`, `twitter`, `substack`, `mastodon`, `github`. Add other
 
 ## Follows and forks
 
-Tools such as obsidian-publictxt-remotes follow other repos and fork pages from them;
-the site reads what they write.
+Tools such as obsidian-publictxt-remotes follow other repos, mirror pages from them and
+fork pages from them; the site reads what they write.
 
 - **A follow** is a note in `follows/` with the repo's `url` (or `local: true`, for a
   repo with no public URL). The file name is the follow's name; its `rating` is your
-  rating of that repo — the [source rating](site.md#community) of every page forked from it —
+  rating of that repo — the [source rating](site.md#community) of every page mirrored or forked from it —
   and its `description` a line about it. The note's page shows the repository, the
-  rating and a link to its forked pages; the note itself counts as unrated.
-- **A fork** is a page with `fork_*` keys saying where it was copied from. It shows
+  rating and links to its mirrored and forked pages; the note itself counts as unrated.
+- **A mirror** is a page from a repo you follow, kept as its author wrote it, with
+  `mirror_*` keys saying where it came from. Mirrors live under `community/`, in a folder
+  named for the follow. It shows **From** — the follow's name, linked to its note — and
+  **↗ original**, as a fork does. Its `rating`, if it has one, is its author's. Mirrors are
+  [left out of lists and search](site.md#community) until a reader asks for them.
+- **A fork** is your own page, made from one in a repo you follow, with `fork_*` keys saying where it was copied from. It shows
   **Forked from** — the follow's name, linked to its note — and **↗ original**: the file
   it was forked from on GitHub, GitLab or Codeberg; elsewhere the repo; for a local
   follow, nothing.
@@ -261,10 +266,10 @@ Why I follow Ann, and what to read there.
 
 A fork keeps its date if it has one of its own — `created:`, or a date in the file name.
 Without one, its date is when it came into your repo, shown as **forked** *date*: the
-original's history isn't in your repo.
+original's history isn't in your repo. A mirror is the same, shown as **mirrored** *date*.
 
 A fork whose `fork_remote` names no follow — the follow was renamed or removed — gets a
-build warning, and shows that name unlinked.
+build warning (a mirror's `mirror_remote` likewise), and shows that name unlinked.
 
 ## Drafts and hidden pages
 
@@ -298,6 +303,7 @@ All optional.
 | `bookmark` / `bookmarks` | URL or list | Makes it a bookmark |
 | `facebook`, `mastodon`, … | URL or list | "Posted on" links |
 | `fork_remote`, `fork_repo`, `fork_path`, … | written by the forking tool | A fork — see [Follows and forks](#follows-and-forks) |
+| `mirror_remote`, `mirror_repo`, `mirror_path`, … | written by the mirroring tool | A mirror — see [Follows and forks](#follows-and-forks) |
 | `url`, `local`, `rating` in `follows/` | repo URL, `true`, 1–5 | A follow, and your rating of it |
 | `publish` | `off` | Keep off the site |
 | `description` | text | The page's meta description (search engines, link previews) |

@@ -2,10 +2,11 @@
   A page's display dates — the one "2 Jan 2006" form and >1-day rule, for the
   page, sidebar, index.json and Pagefind, so JS never formats a date (a
   reader's zone would shift the day). Returns dict created, updated: ""
-  when undated; updated "" unless over a day after created; and forked: true
-  when `created` is only when a fork came into this repo — no date of its own
-  (front matter or file name), so this repo's Git history, mtime or the build
-  gave it. Shown as "forked <date>". Expects a page.
+  when undated; updated "" unless over a day after created; and arrived:
+  "forked" or "mirrored" when `created` is only when a fork or a mirror came
+  into this repo — no date of its own (front matter or file name), so this
+  repo's Git history, mtime or the build gave it — else "". Shown as
+  "forked <date>", "mirrored <date>". Expects a page.
 */}}
 {{ $created := "" }}
 {{ $updated := "" }}
@@ -14,5 +15,8 @@
   {{/* An edit on the day of writing is not an update. */}}
   {{ if gt (int (sub .Lastmod.Unix .Date.Unix)) 86400 }}{{ $updated = .Lastmod.Format "2 Jan 2006" }}{{ end }}
 {{ end }}
-{{ $forked := and (isset .Params "source_name") (in (slice "git" "mtime" "build") (string .Params.created_source)) }}
-{{ return dict "created" $created "updated" $updated "forked" $forked }}
+{{ $arrived := "" }}
+{{ if and (isset .Params "source_name") (in (slice "git" "mtime" "build") (string .Params.created_source)) }}
+  {{ $arrived = cond (eq (string .Params.source_kind) "mirror") "mirrored" "forked" }}
+{{ end }}
+{{ return dict "created" $created "updated" $updated "arrived" $arrived }}

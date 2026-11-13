@@ -79,21 +79,21 @@ test("source: one value a page, `missing` for this repo's own; grouped apart", (
 
 test("hidden collections: excluded in the default, so shown as a chip and reset to", () => {
   const c = chipFacets([{ key: "tag" }, { key: "collection", match: ["any"] }]);
-  const d = () => hideByDefault(c.read(qs("tag-not=journal")), ["remotes"]);
-  assert.deepEqual([...d().collection.exc], ["remotes"]);
+  const d = () => hideByDefault(c.read(qs("tag-not=journal")), ["community"]);
+  assert.deepEqual([...d().collection.exc], ["community"]);
   const write = (s) => { const p = qs(""); c.write(p, s, d()); return p.toString(); };
   assert.equal(write(d()), "", "the default: a bare URL");
   // Another filter on top: the URL carries the exclude too.
   const s = d(); s.tag.inc.add("a");
-  assert.equal(write(s), "tag=a&tag-not=journal&collection-not=remotes");
+  assert.equal(write(s), "tag=a&tag-not=journal&collection-not=community");
   // Brought back: the URL says the default no longer holds.
   const shown = d(); shown.collection.exc.clear();
   assert.deepEqual([...c.readOr(qs(write(shown)), d()).collection.exc], []);
   // A default that includes it keeps it; a facet that can't exclude, or isn't there, hides nothing.
-  assert.deepEqual([...hideByDefault(c.read(qs("collection=remotes")), ["remotes"]).collection.exc], []);
+  assert.deepEqual([...hideByDefault(c.read(qs("collection=community")), ["community"]).collection.exc], []);
   const noX = chipFacets([{ key: "collection", states: ["include"] }]);
-  assert.deepEqual([...hideByDefault(noX.read(), ["remotes"]).collection.exc], []);
-  assert.deepEqual(hideByDefault(chipFacets([{ key: "tag" }]).read(), ["remotes"]).collection, undefined);
+  assert.deepEqual([...hideByDefault(noX.read(), ["community"]).collection.exc], []);
+  assert.deepEqual(hideByDefault(chipFacets([{ key: "tag" }]).read(), ["community"]).collection, undefined);
 });
 
 test("a list's default filter: holds without chip params, URL replaces it whole", () => {

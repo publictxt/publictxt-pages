@@ -48,5 +48,5 @@ test("a fork's arrival date reads \"forked\"", async () => {
   const { dateHTML } = await import("../../assets/js/cards.js");
   const it = { created: "2025-01-01T12:00:00Z", createdLabel: "1 Jan 2025" };
   assert.ok(!dateHTML(it).includes("forked"));
-  assert.ok(dateHTML({ ...it, forked: true }).startsWith('<span class="muted">forked</span> <time'));
+  assert.ok(dateHTML({ ...it, arrived: "forked" }).startsWith('<span class="muted">forked</span> <time'));
 });

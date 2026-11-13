@@ -95,7 +95,7 @@ class SiteIndexTest(unittest.TestCase):
 
     def test_fork_source(self):
         """A fork names its source, linked to the follow's page, with a link back; a local one has none."""
-        page = self.html("remotes", "ann-notes", "wiki", "federated-wikis")
+        page = self.html("wiki", "federated-wikis")
         chips = ('<a class="chip" href="/follows/ann-notes/">ann-notes</a>\n<a class="chip chip-link" href="'
                  'https://github.com/example/notes/blob/85f3c01ab408f962ce6ba605e40c96f606e381f9/wiki/Federated%20wikis.md"')
         self.assertEqual(page.count(chips), 2, "header and page meta")
@@ -105,25 +105,41 @@ class SiteIndexTest(unittest.TestCase):
         self.assertNotIn("↗ original", local)
         self.assertNotIn("Forked from", self.html("follows", "ann-notes"), "a follow is this repo's own page")
 
+    def test_mirror_source(self):
+        """A mirror names its source as a fork does, but says "From": the page is the source's, as written there."""
+        page = self.html("community", "ann-notes", "wiki", "plain-text-tools")
+        chips = ('<a class="chip" href="/follows/ann-notes/">ann-notes</a>\n<a class="chip chip-link" href="'
+                 'https://github.com/example/notes/blob/85f3c01ab408f962ce6ba605e40c96f606e381f9/wiki/Plain%20text%20tools.md"')
+        self.assertEqual(page.count(chips), 2, "header and page meta")
+        self.assertIn('<span class="muted">From</span>', page)
+        self.assertNotIn('<span class="muted">Forked from</span>', page)
+        self.assertIn('data-source="ann-notes"', page)
+        self.assertIn('data-source-rating="4"', page)
+        self.assertIn('aria-label="Rated 5 of 5"', page, "its own rating is its author's")
+        self.assertIn('<span class="muted">mirrored</span> <time class="muted"', page)
+        self.assertIn("<dt>Mirrored</dt>", page)
+        self.assertIn('data-arrived="mirrored"', page)
+
     def test_source_filter(self):
         """Every indexed page carries a Pagefind source — a fork's, else own-source.html's;
         index.json only a fork's. Search has the Community block, apart from Filters."""
-        self.assertIn('data-source="ann-notes"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
+        self.assertIn('data-source="ann-notes"', self.html("wiki", "federated-wikis"))
         self.assertIn('data-source="this repo"', self.html("follows", "ann-notes"))
         self.assertIn('data-source="this repo"', self.html("notes"))
         sources = {it["url"]: it["source"] for it in json.loads(self.index) if "source" in it}
-        self.assertEqual(sources, {"/remotes/ann-notes/wiki/federated-wikis/": "ann-notes",
+        self.assertEqual(sources, {"/wiki/federated-wikis/": "ann-notes",
+                                   "/community/ann-notes/wiki/plain-text-tools/": "ann-notes",
                                    "/notes/forked-from-a-local-vault/": "laptop-vault"})
         ratings = {it["url"]: it["sourceRating"] for it in json.loads(self.index) if "sourceRating" in it}
-        self.assertEqual(ratings, {"/remotes/ann-notes/wiki/federated-wikis/": 4}, "a follow's rating; not on the follow itself")
-        self.assertIn('data-source-rating="4"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
+        self.assertEqual(ratings, {"/wiki/federated-wikis/": 4, "/community/ann-notes/wiki/plain-text-tools/": 4}, "a follow's rating; not on the follow itself")
+        self.assertIn('data-source-rating="4"', self.html("wiki", "federated-wikis"))
         self.assertIn('data-source-rating="unrated"', self.html("notes", "forked-from-a-local-vault"))
         self.assertIn('data-source-rating="none"', self.html("follows", "ann-notes"))
         # Sort keys: own pages above any source, unrated forks mid-scale (OWN_SOURCE, UNRATED in sorts.js).
         self.assertIn('data-source-rating-sort="6"', self.html("follows", "ann-notes"))
-        self.assertIn('data-source-rating-sort="4"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
+        self.assertIn('data-source-rating-sort="4"', self.html("wiki", "federated-wikis"))
         self.assertIn('data-source-rating-sort="2.5"', self.html("notes", "forked-from-a-local-vault"))
-        self.assertIn('aria-label="Source rated 4 of 5"', self.html("remotes", "ann-notes", "wiki", "federated-wikis"))
+        self.assertIn('aria-label="Source rated 4 of 5"', self.html("wiki", "federated-wikis"))
         search = self.html("search")
         block = re.search(r'<details class="search-filters fold" id="search-community".*?</details>\s*</div>\s*</details>', search, re.S)
         self.assertIsNotNone(block, "no Community block")
@@ -132,13 +148,14 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('id="filter-source-rating-group" data-facet="source-rating"', block[0])
 
     def test_follow_page(self):
-        """A follow shows its repo, the rating as the source's (the page itself unrated), and its forks."""
+        """A follow shows its repo, the rating as the source's (the page itself unrated), and its mirrors and forks."""
         page = self.html("follows", "ann-notes")
         self.assertIn('href="https://github.com/example/notes" rel="noopener external" target="_blank">↗ github.com/example/notes</a>', page)
         self.assertIn('aria-label="Source rated 4 of 5"', page)
         self.assertNotIn('aria-label="Rated 4 of 5"', page)
         self.assertIn('data-rating="unrated"', page)
-        self.assertIn('<a href="/search/?source=ann-notes">1 page</a>', page)
+        for kind in ("Mirrored pages", "Forked pages"):
+            self.assertIn(f'<dt>{kind}</dt>\n    <dd><a href="/search/?source=ann-notes">1 page</a>', page)
         local = self.html("follows", "laptop-vault")
         self.assertIn('<span class="muted">local repository</span>', local)
         self.assertNotIn("Source rated", local)
@@ -146,22 +163,22 @@ class SiteIndexTest(unittest.TestCase):
 
     def test_forked_date(self):
         """A fork dated only by this repo's history shows "forked"; one with its own date, and own pages, don't."""
-        fork = self.html("remotes", "ann-notes", "wiki", "federated-wikis")
+        fork = self.html("wiki", "federated-wikis")
         self.assertIn('<span class="muted">forked</span> <time class="muted"', fork)
         self.assertIn("<dt>Forked</dt>", fork)
-        self.assertIn('data-forked="true"', fork)
+        self.assertIn('data-arrived="forked"', fork)
         for page in (self.html("notes", "forked-from-a-local-vault"), self.html("notes", "sample")):
             self.assertNotIn('<span class="muted">forked</span>', page)
             self.assertIn("<dt>Created</dt>", page)
-        forked = [it["url"] for it in json.loads(self.index) if it.get("forked")]
-        self.assertEqual(forked, ["/remotes/ann-notes/wiki/federated-wikis/"])
+        arrived = {it["url"]: it["arrived"] for it in json.loads(self.index) if it.get("arrived")}
+        self.assertEqual(arrived, {"/wiki/federated-wikis/": "forked", "/community/ann-notes/wiki/plain-text-tools/": "mirrored"})
 
     def test_hidden_collections(self):
-        """params.hiddenCollections (remotes): out of the no-JS lists, but for the collection's own."""
-        fork = 'href="/remotes/ann-notes/wiki/federated-wikis/"'
-        self.assertNotIn(fork, self.html())
-        self.assertIn(fork, self.html("remotes"))
-        self.assertIn(fork, self.html("remotes", "ann-notes"))
+        """params.hiddenCollections (community): out of the no-JS lists, but for the collection's own."""
+        mirror = 'href="/community/ann-notes/wiki/plain-text-tools/"'
+        self.assertNotIn(mirror, self.html())
+        self.assertIn(mirror, self.html("community"))
+        self.assertIn(mirror, self.html("community", "ann-notes"))
         self.assertIn('href="/notes/forked-from-a-local-vault/"', self.html("notes"), "a fork in this repo's own folder shows")
 
     def test_dataview_tag_list(self):

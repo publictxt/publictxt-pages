@@ -14,11 +14,12 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
   * A nested tag (`dev/app`) -> a term page, `tags/dev--app/_index.md`,
     titled with its name (hashtags.py: Hugo nests terms on `/`).
   * `source_path:` records the source path, for the edit link.
-  * A fork (`fork_*` keys) gets its source — `source_name:`, `source_rating:`,
-    `source_follow:` (the follow's page), `source_original:` (a link back) —
+  * A fork (`fork_*` keys) or a mirror (`mirror_*`) gets its source —
+    `source_name:`, `source_rating:`, `source_follow:` (the follow's page),
+    `source_original:` (a link back), and for a mirror `source_kind: mirror` —
     joined to the repo's `follows/` (sources.py). Computed here, so the same
-    keys in the source are dropped. Warns on a fork whose `fork_remote`
-    names no follow.
+    keys in the source are dropped. Warns on one whose `fork_remote` or
+    `mirror_remote` names no follow.
   * A follow gets `follow_name:` (its name: what forks call their source), and
     its `url:` becomes `follow_url:`, canonical: Hugo reads `url:` as the
     page's own address. Dropped from every other document in `follows/`.
@@ -46,7 +47,7 @@ from pathlib import Path
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
-from sources import FOLLOWS_DIR, KEYS as SOURCE_KEYS, Follow, Source, read_follows, source_of
+from sources import FOLLOWS_DIR, KEYS as SOURCE_KEYS, MIRROR, Follow, Source, read_follows, source_of
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
@@ -66,7 +67,7 @@ UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 # Written by sync from a fork's source (sources.py); never read from the source repo.
-COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "follow_name", "follow_url")
+COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "source_kind", "follow_name", "follow_url")
 
 
 @dataclass
@@ -140,8 +141,10 @@ def drop_keys(fm: str | None, keys: tuple[str, ...]) -> str | None:
 
 
 def source_lines(source: Source | None, published: set[str]) -> list[str]:
-    """A fork's COMPUTED_KEYS; none for this repo's own page. `published`: the
-    follow pages on the site — a link to any other would dangle."""
+    """A fork's or a mirror's COMPUTED_KEYS; none for this repo's own page.
+    `source_kind:` only on a mirror: a page with a source is a fork unless it
+    says otherwise. `published`: the follow pages on the site — a link to any
+    other would dangle."""
     if not source:
         return []
     lines = [f"source_name: {yaml_str(source.name)}"]
@@ -151,6 +154,8 @@ def source_lines(source: Source | None, published: set[str]) -> list[str]:
         lines.append(f"source_follow: {yaml_str(source.follow.path)}")
     if source.original:
         lines.append(f"source_original: {yaml_str(source.original)}")
+    if source.kind == MIRROR:
+        lines.append(f"source_kind: {MIRROR}")
     return lines
 
 
@@ -360,8 +365,8 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                       "not listed as a bookmark", file=sys.stderr)
             stamp = stamp_for(fm, path, rel, resolver)
             source = source_of(source_values(fm), follows)
-            if source and not source.follow and front_matter_value(fm, "fork_remote"):
-                print(f"warning: {rel}: fork_remote {source.name!r} names no follow in "
+            if source and not source.follow and front_matter_value(fm, f"{source.kind}_remote"):
+                print(f"warning: {rel}: {source.kind}_remote {source.name!r} names no follow in "
                       f"{FOLLOWS_DIR}/ — its source is unrated", file=sys.stderr)
             computed = source_lines(source, follow_pages)
             if follow := follow_by_path.get(rel):
