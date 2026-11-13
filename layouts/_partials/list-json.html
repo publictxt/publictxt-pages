@@ -22,7 +22,7 @@
   {{ with partial "categories.html" . }}{{ $item = merge $item (dict "categories" .) }}{{ end }}
   {{ with partial "rating.html" . }}{{ $item = merge $item (dict "rating" .) }}{{ end }}
   {{ with partial "fork-source.html" . }}
-    {{ $item = merge $item (dict "source" .name) }}
+    {{ $item = merge $item (dict "source" .name "copy" (cond .mirror "mirrored" "forked")) }}
     {{ with .rating }}{{ $item = merge $item (dict "sourceRating" .) }}{{ end }}
   {{ end }}
   {{ $d := partial "date-labels.html" . }}

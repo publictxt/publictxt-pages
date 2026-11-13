@@ -45,6 +45,11 @@ together.
 `source` off those pages and `facetValues()` fills it in; Pagefind can't, so
 `pagefind-keys.html` writes it on every page. Both read `own-source.html`.
 
+`copy` ("forked", "mirrored") follows it in the same block, with no `missing`: this
+repo's own pages carry no value in `index.json` or Pagefind. It is not `arrived`, the
+date's word, which only an undated fork or mirror has (`date-labels.html`); both come
+from `fork-source.html`'s `mirror`.
+
 `params.hiddenCollections` is hidden three times over, by one rule — a list with some
 pages of the collection, not all: `list-container.html` (the no-JS list), `list.js` and
 `search.js` (the default chip state, `hideByDefault()`). Anything else that lists pages

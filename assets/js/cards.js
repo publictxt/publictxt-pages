@@ -1,6 +1,6 @@
 // The one page card, for list.js and search.js. Item shape = index.json's
 // (list-json.html): { url, title, collections[], section, tags[], categories[],
-// created, updated, year, createdLabel, updatedLabel, arrived, summary,
+// created, updated, year, createdLabel, updatedLabel, arrived, copy, summary,
 // bookmarks[{url, label}], rating, source, sourceRating }. `source`: a fork's (the repo its
 // text came from), `sourceRating` that repo's 1–5; both absent on this repo's own pages. Display values come from Hugo; JS never
 // formats a date or a label.

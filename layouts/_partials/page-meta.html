@@ -33,11 +33,11 @@
     {{ end }}
     {{ if .mirrors }}
     <dt>Mirrored pages</dt>
-    <dd><a href="{{ "search/" | relURL }}?source={{ .name | urlquery }}">{{ .mirrors }} page{{ if ne .mirrors 1 }}s{{ end }}</a></dd>
+    <dd><a href="{{ "search/" | relURL }}?source={{ .name | urlquery }}&amp;copy=mirrored">{{ .mirrors }} page{{ if ne .mirrors 1 }}s{{ end }}</a></dd>
     {{ end }}
     {{ if .forks }}
     <dt>Forked pages</dt>
-    <dd><a href="{{ "search/" | relURL }}?source={{ .name | urlquery }}">{{ .forks }} page{{ if ne .forks 1 }}s{{ end }}</a></dd>
+    <dd><a href="{{ "search/" | relURL }}?source={{ .name | urlquery }}&amp;copy=forked">{{ .forks }} page{{ if ne .forks 1 }}s{{ end }}</a></dd>
     {{ end }}
     {{ end }}
     {{ with partial "bookmark-urls.html" . }}

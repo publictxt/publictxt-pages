@@ -17,11 +17,14 @@ export const MODES = ["all", "any"];
 // only: `shared` shows values every listed page has. From chip-facets.html,
 // not here: `missing`, the value of a page with none (a source: this repo's
 // own pages), and `group`, the section the facet sits in ("community").
+// `copy` — "forked" or "mirrored" — has no `missing`: this repo's own pages
+// are no copy, so they carry no value.
 const BUILTIN = {
   collection: { item: "collections", prefix: "", shared: true },
   category: { item: "categories", prefix: "" },
   tag: { item: "tags", prefix: "#", limit: 20 },
   source: { item: "source", prefix: "" },
+  copy: { item: "copy", prefix: "" },
 };
 
 // A page's values for facet `d` (a def): index.json holds a list, one value

@@ -77,7 +77,7 @@ layouts/_partials/
   list-json.html        pages -> index.json items, with Hugo-made display values
   list-container.html   [data-list] + no-JS <ul> + loads list.js
   js-params.html        @params for every js.Build — see traps.md
-  chip-facets.html      only reader of params.chipFacets; appends `source`, in the Community block   (partialCached)
+  chip-facets.html      only reader of params.chipFacets; appends `source` and `copy`, in the Community block   (partialCached)
   list-order.html       order: cascade (page -> ancestors -> param)
   list-filter.html      filter: cascade (page -> ancestors): default chip filters
   list-per-page.html    pagerSize: cascade

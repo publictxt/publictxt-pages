@@ -146,6 +146,19 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('id="filter-source-group" data-facet="source"', block[0])
         self.assertEqual(search.count('id="filter-source-group"'), 1)
         self.assertIn('id="filter-source-rating-group" data-facet="source-rating"', block[0])
+        self.assertIn('id="filter-copy-group" data-facet="copy"', block[0])
+
+    def test_copy_filter(self):
+        """A fork is copy "forked", a mirror "mirrored", dated or not; this repo's own pages carry none."""
+        self.assertIn('data-copy="forked"', self.html("wiki", "federated-wikis"))
+        self.assertIn('data-copy="mirrored"', self.html("community", "ann-notes", "wiki", "plain-text-tools"))
+        own = self.html("follows", "ann-notes")
+        self.assertNotIn("data-copy", own)
+        self.assertNotIn("copy[data-copy]", own)
+        copies = {it["url"]: it["copy"] for it in json.loads(self.index) if "copy" in it}
+        self.assertEqual(copies, {"/wiki/federated-wikis/": "forked",
+                                  "/community/ann-notes/wiki/plain-text-tools/": "mirrored",
+                                  "/notes/forked-from-a-local-vault/": "forked"})
 
     def test_follow_page(self):
         """A follow shows its repo, the rating as the source's (the page itself unrated), and its mirrors and forks."""
@@ -154,8 +167,8 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('aria-label="Source rated 4 of 5"', page)
         self.assertNotIn('aria-label="Rated 4 of 5"', page)
         self.assertIn('data-rating="unrated"', page)
-        for kind in ("Mirrored pages", "Forked pages"):
-            self.assertIn(f'<dt>{kind}</dt>\n    <dd><a href="/search/?source=ann-notes">1 page</a>', page)
+        for kind, copy in (("Mirrored pages", "mirrored"), ("Forked pages", "forked")):
+            self.assertIn(f'<dt>{kind}</dt>\n    <dd><a href="/search/?source=ann-notes&amp;copy={copy}">1 page</a>', page)
         local = self.html("follows", "laptop-vault")
         self.assertIn('<span class="muted">local repository</span>', local)
         self.assertNotIn("Source rated", local)

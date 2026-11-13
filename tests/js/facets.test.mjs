@@ -77,6 +77,24 @@ test("source: one value a page, `missing` for this repo's own; grouped apart", (
   assert.deepEqual(c.describe(s), ["ann or bob", "not this repo"]);
 });
 
+test("copy: forked or mirrored, nothing for this repo's own pages", () => {
+  // As chip-facets.html appends it: no `missing`.
+  const c = chipFacets([{ key: "copy", label: "Copy", match: ["any"], group: "community" }]);
+  const [copy] = c.defs;
+  assert.deepEqual([copy.item, copy.group, copy.modes], ["copy", "community", ["any"]]);
+  assert.deepEqual(facetValues(copy, { copy: "mirrored" }), ["mirrored"]);
+  assert.deepEqual(facetValues(copy, {}), []);
+
+  const inc = c.read(qs("copy=forked"));
+  assert.ok(matches(inc.copy, facetValues(copy, { copy: "forked" })));
+  assert.ok(!matches(inc.copy, facetValues(copy, { copy: "mirrored" })));
+  assert.ok(!matches(inc.copy, facetValues(copy, {})), "own pages are no copy");
+  const exc = c.read(qs("copy-not=mirrored"));
+  assert.ok(matches(exc.copy, facetValues(copy, {})), "own pages stay");
+  assert.ok(!matches(exc.copy, facetValues(copy, { copy: "mirrored" })));
+  assert.deepEqual(pagefindConditions(exc.copy), [{ copy: { none: ["mirrored"] } }]);
+});
+
 test("hidden collections: excluded in the default, so shown as a chip and reset to", () => {
   const c = chipFacets([{ key: "tag" }, { key: "collection", match: ["any"] }]);
   const d = () => hideByDefault(c.read(qs("tag-not=journal")), ["community"]);
