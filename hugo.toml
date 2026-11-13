@@ -73,8 +73,9 @@ capitalizeListTitles = false
   # Collections left out of lists and search by default — excluded in the
   # Collection filter, so a reader can bring them back; a list of only that
   # collection (its own section) shows them. Needs the collection filter's
-  # "exclude" state. [] hides none.
-  hiddenCollections = ["remotes"]
+  # "exclude" state. [] hides none. `community`: mirrors, the pages of followed
+  # repos as their authors wrote them (obsidian-publictxt-remotes' community folder).
+  hiddenCollections = ["community"]
   # What the Source filter calls this repo's own pages (forks carry their
   # follow's name). Also its value in URLs: ?source=this+repo.
   ownSource = "this repo"

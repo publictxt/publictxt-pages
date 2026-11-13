@@ -22,12 +22,12 @@
   {{ with partial "categories.html" . }}{{ $item = merge $item (dict "categories" .) }}{{ end }}
   {{ with partial "rating.html" . }}{{ $item = merge $item (dict "rating" .) }}{{ end }}
   {{ with partial "fork-source.html" . }}
-    {{ $item = merge $item (dict "source" .name) }}
+    {{ $item = merge $item (dict "source" .name "copy" (cond .mirror "mirrored" "forked")) }}
     {{ with .rating }}{{ $item = merge $item (dict "sourceRating" .) }}{{ end }}
   {{ end }}
   {{ $d := partial "date-labels.html" . }}
   {{ with $d.created }}{{ $item = merge $item (dict "createdLabel" .) }}{{ end }}
-  {{ if $d.forked }}{{ $item = merge $item (dict "forked" true) }}{{ end }}
+  {{ with $d.arrived }}{{ $item = merge $item (dict "arrived" .) }}{{ end }}
   {{ with $d.updated }}{{ $item = merge $item (dict "updatedLabel" .) }}{{ end }}
   {{ $bookmarks := slice }}
   {{ range partial "bookmark-urls.html" . }}{{ $bookmarks = $bookmarks | append (dict "url" . "label" (partial "bookmark-label.html" .)) }}{{ end }}

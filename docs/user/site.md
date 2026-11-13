@@ -80,23 +80,26 @@ Dates here are `created` — see [Dates](writing.md#dates).
 ## Community
 
 When a list holds pages from more than one source — your own and
-[forks](writing.md#follows-and-forks) from repos you follow — a **Community** block
+[mirrors and forks](writing.md#follows-and-forks) from repos you follow — a **Community** block
 appears under Filters, in lists and in search:
 
 - **Source** — a chip per source: click to show only those, ✕ to leave one out. Your own
   pages are "this repo" ([`ownSource`](configuration.md#filter-chips) renames it).
+- **Copy** — **forked** (your version of a page) or **mirrored** (the page as its author
+  wrote it): click to show only those, ✕ to leave them out (`?copy=forked`,
+  `?copy-not=mirrored`). Your own pages are neither, so picking one leaves them out.
 - **Sort by source** — *Top rated source* / *Lowest rated source*, in the Sort menu where
-  a list has forks. Your own pages count as above any source.
+  a list has mirrors or forks. Your own pages count as above any source.
 - **Source rating** — your rating of the repo (the follow's `rating`), as a minimum:
-  ★4+ shows forks from repos you rated 4 or 5. "Unrated" is forks from repos you haven't
-  rated. Your own pages have no source rating, so picking one leaves them out.
-- A fork's card says **from** *source* — a link to the follow's note; hover for the
+  ★4+ shows mirrors and forks from repos you rated 4 or 5. "Unrated" is those from repos
+  you haven't rated. Your own pages have no source rating, so picking one leaves them out.
+- A mirror's or a fork's card says **from** *source* — a link to the follow's note; hover for the
   repo, your rating and the follow's description. Its page shows the source's rating too.
 
-Pages under `remotes/` — pages fetched from repos you follow — are left out of lists and
-search to start with: **remotes** shows crossed out under Collection; click it to bring
-them in. The Remotes section itself always lists them. Forks you've moved into your own
-folders are yours to show, and do. ([`hiddenCollections`](configuration.md#browse-lists).)
+Pages under `community/` — mirrors: pages from repos you follow, as their authors wrote
+them — are left out of lists and search to start with: **community** shows crossed out
+under Collection; click it to bring them in. The Community section itself always lists
+them. Forks live in your own folders and are yours to show, and do. ([`hiddenCollections`](configuration.md#browse-lists).)
 
 ## On a page
 
@@ -104,7 +107,7 @@ Right column, top: **this page's details** —
 
 - collections, created and updated dates, categories, rating stars, tags
 - the bookmark link, if any; "Posted on" links to where it was cross-posted
-- for a [fork](writing.md#follows-and-forks), its source and a link to the original
+- for a [mirror or a fork](writing.md#follows-and-forks), its source and a link to the original
 
 Below that, **where it sits**:
 

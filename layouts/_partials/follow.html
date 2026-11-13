@@ -3,8 +3,8 @@
   (follow_name:, follow_url:): a dict of name (what its forks call their
   source), url (the repo; "" for a local follow), label (the URL without its
   scheme; "local repository"), rating (this author's of the repo, int 1–5,
-  else 0), description (`description:`) and forks (how many pages came
-  through it). False for any other page. A follow's `rating:` is the repo's,
+  else 0), description (`description:`), and forks and mirrors (how many
+  pages of each kind came through it). False for any other page. A follow's `rating:` is the repo's,
   not the page's: read here, and rating.html gives 0. Expects a page.
 */}}
 {{ $out := false }}
@@ -13,8 +13,13 @@
   {{ $rating := 0 }}
   {{ with $.Params.rating }}{{ if findRE `^[1-5]$` (printf "%v" .) }}{{ $rating = int (printf "%v" .) }}{{ end }}{{ end }}
   {{ $forks := 0 }}
-  {{ with $.File }}{{ $forks = len (where site.RegularPages "Params.source_follow" .Path) }}{{ end }}
+  {{ $mirrors := 0 }}
+  {{ with $.File }}
+    {{ $from := where site.RegularPages "Params.source_follow" .Path }}
+    {{ $mirrors = len (where $from "Params.source_kind" "mirror") }}
+    {{ $forks = sub (len $from) $mirrors }}
+  {{ end }}
   {{ $out = dict "name" (printf "%v" .) "url" $url "label" (cond (ne $url "") (strings.TrimPrefix "https://" $url) "local repository")
-    "rating" $rating "description" (default "" $.Params.description) "forks" $forks }}
+    "rating" $rating "description" (default "" $.Params.description) "forks" $forks "mirrors" $mirrors }}
 {{ end }}
 {{ return $out }}

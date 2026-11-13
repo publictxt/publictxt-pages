@@ -161,22 +161,23 @@
   "year": "2025"
  },
  {
+  "arrived": "forked",
   "collections": [
-   "remotes"
+   "wiki"
   ],
+  "copy": "forked",
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
-  "forked": true,
   "rating": 3,
-  "section": "remotes",
+  "section": "wiki",
   "source": "ann-notes",
   "sourceRating": 4,
-  "summary": "A fork: a page copied from a followed repo, with where it came from in fork_* keys. Its source is the follow fork_remote names (case aside), shown as “Forked from” with …",
+  "summary": "A fork: this author’s own page, made from one in a followed repo, with where it came from in fork_* keys. It lives in this repo’s own folders, so lists and search show …",
   "tags": [],
   "title": "Federated wikis",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
-  "url": "/remotes/ann-notes/wiki/federated-wikis/",
+  "url": "/wiki/federated-wikis/",
   "year": "2025"
  },
  {
@@ -352,6 +353,26 @@
   "year": "2025"
  },
  {
+  "arrived": "mirrored",
+  "collections": [
+   "community"
+  ],
+  "copy": "mirrored",
+  "created": "2025-01-01T12:00:00Z",
+  "createdLabel": "1 Jan 2025",
+  "rating": 5,
+  "section": "community",
+  "source": "ann-notes",
+  "sourceRating": 4,
+  "summary": "A mirror: a page from a followed repo, kept here as its author wrote it, with where it came from in mirror_* keys. It lives under community/, in a folder named for the follow, at …",
+  "tags": [],
+  "title": "Plain text tools",
+  "updated": "2025-03-01T12:00:00Z",
+  "updatedLabel": "1 Mar 2025",
+  "url": "/community/ann-notes/wiki/plain-text-tools/",
+  "year": "2025"
+ },
+ {
   "collections": [
    "wiki"
   ],
@@ -501,6 +522,7 @@
   "collections": [
    "notes"
   ],
+  "copy": "forked",
   "created": "2024-03-02T00:00:00Z",
   "createdLabel": "2 Mar 2024",
   "section": "notes",

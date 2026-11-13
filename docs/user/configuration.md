@@ -89,7 +89,7 @@ filter: tag-not=journal
 ---
 ```
 
-`hiddenCollections` (site-wide, default `["remotes"]`) keeps whole collections out of
+`hiddenCollections` (site-wide, default `["community"]`, where mirrors live) keeps whole collections out of
 every list and of search until a reader asks: each starts excluded in the Collection
 filter, on top of any `filter`. The collection's own section still lists it. `[]` hides
 none; it needs the collection filter's `exclude` state ([Filter chips](#filter-chips)).
@@ -158,8 +158,9 @@ whole default — list every facet you want, in display order.
   # defaults: states = ["include", "exclude"], match = ["all", "any"]
 ```
 
-The **Source** filter (the [Community](site.md#community) block) isn't in this list: it
-shows whenever a list has pages from more than one source. `ownSource` names your own
+The **Source** and **Copy** filters (the [Community](site.md#community) block) aren't in
+this list: Source shows whenever a list has pages from more than one source, Copy where
+some of its pages are forks or mirrors. `ownSource` names your own
 pages there:
 
 ```toml

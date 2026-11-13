@@ -121,6 +121,19 @@ class SourceTest(unittest.TestCase):
         self.assertEqual(s.original, REPO, "the follow's URL; no ref: the repo")
         self.assertEqual(source_of(fork(fork_remote="vault"), FOLLOWS).original, "")
 
+    def test_mirror(self):
+        """`mirror_*` reads as `fork_*` does, and says it is a mirror; fork keys win."""
+        mirror = {"mirror_path": "wiki/A b.md", "mirror_blob": BLOB}
+        self.assertIsNone(source_of(mirror, FOLLOWS), "neither mirror_remote nor mirror_repo")
+        self.assertIsNone(source_of({**mirror, "mirror_remote": "ann", "mirror_blob": "nope"}, FOLLOWS))
+        s = source_of({**mirror, "mirror_remote": "ANN", "mirror_repo": REPO, "mirror_commit": COMMIT}, FOLLOWS)
+        self.assertEqual((s.name, s.rating, s.kind, s.follow.path), ("Ann", 4, "mirror", "follows/Ann.md"))
+        self.assertEqual(s.original, f"{REPO}/blob/{COMMIT}/wiki/A%20b.md")
+        self.assertEqual(source_of({**mirror, "mirror_repo": REPO + ".git"}, FOLLOWS).name, "Ann")
+        self.assertEqual(source_of(fork(fork_remote="ann"), FOLLOWS).kind, "fork")
+        both = source_of({**mirror, "mirror_remote": "vault", **fork(fork_remote="ann")}, FOLLOWS)
+        self.assertEqual((both.name, both.kind), ("Ann", "fork"))
+
     def test_original_url_per_forge(self):
         self.assertEqual(original_url("https://gitlab.com/a/b", "x.md", branch="main"),
                          "https://gitlab.com/a/b/-/blob/main/x.md")
@@ -156,6 +169,17 @@ class SyncTest(unittest.TestCase):
         pages, err = self.synced({"a.md": self.FORK})
         self.assertIn('source_name: "ann"\n---', pages["a.md"])
         self.assertIn("a.md: fork_remote 'ann' names no follow", err)
+
+    def test_mirror_is_marked_and_warns_like_a_fork(self):
+        mirror = f"---\nmirror_remote: ann\nmirror_path: a.md\nmirror_blob: {BLOB}\nsource_kind: fork\n---\nbody\n"
+        pages, err = self.synced({"follows/ann.md": f"---\nurl: {REPO}\nrating: 5\n---\n", "community/ann/a.md": mirror, "a.md": self.FORK})
+        self.assertIn("source_kind: mirror\n", pages["community/ann/a.md"])
+        self.assertNotIn("source_kind: fork", pages["community/ann/a.md"], "authored, so dropped")
+        self.assertIn('source_follow: "follows/ann.md"', pages["community/ann/a.md"])
+        self.assertNotIn("source_kind", pages["a.md"], "a fork is the default")
+        self.assertEqual(err, "")
+        _, err = self.synced({"community/ann/a.md": mirror})
+        self.assertIn("community/ann/a.md: mirror_remote 'ann' names no follow", err)
 
     def test_own_page_has_no_source_keys(self):
         pages, _ = self.synced({"a.md": "---\nsource_rating: 5\nsource_original:\n  - x\nweb: y\n---\nbody\n"})

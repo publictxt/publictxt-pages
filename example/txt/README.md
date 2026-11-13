@@ -36,7 +36,8 @@ git diff tests/golden                                  # read it: every change s
 | `bookmark:` / `bookmarks:`, in and outside `bookmarks/` | `bookmarks/sites/gohugo.io/gohugo.io.md`, `wiki/Projects/PublicTxt/Obsidian.md.md`, `wiki/Site/Pagefind.md` |
 | "Posted on" links (`mastodon:`, `substack:` list) | `blog/20260915-a-post-with-full-front-matter.md` |
 | A follow (`url`, SSH form; `rating`; a tool's key ignored), and a local one (`local: true`) | `follows/ann-notes.md`, `follows/laptop-vault.md` |
-| A fork: source joined to its follow (case aside), link to the original, authored `source_name:` dropped | `remotes/ann-notes/wiki/Federated wikis.md` |
+| A fork: source joined to its follow (case aside), link to the original, authored `source_name:` dropped | `wiki/Federated wikis.md` |
+| A mirror (`mirror_*`): "From" its source, "mirrored" date, in the hidden `community` collection | `community/ann-notes/wiki/Plain text tools.md` |
 | … through a local follow, in this repo's own folder: unrated, no original; its own `created:` (the other: "forked" date) | `notes/forked-from-a-local-vault.md` |
 | Custom keys passed through | `online-things.md` (`web:`), `wiki/Site/Pagefind.md` (`web-links:`) |
 | YouTube and audio embeds in image syntax; note embed `![](page.md)`, and inline as a link | `notes/embeds.md` |

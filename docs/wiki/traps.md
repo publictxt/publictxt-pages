@@ -14,7 +14,7 @@ index count that differs from the body pages; `hugo server` builds skip it.
 
 ## Pairs that must change together
 
-Display values (date labels and their `forked` flag, year, bookmark labels, recent order) are made once, in Hugo,
+Display values (date labels and their `arrived` word — "forked", "mirrored" —, year, bookmark labels, recent order) are made once, in Hugo,
 and reach JS as data: `index.json` for lists, Pagefind meta (`pagefind-keys.html`) for
 search. Add one to both, or search cards go without it. What's still implemented twice:
 
@@ -44,6 +44,11 @@ together.
 `missing`, the value of this repo's own pages (`own-source.html`). `index.json` leaves
 `source` off those pages and `facetValues()` fills it in; Pagefind can't, so
 `pagefind-keys.html` writes it on every page. Both read `own-source.html`.
+
+`copy` ("forked", "mirrored") follows it in the same block, with no `missing`: this
+repo's own pages carry no value in `index.json` or Pagefind. It is not `arrived`, the
+date's word, which only an undated fork or mirror has (`date-labels.html`); both come
+from `fork-source.html`'s `mirror`.
 
 `params.hiddenCollections` is hidden three times over, by one rule — a list with some
 pages of the collection, not all: `list-container.html` (the no-JS list), `list.js` and
