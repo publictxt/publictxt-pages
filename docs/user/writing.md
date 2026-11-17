@@ -28,6 +28,11 @@ optional.
   are plain pages, outside any section.
 - **`_index.md`** is a folder's own page: its intro text, shown above the folder's list
   and searchable. At the root, it's the home page. No `_index.md`? One is generated.
+- **A folder note** can be the folder's page instead: any note with
+  `is-folder-index: true` in its front matter, such as Obsidian's
+  `Design notes/Design notes.md`. Its title is its own name, the edit link opens it,
+  and links to it reach the folder's page. A real `_index.md` wins, as does the first
+  flagged note by name; the build warns about the other, which stays a plain page.
 - An `_index.md` can carry `order:` / `pagerSize:` / `filter:` for its list
   ([Configuration](configuration.md#browse-lists)).
 - Folder names show as written (`Design notes`, not `design-notes`).
@@ -306,6 +311,7 @@ All optional.
 | `mirror_remote`, `mirror_repo`, `mirror_path`, … | written by the mirroring tool | A mirror — see [Follows and forks](#follows-and-forks) |
 | `url`, `local`, `rating` in `follows/` | repo URL, `true`, 1–5 | A follow, and your rating of it |
 | `publish` | `off` | Keep off the site |
+| `is-folder-index` | `true` | This note is its folder's page, in place of `_index.md` — see [Folders and sections](#folders-and-sections) |
 | `description` | text | The page's meta description (search engines, link previews) |
 | `order` / `pagerSize` | see [config](configuration.md#browse-lists) | On `_index.md`: this folder's list order and page size |
 | `author`, `source_repo` | text | Kept, not shown yet |

@@ -88,6 +88,7 @@ Items marked **(TBD)** are not built.
 _index.md, About.md                     (home + root pages)
 
 wiki/_index.md, wiki/A/_index.md        (folder index = section page (any depth))
+wiki/A/A.md + `is-folder-index: true`   (or a flagged note, written as the _index.md; links follow)
 
 blog/2023/12/17/x.md                    (dates derived from path)
 blog/20260509-title.md                  (YYYYMMDD prefix date)
@@ -143,6 +144,7 @@ All front matter optional; sync derives the rest.
 | `tags`                  | Inline or block list       | Merged with `#hashtags`; deduplicated                                           |
 | `created`               | ISO 8601 datetime          | Derived from path, git, mtime, or build time if not set                         |
 | `updated`               | ISO 8601 datetime          | Derived from git, mtime, or build time if not set; never earlier than `created` |
+| `is-folder-index`       | `true`                     | The note is its folder's index, written as `_index.md` at sync; a real `_index.md` wins. Title fallback: its own name; `source_path` stays its path; `.md` links to it are rewritten |
 | `author`, `source_repo` | Metadata                   | Passed through; not filterable                                                  |
 | `bookmark`, `bookmarks` | URL or list                | Adds collection `bookmarks`, wherever the page lives. See [Collections](#collections) |
 | `facebook`, `mastodon`, … | URL or list            | Where else it was posted; keys and labels in `[params.sources]`. Shown as "Posted on" links |
