@@ -93,6 +93,12 @@ class SiteIndexTest(unittest.TestCase):
         page = "/blog/2026/20260925-attachments-beside-the-note---no-post-folders/"
         self.assertIn(f'<a href="{page}">attachments</a>, or <a href="{page}">escaped</a>', html)
 
+    def test_folder_note_link(self):
+        """notes/_index.md: a link to a note flagged `is-folder-index` reaches its folder's page."""
+        html = (self.public / "notes" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<a href="/notes/design-notes/">Design notes</a> is a folder note', html)
+        self.assertIn("An Obsidian folder note", self.html("notes", "design-notes"))
+
     def test_fork_source(self):
         """A fork names its source, linked to the follow's page, with a link back; a local one has none."""
         page = self.html("wiki", "federated-wikis")
