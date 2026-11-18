@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from dates import DateResolver                                              # noqa: E402
-from sources import canonical_repo_url, original_url, read_follows, source_of   # noqa: E402
+from sources import (canonical_repo_url, mirror_folders, original_url, page_original,   # noqa: E402
+                     read_follows, source_of)
 from sync_content import drop_keys, sync                                    # noqa: E402
 
 AT = "2025-01-01T12:00:00+00:00"
@@ -134,6 +135,22 @@ class SourceTest(unittest.TestCase):
         both = source_of({**mirror, "mirror_remote": "vault", **fork(fork_remote="ann")}, FOLLOWS)
         self.assertEqual((both.name, both.kind), ("Ann", "fork"))
 
+    def test_mirror_folders(self):
+        """`<community>/<folder>`, the follow's `folder` key, else its name; "" community: the root."""
+        fs = follows({"follows/Ann.md": {"url": REPO, "folder": "/Ann Notes/"}, "follows/vault.md": {"local": "true"}})
+        self.assertEqual({k: f.name for k, f in mirror_folders(fs, "people/community").items()},
+                         {"people/community/ann notes": "Ann", "people/community/vault": "vault"})
+        self.assertEqual(set(mirror_folders(fs, "")), {"ann notes", "vault"})
+
+    def test_page_original(self):
+        """At the commit of a page from the same follow; else the followed branch; else the repo."""
+        ann = follows({"follows/Ann.md": {"url": REPO, "branch": "dev"}})["ann"]
+        s = source_of({"mirror_remote": "ann", "mirror_path": "x.md", "mirror_blob": BLOB, "mirror_commit": COMMIT}, {"ann": ann})
+        self.assertEqual(page_original(ann, "cs/b c.md", s), f"{REPO}/blob/{COMMIT}/cs/b%20c.md")
+        self.assertEqual(page_original(ann, "cs/b.md"), f"{REPO}/blob/dev/cs/b.md")
+        self.assertEqual(page_original(FOLLOWS["ann"], "cs/b.md"), REPO)
+        self.assertEqual(page_original(FOLLOWS["vault"], "cs/b.md"), "")
+
     def test_original_url_per_forge(self):
         self.assertEqual(original_url("https://gitlab.com/a/b", "x.md", branch="main"),
                          "https://gitlab.com/a/b/-/blob/main/x.md")
@@ -193,6 +210,53 @@ class SyncTest(unittest.TestCase):
         self.assertIn(f'follow_name: "ann"\nfollow_url: "{REPO}"', pages["follows/ann.md"])
         self.assertNotIn("follow_name", pages["follows/note.md"])
         self.assertNotIn("\nurl:", pages["follows/ann.md"] + pages["follows/note.md"])
+
+    ANN = f"---\nurl: {REPO}\nfolder: ann-notes\n---\n"
+    MIRROR = f"---\nmirror_remote: ann\nmirror_path: wiki/a.md\nmirror_blob: {BLOB}\nmirror_commit: {COMMIT}\n---\n"
+
+    def test_community_folder(self):
+        """Pages in params.communityFolder, nested or not, generated indexes too, are `in_community`."""
+        pages, _ = self.synced({"settings/site.toml": '[params]\ncommunityFolder = "/shared/community/"\n',
+                                "shared/community/ann/a.md": "x", "shared/own.md": "x"})
+        for rel in ("shared/community/ann/a.md", "shared/community/ann/_index.md", "shared/community/_index.md"):
+            self.assertIn("in_community: true", pages[rel], rel)
+        for rel in ("shared/own.md", "shared/_index.md"):
+            self.assertNotIn("in_community", pages[rel], rel)
+
+    def test_community_folder_at_the_root(self):
+        """"": the follows' mirror folders, by `folder` or name."""
+        pages, _ = self.synced({"settings/site.toml": '[params]\ncommunityFolder = ""\n', "follows/ann.md": self.ANN,
+                                "ann-notes/wiki/a.md": self.MIRROR, "wiki/b.md": "x"})
+        self.assertIn("in_community: true", pages["ann-notes/wiki/a.md"])
+        self.assertNotIn("in_community", pages["wiki/b.md"] + pages["follows/ann.md"])
+
+    def test_authored_in_community_is_dropped(self):
+        pages, _ = self.synced({"a.md": "---\nin_community: true\n---\nx"})
+        self.assertNotIn("in_community", pages["a.md"])
+
+    def test_links_to_pages_not_mirrored_go_to_the_original(self):
+        body = ("[here](community/ann-notes/wiki/b.md) [gone](<community/ann-notes/cs/no such.md#h>) "
+                "[rel](../cs/c.md) [up](/community/ann-notes/x.md) `[code](community/ann-notes/y.md)` "
+                "[web](https://x.org/community/ann-notes/q.md) ![](community/ann-notes/e%20f.md) ![shown](community/ann-notes/g.md)")
+        pages, _ = self.synced({"follows/ann.md": self.ANN, "community/ann-notes/wiki/a.md": self.MIRROR + body,
+                                "community/ann-notes/wiki/b.md": "x",
+                                "own.md": "[m](community/ann-notes/cs/d.md) [n](<community/ann-notes/wiki/b.md>) [bob](community/bob/z.md)"})
+        a = pages["community/ann-notes/wiki/a.md"]
+        at = f"{REPO}/blob/{COMMIT}"
+        self.assertIn("[here](community/ann-notes/wiki/b.md)", a, "mirrored: kept")
+        self.assertIn(f"[gone](<{at}/cs/no%20such.md>)", a, "the mirror's commit; the heading dropped")
+        self.assertIn(f"[rel]({at}/cs/c.md)", a, "relative, as Hugo reads it")
+        self.assertIn(f"[up]({at}/x.md)", a)
+        self.assertIn("`[code](community/ann-notes/y.md)`", a)
+        self.assertIn("[web](https://x.org/community/ann-notes/q.md)", a)
+        self.assertIn(f" [e f]({at}/e%20f.md) [shown]({at}/g.md)", a, "an embed: a link")
+        self.assertIn(f"[m]({REPO})", pages["own.md"], "not the follow's page: no commit; no branch: the repo")
+        self.assertIn("[n](<community/ann-notes/wiki/b.md>)", pages["own.md"])
+        self.assertIn("[bob](community/bob/z.md)", pages["own.md"], "no follow's mirror folder")
+
+    def test_links_to_a_local_follows_mirror_folder_are_left(self):
+        pages, _ = self.synced({"follows/vault.md": "---\nlocal: true\n---\n", "a.md": "[x](community/vault/x.md)"})
+        self.assertIn("[x](community/vault/x.md)", pages["a.md"])
 
     def test_drop_keys(self):
         self.assertEqual(drop_keys("a: 1\nsource_name:\n  - x\n- y\nb: 2\nsource_rating: 3", ("source_name", "source_rating")),

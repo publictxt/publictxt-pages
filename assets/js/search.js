@@ -111,7 +111,7 @@ function renderFilters(facetCounts, ratingExact, sourceRatingExact) {
   for (const d of CHIPS.defs) {
     const g = groups[d.key];
     const f = state[d.key];
-    const names = sortedKeys(allFilters[d.key]);
+    const names = sortedKeys(allFilters[d.key]).filter((n) => n !== d.unset);   // copy's "none": own pages
     // A facet with a `missing` value (source) always has that one: two to offer a choice.
     g.group.hidden = names.length < (d.missing ? 2 : 1);
     // Past a facet's `limit`, chips fold behind "more", as the lists'; picked ones stay.

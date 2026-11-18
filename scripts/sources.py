@@ -25,6 +25,11 @@ A fork (§5.2) is this author's version of a followed repo's page; a mirror
 `original_url()` is the link back: the forked file on a forge whose URLs we
 know, else the repo, else nothing (a local follow has no URL).
 
+A follow's mirror folder (obsidian-publictxt-remotes) is where its mirrors
+live: `<community folder>/<folder>`, its `folder` key, else its name.
+`mirror_folders()` maps them back to follows, so a link to a page there that
+isn't (a page not mirrored) can go to the original instead (`page_original()`).
+
 Takes front matter as a dict of raw scalar strings (KEYS), so it parses nothing.
 """
 
@@ -33,7 +38,7 @@ from dataclasses import dataclass
 from urllib.parse import quote
 
 FOLLOWS_DIR = "follows"
-FOLLOW_KEYS = ("url", "local", "rating")
+FOLLOW_KEYS = ("url", "local", "rating", "folder", "branch")
 FORK_KEYS = ("fork_remote", "fork_repo", "fork_path", "fork_branch", "fork_commit", "fork_blob")
 MIRROR_KEYS = tuple(k.replace("fork_", "mirror_") for k in FORK_KEYS)
 KEYS = FOLLOW_KEYS + FORK_KEYS + MIRROR_KEYS
@@ -58,6 +63,8 @@ class Follow:
     path: str            # source path, e.g. follows/ann-notes.md
     url: str             # canonical repo URL; "" for a local follow
     rating: int          # 1–5; 0 unrated
+    folder: str = ""     # its mirror folder's name under the community folder: `folder`, else name
+    branch: str = ""     # `branch`, the one followed; "" the repo's default
 
 
 @dataclass(frozen=True)
@@ -67,6 +74,7 @@ class Source:
     follow: Follow | None
     original: str        # URL of the forked file, or of its repo; "" if neither is known
     kind: str = FORK     # FORK, or MIRROR: the source's text as it stands there
+    commit: str = ""     # `*_commit`: the source's commit the text came from, if given
 
 
 def canonical_repo_url(url: str) -> str:
@@ -102,7 +110,9 @@ def read_follows(docs: dict[str, dict[str, str]]) -> tuple[dict[str, Follow], li
         if url and url in urls:
             warnings.append(f"{path}: {url} is already followed by {urls[url]} — ignored")
             continue
-        follows[name.casefold()] = Follow(name, path, url, rating_of(fm.get("rating", "")))
+        folder = fm.get("folder", "").strip().strip("/") or name
+        follows[name.casefold()] = Follow(name, path, url, rating_of(fm.get("rating", "")),
+                                          folder, fm.get("branch", "").strip())
         if url:
             urls[url] = path
     return follows, warnings
@@ -146,6 +156,21 @@ def source_of(fm: dict[str, str], follows: dict[str, Follow]) -> Source | None:
         follow = next((f for f in follows.values() if f.url == repo), None)
     original = original_url(repo or (follow.url if follow else ""), fm[f"{kind}_path"],
                             fm.get(f"{kind}_commit", ""), fm.get(f"{kind}_branch", ""))
+    commit = fm.get(f"{kind}_commit", "")
     if follow:
-        return Source(follow.name, follow.rating, follow, original, kind)
-    return Source(remote or repo, 0, None, original, kind)
+        return Source(follow.name, follow.rating, follow, original, kind, commit)
+    return Source(remote or repo, 0, None, original, kind, commit)
+
+
+def mirror_folders(follows: dict[str, Follow], community: str) -> dict[str, Follow]:
+    """Each follow's mirror folder, `<community>/<folder>` ("" community: the
+    root), case-folded -> the follow."""
+    return {"/".join(p for p in (community, f.folder) if p).casefold(): f for f in follows.values()}
+
+
+def page_original(follow: Follow, path: str, source: Source | None = None) -> str:
+    """The original of the page at `path` in the follow's repo — at the commit
+    `source` came from when it is the same follow (the link was written
+    against it), else on the followed branch, else the repo; "" for a local follow."""
+    commit = source.commit if source and source.follow == follow else ""
+    return original_url(follow.url, path, commit, follow.branch)

@@ -250,8 +250,9 @@ fork pages from them; the site reads what they write.
   and its `description` a line about it. The note's page shows the repository, the
   rating and links to its mirrored and forked pages; the note itself counts as unrated.
 - **A mirror** is a page from a repo you follow, kept as its author wrote it, with
-  `mirror_*` keys saying where it came from. Mirrors live under `community/`, in a folder
-  named for the follow. It shows **From** — the follow's name, linked to its note — and
+  `mirror_*` keys saying where it came from. Mirrors live in the community folder
+  (`community/`, or [`communityFolder`](configuration.md#browse-lists)), in the follow's
+  mirror folder: its `folder:`, else its name. It shows **From** — the follow's name, linked to its note — and
   **↗ original**, as a fork does. Its `rating`, if it has one, is its author's. Mirrors are
   [left out of lists and search](site.md#community) until a reader asks for them.
 - **A fork** is your own page, made from one in a repo you follow, with `fork_*` keys saying where it was copied from. It shows
@@ -272,6 +273,11 @@ Why I follow Ann, and what to read there.
 A fork keeps its date if it has one of its own — `created:`, or a date in the file name.
 Without one, its date is when it came into your repo, shown as **forked** *date*: the
 original's history isn't in your repo. A mirror is the same, shown as **mirrored** *date*.
+
+The mirroring tool points a mirror's links at where each linked page's mirror is or would
+be, by full path (`[b](community/ann-notes/cs/b.md)`). A link to a page that wasn't
+mirrored goes to the original instead: at the commit the linking page came from, else
+the follow's `branch:`, else the repo. A local follow's stay as written.
 
 A fork whose `fork_remote` names no follow — the follow was renamed or removed — gets a
 build warning (a mirror's `mirror_remote` likewise), and shows that name unlinked.

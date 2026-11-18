@@ -89,10 +89,17 @@ filter: tag-not=journal
 ---
 ```
 
-`hiddenCollections` (site-wide, default `["community"]`, where mirrors live) keeps whole collections out of
+`hiddenCollections` (site-wide, default `["community"]`: the pages in `communityFolder`, below) keeps whole collections out of
 every list and of search until a reader asks: each starts excluded in the Collection
 filter, on top of any `filter`. The collection's own section still lists it. `[]` hides
 none; it needs the collection filter's `exclude` state ([Filter chips](#filter-chips)).
+
+`communityFolder` (default `"community"`) is the folder obsidian-publictxt-remotes
+mirrors pages into — set it to the plugin's **Community folder**, by hand. Every page
+under it, at any depth, is in the `community` collection, wherever the folder sits
+(`"people/community"` works). `""`, the repo root as in the plugin: each follow's mirror
+folder (its `folder:`, else its name) instead. A link into a mirror folder that reaches
+no page — one not mirrored — goes to the original ([Follows and forks](writing.md#follows-and-forks)).
 
 `filter` starts the list filtered — chip filters spelled as in the list's URL
 (`tag=a&tag-not=b&collection=blog`). Set it to `""` to stop a parent folder's from

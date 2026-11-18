@@ -1,7 +1,8 @@
 {{/*
   A page's collections, lower-cased and deduped: its top-level section ("page" at
-  root), each of `collections:` (a value or a list), and "bookmarks" when it
-  carries a bookmark URL (bookmark-urls.html). The only reader of `collections:`;
+  root), each of `collections:` (a value or a list), "bookmarks" when it
+  carries a bookmark URL (bookmark-urls.html), and "community" when sync
+  marked it `in_community` (params.communityFolder). The only reader of `collections:`;
   `type:` is left to Hugo (layout choice) and adds nothing. Feeds the
   collection chips, the Pagefind `collection` filter, index.json `collections`,
   and collection-pages.html — so a top-level section lists every page of its
@@ -15,4 +16,5 @@
   {{ end }}
 {{ end }}
 {{ if partial "bookmark-urls.html" . }}{{ $collections = $collections | append "bookmarks" }}{{ end }}
+{{ if .Params.in_community }}{{ $collections = $collections | append "community" }}{{ end }}
 {{ return (apply $collections "lower" "." | uniq) }}

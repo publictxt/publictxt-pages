@@ -154,13 +154,21 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('id="filter-source-rating-group" data-facet="source-rating"', block[0])
         self.assertIn('id="filter-copy-group" data-facet="copy"', block[0])
 
+    def test_pagefind_keys_on_every_page(self):
+        """build.py's key check on Hugo's output: a filter on some pages only fails the build there."""
+        from build import body_pages, key_problems
+        pages = body_pages(self.public)
+        self.assertTrue(pages)
+        self.assertEqual(key_problems(pages), [])
+
     def test_copy_filter(self):
-        """A fork is copy "forked", a mirror "mirrored", dated or not; this repo's own pages carry none."""
+        """A fork is copy "forked", a mirror "mirrored", dated or not; this repo's own pages none in
+        index.json, and "none" in Pagefind, which drops a page lacking a filter from searches on it."""
         self.assertIn('data-copy="forked"', self.html("wiki", "federated-wikis"))
         self.assertIn('data-copy="mirrored"', self.html("community", "ann-notes", "wiki", "plain-text-tools"))
         own = self.html("follows", "ann-notes")
-        self.assertNotIn("data-copy", own)
-        self.assertNotIn("copy[data-copy]", own)
+        self.assertIn('data-copy="none"', own)
+        self.assertIn("copy[data-copy]", own)
         copies = {it["url"]: it["copy"] for it in json.loads(self.index) if "copy" in it}
         self.assertEqual(copies, {"/wiki/federated-wikis/": "forked",
                                   "/community/ann-notes/wiki/plain-text-tools/": "mirrored",
