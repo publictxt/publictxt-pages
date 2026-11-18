@@ -18,7 +18,8 @@ export const MODES = ["all", "any"];
 // not here: `missing`, the value of a page with none (a source: this repo's
 // own pages), and `group`, the section the facet sits in ("community").
 // `copy` — "forked" or "mirrored" — has no `missing`: this repo's own pages
-// are no copy, so they carry no value.
+// are no copy, so they carry no value. In Pagefind they carry `unset`,
+// "none" (a page lacking a filter drops out of searches on it), never a chip.
 const BUILTIN = {
   collection: { item: "collections", prefix: "", shared: true },
   category: { item: "categories", prefix: "" },
