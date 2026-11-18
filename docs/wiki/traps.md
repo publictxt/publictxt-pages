@@ -9,8 +9,9 @@ Every `data-pagefind-body` template **must** call `pagefind-keys.html` (now:
 `page.html`, `section.html`). Pagefind drops a page lacking
 the key it sorts on, or the filter selected — so a template without it vanishes from
 sorted and filtered results, no error. Hence the rating sort key and filter are on
-every page, rated or not. `check_search_index()` catches a page without them, and an
-index count that differs from the body pages; `hugo server` builds skip it.
+every page, rated or not — and `copy`, own pages `"none"`. `check_search_index()` catches a page without them, and an
+index count that differs from the body pages; `hugo server` builds skip it. Its key half,
+`key_problems()`, also runs in `test_site.py`, on Hugo's output alone.
 
 ## Pairs that must change together
 

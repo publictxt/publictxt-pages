@@ -36,7 +36,7 @@ tests/test_folder_index.py  `is-folder-index: true`: a note as its folder's _ind
 tests/test_exclude.py       params.excludeFolders (whole subtrees) and params.skipFiles, left out of sync
 tests/test_sources.py       sources.py: canonical URLs, follows, the join; what sync writes from it
 tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags
-tests/test_site.py          that content through Hugo: index.json vs tests/golden/ (needs hugo)
+tests/test_site.py          that content through Hugo: index.json vs tests/golden/, Pagefind keys on every page (needs hugo)
 tests/test_build.py         build.py's search index check, on made-up public/ trees
 tests/test_map_lint.py      map_lint.py's reading of the map: folder headings, namesakes
 tests/js/facets.test.mjs    facets.js + sorts.js: URL spelling, chip presses, lists = search

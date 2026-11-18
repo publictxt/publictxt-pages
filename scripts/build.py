@@ -68,13 +68,8 @@ class _PageKeys(HTMLParser):
             self.filters = names(a.get("data-pagefind-filter"))
 
 
-def check_search_index(public: Path) -> list[str]:
-    """
-    Pagefind loses pages silently, so fail loudly. Problems (none = fine):
-    its page count differs from the data-pagefind-body pages; or a body page
-    lacks a sort key or filter another has — Pagefind drops it from any search
-    sorted or filtered on that key (pagefind-keys.html, traps.md).
-    """
+def body_pages(public: Path) -> dict[str, _PageKeys]:
+    """The data-pagefind-body pages of a built site, by path, with their keys."""
     pages = {}
     for f in public.rglob("*.html"):
         if f.is_relative_to(public / "pagefind"):
@@ -83,12 +78,14 @@ def check_search_index(public: Path) -> list[str]:
         p.feed(f.read_text(encoding="utf-8"))
         if p.body:
             pages[f.relative_to(public).as_posix()] = p
-    entry = json.loads((public / "pagefind" / "pagefind-entry.json").read_text(encoding="utf-8"))
-    indexed = sum(lang["page_count"] for lang in entry["languages"].values())
+    return pages
 
+
+def key_problems(pages: dict[str, _PageKeys]) -> list[str]:
+    """A body page without a sort key or filter another has: Pagefind drops it
+    from any search sorted or filtered on that key — an exclude too
+    (pagefind-keys.html, traps.md). Needs Hugo's output only, so tests run it."""
     problems = []
-    if indexed != len(pages):
-        problems.append(f"Pagefind indexed {indexed} page(s); {len(pages)} have data-pagefind-body")
     all_sorts = set().union(*(p.sorts or set() for p in pages.values()))
     all_filters = set().union(*(p.filters or set() for p in pages.values()))
     for path, p in sorted(pages.items()):
@@ -97,6 +94,21 @@ def check_search_index(public: Path) -> list[str]:
         elif missing := sorted((all_sorts - p.sorts) | (all_filters - p.filters)):
             problems.append(f"{path}: lacks {', '.join(missing)} — gone from searches using them")
     return problems
+
+
+def check_search_index(public: Path) -> list[str]:
+    """
+    Pagefind loses pages silently, so fail loudly. Problems (none = fine):
+    its page count differs from the data-pagefind-body pages; or key_problems().
+    """
+    pages = body_pages(public)
+    entry = json.loads((public / "pagefind" / "pagefind-entry.json").read_text(encoding="utf-8"))
+    indexed = sum(lang["page_count"] for lang in entry["languages"].values())
+
+    problems = []
+    if indexed != len(pages):
+        problems.append(f"Pagefind indexed {indexed} page(s); {len(pages)} have data-pagefind-body")
+    return problems + key_problems(pages)
 
 
 def main() -> int:
