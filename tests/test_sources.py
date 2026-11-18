@@ -234,6 +234,30 @@ class SyncTest(unittest.TestCase):
         pages, _ = self.synced({"a.md": "---\nin_community: true\n---\nx"})
         self.assertNotIn("in_community", pages["a.md"])
 
+    def test_links_to_pages_not_mirrored_go_to_the_original(self):
+        body = ("[here](community/ann-notes/wiki/b.md) [gone](<community/ann-notes/cs/no such.md#h>) "
+                "[rel](../cs/c.md) [up](/community/ann-notes/x.md) `[code](community/ann-notes/y.md)` "
+                "[web](https://x.org/community/ann-notes/q.md) ![](community/ann-notes/e%20f.md) ![shown](community/ann-notes/g.md)")
+        pages, _ = self.synced({"follows/ann.md": self.ANN, "community/ann-notes/wiki/a.md": self.MIRROR + body,
+                                "community/ann-notes/wiki/b.md": "x",
+                                "own.md": "[m](community/ann-notes/cs/d.md) [n](<community/ann-notes/wiki/b.md>) [bob](community/bob/z.md)"})
+        a = pages["community/ann-notes/wiki/a.md"]
+        at = f"{REPO}/blob/{COMMIT}"
+        self.assertIn("[here](community/ann-notes/wiki/b.md)", a, "mirrored: kept")
+        self.assertIn(f"[gone](<{at}/cs/no%20such.md>)", a, "the mirror's commit; the heading dropped")
+        self.assertIn(f"[rel]({at}/cs/c.md)", a, "relative, as Hugo reads it")
+        self.assertIn(f"[up]({at}/x.md)", a)
+        self.assertIn("`[code](community/ann-notes/y.md)`", a)
+        self.assertIn("[web](https://x.org/community/ann-notes/q.md)", a)
+        self.assertIn(f" [e f]({at}/e%20f.md) [shown]({at}/g.md)", a, "an embed: a link")
+        self.assertIn(f"[m]({REPO})", pages["own.md"], "not the follow's page: no commit; no branch: the repo")
+        self.assertIn("[n](<community/ann-notes/wiki/b.md>)", pages["own.md"])
+        self.assertIn("[bob](community/bob/z.md)", pages["own.md"], "no follow's mirror folder")
+
+    def test_links_to_a_local_follows_mirror_folder_are_left(self):
+        pages, _ = self.synced({"follows/vault.md": "---\nlocal: true\n---\n", "a.md": "[x](community/vault/x.md)"})
+        self.assertIn("[x](community/vault/x.md)", pages["a.md"])
+
     def test_drop_keys(self):
         self.assertEqual(drop_keys("a: 1\nsource_name:\n  - x\n- y\nb: 2\nsource_rating: 3", ("source_name", "source_rating")),
                          "a: 1\nb: 2")

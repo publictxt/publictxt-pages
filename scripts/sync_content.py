@@ -29,6 +29,9 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     obsidian-publictxt-remotes mirrors into; at the root, "": in a follow's
     mirror folder) gets `in_community: true` — the `community` collection —
     generated folder indexes too.
+  * A `.md` link into a follow's mirror folder that reaches no page (a page
+    not mirrored: the remotes plugin writes such links) points at the original
+    instead (sources.py page_original), when the follow has a URL.
   * A follow gets `follow_name:` (its name: what forks call their source), and
     its `url:` becomes `follow_url:`, canonical: Hugo reads `url:` as the
     page's own address. Dropped from every other document in `follows/`.
@@ -54,12 +57,13 @@ import sys
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 from urllib.parse import unquote
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
 from sources import (FOLLOWS_DIR, KEYS as SOURCE_KEYS, MIRROR, Follow, Source, mirror_folders,
-                     read_follows, source_of)
+                     page_original, read_follows, source_of)
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
@@ -158,6 +162,57 @@ def retarget_links(body: str, rel: str, moved: dict[str, str]) -> str:
     return LINK_DEST_RE.sub(repl, body)
 
 
+def link_targets(dest: str, rel: str) -> list[str]:
+    """Where Hugo's link hook may find an unquoted `.md` link `dest` from the
+    page at `rel`: from the root with a leading `/`; else relative to the
+    page's folder, then from the root (GetPage's fallback)."""
+    if dest.startswith("/"):
+        return [posixpath.normpath(dest.lstrip("/"))]
+    return [posixpath.normpath(posixpath.join(posixpath.dirname(rel), dest)), posixpath.normpath(dest)]
+
+
+def link_originals(body: str, rel: str, notes: set[str], mirrors: dict[str, Follow],
+                   source: Source | None = None) -> str:
+    """`.md` links and embeds in the page at `rel` that reach no note in `notes`
+    (case-folded source paths of the site's pages) but land in a mirror folder
+    (`mirrors`, sources.mirror_folders) go to the page's original instead:
+    a page the remotes plugin didn't mirror. `source`: the page's own, for the
+    commit its links were written against. A local follow's are left.
+    A path that starts with a mirror folder is from the root, as the plugin
+    writes it and Obsidian reads it, even where Hugo would try it relative first.
+    An embed becomes a link (there is nothing here to embed), shown as the
+    page's name when it shows nothing."""
+    if not mirrors:
+        return body
+
+    def repl(m: re.Match) -> str:
+        dest = m.group("dest")
+        if dest is None:
+            return m.group(0)
+        angled = dest.startswith("<")
+        raw = dest[1:-1] if angled else dest
+        path = raw.partition("#")[0]
+        if not path.lower().endswith(".md") or "://" in path:
+            return m.group(0)
+        targets = link_targets(unquote(path), rel)
+        if any(t.casefold() in notes for t in targets):
+            return m.group(0)
+        for target in reversed(targets):   # the root first
+            folded = target.casefold()
+            for folder, follow in mirrors.items():
+                if folded.startswith(folder + "/"):
+                    url = page_original(follow, target[len(folder) + 1:], source)
+                    if not url:
+                        return m.group(0)
+                    opening = m.group("open")
+                    if opening.startswith("!"):
+                        opening = f"[{opening[2:-2] or posixpath.basename(target)[:-3]}]("
+                    return opening + (f"<{url}>" if angled else url)
+        return m.group(0)
+
+    return LINK_DEST_RE.sub(repl, body)
+
+
 def lacks_bookmark_url(rel: str, fm: str | None, is_index: bool) -> bool:
     """A bookmark page, by location, missing the key that actually makes it one."""
     if is_index or not rel.startswith("bookmarks/") or rel.startswith("bookmarks/wiki/"):
@@ -241,11 +296,13 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
 
 def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | None = None,
                  title_from_heading: bool = True, source: list[str] = (),
-                 moved: dict[str, str] | None = None) -> str:
+                 moved: dict[str, str] | None = None,
+                 originals: "Callable[[str], str] | None" = None) -> str:
     """`titles`: collects term_titles() of the page's tags, for write_term_pages().
     `title_from_heading`: params.titleFromHeading — False, the H1 is never the title.
     `source`: the page's computed lines: source_lines(), a follow's `follow_url:`, IN_COMMUNITY.
-    `moved`: folder_indexes(), whose links retarget_links() rewrites."""
+    `moved`: folder_indexes(), whose links retarget_links() rewrites.
+    `originals`: the body with links to pages not mirrored rewritten (link_originals)."""
     fm, body = split_front_matter(text)
     fm = drop_keys(rename_legacy_keys(fm), COMPUTED_KEYS)
     if rel.startswith(FOLLOWS_DIR + "/"):
@@ -272,6 +329,8 @@ def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | Non
         added.append(f"source_path: {yaml_str(rel)}")
     added.extend(source)
 
+    if originals:
+        body = originals(body)
     body = linkify(retarget_links(body, rel, moved or {}))
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
@@ -360,6 +419,17 @@ def source_values(fm: str | None) -> dict[str, str]:
     return {k: front_matter_value(fm, k) for k in SOURCE_KEYS}
 
 
+def published_notes(src: Path, excluded: list[tuple[str, ...]], skip: set[str]) -> set[str]:
+    """Case-folded source paths of the Markdown that becomes pages."""
+    notes = set()
+    for md in src.rglob("*.md"):
+        rel = md.relative_to(src)
+        if (md.is_file() and md.name.casefold() not in skip and not any(p in SKIP_DIRS for p in rel.parts)
+                and not is_excluded(rel, excluded) and not is_unpublished(md.read_text(encoding="utf-8"))):
+            notes.add(rel.as_posix().casefold())
+    return notes
+
+
 def in_folders(rel: str, folders: list[str]) -> bool:
     """`rel` is below one of `folders` (case-folded paths)."""
     return any(rel.casefold().startswith(f + "/") for f in folders)
@@ -440,6 +510,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     community = community_folder(src)
     mirrors = mirror_folders(follows, community)
     community_dirs = [community.casefold()] if community else list(mirrors)
+    notes = published_notes(src, excluded, skip) if mirrors else set()
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -485,8 +556,9 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                     computed.append(f"follow_url: {yaml_str(follow.url)}")
             if in_folders(rel, community_dirs):
                 computed.append(IN_COMMUNITY)
+            originals = lambda body: link_originals(body, rel, notes, mirrors, source)  # noqa: E731
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed, moved),
+            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed, moved, originals),
                               encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1

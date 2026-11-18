@@ -77,7 +77,8 @@ capitalizeListTitles = false
   hiddenCollections = ["community"]
   # The folder obsidian-publictxt-remotes mirrors into — set it to the plugin's
   # Community folder. Its pages are the `community` collection, wherever it sits;
-  # "" (the root, as the plugin's): each follow's mirror folder.
+  # "" (the root, as the plugin's): each follow's mirror folder. A link into a
+  # mirror folder that reaches no page (not mirrored) goes to the original.
   communityFolder = "community"
   # What the Source filter calls this repo's own pages (forks carry their
   # follow's name). Also its value in URLs: ?source=this+repo.
