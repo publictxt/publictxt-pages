@@ -17,6 +17,7 @@ source_rating: 4
 source_follow: "follows/ann-notes.md"
 source_original: "https://github.com/example/notes/blob/85f3c01ab408f962ce6ba605e40c96f606e381f9/wiki/Plain%20text%20tools.md"
 source_kind: mirror
+in_community: true
 ---
 A mirror: a page from a followed repo, kept here as its author wrote it, with where
 it came from in `mirror_*` keys. It lives under `community/`, in a folder named for

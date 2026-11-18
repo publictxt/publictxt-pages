@@ -25,6 +25,10 @@ fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
     joined to the repo's `follows/` (sources.py). Computed here, so the same
     keys in the source are dropped. Warns on one whose `fork_remote` or
     `mirror_remote` names no follow.
+  * A page in the community folder (`params.communityFolder`, the one
+    obsidian-publictxt-remotes mirrors into; at the root, "": in a follow's
+    mirror folder) gets `in_community: true` — the `community` collection —
+    generated folder indexes too.
   * A follow gets `follow_name:` (its name: what forks call their source), and
     its `url:` becomes `follow_url:`, canonical: Hugo reads `url:` as the
     page's own address. Dropped from every other document in `follows/`.
@@ -54,7 +58,8 @@ from urllib.parse import unquote
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
-from sources import FOLLOWS_DIR, KEYS as SOURCE_KEYS, MIRROR, Follow, Source, read_follows, source_of
+from sources import (FOLLOWS_DIR, KEYS as SOURCE_KEYS, MIRROR, Follow, Source, mirror_folders,
+                     read_follows, source_of)
 
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
@@ -76,7 +81,9 @@ UPDATED_LINE_RE = re.compile(r"^updated: .*$", re.MULTILINE)
 # Legacy keys, renamed in the copy.
 LEGACY_KEYS = {"date": "created", "lastmod": "updated"}
 # Written by sync from a fork's source (sources.py); never read from the source repo.
-COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "source_kind", "follow_name", "follow_url")
+COMPUTED_KEYS = ("source_name", "source_rating", "source_follow", "source_original", "source_kind",
+                 "follow_name", "follow_url", "in_community")
+IN_COMMUNITY = "in_community: true"   # page-collections.html: the `community` collection
 
 
 @dataclass
@@ -237,7 +244,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | Non
                  moved: dict[str, str] | None = None) -> str:
     """`titles`: collects term_titles() of the page's tags, for write_term_pages().
     `title_from_heading`: params.titleFromHeading — False, the H1 is never the title.
-    `source`: the page's source_lines(), a follow's `follow_url:`.
+    `source`: the page's computed lines: source_lines(), a follow's `follow_url:`, IN_COMMUNITY.
     `moved`: folder_indexes(), whose links retarget_links() rewrites."""
     fm, body = split_front_matter(text)
     fm = drop_keys(rename_legacy_keys(fm), COMPUTED_KEYS)
@@ -292,6 +299,17 @@ def title_from_heading(src: Path) -> bool:
     return value
 
 
+def community_folder(src: Path) -> str:
+    """`params.communityFolder`: the repo's site settings, else hugo.toml's
+    default — slashes trimmed; "" is the root, as the remotes plugin's."""
+    with HUGO_CONFIG.open("rb") as f:
+        default = tomllib.load(f).get("params", {}).get("communityFolder", "")
+    value = site_params(src).get("communityFolder", default)
+    if not isinstance(value, str):
+        raise SystemExit(f"error: {SITE_CONFIG}: params.communityFolder must be a folder path")
+    return value.replace("\\", "/").strip().strip("/")
+
+
 def excluded_folders(src: Path) -> list[tuple[str, ...]]:
     """`params.excludeFolders` from the repo's site settings, as case-folded path parts.
 
@@ -340,6 +358,11 @@ def hidden_folders(src: Path, excluded: list[tuple[str, ...]] = (),
 
 def source_values(fm: str | None) -> dict[str, str]:
     return {k: front_matter_value(fm, k) for k in SOURCE_KEYS}
+
+
+def in_folders(rel: str, folders: list[str]) -> bool:
+    """`rel` is below one of `folders` (case-folded paths)."""
+    return any(rel.casefold().startswith(f + "/") for f in folders)
 
 
 def follows_of(src: Path, excluded: list[tuple[str, ...]], skip: set[str]) -> tuple[dict[str, Follow], set[str]]:
@@ -414,6 +437,9 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     follows, follow_pages = follows_of(src, excluded, skip)
     follow_by_path = {f.path: f for f in follows.values()}
     moved = folder_indexes(src, excluded, skip)
+    community = community_folder(src)
+    mirrors = mirror_folders(follows, community)
+    community_dirs = [community.casefold()] if community else list(mirrors)
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -457,8 +483,11 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                 computed.append(f"follow_name: {yaml_str(follow.name)}")
                 if follow.url:
                     computed.append(f"follow_url: {yaml_str(follow.url)}")
+            if in_folders(rel, community_dirs):
+                computed.append(IN_COMMUNITY)
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed, moved), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed, moved),
+                              encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
@@ -467,7 +496,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
             other_count += 1
 
     newest = newest_updated_by_folder(dest, pages)
-    md_count += add_missing_indexes(dest, resolver.built_at, newest)
+    md_count += add_missing_indexes(dest, resolver.built_at, newest, community_dirs)
     inherit_index_dates(indexes, newest)
     write_term_pages(dest, titles)   # after add_missing_indexes: tags/ is no section
     return md_count, other_count, unpublished
@@ -500,10 +529,12 @@ def inherit_index_dates(indexes: dict[Path, Stamp], newest: dict[Path, str]) -> 
             index.write_text(patched, encoding="utf-8")
 
 
-def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> int:
+def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str],
+                        community_dirs: list[str] = ()) -> int:
     """
     An `_index.md` for every folder with Markdown below it and none of its own —
-    Hugo needs one for a section. Dated by its newest page.
+    Hugo needs one for a section. Dated by its newest page; IN_COMMUNITY in a
+    community folder (`community_dirs`, case-folded), or the folder itself.
     """
     created = 0
     for d in sorted(p for p in dest.rglob("*") if p.is_dir()):
@@ -511,9 +542,11 @@ def add_missing_indexes(dest: Path, built_at: str, newest: dict[Path, str]) -> i
             continue
         title = d.name.replace("-", " ").replace("_", " ").strip()
         updated = newest.get(d, built_at)
+        folder = d.relative_to(dest).as_posix()
+        community = IN_COMMUNITY + "\n" if in_folders(folder + "/_index.md", community_dirs) else ""
         (d / "_index.md").write_text(
             f"---\ntitle: {yaml_str(title)}\ncreated: {updated}\n"
-            f"created_source: children\nupdated: {updated}\n---\n",
+            f"created_source: children\nupdated: {updated}\n{community}---\n",
             encoding="utf-8",
         )
         created += 1
