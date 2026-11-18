@@ -14,7 +14,7 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 
 ```txt
 scripts/sync_content.py     source repo -> build/content: titles, dates,
-                            hashtags, source_path, skips (incl. `publish: off`, `params.excludeFolders`, `params.skipFiles`);
+                            hashtags, source_path, folder notes (`is-folder-index`) -> _index.md, skips (incl. `publish: off`, `params.excludeFolders`, `params.skipFiles`);
                             reads `params.titleFromHeading`; a fork's or a mirror's source_* keys, a follow's `follow_name` and `url` -> `follow_url`
 scripts/sources.py          follows, forks, mirrors and the join: a fork's or a mirror's source, source rating, link to the original
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
@@ -32,6 +32,7 @@ tests/test_golden.py        example/txt through sync vs tests/golden/;
                             docstring: refreshing the snapshot
 tests/test_dates.py         the date ladder, which the golden test fixes
 tests/test_title.py         derive_title: the H1 on the first line only; titleFromHeading
+tests/test_folder_index.py  `is-folder-index: true`: a note as its folder's _index.md; links to it rewritten
 tests/test_exclude.py       params.excludeFolders (whole subtrees) and params.skipFiles, left out of sync
 tests/test_sources.py       sources.py: canonical URLs, follows, the join; what sync writes from it
 tests/test_hashtags.py       merge_tags: a `#` already in front matter `tags` is dropped; nested tags

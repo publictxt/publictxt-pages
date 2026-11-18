@@ -3,7 +3,12 @@
 sync_content.py — copy a PublicTxt/Obsidian repo into Hugo's content dir,
 fixing what Hugo can't handle natively. Never modifies the source; wipes dest.
 
-  * A folder's index is `_index.md`, Hugo's name, passed through as written.
+  * A folder's index is `_index.md`, Hugo's name, passed through as written —
+    or any note flagged `is-folder-index: true` (an Obsidian folder note,
+    `Design notes/Design notes.md`), written as its folder's `_index.md`. Its
+    title falls back to its own name; `source_path:` stays its real path; links
+    and embeds to it (`.md`, from any page) are rewritten to the `_index.md`.
+    Warns and keeps it a page when its folder has an index already.
   * No `title:` -> a `# H1` on the first non-blank line (removed from the
     body), else filename. An H1 further down stays a heading. Site settings
     `params.titleFromHeading = false`: always the filename, the H1 kept.
@@ -38,12 +43,14 @@ beside dest as `site.toml`, which build.py overlays on hugo.toml.
 Usage: python3 scripts/sync_content.py <source_repo> <dest_content_dir>
 """
 
+import posixpath
 import re
 import shutil
 import sys
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import unquote
 
 from dates import DateResolver, sort_key
 from hashtags import linkify, merge_tags, page_tags, term_titles
@@ -52,6 +59,8 @@ from sources import FOLLOWS_DIR, KEYS as SOURCE_KEYS, MIRROR, Follow, Source, re
 SKIP_DIRS = {".git", ".obsidian", ".trash", "_site", "node_modules"}
 HUGO_CONFIG = Path(__file__).resolve().parent.parent / "hugo.toml"   # the default params
 INDEX_NAMES = {"_index.md"}
+FOLDER_INDEX_KEY = "is-folder-index"   # a note to write as its folder's _index.md
+TRUE = {"true", "yes", "on", "1"}
 SITE_CONFIG = "settings/site.toml"   # in the source repo; -> <dest>/../site.toml
 # `publish:` values that keep a page off the site (YAML reads off/no as false).
 UNPUBLISHED = {"off", "false", "no", "0"}
@@ -98,6 +107,48 @@ def front_matter_value(fm: str | None, key: str) -> str:
 def is_unpublished(text: str) -> bool:
     fm, _ = split_front_matter(text)
     return front_matter_value(fm, "publish").lower() in UNPUBLISHED
+
+
+def is_folder_index(fm: str | None) -> bool:
+    return front_matter_value(fm, FOLDER_INDEX_KEY).lower() in TRUE
+
+
+# A link or embed destination, `<…>` or bare, in the regions hashtags.py
+# protects too: code is left alone, so a link shown as code stays as written.
+LINK_DEST_RE = re.compile(
+    r"(?P<code>```.*?```|~~~.*?~~~|`[^`\n]*`)"
+    r"|(?P<open>!?\[[^\]\n]*\]\()(?P<dest><[^>\n]*>|[^)\s]*)",
+    re.DOTALL,
+)
+
+
+def retarget_links(body: str, rel: str, moved: dict[str, str]) -> str:
+    """`.md` links and embeds in the page at `rel` that reach a note in `moved`
+    (case-folded source path -> its `_index.md` path) point at the index instead,
+    the folder part kept as written. Resolved as Hugo's link hook does: relative
+    to the page's folder, or from the root with a leading `/`."""
+    if not moved:
+        return body
+
+    def repl(m: re.Match) -> str:
+        dest = m.group("dest")
+        if dest is None:
+            return m.group(0)
+        angled = dest.startswith("<")
+        raw = dest[1:-1] if angled else dest
+        path, hash_, frag = raw.partition("#")
+        if not path.lower().endswith(".md") or "://" in path:
+            return m.group(0)
+        plain = unquote(path)
+        target = (plain.lstrip("/") if plain.startswith("/")
+                  else posixpath.normpath(posixpath.join(posixpath.dirname(rel), plain)))
+        if target.casefold() not in moved:
+            return m.group(0)
+        folder = path[:path.rfind("/") + 1]
+        new = folder + "_index.md" + hash_ + frag
+        return m.group("open") + (f"<{new}>" if angled else new)
+
+    return LINK_DEST_RE.sub(repl, body)
 
 
 def lacks_bookmark_url(rel: str, fm: str | None, is_index: bool) -> bool:
@@ -182,10 +233,12 @@ def stamp_for(fm: str | None, path: Path, rel: str, resolver: DateResolver) -> S
 
 
 def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | None = None,
-                 title_from_heading: bool = True, source: list[str] = ()) -> str:
+                 title_from_heading: bool = True, source: list[str] = (),
+                 moved: dict[str, str] | None = None) -> str:
     """`titles`: collects term_titles() of the page's tags, for write_term_pages().
     `title_from_heading`: params.titleFromHeading — False, the H1 is never the title.
-    `source`: the page's source_lines(), a follow's `follow_url:`."""
+    `source`: the page's source_lines(), a follow's `follow_url:`.
+    `moved`: folder_indexes(), whose links retarget_links() rewrites."""
     fm, body = split_front_matter(text)
     fm = drop_keys(rename_legacy_keys(fm), COMPUTED_KEYS)
     if rel.startswith(FOLLOWS_DIR + "/"):
@@ -212,7 +265,7 @@ def normalise_md(text: str, rel: str, stamp: Stamp, titles: dict[str, str] | Non
         added.append(f"source_path: {yaml_str(rel)}")
     added.extend(source)
 
-    body = linkify(body)
+    body = linkify(retarget_links(body, rel, moved or {}))
 
     fm_lines = [l for l in (fm or "").split("\n") if l.strip()] + added
     if titles is not None:
@@ -307,6 +360,36 @@ def follows_of(src: Path, excluded: list[tuple[str, ...]], skip: set[str]) -> tu
     return follows, published
 
 
+def folder_indexes(src: Path, excluded: list[tuple[str, ...]], skip: set[str]) -> dict[str, str]:
+    """Notes flagged `is-folder-index`, case-folded source path -> the `_index.md`
+    each is written as. Not when the folder has a published `_index.md` (or an
+    earlier flagged note, by name): warned, it stays a page. Unpublished or left out:
+    not an index."""
+    found: dict[str, str] = {}
+    claimed: dict[str, str] = {}   # folder -> the note that took it
+    for md in sorted(src.rglob("*.md")):
+        rel = md.relative_to(src)
+        if (not md.is_file() or md.name in INDEX_NAMES or md.name.casefold() in skip
+                or any(p in SKIP_DIRS for p in rel.parts) or is_excluded(rel, excluded)):
+            continue
+        text = md.read_text(encoding="utf-8")
+        if is_unpublished(text) or not is_folder_index(split_front_matter(text)[0]):
+            continue
+        folder = rel.parent.as_posix()
+        index = (rel.parent / "_index.md").as_posix()
+        own = md.parent / "_index.md"
+        if own.is_file() and not is_unpublished(own.read_text(encoding="utf-8")):
+            print(f"warning: {rel.as_posix()}: {FOLDER_INDEX_KEY}, but {index} is the folder's "
+                  "index — kept as a page", file=sys.stderr)
+        elif folder in claimed:
+            print(f"warning: {rel.as_posix()}: {FOLDER_INDEX_KEY}, but {claimed[folder]} is "
+                  "the folder's index already — kept as a page", file=sys.stderr)
+        else:
+            claimed[folder] = rel.as_posix()
+            found[rel.as_posix().casefold()] = index
+    return found
+
+
 def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[int, int, int]:
     """`resolver`: a test's fixed dates; default reads this repo's Git history."""
     if dest.exists():
@@ -330,6 +413,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
     from_heading = title_from_heading(src)
     follows, follow_pages = follows_of(src, excluded, skip)
     follow_by_path = {f.path: f for f in follows.values()}
+    moved = folder_indexes(src, excluded, skip)
 
     md_count = other_count = unpublished = 0
     pages: dict[Path, Stamp] = {}     # regular page -> stamp, for index inheritance
@@ -351,10 +435,10 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
             continue
 
         rel = path.relative_to(src).as_posix()
-        target = dest / rel
+        target = dest / moved.get(rel.casefold(), rel)
 
         if path.suffix.lower() == ".md":
-            is_index = path.name in INDEX_NAMES
+            is_index = path.name in INDEX_NAMES or rel.casefold() in moved
             text = path.read_text(encoding="utf-8")
             if is_unpublished(text):
                 unpublished += 1
@@ -374,7 +458,7 @@ def sync(src: Path, dest: Path, resolver: DateResolver | None = None) -> tuple[i
                 if follow.url:
                     computed.append(f"follow_url: {yaml_str(follow.url)}")
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed), encoding="utf-8")
+            target.write_text(normalise_md(text, rel, stamp, titles, from_heading, computed, moved), encoding="utf-8")
             (indexes if is_index else pages)[target] = stamp
             md_count += 1
         else:
