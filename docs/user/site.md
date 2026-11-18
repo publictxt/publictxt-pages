@@ -96,8 +96,8 @@ appears under Filters, in lists and in search:
 - A mirror's or a fork's card says **from** *source* — a link to the follow's note; hover for the
   repo, your rating and the follow's description. Its page shows the source's rating too.
 
-Pages under `community/` — mirrors: pages from repos you follow, as their authors wrote
-them — are left out of lists and search to start with: **community** shows crossed out
+Pages in the community folder (`community/`, or [`communityFolder`](configuration.md#browse-lists)) —
+mirrors: pages from repos you follow, as their authors wrote them — are left out of lists and search to start with: **community** shows crossed out
 under Collection; click it to bring them in. The Community section itself always lists
 them. Forks live in your own folders and are yours to show, and do. ([`hiddenCollections`](configuration.md#browse-lists).)
 

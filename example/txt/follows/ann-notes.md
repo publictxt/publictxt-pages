@@ -16,4 +16,7 @@ mirrored, such as [Plain text tools](<../community/ann-notes/wiki/Plain text too
 Its `description` is the tooltip on a fork card's source chip, with the repo and the
 rating; the rating is shown here as the source's, and the page itself is unrated.
 
-Other keys (`folder`) belong to the tool that fetched the repo; the site ignores them.
+Its `folder` is its mirror folder's name under the community folder, where the
+mirroring tool puts its pages (without it, the follow's name); a `branch` would be
+the branch followed. The site reads both to link a page that wasn't mirrored to the
+original.

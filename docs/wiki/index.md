@@ -15,8 +15,10 @@ Hugo never reads the source repo — only what sync writes: `build/content/`, `b
 ```txt
 scripts/sync_content.py     source repo -> build/content: titles, dates,
                             hashtags, source_path, folder notes (`is-folder-index`) -> _index.md, skips (incl. `publish: off`, `params.excludeFolders`, `params.skipFiles`);
-                            reads `params.titleFromHeading`; a fork's or a mirror's source_* keys, a follow's `follow_name` and `url` -> `follow_url`
-scripts/sources.py          follows, forks, mirrors and the join: a fork's or a mirror's source, source rating, link to the original
+                            reads `params.titleFromHeading`; a fork's or a mirror's source_* keys, a follow's `follow_name` and `url` -> `follow_url`;
+                            `in_community` (`params.communityFolder`); links to pages not mirrored -> the original
+scripts/sources.py          follows, forks, mirrors and the join: a fork's or a mirror's source, source rating, link to the original;
+                            follows' mirror folders
 scripts/dates.py            created/updated ladders, one git log pass, sort_key
 scripts/hashtags.py         HASHTAG_RE; linkify (body), merge_tags (front matter `tags`); nested tags + parents, flat keys
 scripts/build.py            full pipeline, any OS, + search index check; docstring has usage
@@ -86,7 +88,7 @@ layouts/_partials/
   pagefind-keys.html    hidden sort keys + filters — see traps.md
   bookmark-urls.html    only reader of bookmark:/bookmarks:
   bookmark-links.html   the chip row
-  page-collections.html only reader of collections:; + section, "bookmarks" if URL
+  page-collections.html only reader of collections:; + section, "bookmarks" if URL, "community" if in_community
   collection-pages.html every page of a collection        (partialCached)
   section-pages.html    what a section lists, + its scope
   bookmark-label.html   one URL's short form (returns it)

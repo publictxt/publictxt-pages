@@ -17,6 +17,12 @@ the follow, at the path it has in that repo. Its **source** is the follow
 to the original, at the commit it was mirrored at. Its source rating is the follow's
 `rating` (4); its own `rating` (5) is its author's.
 
-`community` is a hidden collection: its pages are left out of lists and search until
-a reader asks for them, and always listed in the Community section itself. With no
-date of its own, this page shows **mirrored** and the date it arrived.
+`community` is a hidden collection: the pages in the community folder
+(`params.communityFolder`), left out of lists and search until a reader asks for
+them, and always listed in the Community section itself. With no date of its own,
+this page shows **mirrored** and the date it arrived.
+
+The mirroring tool points a mirror's links at where each page's mirror is or would
+be, by its full path: [Federated wikis](community/ann-notes/wiki/Federated%20wikis.md)
+wasn't mirrored here — this author forked it — so the site links the original instead,
+at the commit this page came from.

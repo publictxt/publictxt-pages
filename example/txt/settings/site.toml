@@ -18,6 +18,9 @@
 #   titleFromHeading = false
 #   description = "Plain-text notes, published."
 #   sectionOrder = ["blog", "wiki", "notes"]
+  # Where obsidian-publictxt-remotes mirrors pages: its Community folder setting.
+  # Its pages are the hidden `community` collection; "" is the repo root.
+#   communityFolder = "community"
 
 # [[params.chipFacets]]
 #   key = "collection"

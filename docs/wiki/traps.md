@@ -54,6 +54,11 @@ search on it, `?copy-not=mirrored` included. It is not `arrived`, the
 date's word, which only an undated fork or mirror has (`date-labels.html`); both come
 from `fork-source.html`'s `mirror`.
 
+The `community` collection is named twice: `page-collections.html` adds it from sync's
+`in_community` (`params.communityFolder`, read by `sync_content.py`, not Hugo), and
+`hiddenCollections`' default hides it. `communityFolder` must match the remotes plugin's
+Community folder by hand; nothing checks.
+
 `params.hiddenCollections` is hidden three times over, by one rule — a list with some
 pages of the collection, not all: `list-container.html` (the no-JS list), `list.js` and
 `search.js` (the default chip state, `hideByDefault()`). Anything else that lists pages
