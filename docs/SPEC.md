@@ -13,7 +13,7 @@ Items marked **(TBD)** are not built.
   - The sidebar lists sections by folder name, in `params.sectionOrder`. (TBD-ISSUE)
   - Top-level sections list every page of their [collection](#collections), wherever filed.
   - Contents views below a section's index body (server-rendered, not search-indexed):
-    - Folder tree for `treeSections` (default wiki).
+    - Folder tree for `treeSections` (default wiki, community).
     - Timeline by date for `timelineSections` (default blog, posts) once the list spans two or more months.
   - Sections move to specialised Views over Collections (TBD)
     - Blog view: timeline-like, toggling collections (a page's shared timeline already does this for `timelineCollections`).

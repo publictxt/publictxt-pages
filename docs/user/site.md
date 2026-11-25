@@ -33,7 +33,7 @@ page, newest first ([`listOrder`](configuration.md#browse-lists)), with the full
 `/blog/`, `/wiki/`, and every sub-folder:
 
 1. The folder's `_index.md` text
-2. For a [tree section](configuration.md#timeline-and-folder-tree) (default `wiki`): its
+2. For a [tree section](configuration.md#timeline-and-folder-tree) (default `wiki`, `community`): its
    sub-folders, one level open
 3. The browse list — for a top-level section, every page in its
    [collection](writing.md#collections), wherever filed; for a sub-folder, only what's
@@ -116,7 +116,7 @@ Below that, **where it sits**:
   [`timelineCollections`](configuration.md#timeline-and-folder-tree) (default `blog`,
   `posts`) share one timeline, with a chip per collection — and per `timelineTags` tag —
   to narrow it.
-- **Folder tree** — for tree sections (default `wiki`): folders then pages, A→Z, open
+- **Folder tree** — for tree sections (default `wiki`, `community`): folders then pages, A→Z, open
   along the page's path. Reference material is read by place, not date.
 
 Root-level pages get neither.

@@ -261,6 +261,19 @@ class SiteIndexTest(unittest.TestCase):
         self.assertIn('<a href="/wiki/pipeline/dates/">Dates</a>', tree)
         self.assertIn('href="/wiki/projects/">Projects</a><span class="count">4</span>', tree)
 
+    def test_community_tree(self):
+        """The community folder, outside treeSections: a mirror gets its tree, the folder its contents."""
+        html = self.html("community", "ann-notes", "wiki", "plain-text-tools")
+        tree = re.search(r'<details class="timeline fold tree".*?</nav>', html, re.S)
+        self.assertIsNotNone(tree, "no community tree")
+        self.assertNotIn("data-page-timeline", html)
+        self.assertIn('<span class="side-heading">Community tree</span>', tree[0])
+        self.assertEqual(self.rows(tree[0], "on"), ["/community/ann-notes/", "/community/ann-notes/wiki/"])
+        self.assertEqual(self.current(tree[0]), ["/community/ann-notes/wiki/plain-text-tools/"])
+        top = re.search(r'<details class="tree contents fold" open>.*?</nav>', self.html("community"), re.S)
+        self.assertIsNotNone(top, "no community contents")
+        self.assertEqual(self.rows(top[0], "open"), ["/community/ann-notes/"])
+
     def test_timeline_outside_tree_sections(self):
         """A page outside params.treeSections keeps its timeline."""
         html = self.html("notes", "sample")

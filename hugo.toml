@@ -50,8 +50,9 @@ capitalizeListTitles = false
   timelineTags = ["journal"]
   # Top-level sections (folder names) whose pages show a folder tree of the
   # section in place of the timeline: reference material, read by place, not
-  # date. Empty = every page a timeline.
-  treeSections = ["wiki"]
+  # date. Empty = every page a timeline. "community": mirrors, by the repo
+  # they came from — a communityFolder not at the top level isn't matched.
+  treeSections = ["wiki", "community"]
   # Top-level sections (folder names) whose folder pages (the section's and
   # each sub-folder's) show their pages by year and month, with titles, above
   # the browse list: a log, read by date. Shown across two months or more.
