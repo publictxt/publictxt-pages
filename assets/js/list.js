@@ -6,7 +6,7 @@
 //
 //   data-scope-kind   section | collection | tag | recent
 //   data-scope-value  a path, a collection, a tag, or a limit
-//   data-order        default sort (sorts.js); sticky pages top it only (stickyFirst)
+//   data-order        default sort (sorts.js); sticky pages top it and Newest only (pinsUnder)
 //   data-filter       default chip filters, as the URL spells them (`tag-not=journal`);
 //                     hidden collections (@params) are excluded on top
 //   data-per-page     cards per page, until the reader picks a size (page-size.js)
@@ -23,7 +23,7 @@ import { addsPages, chipFacets, facetValues, filterChip, foldHint, hideByDefault
 import { dock } from "./layout.js";
 import { pageHolding, pageSizes, readPageSize, writePageSize } from "./page-size.js";
 import { siteIndex, scope } from "./site-index.js";
-import { OWN_SOURCE, UNRATED, normaliseSort, parseSort, sortsFor, stickyFirst } from "./sorts.js";
+import { OWN_SOURCE, UNRATED, normaliseSort, parseSort, pinsUnder, sortsFor, stickyFirst } from "./sorts.js";
 import { monthCount, monthFilter, monthOf, renderTimeline, timeline } from "./timeline.js";
 
 const CHIPS = chipFacets(params.chipFacets);
@@ -383,7 +383,7 @@ async function mount(root) {
 
   function render(pushHistory) {
     const byPick = sorted(items.filter((it) => passes(it)), state.sort);
-    const filtered = state.sort === defaultSort ? stickyFirst(byPick) : byPick;
+    const filtered = pinsUnder(state.sort, defaultSort) ? stickyFirst(byPick) : byPick;
     const size = perPage || filtered.length || 1;
     const total = Math.max(1, Math.ceil(filtered.length / size));
     if (state.page > total) state.page = total;

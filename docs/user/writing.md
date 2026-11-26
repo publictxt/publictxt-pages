@@ -141,8 +141,8 @@ minimum-rating filter.
 
 Tag a page `#sticky` (or `tags: [sticky]`) to keep it at the top of every list it's
 in — home, its section, its tags — with a 📌 on its card in place of the `#sticky`
-chip. Sticky pages lead only while a list is in its default order; when a reader
-picks a sort, that sort decides. Filters still apply, and search ranks them like any
+chip. Sticky pages lead while a list is in its default order, or sorted Newest; any other
+sort a reader picks decides alone. Filters still apply, and search ranks them like any
 other page but shows the pin. The tag is set by [`stickyTag`](configuration.md#browse-lists).
 
 ## Links

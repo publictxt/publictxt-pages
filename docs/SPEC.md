@@ -44,7 +44,7 @@ Items marked **(TBD)** are not built.
   - Community filters: Source, Source rating — see Sources.
   - Filters: Collection, Category, Tag, Rating (`rating:` 1–5, minimum), and Year/month picked from the timeline.
   - Compact toggle for one-line cards.
-  - Sticky pages (tagged `#sticky`, `stickyTag`) top a list under its default sort, with a pin on their cards; a reader's own sort ignores it. Search shows the pin but doesn't sort on it. A toggle to keep them on top under every sort (TBD).
+  - Sticky pages (tagged `#sticky`, `stickyTag`) top a list under its default sort or Newest, with a pin on their cards; other sorts ignore it — Oldest, Recently updated and the rest ask a question a pin doesn't answer. Search shows the pin but doesn't sort on it.
 - Search
   - Full-text search via Pagefind.
   - Same facets and sorts as browse lists, usable without a query. Tags past the first 20 fold behind "more", as in lists. Date ranges (TBD).

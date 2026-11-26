@@ -8,7 +8,7 @@ import {
   addsPages, chipFacets, describe, facetValues, hideByDefault, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
-import { normaliseSort, parseSort, sortLabel, sortsFor, stickyFirst, SORTS } from "../../assets/js/sorts.js";
+import { normaliseSort, parseSort, sortLabel, pinsUnder, sortsFor, stickyFirst, SORTS } from "../../assets/js/sorts.js";
 
 const qs = (s) => new URLSearchParams(s);
 const url = (f) => { const p = new URLSearchParams(); writeFacet(p, f); return p.toString(); };
@@ -238,4 +238,10 @@ test("stickyFirst: sticky pages first, each part's order kept (sticky-first.html
   const items = [{ t: "a" }, { t: "b", sticky: true }, { t: "c" }, { t: "d", sticky: true }];
   assert.deepEqual(stickyFirst(items).map((it) => it.t), ["b", "d", "a", "c"]);
   assert.deepEqual(items.map((it) => it.t), ["a", "b", "c", "d"]);   // not in place
+});
+
+test("pinsUnder: the list's default sort, or Newest; nothing else", () => {
+  assert.equal(pinsUnder("title", "title"), true);
+  assert.equal(pinsUnder("created", "title"), true);
+  for (const s of ["created asc", "updated", "updated asc", "rating", "title desc"]) assert.equal(pinsUnder(s, "title"), false, s);
 });
