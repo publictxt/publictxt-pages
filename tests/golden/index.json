@@ -422,7 +422,7 @@
   "createdLabel": "1 Jan 2025",
   "section": "",
   "sticky": true,
-  "summary": "What publictxt-pages doesn’t do yet — a root-level page outside any section. SPEC.md has the full list.\nTagged #sticky, so it tops every list it’s in, under the …",
+  "summary": "What publictxt-pages doesn’t do yet — a root-level page outside any section. SPEC.md has the full list.\nPinned to the top of lists: #sticky\nNext [[wikilink]] conversion at …",
   "tags": [
    "sticky"
   ],

@@ -8,7 +8,7 @@ tags: ["sticky"]
 ---
 What publictxt-pages doesn't do yet — a root-level page outside any section. [SPEC.md](https://github.com/publictxt/publictxt-pages/blob/main/docs/SPEC.md) has the full list.
 
-Tagged [#sticky](/tags/sticky/), so it tops every list it's in, under the list's own order, with a pin on its card.
+Pinned to the top of lists: [#sticky](/tags/sticky/)
 
 ## Next
 - `[[wikilink]]` conversion at sync — [Other Software](wiki/Projects/PublicTxt/Other%20Software.md) writes them
