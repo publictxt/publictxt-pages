@@ -39,9 +39,10 @@ export function parseSort(s) {
 }
 
 // Sticky pages (sticky.html) first, each part's order kept — under a list's
-// default sort, or Newest; any other pick is the reader's question, a pin no
-// answer to it. As sticky-first.html, for the no-JS lists (default order).
-export const pinsUnder = (sort, defaultSort) => sort === defaultSort || sort === "created";
+// default sort, or a newest-first date sort (Newest, Recently updated): what's
+// current. Oldest-first, title and rating picks are the reader's question, a
+// pin no answer to it. As sticky-first.html, for the no-JS lists (default order).
+export const pinsUnder = (sort, defaultSort) => sort === defaultSort || sort === "created" || sort === "updated";
 export function stickyFirst(items) {
   return [...items.filter((it) => it.sticky), ...items.filter((it) => !it.sticky)];
 }

@@ -240,8 +240,9 @@ test("stickyFirst: sticky pages first, each part's order kept (sticky-first.html
   assert.deepEqual(items.map((it) => it.t), ["a", "b", "c", "d"]);   // not in place
 });
 
-test("pinsUnder: the list's default sort, or Newest; nothing else", () => {
+test("pinsUnder: the list's default sort, or a newest-first date sort; nothing else", () => {
   assert.equal(pinsUnder("title", "title"), true);
   assert.equal(pinsUnder("created", "title"), true);
-  for (const s of ["created asc", "updated", "updated asc", "rating", "title desc"]) assert.equal(pinsUnder(s, "title"), false, s);
+  assert.equal(pinsUnder("updated", "title"), true);
+  for (const s of ["created asc", "updated asc", "rating", "title desc"]) assert.equal(pinsUnder(s, "title"), false, s);
 });

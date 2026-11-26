@@ -6,7 +6,7 @@
 //
 //   data-scope-kind   section | collection | tag | recent
 //   data-scope-value  a path, a collection, a tag, or a limit
-//   data-order        default sort (sorts.js); sticky pages top it and Newest only (pinsUnder)
+//   data-order        default sort (sorts.js); sticky pages top it, Newest and Recently updated only (pinsUnder)
 //   data-filter       default chip filters, as the URL spells them (`tag-not=journal`);
 //                     hidden collections (@params) are excluded on top
 //   data-per-page     cards per page, until the reader picks a size (page-size.js)
