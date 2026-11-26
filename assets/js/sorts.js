@@ -38,6 +38,13 @@ export function parseSort(s) {
   return { field, dir: dir || (field === "title" ? "asc" : "desc") };
 }
 
+// Sticky pages (sticky.html) first, each part's order kept: lists do this
+// under their default sort only — a reader's own pick is theirs.
+// As sticky-first.html, for the no-JS lists.
+export function stickyFirst(items) {
+  return [...items.filter((it) => it.sticky), ...items.filter((it) => !it.sticky)];
+}
+
 export function sortLabel(s) {
   return (SORTS.find(([v]) => v === s) || [, s])[1];
 }

@@ -1,0 +1,12 @@
+{{/*
+  Is the page sticky — tagged sticky-tag.html's tag (params.stickyTag;
+  matched case-insensitively, the whole tag: `sticky/x` is not it)? A sticky page tops browse lists under their
+  default sort (list.js; list-container.html's no-JS list, home's too) and
+  wears a pin on its card (cards.js), where the tag's own chip is left off.
+  Search sorts it as any page (one Pagefind sort key), pin shown.
+  Expects a page; returns a bool.
+*/}}
+{{ $tag := partialCached "sticky-tag.html" site }}
+{{ $out := false }}
+{{ if $tag }}{{ range .GetTerms "tags" }}{{ if eq (lower .LinkTitle) $tag }}{{ $out = true }}{{ end }}{{ end }}{{ end }}
+{{ return $out }}

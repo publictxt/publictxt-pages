@@ -252,9 +252,10 @@ function resultCard(d) {
     updatedLabel: d.meta?.updated_label || "",
     arrived: d.meta?.arrived || "",
     rating: Number(d.meta?.rating) || 0,
+    sticky: Boolean(d.meta?.sticky),
     source: (d.filters?.source || []).find((s) => s !== SOURCE?.missing) || "",
   };
-  return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "", sources: params.sources });
+  return card(item, { activeTags: state.tag?.inc, onTag: toggleTag, summaryHTML: d.excerpt || "", sources: params.sources, stickyTag: params.stickyTag });
 }
 
 // ---- wiring -------------------------------------------------------------

@@ -1,0 +1,9 @@
+{{/*
+  The only reader of params.stickyTag: the tag that makes a page sticky,
+  lower-cased; default "sticky", "" = no sticky pages. For sticky.html and
+  js-params.html (cards leave its chip off a sticky card). Expects nothing;
+  returns a string.
+*/}}
+{{ $tag := "sticky" }}
+{{ if isset site.Params "stickytag" }}{{ $tag = printf "%v" site.Params.stickyTag }}{{ end }}
+{{ return (strings.TrimSpace $tag | lower) }}

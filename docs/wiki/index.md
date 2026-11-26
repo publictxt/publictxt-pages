@@ -102,6 +102,9 @@ layouts/_partials/
   categories.html       only reader of categories:/category:
   category-counts.html  used categories + counts, for the sidebar (partialCached)
   rating.html           only reader of rating: — but a follow's, which is follow.html's
+  sticky-tag.html       only reader of params.stickyTag (returns it, lower-cased)   (partialCached)
+  sticky.html           is a page sticky — tagged it? (returns a bool)
+  sticky-first.html     pages, sticky ones first: the no-JS lists' order
   note-embed.html       ![](page.md) -> the page's content boxed; inline/unresolved -> link
   attachment-url.html   relative file path -> its URL: beside the note, or a top-level folder (returns it)
 
@@ -128,8 +131,8 @@ layouts/_markup/
 assets/js/site-index.js   fetch index.json (recent-first) once per document; scope() subsets
 assets/js/layout.js       breakpoints for JS; dock(): filters right column <-> page flow
 assets/js/nav.js          ☰: collapse the nav (wide), drawer (narrower); blocking, in <head>
-assets/js/sorts.js        the sort vocabulary, ?sort= spellings
-assets/js/cards.js        the one card renderer; rating filter value; density toggle
+assets/js/sorts.js        the sort vocabulary, ?sort= spellings; stickyFirst()
+assets/js/cards.js        the one card renderer (a sticky card's pin); rating filter value; density toggle
 assets/js/page-size.js    lists' page size: the reader's remembered pick, its choices
 assets/js/facets.js       chip facets from config; include, exclude, match any/all; rating
                           chips; remembered section folds — shared by lists and search

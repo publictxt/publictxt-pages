@@ -137,6 +137,14 @@ Categories must be on the [configured list](configuration.md#categories) (else i
 with a build warning). Ratings show as stars and drive *Top rated* sorting and a
 minimum-rating filter.
 
+## Sticky pages
+
+Tag a page `#sticky` (or `tags: [sticky]`) to keep it at the top of every list it's
+in — home, its section, its tags — with a 📌 on its card in place of the `#sticky`
+chip. Sticky pages lead only while a list is in its default order; when a reader
+picks a sort, that sort decides. Filters still apply, and search ranks them like any
+other page but shows the pin. The tag is set by [`stickyTag`](configuration.md#browse-lists).
+
 ## Links
 
 Use relative Markdown links — Obsidian writes these with the setup in

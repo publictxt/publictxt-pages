@@ -6,8 +6,10 @@
     months      month-names.html — for timeline.js
     hiddenCollections  hidden-collections.html
     sources     sources.html — for cards' source chips
+    stickyTag   sticky-tag.html — cards leave its chip off sticky pages
   Expects the surface, "lists", "search" or "page" — unused yet, for per-surface
   settings.
 */}}
 {{ return dict "chipFacets" (partialCached "chip-facets.html" site) "months" (partialCached "month-names.html" site)
-  "hiddenCollections" (partialCached "hidden-collections.html" site) "sources" (partialCached "sources.html" site) }}
+  "hiddenCollections" (partialCached "hidden-collections.html" site) "sources" (partialCached "sources.html" site)
+  "stickyTag" (partialCached "sticky-tag.html" site) }}
