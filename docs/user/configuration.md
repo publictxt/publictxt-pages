@@ -130,8 +130,12 @@ logs, or a **folder tree** for reference material. See [The published site](site
   timelineTags = ["journal"]
 
   # Sections whose pages show a folder tree instead of the timeline.
-  treeSections = ["wiki"]
+  treeSections = ["wiki", "community"]
 ```
+
+`treeSections` names top-level folders. The default's `community` is the
+[community folder](#browse-lists): mirrors, browsed by the repo they came from. With
+`communityFolder` nested or `""`, list the top-level folder(s) holding mirrors instead.
 
 ## Categories
 
@@ -254,7 +258,7 @@ title = "Jo's notes"
   sectionOrder = ["blog", "wiki", "bookmarks", "notes"]
   timelineCollections = ["blog"]
   timelineTags = []
-  treeSections = ["wiki"]
+  treeSections = ["wiki", "community"]
   excludeFolders = ["settings/Templates"]
   skipFiles = ["CNAME", ".gitignore", "README.md"]
   pagerSize = 30
