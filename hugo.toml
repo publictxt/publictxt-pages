@@ -70,8 +70,8 @@ capitalizeListTitles = false
   # more" — until a reader picks their own (remembered in their browser).
   # Not Hugo's [pagination] pagerSize: lists page in the browser.
   pagerSize = 20
-  # Pages with this tag (case aside) top every list under its default order,
-  # Newest and Recently updated, pinned on their cards; other sorts ignore it. "" = none.
+  # The tag (case aside) that pins a page atop lists — docs/user/writing.md,
+  # Sticky pages. "" = none.
   stickyTag = "sticky"
 
   # Collections left out of lists and search by default — excluded in the

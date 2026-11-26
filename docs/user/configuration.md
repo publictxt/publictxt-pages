@@ -78,9 +78,8 @@ Site-wide defaults for home, every section and every tag list:
 
 `created` and `updated` default newest first, `title` A→Z, `rating` top first.
 
-`stickyTag` (default `"sticky"`) — pages with this tag go to the top of every list
-they're in, under the list's default order, Newest and Recently updated; `""` turns it off. See
-[Sticky pages](writing.md#sticky-pages).
+`stickyTag` (default `"sticky"`) — the tag that makes a page
+[sticky](writing.md#sticky-pages); `""` turns it off.
 
 **Per section**: in a folder's `_index.md` front matter. Applies to that folder and
 every folder below it, unless one sets its own.
