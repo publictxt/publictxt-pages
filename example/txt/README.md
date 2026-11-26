@@ -44,6 +44,7 @@ git diff tests/golden                                  # read it: every change s
 | YouTube and audio embeds in image syntax; note embed `![](page.md)`, and inline as a link | `notes/embeds.md` |
 | ` ```dataview ` tag list, with `LIMIT`; unsupported query left as code | `notes/tag-lists.md` |
 | `[[wikilinks]]`, dangling and cross-section links | `Roadmap.md`, `wiki/Projects/PublicTxt/*`, `blog/2023/12/17/20231217.md` |
+| A sticky page (`#sticky`, `params.stickyTag`): first in lists, pinned card |  `Roadmap.md` |
 | Root-level pages | `_index.md`, `Roadmap.md`, `online-things.md` |
 | Skipped: this README (`skipFiles`), `CNAME`, `.obsidian/` | — |
 | Non-Markdown copied verbatim | `media/icon.png`; beside a note in a section, `notes/pipeline.png` |

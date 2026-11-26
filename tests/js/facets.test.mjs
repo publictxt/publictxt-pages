@@ -8,7 +8,7 @@ import {
   addsPages, chipFacets, describe, facetValues, hideByDefault, matches, pagefindConditions, press, ratingCounts, readFacet, toggleInclude,
   writeFacet,
 } from "../../assets/js/facets.js";
-import { normaliseSort, parseSort, sortLabel, sortsFor, SORTS } from "../../assets/js/sorts.js";
+import { normaliseSort, parseSort, sortLabel, pinsUnder, sortsFor, stickyFirst, SORTS } from "../../assets/js/sorts.js";
 
 const qs = (s) => new URLSearchParams(s);
 const url = (f) => { const p = new URLSearchParams(); writeFacet(p, f); return p.toString(); };
@@ -232,4 +232,17 @@ test("rating chips count that rating or better; unrated stays exact", () => {
   const c = ratingCounts({ 5: 2, 3: 1, unrated: 4 });
   assert.deepEqual(c, { 1: 3, 2: 3, 3: 3, 4: 2, 5: 2, unrated: 4 });   // ★4+ counts the 5s
   assert.equal(ratingCounts({}).unrated, 0);
+});
+
+test("stickyFirst: sticky pages first, each part's order kept (sticky-first.html)", () => {
+  const items = [{ t: "a" }, { t: "b", sticky: true }, { t: "c" }, { t: "d", sticky: true }];
+  assert.deepEqual(stickyFirst(items).map((it) => it.t), ["b", "d", "a", "c"]);
+  assert.deepEqual(items.map((it) => it.t), ["a", "b", "c", "d"]);   // not in place
+});
+
+test("pinsUnder: the list's default sort, or a newest-first date sort; nothing else", () => {
+  assert.equal(pinsUnder("title", "title"), true);
+  assert.equal(pinsUnder("created", "title"), true);
+  assert.equal(pinsUnder("updated", "title"), true);
+  for (const s of ["created asc", "updated asc", "rating", "title desc"]) assert.equal(pinsUnder(s, "title"), false, s);
 });

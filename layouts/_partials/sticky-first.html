@@ -1,0 +1,8 @@
+{{/*
+  Pages, sticky ones (sticky.html) first, each part in its given order — the
+  no-JS lists' default-sort order, as list.js's. Expects a page collection;
+  returns a slice.
+*/}}
+{{ $sticky := slice }}{{ $rest := slice }}
+{{ range . }}{{ if partial "sticky.html" . }}{{ $sticky = $sticky | append . }}{{ else }}{{ $rest = $rest | append . }}{{ end }}{{ end }}
+{{ return ($sticky | append $rest) }}

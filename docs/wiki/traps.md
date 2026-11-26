@@ -29,6 +29,7 @@ search. Add one to both, or search cards go without it. What's still implemented
 | `source-rating` `"none"` on this repo's own pages, in `pagefind-keys.html` | `NO_SOURCE` in `cards.js`; `sourceRatingPasses()` is the lists' rule, `pagefindFilters()` search's |
 | `created`'s `2006-01-…` form in `list-json.html` | `monthOf()` in `timeline.js` reads its digits |
 | Pagefind `month` filter, `"2006-01"`, in `pagefind-keys.html` | `countsTree()` in `timeline.js`, `?year=&month=` → `month` in `search.js` |
+| sticky pages first: `sticky-first.html` (no-JS lists, home's: the default order) | `stickyFirst()` in `sorts.js`, under the default sort, Newest or Recently updated (`pinsUnder()`), in `list.js` `render()`; search doesn't (one Pagefind sort key) |
 | `timeline/content.html`: grouping (year, month, newest first, undated out, ≥2 months) and markup (`.tl-*` classes; no sparklines or month bars) | `timeline()`, `monthCount()` and `renderTimeline()` in `timeline.js`; `main.css` styles both |
 
 A nested tag's `/` is `--` in its term key and URL: `term_key()`/`tag_path()` in

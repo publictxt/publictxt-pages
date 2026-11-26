@@ -7,7 +7,8 @@
   Client-side, not .Paginate: that fixes order and membership at build time,
   so sorting and filtering could only act on one page.
   Expects a dict:
-    pages    — the page collection, in the order the fallback should show
+    pages    — the page collection, in the order the fallback should show;
+               sticky pages are moved first (sticky-first.html)
     scope    — dict: kind (section | collection | tag | recent), value
     order    — default sort (see list.js), optional
     filter   — default chip filters, URL-spelled (list-filter.html), optional
@@ -23,7 +24,7 @@
     {{- if lt (len $in) (len $.pages) }}{{ $skip = $skip | append $in }}{{ end -}}
   {{- end }}
   <ul class="link-list">
-    {{ range .pages | complement $skip }}
+    {{ range partial "sticky-first.html" (.pages | complement $skip) }}
     <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> {{ range partial "page-collections.html" . }}<span class="chip chip-collection">{{ . }}</span> {{ end }}{{ partial "page-date.html" (dict "page" .) }}</li>
     {{ end }}
   </ul>

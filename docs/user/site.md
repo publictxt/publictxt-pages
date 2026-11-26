@@ -46,7 +46,8 @@ Breadcrumbs above every page but home trace the folders.
 Home, section and tag lists share one interface.
 
 **Sort**: Newest, Oldest, Title, Recently updated, Top/Lowest rated (unrated counts as
-2.5). Starts at the [configured order](configuration.md#browse-lists).
+2.5). Starts at the [configured order](configuration.md#browse-lists), with
+[sticky pages](writing.md#sticky-pages) (📌) first there and under Newest and Recently updated; other sorts ignore them.
 
 **Show**, beside sort: cards per page — 10, 20, 50 or All, plus the list's own
 [default](configuration.md#browse-lists). Changing it keeps the cards you were looking at

@@ -1,7 +1,7 @@
 // The one page card, for list.js and search.js. Item shape = index.json's
 // (list-json.html): { url, title, collections[], section, tags[], categories[],
 // created, updated, year, createdLabel, updatedLabel, arrived, copy, summary,
-// bookmarks[{url, label}], rating, source, sourceRating }. `source`: a fork's (the repo its
+// bookmarks[{url, label}], rating, source, sourceRating, sticky }. `sticky`: true on a sticky page (sticky.html), else absent. `source`: a fork's (the repo its
 // text came from), `sourceRating` that repo's 1–5; both absent on this repo's own pages. Display values come from Hugo; JS never
 // formats a date or a label.
 
@@ -100,18 +100,20 @@ function sourceChip(name, sources) {
  *   summaryHTML  pre-rendered HTML (a search excerpt with <mark>) in place of item.summary
  *   sources      @params' sources (sources.html), for the source chip: a link to
  *                the follow's page, the repo's details its tooltip
+ *   stickyTag    @params' stickyTag: a sticky card's chip for it is left off — the pin says it
  */
 export function card(item, opts = {}) {
   const li = document.createElement("li");
-  li.className = "page-card";
-  const tags = item.tags || [];
+  li.className = item.sticky ? "page-card sticky" : "page-card";
+  const pinTag = item.sticky && opts.stickyTag ? opts.stickyTag.toLowerCase() : null;
+  const tags = (item.tags || []).filter((t) => t.toLowerCase() !== pinTag);
   const active = opts.activeTags || new Set();
   const tagChip = (t) => opts.onTag
     ? `<button type="button" class="chip filter-chip${active.has(t) ? " active" : ""}" data-tag="${escapeHTML(t)}" aria-pressed="${active.has(t)}">#${escapeHTML(t)}</button>`
     : `<a class="chip" href="${escapeHTML(tagURL(t))}">#${escapeHTML(t)}</a>`;
   li.innerHTML = `
     <div class="page-card-head">
-      <a class="page-card-title" href="${escapeHTML(item.url)}">${escapeHTML(item.title || item.url)}</a>
+      <a class="page-card-title" href="${escapeHTML(item.url)}">${item.sticky ? `<span class="page-card-pin" role="img" aria-label="Sticky" title="Sticky">📌</span> ` : ""}${escapeHTML(item.title || item.url)}</a>
       ${(item.collections || []).length ? `<span class="page-card-collections">${item.collections.map((t) =>
         `<span class="chip chip-collection">${escapeHTML(t)}</span>`).join("")}</span>` : ""}
     </div>

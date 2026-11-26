@@ -12,7 +12,8 @@
   repo's pages, which no source rating filter matches — NO_SOURCE in cards.js;
   its sort key 6 for them, above any source, 2.5 unrated — OWN_SOURCE, UNRATED in sorts.js), and
   category — one span per value, as an attribute holds only one. Meta: the
-  date labels (date-labels.html; `arrived`, "forked" or "mirrored", when the date is a fork's or a mirror's arrival) and rating, for result cards.
+  date labels (date-labels.html; `arrived`, "forked" or "mirrored", when the date is a fork's or a mirror's arrival), rating, and
+  sticky ("1", sticky pages only: the pin; search doesn't sort on it — sticky.html), for result cards.
 
   Every `data-pagefind-body` template must include this, or the page drops out
   of sorted and filtered results. See docs/wiki/traps.md.
@@ -30,12 +31,15 @@
 {{ with $d.arrived }}{{ $meta = $meta | append "arrived[data-arrived]" }}{{ end }}
 {{ with $d.updated }}{{ $meta = $meta | append "updated_label[data-updated-label]" }}{{ end }}
 {{ with $rating }}{{ $meta = $meta | append "rating[data-rating]" }}{{ end }}
+{{ $sticky := partial "sticky.html" . }}
+{{ if $sticky }}{{ $meta = $meta | append "sticky[data-sticky]" }}{{ end }}
 <span hidden data-pagefind-sort="created[data-created], updated[data-updated], title[data-title], rating[data-rating-sort], source-rating[data-source-rating-sort]"
   data-pagefind-filter="year[data-year], month[data-month], rating[data-rating], source[data-source], source-rating[data-source-rating], copy[data-copy]"
   {{- with $meta }} data-pagefind-meta="{{ delimit . ", " }}"{{ end }}
   {{- with $d.created }} data-created-label="{{ . }}"{{ end }}
   {{- with $d.updated }} data-updated-label="{{ . }}"{{ end }}
   {{- with $d.arrived }} data-arrived="{{ . }}"{{ end }}
+  {{- if $sticky }} data-sticky="1"{{ end }}
   data-created="{{ .Date.Unix }}" data-updated="{{ .Lastmod.Unix }}" data-title="{{ lower .Title }}"
   data-year="{{ .Date.Format "2006" }}" data-month="{{ .Date.Format "2006-01" }}"
   data-rating-sort="{{ $rating | default 2.5 }}" data-rating="{{ $rating | default "unrated" }}" data-source="{{ $source }}" data-source-rating="{{ $sourceRating }}" data-source-rating-sort="{{ $sourceRatingSort }}" data-copy="{{ $copy }}"></span>

@@ -50,3 +50,23 @@ test("a fork's arrival date reads \"forked\"", async () => {
   assert.ok(!dateHTML(it).includes("forked"));
   assert.ok(dateHTML({ ...it, arrived: "forked" }).startsWith('<span class="muted">forked</span> <time'));
 });
+
+test("a sticky card: pinned, its sticky chip left off; others keep the tag", async () => {
+  const { card } = await import("../../assets/js/cards.js");
+  globalThis.document = {
+    documentElement: { dataset: {} },
+    createElement: () => ({ querySelectorAll: () => [], innerHTML: "", className: "" }),
+  };
+  try {
+    const pinned = card({ url: "/r/", title: "R", tags: ["Sticky", "notes"], sticky: true }, { stickyTag: "sticky" });
+    assert.match(pinned.innerHTML, /page-card-pin/);
+    assert.doesNotMatch(pinned.innerHTML, /#Sticky/);
+    assert.match(pinned.innerHTML, /#notes/);
+    assert.equal(pinned.className, "page-card sticky");
+    const plain = card({ url: "/p/", title: "P", tags: ["sticky"] }, { stickyTag: "sticky" });   // not marked sticky: tag stays
+    assert.doesNotMatch(plain.innerHTML, /page-card-pin/);
+    assert.match(plain.innerHTML, /#sticky/);
+  } finally {
+    delete globalThis.document;
+  }
+});

@@ -421,8 +421,11 @@
   "created": "2025-01-01T12:00:00Z",
   "createdLabel": "1 Jan 2025",
   "section": "",
-  "summary": "What publictxt-pages doesn’t do yet — a root-level page outside any section. SPEC.md has the full list.\nNext [[wikilink]] conversion at sync — Other Software writes them …",
-  "tags": [],
+  "sticky": true,
+  "summary": "What publictxt-pages doesn’t do yet — a root-level page outside any section. SPEC.md has the full list.\nPinned to the top of lists: #sticky\nNext [[wikilink]] conversion at …",
+  "tags": [
+   "sticky"
+  ],
   "title": "Roadmap",
   "updated": "2025-03-01T12:00:00Z",
   "updatedLabel": "1 Mar 2025",
